@@ -1,0 +1,22 @@
+{
+  "name": "code-push",
+  "version": "0.0.1",
+  "description": "Source code for the Code Push service SDK",
+  "main": "script/index.js",
+  "scripts": {
+    "test": "gulp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Microsoft/hybrid-mobile-deploy/"
+  },
+  "author": "Microsoft",
+  "dependencies": {
+    "base-64": "^0.1.0",
+    "fs": "0.0.2",
+    "node-uuid": "^1.4.3",
+    "q": "^1.4.1",
+    "superagent": "~1.2.0",
+    "try-json": "^1.0.0"
+  }
+}
