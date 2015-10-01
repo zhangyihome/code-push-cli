@@ -205,16 +205,17 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         isValidCommandCategory = true;
         isValidCommand = true;
     })
-    .command("register", "Register a new account with a specific code push server", (yargs: yargs.Argv) => {
-        isValidCommandCategory = true;
-        isValidCommand = true;
-        yargs.usage(USAGE_PREFIX + " register [serverUrl]")
-            .demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
-            .example("register", "Creates a new user account with " + CODE_PUSH_URL)
-            .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
+    // Disabling this for closed beta
+    //.command("register", "Register a new account with a specific code push server", (yargs: yargs.Argv) => {
+        //isValidCommandCategory = true;
+        //isValidCommand = true;
+        //yargs.usage(USAGE_PREFIX + " register [serverUrl]")
+            //.demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
+            //.example("register", "Creates a new user account with " + CODE_PUSH_URL)
+            //.check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
-        addCommonConfiguration(yargs);
-    })
+        //addCommonConfiguration(yargs);
+    //})
     .wrap(yargs.terminalWidth())
     .strict()  // Validate hyphenated (named) arguments.
     .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommandCategory)  // Report unrecognized, non-hyphenated command category.
