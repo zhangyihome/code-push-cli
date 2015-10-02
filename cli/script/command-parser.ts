@@ -3,7 +3,7 @@ import * as cli from "../definitions/cli";
 import * as semver from "semver";
 
 const USAGE_PREFIX = "Usage:  code-push";
-const CODE_PUSH_URL = "http://codepush.azurewebsites.net";
+const CODE_PUSH_URL = "https://codepush.azurewebsites.net";
 
 // Command categories are:  access-key, app, deploy, deployment, deployment-key, login, logout, register
 var isValidCommandCategory = false;
