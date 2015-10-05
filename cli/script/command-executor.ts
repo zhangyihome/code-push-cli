@@ -185,6 +185,7 @@ function deploy(command: cli.IDeployCommand): Promise<void> {
                                     return;
                                 }
 
+                                var baseDirectoryPath = path.dirname(directoryPath);
                                 var fileName: string = generateRandomFilename(15) + ".zip";
                                 var zipFile = new yazl.ZipFile();
                                 var writeStream: fs.WriteStream = fs.createWriteStream(fileName);
@@ -201,7 +202,7 @@ function deploy(command: cli.IDeployCommand): Promise<void> {
 
                                 for (var i = 0; i < files.length; ++i) {
                                     var file: string = files[i];
-                                    var relativePath: string = path.relative(directoryPath, file);
+                                    var relativePath: string = path.relative(baseDirectoryPath, file);
 
                                     // yazl does not like backslash (\) in the metadata path.
                                     relativePath = slash(relativePath);
