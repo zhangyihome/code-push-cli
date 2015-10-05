@@ -184,7 +184,7 @@ function deploy(command: cli.IDeployCommand): Promise<void> {
                                     reject(error);
                                     return;
                                 }
-                                
+
                                 var baseDirectoryPath = path.dirname(directoryPath);
                                 var fileName: string = generateRandomFilename(15) + ".zip";
                                 var zipFile = new yazl.ZipFile();
