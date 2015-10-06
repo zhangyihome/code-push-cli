@@ -688,7 +688,7 @@ function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
 
     fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
 
-    log("Login token persisted to file '" + configFilePath + "'. Logout to remove the file.");
+    log("Login token persisted to file '" + configFilePath + "'. Run 'code-push logout' to remove the file.");
 }
 
 function throwForInvalidAccessKeyId(accessKeyId: string, accessKeyName: string): void {
