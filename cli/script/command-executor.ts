@@ -200,6 +200,16 @@ function deploy(command: cli.IDeployCommand): Promise<void> {
                                         resolve({ isTemporary: true, path: filePath });
                                     });
 
+                                for (var i = 0; i < directories.length; ++i) {
+                                    var directory: string = directories[i];
+                                    var relativePath: string = path.relative(baseDirectoryPath, directory);
+
+                                    // yazl does not like backslash (\) in the metadata path.
+                                    relativePath = slash(relativePath);
+                                    
+                                    zipFile.addEmptyDirectory(relativePath);
+                                }
+
                                 for (var i = 0; i < files.length; ++i) {
                                     var file: string = files[i];
                                     var relativePath: string = path.relative(baseDirectoryPath, file);
