@@ -158,7 +158,7 @@ function deleteConnectionInfoCache(): void {
     try {
         fs.unlinkSync(configFilePath);
 
-        log("Deleted configuration file at " + configFilePath + ".");
+        log("Deleted configuration file at '" + configFilePath + "'.");
     } catch (ex) {
     }
 }
@@ -698,7 +698,7 @@ function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
 
     fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
 
-    log("Wrote configuration file to " + configFilePath + ".");
+    log("Login token persisted to file '" + configFilePath + "'. Run 'code-push logout' to remove the file.");
 }
 
 function throwForInvalidAccessKeyId(accessKeyId: string, accessKeyName: string): void {
