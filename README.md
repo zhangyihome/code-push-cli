@@ -11,7 +11,7 @@ Dev Setup
 
 ### Building
 
-* Run `npm install` from the root.
+* Run `npm install` from the root of the repository.
 * Run `gulp install` to install the NPM dependencies of each module within the project.
 * Run `gulp link` to link CLI and SDK for local development. It is advisable to do this step if you are making changes to the SDK and want the CLI to pick those changes.
 * Run `gulp build` to build all of the modules. To build just one of the modules (e.g. cli or sdk), run `gulp build-cli` or `gulp build-sdk`.
