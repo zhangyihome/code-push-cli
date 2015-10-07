@@ -6,7 +6,6 @@ Dev Setup
 
 * Install [Node.js](https://nodejs.org/)
 * Install [Git](http://www.git-scm.com/)
-* Install [Python 2.7](https://www.python.org/downloads/) (needed to build some Node modules)
 * Install Gulp: `npm install -g gulp`
 * Clone the Repository: `git clone https://github.com/Microsoft/code-push.git`
 
