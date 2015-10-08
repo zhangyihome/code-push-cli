@@ -91,3 +91,22 @@ Usage
 ```
 
 ###Steps to publish updates to your apps
+* Once you have configured apps with your code push service server url and deployment key use the following steps to publish updates to your cordova/react native apps.
+* Make sure you deploy the updates to the correct deployment for which you configured your apps.
+* Use the deploy command to upload your updates to the code push service
+```
+    code-push deploy <appName> <package> <minAppVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory <true|false>]
+    
+    Options:
+      --deploymentName, -d  The deployment to publish the update to                           [string] [default: "Staging"]
+      --description, --des  The description of changes made to the app with this update       [string] [default: null]
+      --mandatory, -m       Whether this update should be considered mandatory to the client  [boolean] [default: false]
+    
+    Examples:
+      deploy MyApp app.js 1.0.3                Upload app.js to the default deployment for app "MyApp" with the minimum
+                                               required semver compliant app version of 1.0.3
+      deploy MyApp app.js 1.0.3 -d Production  Upload app.js to the "Production" deployment for app "MyApp" with the minimum
+                                               required semver compliant app version of 1.0.3
+```
+* You can provide either a single file(for react native) or a folder path(for cordova) as your package. The service will upload the file or zip & upload the folder containing the assets for your app to the storage and serve the updates to your mobile apps.
+* Also make sure the minAppVersion is [Semver](http://semver.org/) compliant. You should use successively increasing app versions(major, minor or patch) for every time you upload a package to the same deployment for distributing updates with the code push service.
