@@ -5,7 +5,7 @@ Dev Setup
 ---
 
 * Install [Node.js](https://nodejs.org/)
-* Install Gulp: `npm install -g code-push`
+* Install Code Push CLI: `npm install -g code-push`
 
 Usage
 ---
