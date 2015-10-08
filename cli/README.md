@@ -1,4 +1,4 @@
-Code Push Command Line Interface(CLI)
+Code Push Command Line Interface (CLI)
 ===
 
 Dev Setup
