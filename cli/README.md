@@ -109,4 +109,4 @@ Usage
                                                required semver compliant app version of 1.0.3
 ```
 * You can provide either a single file(for react native) or a folder path(for cordova) as your package. The service will upload the file or zip & upload the folder containing the assets for your app to the storage and serve the updates to your mobile apps.
-* Also make sure the minAppVersion is [Semver](http://semver.org/) compliant. You should use successively increasing app versions(major, minor or patch) for every time you upload a package to the same deployment for distributing updates with the code push service.
+* Also make sure the minAppVersion is [Semver](http://semver.org/) compliant.
