@@ -280,27 +280,6 @@ describe("CLI", () => {
             });
     });
 
-    it("deploymentKeyList lists deployment key names and ID's", (done: MochaDone): void => {
-        var command: cli.IDeploymentKeyListCommand = {
-            type: cli.CommandType.deploymentKeyList,
-            appName: "a",
-            deploymentName: "Production",
-            format: "json"
-        };
-
-        cmdexec.execute(command)
-            .done((): void => {
-                sinon.assert.calledOnce(log);
-                assert.equal(log.args[0].length, 1);
-
-                var actual: string = log.args[0][0];
-                var expected = "[{\"name\":\"Primary\",\"id\":\"5\",\"key\":\"6\"}]";
-
-                assert.equal(actual, expected);
-                done();
-            });
-    });
-
     it("deploymentList lists deployment names and ID's", (done: MochaDone): void => {
         var command: cli.IDeploymentListCommand = {
             type: cli.CommandType.deploymentList,

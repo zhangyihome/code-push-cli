@@ -65,17 +65,6 @@ function appRemove(commandName: string, yargs: yargs.Argv): void {
     addCommonConfiguration(yargs);
 }
 
-function deploymentKeyList(commandName: string, yargs: yargs.Argv): void {
-    isValidCommand = true;
-    yargs.usage(USAGE_PREFIX + " deployment-key " + commandName + " <appName> <deploymentName> [--format <format>]")
-        .demand(/*count*/ 4, /*max*/ 4)  // Require exactly three non-option arguments.
-        .example("deployment-key " + commandName + " MyApp MyDeployment", "Lists deployment keys for deployment \"MyDeployment\" in app \"MyApp\" in tabular format")
-        .example("deployment-key " + commandName + " MyApp MyDeployment --format json", "Lists deployment keys for deployment \"MyDeployment\" in app \"MyApp\" in JSON format")
-        .option("format", { default: "table", demand: false, description: "The output format (\"json\" or \"table\")", type: "string" });
-
-    addCommonConfiguration(yargs);
-}
-
 function deploymentList(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
     yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> [--format <format>] [--verbose <true|false>]")
@@ -177,16 +166,6 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
                 addCommonConfiguration(yargs);
             })
             .command("rm", "Remove a deployment from an app", (yargs: yargs.Argv) => deploymentRemove("rm", yargs))
-            .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
-
-        addCommonConfiguration(yargs);
-    })
-    .command("deployment-key", "Deployment key commands", (yargs: yargs.Argv) => {
-        isValidCommandCategory = true;
-        yargs.usage(USAGE_PREFIX + " deployment-key <command>")
-            .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
-            .command("list", "List the deployment keys associated with a deployment", (yargs: yargs.Argv) => deploymentKeyList("list", yargs))
-            .command("ls", "List the deployment keys associated with a deployment", (yargs: yargs.Argv) => deploymentKeyList("ls", yargs))
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
         addCommonConfiguration(yargs);
@@ -355,23 +334,6 @@ function createCommand(): cli.ICommand {
                             deploymentRenameCommand.appName = arg2;
                             deploymentRenameCommand.currentDeploymentName = arg3;
                             deploymentRenameCommand.newDeploymentName = arg4;
-                        }
-                        break;
-                }
-                break;
-
-            case "deployment-key":
-                switch (arg1) {
-                    case "list":
-                    case "ls":
-                        if (arg2 && arg3) {
-                            cmd = { type: cli.CommandType.deploymentKeyList };
-
-                            var deploymentKeyListCommand = <cli.IDeploymentKeyListCommand>cmd;
-
-                            deploymentKeyListCommand.appName = arg2;
-                            deploymentKeyListCommand.deploymentName = arg3;
-                            deploymentKeyListCommand.format = argv["format"];
                         }
                         break;
                 }
