@@ -61,5 +61,6 @@ declare module "rest-definitions" {
         blobUrl: string;
         diffBlobUrl?: string;
         diffAgainstPackageHash?: string;
+        uploadTime: number;
     }
 }

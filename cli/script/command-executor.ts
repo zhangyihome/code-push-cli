@@ -107,14 +107,14 @@ function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
 
 function appAdd(command: cli.IAppAddCommand): Promise<void> {
     return sdk.addApp(command.appName, /*description*/ null)
-        .then((app: App): void => {
+        .then((app: App): Promise<void> => {
             log("Added app \"" + command.appName + "\" with ID " + app.id + ".\nCreated two default deployments:");
             var deploymentListCommand: cli.IDeploymentListCommand = {
                 type: cli.CommandType.deploymentList,
                 appName: app.name,
                 format: "table"
             };
-            deploymentList(deploymentListCommand);
+            return deploymentList(deploymentListCommand);
         });
 }
 
@@ -260,7 +260,7 @@ function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
         })
 }
 
-function deploymentList(command: cli.IDeploymentListCommand): Promise<void> {
+export var deploymentList = (command: cli.IDeploymentListCommand): Promise<void> => {
     throwForInvalidOutputFormat(command.format);
     var theAppId: string;
 
@@ -271,7 +271,7 @@ function deploymentList(command: cli.IDeploymentListCommand): Promise<void> {
 
             return sdk.getDeployments(appId);
         })
-        .then((deployments: Deployment[]): void => {
+        .then((deployments: Deployment[]): Promise<void> => {
             var deploymentKeyList: Array<string> = [];
             var deploymentKeyPromises: Array<Promise<void>> = [];
             deployments.forEach((deployment: Deployment, index: number) => {
@@ -279,7 +279,7 @@ function deploymentList(command: cli.IDeploymentListCommand): Promise<void> {
                     deploymentKeyList[index] = deploymentKeys[0].key;
                 }));
             });
-            Q.all(deploymentKeyPromises).then(() => {
+            return Q.all(deploymentKeyPromises).then(() => {
                 printDeploymentList(command, deployments, deploymentKeyList);
             });
         });
@@ -555,7 +555,8 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
                     strippedDeployment["package"] = {
                         "appVersion": deployment.package.appVersion,
                         "isMandatory": deployment.package.isMandatory,
-                        "packageHash": deployment.package.packageHash
+                        "packageHash": deployment.package.packageHash,
+                        "uploadTime": new Date(+deployment.package.uploadTime)
                     };
                     if (deployment.package.description) strippedDeployment["package"]["description"] = deployment.package.description;
                 }
@@ -577,9 +578,10 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
                             (deployment.package.description ? wordwrap(30)("Description: " + deployment.package.description) + "\n" : "") +
                             "Version: " + deployment.package.appVersion + "\n" +
                             "Mandatory: " + (deployment.package.isMandatory ? "Yes" : "No") + "\n" +
-                            "Hash: " + deployment.package.packageHash;
+                            "Hash: " + deployment.package.packageHash + "\n" + 
+                            "Uploaded On: " + new Date(+deployment.package.uploadTime);
                         }
-                        row.push( deployment.description ? wordwrap(30)(deployment.description) : "", packageString);
+                        row.push(deployment.description ? wordwrap(30)(deployment.description) : "", packageString);
                     }
                     dataSource.push(row);
                 });
