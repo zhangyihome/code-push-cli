@@ -550,7 +550,6 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
         deployments.forEach((deployment: Deployment, index: number) => {
             var strippedDeployment: any = { "name": deployment.name, "deploymentKey": deploymentKeys[index] };
             if (command.verbose) {
-                if (deployment.description) strippedDeployment["description"] = deployment.description;
                 if (deployment.package) {
                     strippedDeployment["package"] = {
                         "appVersion": deployment.package.appVersion,

@@ -310,7 +310,7 @@ describe("CLI", () => {
             });
     });
 
-    it("deploymentList -v lists deployment names, ID's, descriptions and package information", (done: MochaDone): void => {
+    it("deploymentList -v lists deployment names, deployment keys, and package information", (done: MochaDone): void => {
         var command: cli.IDeploymentListCommand = {
             type: cli.CommandType.deploymentList,
             appName: "a",
@@ -324,7 +324,7 @@ describe("CLI", () => {
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = "[{\"name\":\"Production\",\"deploymentKey\":\"6\"},{\"name\":\"Staging\",\"deploymentKey\":\"6\",\"description\":\"cde\",\"package\":{\"appVersion\":\"1.0.0\",\"isMandatory\":true,\"packageHash\":\"jkl\",\"uploadTime\":" + JSON.stringify(new Date(1000)) + ",\"description\":\"fgh\"}}]";
+                var expected = "[{\"name\":\"Production\",\"deploymentKey\":\"6\"},{\"name\":\"Staging\",\"deploymentKey\":\"6\",\"package\":{\"appVersion\":\"1.0.0\",\"isMandatory\":true,\"packageHash\":\"jkl\",\"uploadTime\":" + JSON.stringify(new Date(1000)) + ",\"description\":\"fgh\"}}]";
 
                 assert.equal(actual, expected);
                 done();
