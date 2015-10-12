@@ -108,7 +108,7 @@ function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
 function appAdd(command: cli.IAppAddCommand): Promise<void> {
     return sdk.addApp(command.appName, /*description*/ null)
         .then((app: App): Promise<void> => {
-            log("Added app \"" + command.appName + "\" with ID " + app.id + ".\nCreated two default deployments:");
+            log("Successfully added app \"" + command.appName + "\".\nCreated two default deployments:");
             var deploymentListCommand: cli.IDeploymentListCommand = {
                 type: cli.CommandType.deploymentList,
                 appName: app.name,
@@ -566,7 +566,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
         log(JSON.stringify(dataSource));
     } else if (command.format === "table") {
         var headers = ["Name", "Deployment Key"];
-        if (command.verbose) headers.push("Deployment Description", "Package Metadata");
+        if (command.verbose) headers.push("Package Metadata");
         printTable(headers,
             (dataSource: any[]): void => {
                 deployments.forEach((deployment: Deployment, index: number): void => {
@@ -576,17 +576,16 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
                         if (deployment.package) {
                             packageString =
                             (deployment.package.description ? wordwrap(30)("Description: " + deployment.package.description) + "\n" : "") +
-                            "Version: " + deployment.package.appVersion + "\n" +
+                            "Minimum App Store Version: " + deployment.package.appVersion + "\n" +
                             "Mandatory: " + (deployment.package.isMandatory ? "Yes" : "No") + "\n" +
                             "Hash: " + deployment.package.packageHash + "\n" + 
                             "Uploaded On: " + new Date(+deployment.package.uploadTime);
                         }
-                        row.push(deployment.description ? wordwrap(30)(deployment.description) : "", packageString);
+                        row.push(packageString);
                     }
                     dataSource.push(row);
                 });
-            },
-            command.verbose
+            }
         );
     }
 }
@@ -609,26 +608,11 @@ function printList<T extends { id: string; name: string; }>(format: string, item
     }
 }
 
-function printTable(columnNames: string[], readData: (dataSource: any[]) => void, separateRows?: boolean): void {
-    var table: any;
-
-    if (separateRows) {
-        table = new Table({
-            head: columnNames,
-            style: { head: ["cyan"] }
-        });
-    } else {
-        table = new Table({
-            chars: {
-                "mid": "",
-                "left-mid": "",
-                "mid-mid": "",
-                "right-mid": ""
-            },
-            head: columnNames,
-            style: { head: ["cyan"] }
-        });
-    }
+function printTable(columnNames: string[], readData: (dataSource: any[]) => void): void {
+    var table = new Table({
+        head: columnNames,
+        style: { head: ["cyan"] }
+    });
 
     readData(table);
 

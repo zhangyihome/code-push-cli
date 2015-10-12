@@ -188,7 +188,7 @@ describe("CLI", () => {
             .done((): void => {
                 sinon.assert.calledOnce(addApp);
                 sinon.assert.calledTwice(log);
-                sinon.assert.calledWithExactly(log, "Added app \"a\" with ID appId.\nCreated two default deployments:");
+                sinon.assert.calledWithExactly(log, "Successfully added app \"a\".\nCreated two default deployments:");
                 sinon.assert.calledOnce(deploymentList);
                 sinon.assert.calledWithExactly(deploymentList, deploymentListCommand);
                 done();

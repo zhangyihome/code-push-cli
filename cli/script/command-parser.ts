@@ -87,7 +87,7 @@ function deploymentRemove(commandName: string, yargs: yargs.Argv): void {
 
 var argv = yargs.usage(USAGE_PREFIX + " <command>")
     .demand(/*count*/ 1, /*max*/ 1)  // Require exactly one non-option argument.
-    .command("access-key", "Access key commands", (yargs: yargs.Argv) => {
+    .command("access-key", "View and delete active user sessions", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         yargs.usage(USAGE_PREFIX + " access-key <command>")
             .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
@@ -99,7 +99,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
         addCommonConfiguration(yargs);
     })
-    .command("app", "Application commands", (yargs: yargs.Argv) => {
+    .command("app", "View and manage your CodePush-enabled apps", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         yargs.usage(USAGE_PREFIX + " app <command>")
             .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
@@ -142,7 +142,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
         addCommonConfiguration(yargs);
     })
-    .command("deployment", "Deployment commands", (yargs: yargs.Argv) => {
+    .command("deployment", "View and manage the deployments for your apps", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         yargs.usage(USAGE_PREFIX + " deployment <command>")
             .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
@@ -170,7 +170,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
         addCommonConfiguration(yargs);
     })
-    .command("login", "Authenticate this session with a specific code push server and registered account", (yargs: yargs.Argv) => {
+    .command("login", "Authenticate with the CodePush server in order to begin managing your apps", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         isValidCommand = true;
         yargs.usage(USAGE_PREFIX + " login [serverUrl]")
