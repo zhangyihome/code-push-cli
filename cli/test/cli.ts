@@ -63,7 +63,8 @@ export class SdkStub {
                 packageHash: "jkl",
                 isMandatory: true,
                 size: 10,
-                blobUrl: "http://mno.pqr"
+                blobUrl: "http://mno.pqr",
+                uploadTime: +1000
             }
         }]);
     }
@@ -173,14 +174,23 @@ describe("CLI", () => {
             type: cli.CommandType.appAdd,
             appName: "a"
         };
+        
+        var deploymentListCommand: cli.IDeploymentListCommand = {
+            type: cli.CommandType.deploymentList,
+            appName: "a",
+            format: "table"
+        };
 
         var addApp: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "addApp");
+        var deploymentList: Sinon.SinonSpy = sandbox.spy(cmdexec, "deploymentList");
 
         cmdexec.execute(command)
             .done((): void => {
                 sinon.assert.calledOnce(addApp);
-                sinon.assert.calledOnce(log);
-                sinon.assert.calledWithExactly(log, "Added app \"a\" with ID appId.");
+                sinon.assert.calledTwice(log);
+                sinon.assert.calledWithExactly(log, "Successfully added app \"a\".\nCreated two default deployments:");
+                sinon.assert.calledOnce(deploymentList);
+                sinon.assert.calledWithExactly(deploymentList, deploymentListCommand);
                 done();
             });
     });
@@ -280,28 +290,7 @@ describe("CLI", () => {
             });
     });
 
-    it("deploymentKeyList lists deployment key names and ID's", (done: MochaDone): void => {
-        var command: cli.IDeploymentKeyListCommand = {
-            type: cli.CommandType.deploymentKeyList,
-            appName: "a",
-            deploymentName: "Production",
-            format: "json"
-        };
-
-        cmdexec.execute(command)
-            .done((): void => {
-                sinon.assert.calledOnce(log);
-                assert.equal(log.args[0].length, 1);
-
-                var actual: string = log.args[0][0];
-                var expected = "[{\"name\":\"Primary\",\"id\":\"5\",\"key\":\"6\"}]";
-
-                assert.equal(actual, expected);
-                done();
-            });
-    });
-
-    it("deploymentList lists deployment names and ID's", (done: MochaDone): void => {
+    it("deploymentList lists deployment names and deployment keys", (done: MochaDone): void => {
         var command: cli.IDeploymentListCommand = {
             type: cli.CommandType.deploymentList,
             appName: "a",
@@ -314,14 +303,14 @@ describe("CLI", () => {
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = "[{\"name\":\"Production\",\"id\":\"3\"},{\"name\":\"Staging\",\"id\":\"4\"}]";
+                var expected = "[{\"name\":\"Production\",\"deploymentKey\":\"6\"},{\"name\":\"Staging\",\"deploymentKey\":\"6\"}]";
 
                 assert.equal(actual, expected);
                 done();
             });
     });
 
-    it("deploymentList -v lists deployment names, ID's, descriptions and package information", (done: MochaDone): void => {
+    it("deploymentList -v lists deployment names, deployment keys, and package information", (done: MochaDone): void => {
         var command: cli.IDeploymentListCommand = {
             type: cli.CommandType.deploymentList,
             appName: "a",
@@ -335,7 +324,7 @@ describe("CLI", () => {
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = "[{\"name\":\"Production\",\"id\":\"3\"},{\"name\":\"Staging\",\"id\":\"4\",\"description\":\"cde\",\"package\":{\"appVersion\":\"1.0.0\",\"isMandatory\":true,\"packageHash\":\"jkl\",\"description\":\"fgh\"}}]";
+                var expected = "[{\"name\":\"Production\",\"deploymentKey\":\"6\"},{\"name\":\"Staging\",\"deploymentKey\":\"6\",\"package\":{\"appVersion\":\"1.0.0\",\"isMandatory\":true,\"packageHash\":\"jkl\",\"uploadTime\":" + JSON.stringify(new Date(1000)) + ",\"description\":\"fgh\"}}]";
 
                 assert.equal(actual, expected);
                 done();
