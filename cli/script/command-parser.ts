@@ -185,7 +185,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         isValidCommand = true;
     })
     // Disabling this for closed beta
-    //.command("register", "Register a new account with a specific code push server", (yargs: yargs.Argv) => {
+    //.command("register", "Register a new account with a specific CodePush server", (yargs: yargs.Argv) => {
         //isValidCommandCategory = true;
         //isValidCommand = true;
         //yargs.usage(USAGE_PREFIX + " register [serverUrl]")

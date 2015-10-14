@@ -1,7 +1,7 @@
 {
   "name": "code-push",
   "version": "0.0.1",
-  "description": "Source code for the Code Push service SDK",
+  "description": "Source code for the CodePush service SDK",
   "main": "script/index.js",
   "scripts": {
     "test": "gulp"
