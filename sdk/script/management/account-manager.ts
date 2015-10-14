@@ -74,7 +74,7 @@ export class AccountManager {
                 .send({ token: loginInfo.accessKeyName })
                 .end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -104,7 +104,7 @@ export class AccountManager {
 
             req.end((err: any, res: request.Response) => {
                     if (err && err.status !== 401) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -132,7 +132,7 @@ export class AccountManager {
 
             req.end((err: any, res: request.Response) => {
                     if (err && err.status !== 401) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -162,7 +162,7 @@ export class AccountManager {
                 .send(JSON.stringify(accessKey))
                 .end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -195,7 +195,7 @@ export class AccountManager {
 
             req.end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -226,7 +226,7 @@ export class AccountManager {
 
             req.end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -257,7 +257,7 @@ export class AccountManager {
 
             req.end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -285,7 +285,7 @@ export class AccountManager {
 
             req.end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -320,7 +320,7 @@ export class AccountManager {
                 .send(JSON.stringify(accountInfoToChange))
                 .end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -348,7 +348,7 @@ export class AccountManager {
 
             req.end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -379,7 +379,7 @@ export class AccountManager {
 
             req.end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -413,7 +413,7 @@ export class AccountManager {
                 .send(JSON.stringify(app))
                 .end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -447,7 +447,7 @@ export class AccountManager {
 
             req.end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -475,7 +475,7 @@ export class AccountManager {
                 .send(JSON.stringify(infoToChange))
                 .end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -506,7 +506,7 @@ export class AccountManager {
                 .send(JSON.stringify(deployment))
                 .end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -538,7 +538,7 @@ export class AccountManager {
 
             req.end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -568,7 +568,7 @@ export class AccountManager {
 
             req.end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -600,7 +600,7 @@ export class AccountManager {
                 .send(JSON.stringify(infoToChange))
                 .end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -627,7 +627,7 @@ export class AccountManager {
 
             req.end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -657,7 +657,7 @@ export class AccountManager {
                 .send(JSON.stringify(deploymentKey))
                 .end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -689,7 +689,7 @@ export class AccountManager {
 
             req.end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -719,7 +719,7 @@ export class AccountManager {
 
             req.end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -751,7 +751,7 @@ export class AccountManager {
                 .send(JSON.stringify(infoToChange))
                 .end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -778,7 +778,7 @@ export class AccountManager {
 
             req.end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -814,7 +814,7 @@ export class AccountManager {
                 .field("packageInfo", JSON.stringify(packageInfo))
                 .end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -840,7 +840,7 @@ export class AccountManager {
 
             req.end((err: any, res: request.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: err.message });
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                         return;
                     }
 
@@ -866,6 +866,10 @@ export class AccountManager {
         var decoded: string = base64.decode(accessKey);
 
         return tryJSON(decoded);
+    }
+
+    private getErrorMessage(error: Error, response: request.Response): string {
+        return response && response.text ? response.text : error.message;
     }
 
     private generatePackageInfo(description: string, label: string, appVersion: string, isMandatory: boolean): PackageToUpload {
