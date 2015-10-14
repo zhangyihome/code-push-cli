@@ -15,7 +15,7 @@
   },
   "author": "Microsoft",
   "dependencies": {
-    "code-push": "^1.0.0-beta",
+    "code-push": "1.0.0-beta",
     "base-64": "^0.1.0",
     "chalk": "^1.1.0",
     "cli-table": "^0.3.1",
