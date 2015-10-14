@@ -1,17 +1,17 @@
-Code Push Command Line Interface (CLI)
+CodePush Command Line Interface (CLI)
 ===
 
 Dev Setup
 ---
 
 * Install [Node.js](https://nodejs.org/)
-* Install Code Push CLI: `npm install -g code-push`
+* Install CodePush CLI: `npm install -g code-push`
 
 Usage
 ---
 
-* Get access to the code push webservice[TODO: Add link to code push service beta signup].
-* Once you have access to the code push webservice use the following commands to create and publish updates to your app.
+* Get access to the CodePush webservice[TODO: Add link to CodePush service beta signup].
+* Once you have access to the CodePush webservice use the following commands to create and publish updates to your app.
 ```
       code-push <command>
       
@@ -21,14 +21,14 @@ Usage
         deploy          Upload a new app version to a specific deployment
         deployment      Deployment commands
         deployment-key  Deployment key commands
-        login           Authenticate this session with a specific code push server and registered account
+        login           Authenticate this session with a specific CodePush server and registered account
         logout          Log out of the current session`
 ```
 
-###Steps to create an app with code push service using code push CLI.
+###Steps to create an app with CodePush service using the CodePush CLI.
 
 ####Login
-* Login using your registered Github or Microsoft account with the code push service.
+* Login using your registered Github or Microsoft account with the CodePush service.
 * Run the following command and select the authentication provider with which to login to the service.
 ```
       code-push login [serverUrl]
@@ -40,7 +40,7 @@ Usage
 * Create an app for the service. Use the following commands to add/remove/view the apps.
 ```
       code-push app add MyApp
-        This will create an app named 'MyApp' in code push service
+        This will create an app named 'MyApp' in CodePush service
         
       code-push app --help
       Commands:
@@ -72,7 +72,7 @@ Usage
 ```
 
 ####Get deployment key
-* Every deployment has a primary deployment-key. You need this key to be used in your Cordova/React-Native Android/iOS apps to pull updates from the code push service.
+* Every deployment has a primary deployment-key. You need this key to be used in your Cordova/React-Native Android/iOS apps to pull updates from the CodePush service.
 * Make sure you get the correct deployment-key for the deployment to which you would be pushing your app updates.
 ```
         code-push deployment-key list MyApp iOSDeployment
@@ -91,9 +91,9 @@ Usage
 ```
 
 ###Steps to publish updates to your apps
-* Once you have configured apps with your code push service server url and deployment key use the following steps to publish updates to your cordova/react native apps.
+* Once you have configured apps with your CodePush service server url and deployment key use the following steps to publish updates to your cordova/react native apps.
 * Make sure you deploy the updates to the correct deployment for which you configured your apps.
-* Use the deploy command to upload your updates to the code push service
+* Use the deploy command to upload your updates to the CodePush service
 ```
     code-push deploy <appName> <package> <minAppVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory <true|false>]
     
