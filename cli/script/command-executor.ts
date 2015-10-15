@@ -605,7 +605,7 @@ function printAccessKeys<T extends { id: string; name: string; description: stri
 
         log(JSON.stringify(dataSource));
     } else if (format === "table") {
-        printTable(["Name", "Description"], (dataSource: any[]): void => {
+        printTable(["Key", "Description"], (dataSource: any[]): void => {
             items.forEach((item: T): void => {
                 dataSource.push([item.name, item.description]);
             });
