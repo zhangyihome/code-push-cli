@@ -11,10 +11,19 @@ var isValidCommandCategory = false;
 var isValidCommand = false;
 var wasHelpShown = false;
 
-function showHelp(): void {
+function showHelp(showRootDescription?: boolean): void {
     if (!wasHelpShown) {
+        if (showRootDescription) {
+            console.log("  _____        __    ___           __ ");
+            console.log(" / ___/__  ___/ /__ / _ \\__ _____ / / ");
+            console.log("/ /__/ _ \\/ _  / -_) ___/ // (_-</ _ \\");
+            console.log("\\___/\\___/\\_,_/\\__/_/   \\_,_/___/_//_/    CLI v" + require("../package.json").version);
+            console.log("======================================");
+            console.log("");
+            console.log("CodePush is a service that allows you to publish app updates directly to your users' devices.\n");
+        }
+        
         yargs.showHelp();
-
         wasHelpShown = true;
     }
 }
@@ -40,7 +49,7 @@ function accessKeyRemove(commandName: string, yargs: yargs.Argv): void {
 }
 
 function addCommonConfiguration(yargs: yargs.Argv): void {
-    yargs.wrap(yargs.terminalWidth())
+    yargs.wrap(/*columnLimit*/ null)
         .strict()  // Validate hyphenated (named) arguments.
         .fail((msg: string) => showHelp());  // Suppress the default error message.
 }
@@ -131,7 +140,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " deploy <appName> <package> <minAppVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory <true|false>]")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
             .example("deploy MyApp app.js 1.0.3", "Upload app.js to the default deployment for app \"MyApp\" with the minimum required semver compliant app version of 1.0.3")
-            .example("deploy MyApp app.js 1.0.3 -d Production", "Upload app.js to the \"Production\" deployment for app \"MyApp\" with the minimum required semver compliant app version of 1.0.3")
+            .example("deploy MyApp www 1.0.3 -d Production", "Upload the \"www\" folder and all its contents to the \"Production\" deployment for app \"MyApp\" with the minimum required semver compliant app version of 1.0.3")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
@@ -195,10 +204,12 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
         //addCommonConfiguration(yargs);
     //})
-    .wrap(yargs.terminalWidth())
+    .alias("v", "version")
+    .version(require("../package.json").version)
+    .wrap(/*columnLimit*/ null)
     .strict()  // Validate hyphenated (named) arguments.
     .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommandCategory)  // Report unrecognized, non-hyphenated command category.
-    .fail((msg: string) => showHelp())  // Suppress the default error message.
+    .fail((msg: string) => showHelp(/*showRootDescription*/ true))  // Suppress the default error message.
     .argv;
 
 function createCommand(): cli.ICommand {

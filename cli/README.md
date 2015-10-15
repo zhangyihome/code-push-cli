@@ -105,8 +105,8 @@ Usage
     Examples:
       deploy MyApp app.js 1.0.3                Upload app.js to the default deployment for app "MyApp" with the minimum
                                                required semver compliant app version of 1.0.3
-      deploy MyApp app.js 1.0.3 -d Production  Upload app.js to the "Production" deployment for app "MyApp" with the minimum
-                                               required semver compliant app version of 1.0.3
+      deploy MyApp www 1.0.3 -d Production     Upload the "www" folder and all its contents to the "Production" deployment for 
+                                               app "MyApp" with the minimum required semver compliant app version of 1.0.3
 ```
 * You can provide either a single file(for react native) or a folder path(for cordova) as your package. The service will upload the file or zip & upload the folder containing the assets for your app to the storage and serve the updates to your mobile apps.
 * Also make sure the minAppVersion is [Semver](http://semver.org/) compliant.
