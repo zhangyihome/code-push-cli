@@ -20,7 +20,7 @@ function showHelp(showRootDescription?: boolean): void {
             console.log("\\___/\\___/\\_,_/\\__/_/   \\_,_/___/_//_/    CLI v" + require("../package.json").version);
             console.log("======================================");
             console.log("");
-            console.log("CodePush is a service that allows you to publish app updates directly to your users' devices.\n");
+            console.log("CodePush is a service that allows you to publish mobile app updates directly to your users' devices.\n");
         }
         
         yargs.showHelp();
@@ -140,7 +140,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " deploy <appName> <package> <minAppVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory <true|false>]")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
             .example("deploy MyApp app.js 1.0.3", "Upload app.js to the default deployment for app \"MyApp\" with the minimum required semver compliant app version of 1.0.3")
-            .example("deploy MyApp www 1.0.3 -d Production", "Upload the \"www\" folder and all its contents to the \"Production\" deployment for app \"MyApp\" with the minimum required semver compliant app version of 1.0.3")
+            .example("deploy MyApp ./platforms/ios/www 1.0.3 -d Production", "Upload the \"./platforms/ios/www\" folder and all its contents to the \"Production\" deployment for app \"MyApp\" with the minimum required semver compliant app version of 1.0.3")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
