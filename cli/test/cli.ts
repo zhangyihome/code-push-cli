@@ -280,12 +280,14 @@ describe("CLI", () => {
         };
 
         var addDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "addDeployment");
+        var getDeploymentKeys: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getDeploymentKeys");
 
         cmdexec.execute(command)
             .done((): void => {
                 sinon.assert.calledOnce(addDeployment);
+                sinon.assert.calledOnce(getDeploymentKeys);
                 sinon.assert.calledOnce(log);
-                sinon.assert.calledWithExactly(log, "Added deployment \"b\" with ID deploymentId to app \"a\".");
+                sinon.assert.calledWithExactly(log, "Added deployment \"b\" with key \"6\" to app \"a\".");
                 done();
             });
     });

@@ -242,9 +242,11 @@ function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
             throwForInvalidAppId(appId, command.appName);
 
             return sdk.addDeployment(appId, command.deploymentName, /*description*/ null)
-                .then((deployment: Deployment): void => {
-                    log("Added deployment \"" + command.deploymentName + "\" with ID " + deployment.id + " to app \"" + command.appName + "\".");
-                })
+                .then((deployment: Deployment): Promise<DeploymentKey[]> => {
+                    return sdk.getDeploymentKeys(appId, deployment.id);
+                }).then((deploymentKeys: DeploymentKey[]) => {
+                    log("Added deployment \"" + command.deploymentName + "\" with key \"" + deploymentKeys[0].key + "\" to app \"" + command.appName + "\".");
+                });
         })
 }
 
