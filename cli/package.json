@@ -1,7 +1,7 @@
 {
   "name": "code-push-cli",
-  "version": "0.0.1",
-  "description": "Source code for the Code Push command line interface",
+  "version": "1.0.2-beta",
+  "description": "Management CLI for the CodePush service",
   "main": "script/cli.js",
   "scripts": {
     "test": "gulp test"
@@ -15,6 +15,7 @@
   },
   "author": "Microsoft",
   "dependencies": {
+    "code-push": "1.0.0-beta",
     "base-64": "^0.1.0",
     "chalk": "^1.1.0",
     "cli-table": "^0.3.1",

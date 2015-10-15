@@ -1,14 +1,14 @@
 {
   "name": "code-push",
   "version": "1.0.0-beta",
-  "description": "Source code for the Code Push service SDK",
+  "description": "Source code for the CodePush service SDK",
   "main": "script/index.js",
   "scripts": {
     "test": "gulp"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Microsoft/hybrid-mobile-deploy/"
+    "url": "https://github.com/Microsoft/code-push.git"
   },
   "author": "Microsoft",
   "dependencies": {

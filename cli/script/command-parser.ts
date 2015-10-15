@@ -1,6 +1,7 @@
 ﻿import * as yargs from "yargs";
 import * as cli from "../definitions/cli";
 import * as semver from "semver";
+import * as chalk from "chalk";
 
 const USAGE_PREFIX = "Usage:  code-push";
 const CODE_PUSH_URL = "https://codepush.azurewebsites.net";
@@ -11,10 +12,19 @@ var isValidCommandCategory = false;
 var isValidCommand = false;
 var wasHelpShown = false;
 
-function showHelp(): void {
+function showHelp(showRootDescription?: boolean): void {
     if (!wasHelpShown) {
+        if (showRootDescription) {
+            console.log(chalk.cyan("  _____        __  " + chalk.green("  ___           __ ")));
+            console.log(chalk.cyan(" / ___/__  ___/ /__" + chalk.green(" / _ \\__ _____ / / ")));
+            console.log(chalk.cyan("/ /__/ _ \\/ _  / -_)" + chalk.green(" ___/ // (_-</ _ \\")));
+            console.log(chalk.cyan("\\___/\\___/\\_,_/\\__/" + chalk.green("_/   \\_,_/___/_//_/")) + "    CLI v" + require("../package.json").version);
+            console.log(chalk.cyan("======================================"));
+            console.log("");
+            console.log("CodePush is a service that allows you to publish mobile app updates directly to your users' devices.\n");
+        }
+        
         yargs.showHelp();
-
         wasHelpShown = true;
     }
 }
@@ -40,7 +50,7 @@ function accessKeyRemove(commandName: string, yargs: yargs.Argv): void {
 }
 
 function addCommonConfiguration(yargs: yargs.Argv): void {
-    yargs.wrap(yargs.terminalWidth())
+    yargs.wrap(/*columnLimit*/ null)
         .strict()  // Validate hyphenated (named) arguments.
         .fail((msg: string) => showHelp());  // Suppress the default error message.
 }
@@ -131,7 +141,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " deploy <appName> <package> <minAppVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory <true|false>]")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
             .example("deploy MyApp app.js 1.0.3", "Upload app.js to the default deployment for app \"MyApp\" with the minimum required semver compliant app version of 1.0.3")
-            .example("deploy MyApp app.js 1.0.3 -d Production", "Upload app.js to the \"Production\" deployment for app \"MyApp\" with the minimum required semver compliant app version of 1.0.3")
+            .example("deploy MyApp ./platforms/ios/www 1.0.3 -d Production", "Upload the \"./platforms/ios/www\" folder and all its contents to the \"Production\" deployment for app \"MyApp\" with the minimum required semver compliant app version of 1.0.3")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
@@ -185,7 +195,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         isValidCommand = true;
     })
     // Disabling this for closed beta
-    //.command("register", "Register a new account with a specific code push server", (yargs: yargs.Argv) => {
+    //.command("register", "Register a new account with a specific CodePush server", (yargs: yargs.Argv) => {
         //isValidCommandCategory = true;
         //isValidCommand = true;
         //yargs.usage(USAGE_PREFIX + " register [serverUrl]")
@@ -195,10 +205,12 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
         //addCommonConfiguration(yargs);
     //})
-    .wrap(yargs.terminalWidth())
+    .alias("v", "version")
+    .version(require("../package.json").version)
+    .wrap(/*columnLimit*/ null)
     .strict()  // Validate hyphenated (named) arguments.
     .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommandCategory)  // Report unrecognized, non-hyphenated command category.
-    .fail((msg: string) => showHelp())  // Suppress the default error message.
+    .fail((msg: string) => showHelp(/*showRootDescription*/ true))  // Suppress the default error message.
     .argv;
 
 function createCommand(): cli.ICommand {

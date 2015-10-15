@@ -1,4 +1,4 @@
-Code Push
+CodePush
 ===
 
 Dev Setup

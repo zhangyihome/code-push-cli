@@ -1,4 +1,4 @@
-Code Push
+CodePush
 
 Copyright (c) Microsoft Corporation
 
