@@ -18,7 +18,8 @@ function contentTask(cwd) {
         "plugin.xml",
         "server.js",
         "web.config",
-        ".npmignore"
+        ".npmignore",
+        "README.md"
     ], options)
     .pipe(gulp.dest("bin", options));
 }
