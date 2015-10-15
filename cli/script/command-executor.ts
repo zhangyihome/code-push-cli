@@ -63,7 +63,7 @@ export var confirm = (): Promise<boolean> => {
                 }
             }
         }, (err: any, result: any): void => {
-            if (result.response === "Y") {
+            if (!result.response || result.response === "" || result.response === "Y") {
                 resolve(true);
             } else {
                 if (result.response !== "n") console.log("Invalid response: \"" + result.response + "\"");

@@ -3,6 +3,7 @@
 import { Promise } from "q";
 import { command } from "./command-parser";
 import { execute } from "./command-executor";
+import * as chalk from "chalk";
 
 function run(): void {
     if (!command) {
@@ -10,7 +11,7 @@ function run(): void {
     }
 
     execute(command)
-        .catch((error: any): void => console.log("Error:  " + error.message))
+        .catch((error: any): void => console.error(chalk.red("Error:  " + error.message)))
         .done();
 }
 
