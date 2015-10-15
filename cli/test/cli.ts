@@ -287,7 +287,7 @@ describe("CLI", () => {
                 sinon.assert.calledOnce(addDeployment);
                 sinon.assert.calledOnce(getDeploymentKeys);
                 sinon.assert.calledOnce(log);
-                sinon.assert.calledWithExactly(log, "Added deployment \"b\" with key \"" + 6 + "\" to app \"a\".");
+                sinon.assert.calledWithExactly(log, "Added deployment \"b\" with key \"6\" to app \"a\".");
                 done();
             });
     });
