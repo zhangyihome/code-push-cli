@@ -1,6 +1,7 @@
 ﻿import * as yargs from "yargs";
 import * as cli from "../definitions/cli";
 import * as semver from "semver";
+import * as chalk from "chalk";
 
 const USAGE_PREFIX = "Usage:  code-push";
 const CODE_PUSH_URL = "https://codepush.azurewebsites.net";
@@ -14,11 +15,11 @@ var wasHelpShown = false;
 function showHelp(showRootDescription?: boolean): void {
     if (!wasHelpShown) {
         if (showRootDescription) {
-            console.log("  _____        __    ___           __ ");
-            console.log(" / ___/__  ___/ /__ / _ \\__ _____ / / ");
-            console.log("/ /__/ _ \\/ _  / -_) ___/ // (_-</ _ \\");
-            console.log("\\___/\\___/\\_,_/\\__/_/   \\_,_/___/_//_/    CLI v" + require("../package.json").version);
-            console.log("======================================");
+            console.log(chalk.cyan("  _____        __  " + chalk.green("  ___           __ ")));
+            console.log(chalk.cyan(" / ___/__  ___/ /__" + chalk.green(" / _ \\__ _____ / / ")));
+            console.log(chalk.cyan("/ /__/ _ \\/ _  / -_)" + chalk.green(" ___/ // (_-</ _ \\")));
+            console.log(chalk.cyan("\\___/\\___/\\_,_/\\__/" + chalk.green("_/   \\_,_/___/_//_/")) + "    CLI v" + require("../package.json").version);
+            console.log(chalk.cyan("======================================"));
             console.log("");
             console.log("CodePush is a service that allows you to publish mobile app updates directly to your users' devices.\n");
         }
