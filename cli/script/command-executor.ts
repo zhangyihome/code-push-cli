@@ -59,16 +59,14 @@ export var confirm = (): Promise<boolean> => {
         prompt.get({
             properties: {
                 response: {
-                    default: "y",
-                    description: chalk.cyan("Are you sure?  ")
+                    description: chalk.cyan("Are you sure? (Y/n):")
                 }
             }
         }, (err: any, result: any): void => {
-            if (err) {
-                reject(err);
-            } else if (result.response === "y" || result.response === "Y") {
+            if (result.response === "Y") {
                 resolve(true);
             } else {
+                if (result.response !== "n") console.log("Invalid response: \"" + result.response + "\"");
                 resolve(false);
             }
         });
