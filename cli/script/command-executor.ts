@@ -80,7 +80,7 @@ function accessKeyList(command: cli.IAccessKeyListCommand): Promise<void> {
 
     return sdk.getAccessKeys()
         .then((accessKeys: AccessKey[]): void => {
-            printList(command.format, accessKeys);
+            printAccessKeys(command.format, accessKeys);
         });
 }
 
@@ -475,8 +475,8 @@ function initiateExternalAuthenticationAsync(serverUrl: string, action: string):
         + "After completing in-browser authentication, please enter your access token to log in or use [CTRL]+[C] to exit.";
 
     log(message);
-
-    var url: string = serverUrl + "/auth/" + action;
+    var hostname: string = os.hostname();
+    var url: string = serverUrl + "/auth/" + action + "?hostname=" + hostname;
 
     log("\r\nLaunching browser for " + url);
 
@@ -592,6 +592,24 @@ function printList<T extends { id: string; name: string; }>(format: string, item
         printTable(["Name", "ID"], (dataSource: any[]): void => {
             items.forEach((item: T): void => {
                 dataSource.push([item.name, item.id]);
+            });
+        });
+    }
+}
+
+function printAccessKeys<T extends { id: string; name: string; description: string }>(format: string, items: T[]): void {
+    if (format === "json") {
+        var dataSource: any[] = [];
+
+        items.forEach((item: T): void => {
+            dataSource.push({ "name": item.name, "id": item.id, "description": item.description });
+        });
+
+        log(JSON.stringify(dataSource));
+    } else if (format === "table") {
+        printTable(["Key", "Description"], (dataSource: any[]): void => {
+            items.forEach((item: T): void => {
+                dataSource.push([item.name, item.description]);
             });
         });
     }

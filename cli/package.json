@@ -1,6 +1,6 @@
 {
   "name": "code-push-cli",
-  "version": "1.0.2-beta",
+  "version": "1.0.3-beta",
   "description": "Management CLI for the CodePush service",
   "main": "script/cli.js",
   "scripts": {
