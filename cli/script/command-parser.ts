@@ -42,9 +42,9 @@ function accessKeyList(commandName: string, yargs: yargs.Argv): void {
 
 function accessKeyRemove(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
-    yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <accessKeyName>")
+    yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <accessKey>")
         .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
-        .example("access-key " + commandName + " abc", "Removes access key \"abc\"");
+        .example("access-key " + commandName + " 8d6513de-050c-4788-96f7-b2a50dd9684v", "Removes the \"8d6513de-050c-4788-96f7-b2a50dd9684c\" access key");
 
     addCommonConfiguration(yargs);
 }
