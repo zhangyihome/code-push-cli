@@ -6,6 +6,8 @@ a central repository that developers can publish updates to (JS, HTML, CSS and i
 have a more deterministic and direct engagement model with your userbase, when addressing bugs and/or adding small features that don't
 require you to re-build a binary and re-distribute it through the respective app stores.
 
+![CodePush CLI](https://cloud.githubusercontent.com/assets/116461/10553365/dfe2c9f0-740e-11e5-967f-03b4f413574c.png)
+
 ## Installation
 
 * Install [Node.js](https://nodejs.org/) 
@@ -118,7 +120,7 @@ Once your app has been configured to query for updates against the CodePush serv
 can begin pushing updates to it using the following command:
 
 ```
-code-push deploy <APP_NAME> <PACKAGE> <MIN_APP_VERSION>
+code-push deploy <APP_NAME> <PACKAGE> <MIN_APP_STORE_VERSION>
 [--deploymentName <DEPLOYMENT_NAME>]
 [--description <DESCRIPTION>]
 [--mandatory <true|false>]
