@@ -1,30 +1,37 @@
-# CodePush Command Line Interface (CLI)
+# CodePush management CLI
+
+CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users' devices. It works by acting as
+a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using provided client SDKs for
+[Cordova](http://github.com/cordova-plugin-code-push) and [React Native](http://github.com/react-native-code-push)). This allows you to
+have a more deterministic and direct engagement model with your userbase, when addressing bugs and/or adding small features that don't
+require you to re-build a binary and re-distribute it through the respective app stores.
 
 ## Installation
 
-* Install [Node.js](https://nodejs.org/)
-* Install CodePush CLI: `npm install -g code-push-cli`
+* Install [Node.js](https://nodejs.org/) 
+* Install the CodePush CLI: `npm install -g code-push-cli`
 
 ## Usage
 
-1. While the service is in beta, you need to request access to the CodePush service [here](https://microsoft.github.io/code-push)
-2. Once your request has been accepted, you can authenticate using the CodePush CLI (details below)
-3. Register your app with the service, and optionally create any additional deployments
-4. CodePush-ify your app and point it at the deployment you wish to use ([Cordova](http://github.com/cordova-plugin-code-push), [React Native](http://github.com/react-native-))
-4. Deploy an update for your registered app
-5. Live long and prosper!
+1. While the service is in beta, you need to request access to it [here](https://microsoft.github.io/code-push)
+2. Once your request has been accepted, you can authenticate using the CodePush CLI ([details](#authentication))
+3. Register your app with the service ([details](#app-management)), and optionally create any additional deployments ([details](#deployment-management))
+4. CodePush-ify your app and point it at the deployment you wish to use (details for [Cordova](http://github.com/cordova-plugin-code-push) and [React Native](http://github.com/react-native-code-push))
+5. Deploy an update for your registered app ([details](#update-deployment))
+6. Live long and prosper! ([details](https://en.wikipedia.org/wiki/Vulcan_salute))
 
 ### Authentication
 
-Every command within the CodePush CLI requires authentication, and therefore, before you can begin managing your account, you need to login using the Github or Microsoft account you used when requesting access to the service. You can do this by running the following command:
+Every command within the CodePush CLI requires authentication, and therefore, before you can begin managing your account, you need to login using
+the Github or Microsoft account you used when requesting access to the service. You can do this by running the following command:
 
 ```
 code-push login
 ```
 
-This will launch a browser, asking you to authenticate with the appropriate identity provider
-and then generate an access token. Copy/paste the token into the CLI and then close the browser.
-You are now succesfully authenticated!
+This will launch a browser, asking you to authenticate with the appropriate identity provider.
+This will then generate an access token than you need to copy/paste into the CLI.
+You are now succesfully authenticated and can safely close your browser window.
 
 When you login from the CLI, your access token (kind of like a cookie) is persisted to disk so
 that you don't have to login everytime you attempt to access your account. In order to delete
@@ -33,6 +40,18 @@ this file from your computer, simply run the following command:
 ```
 code-push logout
 ```
+
+If you forget to logout from a machine you'd prefer not to leave a running session on
+(e.g. your friend's laptop), you can use the following commands to list and remove any
+"live" access tokens. 
+
+```
+code-push access-key ls
+code-push access-key rm <ACCESS_KEY>
+```
+
+The list of access keys will display the name of the machine the token was created on, as well
+as the time the login occured. This should make it easy to spot keys you don't want to keep around.
 
 ### App management
 Before you can deploy any updates, you need to register an app with the CodePush service
@@ -44,7 +63,10 @@ code-push app add <NAME>
 
 All new apps automatically come with two deployments (Staging and Production) so that you
 can begin distributing updates to multiple channels without needing to do anything extra
-(see deployment instructions below).
+(see deployment instructions below). After you create an app, the CLI will output the deployment
+keys for the Staging and Production channels, which you can begin using to configure your clients
+via their respective SDKs (details for [Cordova](http://github.com/cordova-plugin-code-push) and
+[React Native](http://github.com/react-native-code-push)).
 
 If you don't like the name you gave an app, you can rename it using the following command:
 
@@ -52,13 +74,19 @@ If you don't like the name you gave an app, you can rename it using the followin
 code-push app rename <NAME> <NEW_NAME>
 ```
 
-If you no longer need an app, you can remove it from the server using the following command:
+The app's name is only meant to be recognizeable from the management side, and therefore, you
+can feel free to rename it as neccessary. It won't actually impact the running app, since update queries
+are made via deployment keys.
+
+If at some point you no longer need an app, you can remove it from the server using the following command:
 
 ```
 code-push app rm <NAME>
 ```
 
-And finally, if you want to list all apps that you've registered with the CodePush server,
+Do this with caution since any apps that have been configured to use it will obviously stop receiving updates.
+
+Finally, if you want to list all apps that you've registered with the CodePush server,
 you can run the following command:
 
 ```
@@ -66,17 +94,17 @@ code-push app ls
 ```
 
 ### Deployment management
-As mentioned above, every created app automatically includes two deployments: Staging and Production. 
-This allows you to have multiple versions of your app in flight at any time, while still using the CodePush
-server to distribute the updates. If having a staging and production version of your app is enough to suit,
-your needs, then you don't need to do anything else. However, if you want an alpha, dev, etc. deployment
+As mentioned above, every created app automatically includes two deployments: **Staging** and **Production**. 
+This allows you to have multiple versions of your app in flight at any given time, while still using the CodePush
+server to distribute the updates. If having a staging and production version of your app is enough to meet
+your needs, then you don't need to do anything else. However, if you want an alpha, dev, etc. deployment,
 you can easily create them using the following command:
 
 ```
 code-push deployment add <APP_NAME> <DEPLOYMENT_NAME>
 ```
 
-Just like apps, you can remove, rename and list deployments as well, using the following commands respectively:
+Just like with apps, you can remove, rename and list deployments as well, using the following commands respectively:
 
 ```
 code-push deployment rename <APP_NAME> <DEPLOYMENT_NAME> <NEW_DEPLOYMENT_NAME>
@@ -86,7 +114,7 @@ code-push deployment ls <APP_NAME>
 
 ### Update deployment
 
-Once your app has been confifgured to query for updates against the CodePush service--using your desired deployment--you
+Once your app has been configured to query for updates against the CodePush service--using your desired deployment--you
 can begin pushing updates to it using the following command:
 
 ```
