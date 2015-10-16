@@ -13,11 +13,11 @@ require you to re-build a binary and re-distribute it through the respective app
 
 ## Usage
 
-1. While the service is in beta, you need to request access to it [here](https://microsoft.github.io/code-push)
-2. Once your request has been accepted, you can authenticate using the CodePush CLI ([details](#authentication))
-3. Register your app with the service ([details](#app-management)), and optionally create any additional deployments ([details](#deployment-management))
-4. CodePush-ify your app and point it at the deployment you wish to use (details for [Cordova](http://github.com/cordova-plugin-code-push) and [React Native](http://github.com/react-native-code-push))
-5. Deploy an update for your registered app ([details](#update-deployment))
+1. While the service is in beta, you need to [request access](https://microsoft.github.io/code-push)
+2. Once your request has been accepted, you can [authenticate](#authentication) using the CodePush CLI
+3. Register your [app](#app-management) with the service, and optionally create any additional [deployments](#deployment-management)
+4. CodePush-ify your app and point it at the deployment you wish to use ([Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push))
+5. [Deploy](#update-deployment) an update for your registered app
 6. Live long and prosper! ([details](https://en.wikipedia.org/wiki/Vulcan_salute))
 
 ### Authentication
