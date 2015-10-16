@@ -30,7 +30,7 @@ code-push login
 ```
 
 This will launch a browser, asking you to authenticate with the appropriate identity provider.
-This will then generate an access token than you need to copy/paste into the CLI.
+This will generate an access token that you need to copy/paste into the CLI (it will prompt you for it).
 You are now succesfully authenticated and can safely close your browser window.
 
 When you login from the CLI, your access token (kind of like a cookie) is persisted to disk so
