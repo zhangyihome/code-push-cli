@@ -31,9 +31,6 @@
     "node-uuid/node-uuid.d.ts": {
       "commit": "84dfeeac378552c22297a5d555b1999a396d7e7c"
     },
-    "bcrypt/bcrypt.d.ts": {
-      "commit": "3e117d8c9ddf6443d7ed71a74f6bc8b6bcd36077"
-    },
     "passport/passport.d.ts": {
       "commit": "3e117d8c9ddf6443d7ed71a74f6bc8b6bcd36077"
     },
