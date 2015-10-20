@@ -1,10 +1,7 @@
 # CodePush management CLI
 
-CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users' devices. It works by acting as
-a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using provided client SDKs for
-[Cordova](http://github.com/cordova-plugin-code-push) and [React Native](http://github.com/react-native-code-push)). This allows you to
-have a more deterministic and direct engagement model with your userbase, when addressing bugs and/or adding small features that don't
-require you to re-build a binary and re-distribute it through the respective app stores.
+CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users' devices. It works by acting as a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using provided client SDKs for
+[Cordova](http://github.com/cordova-plugin-code-push) and [React Native](http://github.com/react-native-code-push)). This allows you to have a more deterministic and direct engagement model with your userbase, when addressing bugs and/or adding small features that don't require you to re-build a binary and re-distribute it through the respective app stores.
 
 ![CodePush CLI](https://cloud.githubusercontent.com/assets/116461/10553365/dfe2c9f0-740e-11e5-967f-03b4f413574c.png)
 
@@ -24,36 +21,28 @@ require you to re-build a binary and re-distribute it through the respective app
 
 ### Authentication
 
-Every command within the CodePush CLI requires authentication, and therefore, before you can begin managing your account, you need to login using
-the Github or Microsoft account you used when requesting access to the service. You can do this by running the following command:
+Every command within the CodePush CLI requires authentication, and therefore, before you can begin managing your account, you need to login using the Github or Microsoft account you used when requesting access to the service. You can do this by running the following command:
 
 ```
 code-push login
 ```
 
-This will launch a browser, asking you to authenticate with the appropriate identity provider.
-This will generate an access token that you need to copy/paste into the CLI (it will prompt you for it).
-You are now succesfully authenticated and can safely close your browser window.
+This will launch a browser, asking you to authenticate with the appropriate identity provider. This will generate an access token that you need to copy/paste into the CLI (it will prompt you for it). You are now succesfully authenticated and can safely close your browser window.
 
-When you login from the CLI, your access token (kind of like a cookie) is persisted to disk so
-that you don't have to login everytime you attempt to access your account. In order to delete
-this file from your computer, simply run the following command:
+When you login from the CLI, your access token (kind of like a cookie) is persisted to disk so that you don't have to login everytime you attempt to access your account. In order to delete this file from your computer, simply run the following command:
 
 ```
 code-push logout
 ```
 
-If you forget to logout from a machine you'd prefer not to leave a running session on
-(e.g. your friend's laptop), you can use the following commands to list and remove any
-"live" access tokens. 
+If you forget to logout from a machine you'd prefer not to leave a running session on (e.g. your friend's laptop), you can use the following commands to list and remove any "live" access tokens. 
 
 ```
 code-push access-key ls
 code-push access-key rm <ACCESS_KEY>
 ```
 
-The list of access keys will display the name of the machine the token was created on, as well
-as the time the login occured. This should make it easy to spot keys you don't want to keep around.
+The list of access keys will display the name of the machine the token was created on, as well as the time the login occured. This should make it easy to spot keys you don't want to keep around.
 
 ### App management
 Before you can deploy any updates, you need to register an app with the CodePush service
@@ -63,12 +52,7 @@ using the following command:
 code-push app add <NAME>
 ```
 
-All new apps automatically come with two deployments (Staging and Production) so that you
-can begin distributing updates to multiple channels without needing to do anything extra
-(see deployment instructions below). After you create an app, the CLI will output the deployment
-keys for the Staging and Production channels, which you can begin using to configure your clients
-via their respective SDKs (details for [Cordova](http://github.com/cordova-plugin-code-push) and
-[React Native](http://github.com/react-native-code-push)).
+All new apps automatically come with two deployments (Staging and Production) so that you can begin distributing updates to multiple channels without needing to do anything extra (see deployment instructions below). After you create an app, the CLI will output the deployment keys for the Staging and Production channels, which you can begin using to configure your clients via their respective SDKs (details for [Cordova](http://github.com/cordova-plugin-code-push) and [React Native](http://github.com/react-native-code-push)).
 
 If you don't like the name you gave an app, you can rename it using the following command:
 
@@ -76,9 +60,7 @@ If you don't like the name you gave an app, you can rename it using the followin
 code-push app rename <NAME> <NEW_NAME>
 ```
 
-The app's name is only meant to be recognizeable from the management side, and therefore, you
-can feel free to rename it as neccessary. It won't actually impact the running app, since update queries
-are made via deployment keys.
+The app's name is only meant to be recognizeable from the management side, and therefore, you can feel free to rename it as neccessary. It won't actually impact the running app, since update queries are made via deployment keys.
 
 If at some point you no longer need an app, you can remove it from the server using the following command:
 
@@ -96,11 +78,7 @@ code-push app ls
 ```
 
 ### Deployment management
-As mentioned above, every created app automatically includes two deployments: **Staging** and **Production**. 
-This allows you to have multiple versions of your app in flight at any given time, while still using the CodePush
-server to distribute the updates. If having a staging and production version of your app is enough to meet
-your needs, then you don't need to do anything else. However, if you want an alpha, dev, etc. deployment,
-you can easily create them using the following command:
+As mentioned above, every created app automatically includes two deployments: **Staging** and **Production**. This allows you to have multiple versions of your app in flight at any given time, while still using the CodePush server to distribute the updates. If having a staging and production version of your app is enough to meet your needs, then you don't need to do anything else. However, if you want an alpha, dev, etc. deployment, you can easily create them using the following command:
 
 ```
 code-push deployment add <APP_NAME> <DEPLOYMENT_NAME>
@@ -116,11 +94,10 @@ code-push deployment ls <APP_NAME>
 
 ### Update deployment
 
-Once your app has been configured to query for updates against the CodePush service--using your desired deployment--you
-can begin pushing updates to it using the following command:
+Once your app has been configured to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
 
 ```
-code-push deploy <APP_NAME> <PACKAGE> <MIN_APP_STORE_VERSION>
+code-push release <APP_NAME> <PACKAGE> <APP_STORE_VERSION>
 [--deploymentName <DEPLOYMENT_NAME>]
 [--description <DESCRIPTION>]
 [--mandatory <true|false>]
@@ -128,27 +105,21 @@ code-push deploy <APP_NAME> <PACKAGE> <MIN_APP_STORE_VERSION>
 
 #### Package parameter
 
-You can specify either a single file (e.g. a JS bundle for a React Native app), or a path to a directory
-(e.g. the /platforms/ios/www folder for a Cordova app). You don't need to zip up multiple files or directories 
-in order to deploy those changes. The CLI will automatically zip them for you.
+You can specify either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the /platforms/ios/www folder for a Cordova app). You don't need to zip up multiple files or directories in order to deploy those changes. The CLI will automatically zip them for you.
 
-#### Minimum app version parameter
+#### App store version parameter
 
-This specifies what the minimum app store version the code you are pushing depends on. This is important if your
-JavaScript/etc. takes a dependency on a new capabilitiy of the native side of your app (e.g. a Cordova plugin), and therefore,
-requires the user to update to the latest version from the app store.
+This specifies what the minimum app store version the code you are pushing depends on. This is important if your JavaScript/etc. takes a dependency on a new capabilitiy of the native side of your app (e.g. a Cordova plugin), and therefore, requires the user to update to the latest version from the app store.
 
 #### Deployment name parameter
 
-This specifies which deployment you want to deploy the update. This defaults to "Staging", but when you're ready
-to deploy to "Production", or one of your own custom deployments, just explicitly set this argument.
+This specifies which deployment you want to deploy the update. This defaults to "Staging", but when you're ready to deploy to "Production", or one of your own custom deployments, just explicitly set this argument.
 
 *NOTE: The parameter can be set using either "--deploymentName" or "-d".*
 
 #### Description parameter
 
-This provides an optional "change log" for the deployment. The value is simply roundtripped to the client
-so that when the update is detected, your app can choose to display it to the end-user.
+This provides an optional "change log" for the deployment. The value is simply roundtripped to the client so that when the update is detected, your app can choose to display it to the end-user.
 
 *NOTE: This parameter can be set using either "--description" or "-desc"*
 
