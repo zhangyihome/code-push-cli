@@ -84,7 +84,7 @@ function accessKeyList(command: cli.IAccessKeyListCommand): Promise<void> {
         });
 }
 
-function removingConnectionAccessKey(): Promise<void> {
+function removingLocalAccessKey(): Promise<void> {
      return Promise<void>((resolve, reject, notify): void => {
          log(chalk.red("Cannot remove access key for this machine. Please run 'logout' command to remove this access key."));
      });
@@ -92,7 +92,7 @@ function removingConnectionAccessKey(): Promise<void> {
 
 function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
     if (command.accessKeyName === connectionInfo.accessKeyName) {
-        return removingConnectionAccessKey();
+        return removingLocalAccessKey();
     } else {
         return getAccessKeyId(command.accessKeyName)
             .then((accessKeyId: string): Promise<void> => {
