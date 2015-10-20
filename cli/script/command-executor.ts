@@ -621,7 +621,7 @@ function release(command: cli.IReleaseCommand): Promise<void> {
 
                     return getPackageFilePromise
                         .then((file: IPackageFile): Promise<void> => {
-                            return sdk.addPackage(appId, deploymentId, file.path, command.description, /*label*/ null, command.minAppVersion, command.mandatory)
+                            return sdk.addPackage(appId, deploymentId, file.path, command.description, /*label*/ null, command.appStoreVersion, command.mandatory)
                                 .then((): void => {
                                     log("Released a new package containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment for \"" + command.appName + "\".");
 
