@@ -261,8 +261,18 @@ function deserializeConnectionInfo(): IConnectionInfo {
     return tryJSON(json);
 }
 
+function alreadyLoggedInOrRegistered(): Promise<void> {
+     return Promise<void>((resolve, reject, notify): void => {
+         log("You are already logged in!! Please logout to login again.");
+     });
+}
+
 export function execute(command: cli.ICommand): Promise<void> {
     connectionInfo = deserializeConnectionInfo();
+
+    if (connectionInfo && (command.type === cli.CommandType.login || command.type === cli.CommandType.register)) {
+        return alreadyLoggedInOrRegistered();
+    }
 
     switch (command.type) {
         case cli.CommandType.login:
