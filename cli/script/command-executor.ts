@@ -35,7 +35,7 @@ interface IPackageFile {
 
 // Exported variables for unit testing.
 export var sdk: AccountManager;
-export var log = (message: string): void => console.log(message);
+export var log = (message: string | Chalk.ChalkChain): void => console.log(message);
 
 export var loginWithAccessToken = (): Promise<void> => {
     if (!connectionInfo) {
@@ -84,23 +84,33 @@ function accessKeyList(command: cli.IAccessKeyListCommand): Promise<void> {
         });
 }
 
+function removingConnectionAccessKey(): Promise<void> {
+     return Promise<void>((resolve, reject, notify): void => {
+         log(chalk.red("Cannot remove access key for this machine. Please run 'logout' command to remove this access key."));
+     });
+}
+
 function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
-    return getAccessKeyId(command.accessKeyName)
-        .then((accessKeyId: string): Promise<void> => {
-            throwForInvalidAccessKeyId(accessKeyId, command.accessKeyName);
+    if (command.accessKeyName === connectionInfo.accessKeyName) {
+        return removingConnectionAccessKey();
+    } else {
+        return getAccessKeyId(command.accessKeyName)
+            .then((accessKeyId: string): Promise<void> => {
+                throwForInvalidAccessKeyId(accessKeyId, command.accessKeyName);
 
-            return confirm()
-                .then((wasConfirmed: boolean): Promise<void> => {
-                    if (wasConfirmed) {
-                        return sdk.removeAccessKey(accessKeyId)
-                            .then((): void => {
-                                log("Removed access key \"" + command.accessKeyName + "\".");
-                            });
-                    }
+                return confirm()
+                    .then((wasConfirmed: boolean): Promise<void> => {
+                        if (wasConfirmed) {
+                            return sdk.removeAccessKey(accessKeyId)
+                                .then((): void => {
+                                    log("Removed access key \"" + command.accessKeyName + "\".");
+                                });
+                        }
 
-                    log("Remove cancelled.");
-                });
-        });
+                        log("Remove cancelled.");
+                    });
+            });
+    }
 }
 
 function appAdd(command: cli.IAppAddCommand): Promise<void> {
@@ -263,7 +273,7 @@ function deserializeConnectionInfo(): IConnectionInfo {
 
 function alreadyLoggedIn(): Promise<void> {
      return Promise<void>((resolve, reject, notify): void => {
-         log("You are already logged in!! Please logout to login again.");
+         log("You are already logged in from this machine!");
      });
 }
 
