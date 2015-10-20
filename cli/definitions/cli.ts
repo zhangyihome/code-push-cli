@@ -79,6 +79,6 @@ export interface IReleaseCommand extends ICommand {
     deploymentName: string;
     description: string;
     mandatory: boolean;
-    minAppVersion: string;
+    appStoreVersion: string;
     package: string;
 }

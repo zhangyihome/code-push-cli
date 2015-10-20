@@ -138,16 +138,16 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         addCommonConfiguration(yargs);
     })
     .command("release", "Release a new version of your app to a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " release <appName> <package> <minAppVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory <true|false>]")
+        yargs.usage(USAGE_PREFIX + " release <appName> <package> <appStoreVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory <true|false>]")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
-            .example("release MyApp app.js 1.0.3", "Upload app.js to the default deployment for app \"MyApp\" with the minimum required semver compliant app version of 1.0.3")
-            .example("release MyApp ./platforms/ios/www 1.0.3 -d Production", "Upload the \"./platforms/ios/www\" folder and all its contents to the \"Production\" deployment for app \"MyApp\" with the minimum required semver compliant app version of 1.0.3")
+            .example("release MyApp app.js 1.0.3", "Upload app.js to the default deployment for app \"MyApp\" with the minimum required semver compliant app store version of 1.0.3")
+            .example("release MyApp ./platforms/ios/www 1.0.3 -d Production", "Upload the \"./platforms/ios/www\" folder and all its contents to the \"Production\" deployment for app \"MyApp\" with the minimum required semver compliant app store version of 1.0.3")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
             .check((argv: any, aliases: { [alias: string]: string }) => {
-                var minAppVersion: string = argv._[3];
-                return semver.valid(minAppVersion) !== null;
+                var appStoreVersion: string = argv._[3];
+                return semver.valid(appStoreVersion) !== null;
             });
 
         addCommonConfiguration(yargs);
@@ -364,7 +364,7 @@ function createCommand(): cli.ICommand {
 
                     releaseCommand.appName = arg1;
                     releaseCommand.package = arg2;
-                    releaseCommand.minAppVersion = arg3;
+                    releaseCommand.appStoreVersion = arg3;
                     releaseCommand.deploymentName = argv["deploymentName"];
                     releaseCommand.description = argv["description"];
                     releaseCommand.mandatory = argv["mandatory"];
