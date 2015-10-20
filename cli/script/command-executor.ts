@@ -167,75 +167,6 @@ function deleteConnectionInfoCache(): void {
     }
 }
 
-function deploy(command: cli.IDeployCommand): Promise<void> {
-    return getAppId(command.appName)
-        .then((appId: string): Promise<void> => {
-            throwForInvalidAppId(appId, command.appName);
-
-            return getDeploymentId(appId, command.deploymentName)
-                .then((deploymentId: string): Promise<void> => {
-                    throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
-
-                    var filePath: string = command.package;
-                    var getPackageFilePromise: Promise<IPackageFile>;
-
-                    if (fs.lstatSync(filePath).isDirectory()) {
-                        getPackageFilePromise = Promise<IPackageFile>((resolve: (file: IPackageFile) => void, reject: (reason: Error) => void): void => {
-                            var directoryPath: string = filePath;
-
-                            recursiveFs.readdirr(directoryPath, (error?: any, directories?: string[], files?: string[]): void => {
-                                if (error) {
-                                    reject(error);
-                                    return;
-                                }
-
-                                var baseDirectoryPath = path.dirname(directoryPath);
-                                var fileName: string = generateRandomFilename(15) + ".zip";
-                                var zipFile = new yazl.ZipFile();
-                                var writeStream: fs.WriteStream = fs.createWriteStream(fileName);
-
-                                zipFile.outputStream.pipe(writeStream)
-                                    .on("error", (error: Error): void => {
-                                        reject(error);
-                                    })
-                                    .on("close", (): void => {
-                                        filePath = path.join(process.cwd(), fileName);
-
-                                        resolve({ isTemporary: true, path: filePath });
-                                    });
-
-                                for (var i = 0; i < files.length; ++i) {
-                                    var file: string = files[i];
-                                    var relativePath: string = path.relative(baseDirectoryPath, file);
-
-                                    // yazl does not like backslash (\) in the metadata path.
-                                    relativePath = slash(relativePath);
-
-                                    zipFile.addFile(file, relativePath);
-                                }
-
-                                zipFile.end();
-                            });
-                        });
-                    } else {
-                        getPackageFilePromise = Q({ isTemporary: false, path: filePath });
-                    }
-
-                    return getPackageFilePromise
-                        .then((file: IPackageFile): Promise<void> => {
-                            return sdk.addPackage(appId, deploymentId, file.path, command.description, /*label*/ null, command.minAppVersion, command.mandatory)
-                                .then((): void => {
-                                    log("Deployed package " + command.package + " to deployment \"" + command.deploymentName + "\" for app \"" + command.appName + "\".");
-
-                                    if (file.isTemporary) {
-                                        fs.unlinkSync(filePath);
-                                    }
-                                });
-                        });
-                });
-        });
-}
-
 function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
     return getAppId(command.appName)
         .then((appId: string): Promise<void> => {
@@ -365,9 +296,6 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.appRename:
                     return appRename(<cli.IAppRenameCommand>command);
 
-                case cli.CommandType.deploy:
-                    return deploy(<cli.IDeployCommand>command);
-
                 case cli.CommandType.deploymentAdd:
                     return deploymentAdd(<cli.IDeploymentAddCommand>command);
 
@@ -379,6 +307,9 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.deploymentRename:
                     return deploymentRename(<cli.IDeploymentRenameCommand>command);
+
+                case cli.CommandType.release:
+                    return release(<cli.IReleaseCommand>command);
 
                 default:
                     // We should never see this message as invalid commands should be caught by the argument parser.
@@ -630,6 +561,77 @@ function register(command: cli.IRegisterCommand): Promise<void> {
     initiateExternalAuthenticationAsync(command.serverUrl, "register");
 
     return loginWithAccessTokenInternal(command.serverUrl);
+}
+
+function release(command: cli.IReleaseCommand): Promise<void> {
+    return getAppId(command.appName)
+        .then((appId: string): Promise<void> => {
+            throwForInvalidAppId(appId, command.appName);
+
+            return getDeploymentId(appId, command.deploymentName)
+                .then((deploymentId: string): Promise<void> => {
+                    throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
+
+                    var filePath: string = command.package;
+                    var getPackageFilePromise: Promise<IPackageFile>;
+                    var isSingleFilePackage: boolean = true;
+
+                    if (fs.lstatSync(filePath).isDirectory()) {
+                        isSingleFilePackage = false;
+                        getPackageFilePromise = Promise<IPackageFile>((resolve: (file: IPackageFile) => void, reject: (reason: Error) => void): void => {
+                            var directoryPath: string = filePath;
+
+                            recursiveFs.readdirr(directoryPath, (error?: any, directories?: string[], files?: string[]): void => {
+                                if (error) {
+                                    reject(error);
+                                    return;
+                                }
+
+                                var baseDirectoryPath = path.dirname(directoryPath);
+                                var fileName: string = generateRandomFilename(15) + ".zip";
+                                var zipFile = new yazl.ZipFile();
+                                var writeStream: fs.WriteStream = fs.createWriteStream(fileName);
+
+                                zipFile.outputStream.pipe(writeStream)
+                                    .on("error", (error: Error): void => {
+                                        reject(error);
+                                    })
+                                    .on("close", (): void => {
+                                        filePath = path.join(process.cwd(), fileName);
+
+                                        resolve({ isTemporary: true, path: filePath });
+                                    });
+
+                                for (var i = 0; i < files.length; ++i) {
+                                    var file: string = files[i];
+                                    var relativePath: string = path.relative(baseDirectoryPath, file);
+
+                                    // yazl does not like backslash (\) in the metadata path.
+                                    relativePath = slash(relativePath);
+
+                                    zipFile.addFile(file, relativePath);
+                                }
+
+                                zipFile.end();
+                            });
+                        });
+                    } else {
+                        getPackageFilePromise = Q({ isTemporary: false, path: filePath });
+                    }
+
+                    return getPackageFilePromise
+                        .then((file: IPackageFile): Promise<void> => {
+                            return sdk.addPackage(appId, deploymentId, file.path, command.description, /*label*/ null, command.minAppVersion, command.mandatory)
+                                .then((): void => {
+                                    log("Released a new package containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment for \"" + command.appName + "\".");
+
+                                    if (file.isTemporary) {
+                                        fs.unlinkSync(filePath);
+                                    }
+                                });
+                        });
+                });
+        });
 }
 
 function requestAccessToken(): Promise<string> {

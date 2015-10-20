@@ -5,14 +5,14 @@
     appList,
     appRemove,
     appRename,
-    deploy,
     deploymentAdd,
     deploymentList,
     deploymentRemove,
     deploymentRename,
     login,
     logout,
-    register
+    register,
+    release
 }
 
 export interface ICommand {
@@ -44,15 +44,6 @@ export interface IAppRenameCommand extends ICommand {
     newAppName: string;
 }
 
-export interface IDeployCommand extends ICommand {
-    appName: string;
-    deploymentName: string;
-    description: string;
-    mandatory: boolean;
-    minAppVersion: string;
-    package: string;
-}
-
 export interface IDeploymentAddCommand extends ICommand {
     appName: string;
     deploymentName: string;
@@ -81,4 +72,13 @@ export interface ILoginCommand extends ICommand {
 
 export interface IRegisterCommand extends ICommand {
     serverUrl: string;
+}
+
+export interface IReleaseCommand extends ICommand {
+    appName: string;
+    deploymentName: string;
+    description: string;
+    mandatory: boolean;
+    minAppVersion: string;
+    package: string;
 }
