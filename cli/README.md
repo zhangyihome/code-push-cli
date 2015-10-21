@@ -39,7 +39,7 @@ If you forget to logout from a machine you'd prefer not to leave a running sessi
 
 ```
 code-push access-key ls
-code-push access-key rm <ACCESS_KEY>
+code-push access-key rm <accessKey>
 ```
 
 The list of access keys will display the name of the machine the token was created on, as well as the time the login occured. This should make it easy to spot keys you don't want to keep around.
@@ -49,7 +49,7 @@ Before you can deploy any updates, you need to register an app with the CodePush
 using the following command:
 
 ```
-code-push app add <NAME>
+code-push app add <appName>
 ```
 
 All new apps automatically come with two deployments (Staging and Production) so that you can begin distributing updates to multiple channels without needing to do anything extra (see deployment instructions below). After you create an app, the CLI will output the deployment keys for the Staging and Production channels, which you can begin using to configure your clients via their respective SDKs (details for [Cordova](http://github.com/cordova-plugin-code-push) and [React Native](http://github.com/react-native-code-push)).
@@ -57,7 +57,7 @@ All new apps automatically come with two deployments (Staging and Production) so
 If you don't like the name you gave an app, you can rename it using the following command:
 
 ```
-code-push app rename <NAME> <NEW_NAME>
+code-push app rename <appName> <newAppName>
 ```
 
 The app's name is only meant to be recognizeable from the management side, and therefore, you can feel free to rename it as neccessary. It won't actually impact the running app, since update queries are made via deployment keys.
@@ -65,7 +65,7 @@ The app's name is only meant to be recognizeable from the management side, and t
 If at some point you no longer need an app, you can remove it from the server using the following command:
 
 ```
-code-push app rm <NAME>
+code-push app rm <appName>
 ```
 
 Do this with caution since any apps that have been configured to use it will obviously stop receiving updates.
@@ -81,15 +81,15 @@ code-push app ls
 As mentioned above, every created app automatically includes two deployments: **Staging** and **Production**. This allows you to have multiple versions of your app in flight at any given time, while still using the CodePush server to distribute the updates. If having a staging and production version of your app is enough to meet your needs, then you don't need to do anything else. However, if you want an alpha, dev, etc. deployment, you can easily create them using the following command:
 
 ```
-code-push deployment add <APP_NAME> <DEPLOYMENT_NAME>
+code-push deployment add <appName> <deploymentName>
 ```
 
 Just like with apps, you can remove, rename and list deployments as well, using the following commands respectively:
 
 ```
-code-push deployment rename <APP_NAME> <DEPLOYMENT_NAME> <NEW_DEPLOYMENT_NAME>
-code-push deployment rm <APP_NAME> <DEPLOYMENT_NAME>
-code-push deployment ls <APP_NAME>
+code-push deployment rename <appName> <deploymentName> <newDeploymentName>
+code-push deployment rm <appName> <deploymentName>
+code-push deployment ls <appName>
 ```
 
 ### Update deployment
@@ -97,9 +97,9 @@ code-push deployment ls <APP_NAME>
 Once your app has been configured to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
 
 ```
-code-push release <APP_NAME> <PACKAGE> <APP_STORE_VERSION>
-[--deploymentName <DEPLOYMENT_NAME>]
-[--description <DESCRIPTION>]
+code-push release <appName> <package> <appStoreVersion>
+[--deploymentName <deploymentName>]
+[--description <description>]
 [--mandatory <true|false>]
 ```
 
