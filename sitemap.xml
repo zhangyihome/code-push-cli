@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>/</loc>
-    <lastmod>2015-10-21T15:11:12-07:00</lastmod>
+    <lastmod>2015-10-21T15:16:19-07:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -10,7 +10,7 @@
   <url>
     <loc>/docs/cli.html</loc>
     
-      <lastmod>2015-10-21T15:11:12-07:00</lastmod>
+      <lastmod>2015-10-21T15:16:19-07:00</lastmod>
     
     
       <changefreq>monthly</changefreq>
@@ -23,7 +23,7 @@
   <url>
     <loc>/docs/cordova.html</loc>
     
-      <lastmod>2015-10-21T15:11:12-07:00</lastmod>
+      <lastmod>2015-10-21T15:16:19-07:00</lastmod>
     
     
       <changefreq>monthly</changefreq>
@@ -36,7 +36,7 @@
   <url>
     <loc>/docs/getting-started.html</loc>
     
-      <lastmod>2015-10-21T15:11:12-07:00</lastmod>
+      <lastmod>2015-10-21T15:16:19-07:00</lastmod>
     
     
       <changefreq>monthly</changefreq>
@@ -49,7 +49,7 @@
   <url>
     <loc>/docs/react-native.html</loc>
     
-      <lastmod>2015-10-21T15:11:12-07:00</lastmod>
+      <lastmod>2015-10-21T15:16:19-07:00</lastmod>
     
     
       <changefreq>monthly</changefreq>
@@ -62,7 +62,7 @@
   <url>
     <loc>/docs/index.html</loc>
     
-      <lastmod>2015-10-21T15:11:12-07:00</lastmod>
+      <lastmod>2015-10-21T15:16:19-07:00</lastmod>
     
     
       <changefreq>monthly</changefreq>
@@ -76,7 +76,7 @@
   <url>
     <loc>/404.html</loc>
     
-      <lastmod>2015-10-21T15:11:12-07:00</lastmod>
+      <lastmod>2015-10-21T15:16:19-07:00</lastmod>
     
     
       <changefreq>monthly</changefreq>
@@ -89,7 +89,7 @@
   <url>
     <loc>/atom.xml</loc>
     
-      <lastmod>2015-10-21T15:11:12-07:00</lastmod>
+      <lastmod>2015-10-21T15:16:19-07:00</lastmod>
     
     
       <changefreq>monthly</changefreq>
@@ -102,7 +102,7 @@
   <url>
     <loc>/index.html</loc>
     
-      <lastmod>2015-10-21T15:11:12-07:00</lastmod>
+      <lastmod>2015-10-21T15:16:19-07:00</lastmod>
     
     
       <changefreq>monthly</changefreq>
@@ -115,7 +115,7 @@
   <url>
     <loc>/faq/index.html</loc>
     
-      <lastmod>2015-10-21T15:11:12-07:00</lastmod>
+      <lastmod>2015-10-21T15:16:19-07:00</lastmod>
     
     
       <changefreq>monthly</changefreq>
@@ -128,7 +128,7 @@
   <url>
     <loc>/sitemap.xml</loc>
     
-      <lastmod>2015-10-21T15:11:12-07:00</lastmod>
+      <lastmod>2015-10-21T15:16:19-07:00</lastmod>
     
     
       <changefreq>monthly</changefreq>
