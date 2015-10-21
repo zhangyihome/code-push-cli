@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
  <title>CodePush</title>
- <link href="http://microsoft.github.io/code-push/atom.xml" rel="self"/>
- <link href="http://microsoft.github.io/code-push/"/>
- <updated>2015-10-21T14:05:11-07:00</updated>
- <id>http://microsoft.github.io/code-push</id>
+ <link href="/atom.xml" rel="self"/>
+ <link href="/"/>
+ <updated>2015-10-21T14:41:31-07:00</updated>
+ <id></id>
  <author>
    <name></name>
    <email></email>
