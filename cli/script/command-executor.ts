@@ -84,15 +84,15 @@ function accessKeyList(command: cli.IAccessKeyListCommand): Promise<void> {
         });
 }
 
-function removingLocalAccessKey(): Promise<void> {
+function removeLocalAccessKey(): Promise<void> {
      return Promise<void>((resolve, reject, notify): void => {
-         log(chalk.red("Cannot remove access key for this machine. Please run 'logout' command to remove this access key."));
+         log(chalk.red("[Error] Cannot remove the access key for the current session. Please run 'code-push logout' if you would like to remove this access key."));
      });
 }
 
 function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
     if (command.accessKeyName === connectionInfo.accessKeyName) {
-        return removingLocalAccessKey();
+        return removeLocalAccessKey();
     } else {
         return getAccessKeyId(command.accessKeyName)
             .then((accessKeyId: string): Promise<void> => {
@@ -271,21 +271,21 @@ function deserializeConnectionInfo(): IConnectionInfo {
     return tryJSON(json);
 }
 
-function alreadyLoggedIn(): Promise<void> {
+function notifyAlreadyLoggedIn(): Promise<void> {
      return Promise<void>((resolve, reject, notify): void => {
-         log("You are already logged in from this machine!");
+         log("You are already logged in from this machine.");
      });
 }
 
 export function execute(command: cli.ICommand): Promise<void> {
     connectionInfo = deserializeConnectionInfo();
 
-    if (connectionInfo && command.type === cli.CommandType.login) {
-        return alreadyLoggedIn();
-    }
-
     switch (command.type) {
         case cli.CommandType.login:
+            if (connectionInfo) {
+                return notifyAlreadyLoggedIn();
+            }
+
             return login(<cli.ILoginCommand>command);
 
         case cli.CommandType.logout:
