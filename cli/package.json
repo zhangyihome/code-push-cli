@@ -13,7 +13,15 @@
     "type": "git",
     "url": "https://github.com/Microsoft/code-push/"
   },
-  "author": "Microsoft",
+  "keywords": [
+    "code",
+    "push",
+    "cordova",
+    "react-native",
+    "react"
+  ],
+  "author": "Microsoft Corporation",
+  "license": "MIT",
   "dependencies": {
     "code-push": "1.0.0-beta",
     "base-64": "^0.1.0",
