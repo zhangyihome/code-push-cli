@@ -152,6 +152,13 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
         addCommonConfiguration(yargs);
     })
+    .command("promote", "Promote the package from one deployment of your app to another", (yargs: yargs.Argv) => {
+        yargs.usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName>")
+            .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
+            .example("promote MyApp Staging Production", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\"");
+            
+        addCommonConfiguration(yargs);
+    })
     .command("deployment", "View and manage the deployments for your apps", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         yargs.usage(USAGE_PREFIX + " deployment <command>")
@@ -309,7 +316,6 @@ function createCommand(): cli.ICommand {
                             deploymentListCommand.verbose = argv["verbose"];
                         }
                         break;
-
                     case "remove":
                     case "rm":
                         if (arg2 && arg3) {
@@ -346,6 +352,18 @@ function createCommand(): cli.ICommand {
 
             case "logout":
                 cmd = { type: cli.CommandType.logout };
+                break;
+                
+            case "promote":
+                if (arg1 && arg2 && arg3) {
+                    cmd = { type: cli.CommandType.promote };
+
+                    var deploymentPromoteCommand = <cli.IPromoteCommand>cmd;
+
+                    deploymentPromoteCommand.appName = arg1;
+                    deploymentPromoteCommand.sourceDeploymentName = arg2;
+                    deploymentPromoteCommand.destDeploymentName = arg3;
+                }
                 break;
 
             case "register":

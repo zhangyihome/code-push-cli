@@ -11,6 +11,7 @@
     deploymentRename,
     login,
     logout,
+    promote,
     register,
     release
 }
@@ -68,6 +69,12 @@ export interface IDeploymentRenameCommand extends ICommand {
 
 export interface ILoginCommand extends ICommand {
     serverUrl: string;
+}
+
+export interface IPromoteCommand extends ICommand {
+    appName: string;
+    sourceDeploymentName: string;
+    destDeploymentName: string;
 }
 
 export interface IRegisterCommand extends ICommand {
