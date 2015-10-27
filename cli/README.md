@@ -1,7 +1,7 @@
 # CodePush management CLI
 
 CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users' devices. It works by acting as a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using provided client SDKs for
-[Cordova](http://github.com/cordova-plugin-code-push) and [React Native](http://github.com/react-native-code-push)). This allows you to have a more deterministic and direct engagement model with your userbase, when addressing bugs and/or adding small features that don't require you to re-build a binary and re-distribute it through the respective app stores.
+[Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push)). This allows you to have a more deterministic and direct engagement model with your userbase, when addressing bugs and/or adding small features that don't require you to re-build a binary and re-distribute it through the respective app stores.
 
 ![CodePush CLI](https://cloud.githubusercontent.com/assets/1646506/10623441/e355f1ec-7743-11e5-93f7-0223b5baeddc.png)
 
