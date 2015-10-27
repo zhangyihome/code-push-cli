@@ -12,7 +12,7 @@ var isValidCommandCategory = false;
 var isValidCommand = false;
 var wasHelpShown = false;
 
-function showHelp(showRootDescription?: boolean): void {
+export function showHelp(showRootDescription?: boolean): void {
     if (!wasHelpShown) {
         if (showRootDescription) {
             console.log(chalk.cyan("  _____        __  " + chalk.green("  ___           __ ")));
