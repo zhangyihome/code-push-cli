@@ -592,9 +592,9 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
     var destDeploymentId: string;
     
     return getAppId(command.appName)
-        .then((gotAppId: string): Promise<string> => {
-            throwForInvalidAppId(gotAppId, command.appName);
-            appId = gotAppId;
+        .then((appIdResult: string): Promise<string> => {
+            throwForInvalidAppId(appIdResult, command.appName);
+            appId = appIdResult;
             return getDeploymentId(appId, command.sourceDeploymentName);
         })
         .then((deploymentId: string): Promise<string> => {
