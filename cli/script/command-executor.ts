@@ -454,7 +454,7 @@ function login(command: cli.ILoginCommand): Promise<void> {
         throwForMissingCredentials(command.accessKeyName, command.providerName, command.providerUniqueId);
         
         sdk = new AccountManager(command.serverUrl);
-        var credentialsJSONString = JSON.stringify({ accessKeyName: command.accessKeyName, providerName: command.providerName.toLowerCase(), providerUniqueId: command.providerUniqueId });
+        var credentialsJSONString: string = JSON.stringify({ accessKeyName: command.accessKeyName, providerName: command.providerName.toLowerCase(), providerUniqueId: command.providerUniqueId });
         var accessToken: string = base64.encode(credentialsJSONString);
         return sdk.loginWithAccessToken(accessToken)
             .then((): void => {
