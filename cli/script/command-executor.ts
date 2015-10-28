@@ -44,7 +44,7 @@ export var loginWithAccessToken = (): Promise<void> => {
 
     sdk = new AccountManager(connectionInfo.serverUrl);
 
-    var accessToken: string = base64.encode();
+    var accessToken: string = base64.encode(JSON.stringify({ accessKeyName: connectionInfo.accessKeyName, providerName: connectionInfo.providerName, providerUniqueId: connectionInfo.providerUniqueId }));
 
     return sdk.loginWithAccessToken(accessToken);
 }
