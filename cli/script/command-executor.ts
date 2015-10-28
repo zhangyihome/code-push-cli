@@ -44,7 +44,7 @@ export var loginWithAccessToken = (): Promise<void> => {
 
     sdk = new AccountManager(connectionInfo.serverUrl);
 
-    var accessToken: string = base64.encode(JSON.stringify({ accessKeyName: connectionInfo.accessKeyName, providerName: connectionInfo.providerName, providerUniqueId: connectionInfo.providerUniqueId }));
+    var accessToken: string = base64.encode();
 
     return sdk.loginWithAccessToken(accessToken);
 }
@@ -454,7 +454,8 @@ function login(command: cli.ILoginCommand): Promise<void> {
         throwForMissingCredentials(command.accessKeyName, command.providerName, command.providerUniqueId);
         
         sdk = new AccountManager(command.serverUrl);
-        var accessToken: string = base64.encode(JSON.stringify({ accessKeyName: command.accessKeyName, providerName: command.providerName.toLowerCase(), providerUniqueId: command.providerUniqueId }));
+        var credentialsJSONString = JSON.stringify({ accessKeyName: command.accessKeyName, providerName: command.providerName.toLowerCase(), providerUniqueId: command.providerUniqueId });
+        var accessToken: string = base64.encode(credentialsJSONString);
         return sdk.loginWithAccessToken(accessToken)
             .then((): void => {
                 log("Log in successful.");
