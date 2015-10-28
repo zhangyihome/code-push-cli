@@ -218,16 +218,16 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         isValidCommand = true;
     })
     // Disabling this for closed beta
-    .command("register", "Register a new account with a specific CodePush server", (yargs: yargs.Argv) => {
-        isValidCommandCategory = true;
-        isValidCommand = true;
-        yargs.usage(USAGE_PREFIX + " register [serverUrl]")
-            .demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
-            .example("register", "Creates a new user account with " + CODE_PUSH_URL)
-            .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
+    //.command("register", "Register a new account with a specific CodePush server", (yargs: yargs.Argv) => {
+        //isValidCommandCategory = true;
+        //isValidCommand = true;
+        //yargs.usage(USAGE_PREFIX + " register [serverUrl]")
+            //.demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
+            //.example("register", "Creates a new user account with " + CODE_PUSH_URL)
+            //.check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
-        addCommonConfiguration(yargs);
-    })
+        //addCommonConfiguration(yargs);
+    //})
     .alias("v", "version")
     .version(require("../package.json").version)
     .wrap(/*columnLimit*/ null)
