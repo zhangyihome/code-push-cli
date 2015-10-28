@@ -38,6 +38,23 @@ code-push logout
 If you forget to logout from a machine you'd prefer not to leave a running session on (e.g. your friend's laptop), you can use the following commands to list and remove any "live" access tokens. 
 
 ```
+code-push access-key add
+code-push access-key add --des \"VSO Integration\"
+```
+
+You can generate additional access keys for your account with an optional description. This lets you log in to CodePush and manage your apps without going through the 3rd party authentication step, e.g. from a CI environment.
+
+```
+code-push login --key myKey -p microsoft -id 0123456
+```
+
+After generating the access key, you can call the login command with the generated key along with your 3rd party (GitHub, Microsoft) ID. 
+
+You can find your GitHub ID [here](http://caius.github.io/github_id/). 
+
+To find your Microsoft ID, go to [https://profile.live.com/](https://profile.live.com/). You will be redirected to another page, e.g. https://profile.live.com/cid-*94c6d0c6e464f387*. In this example, the Microsoft ID is 94c6d0c6e464f387.
+
+```
 code-push access-key ls
 code-push access-key rm <accessKey>
 ```
@@ -129,3 +146,12 @@ This specifies whether the update is mandatory or not (**true** or **false**). T
 who can decide to actually enforce it or not. The default value is **false**
 
 *NOTE: This parameter can be set using either "--mandatory" or "-m"*
+
+
+### Promote deployment
+
+You can also promote packages from one deployment to another, e.g. from Staging to Production.
+
+```
+code-push promote <appName> <sourceDeploymentName> <destDeploymentName>
+```

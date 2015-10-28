@@ -150,9 +150,9 @@ export class AccountManager {
         });
     }
 
-    public addAccessKey(description?: string): Promise<AccessKey> {
+    public addAccessKey(machine: string, description?: string): Promise<AccessKey> {
         return Promise<AccessKey>((resolve, reject, notify) => {
-            var accessKey: AccessKey = { id: null, name: uuid.v4(), description: description };
+            var accessKey: AccessKey = { id: null, name: uuid.v4(), datetime: new Date().getTime(), machine: machine, description: description };
             var requester: request.SuperAgent<any> = this._authedAgent ? this._authedAgent : request;
             var req = requester.post(this.serverUrl + "/accessKeys/");
 

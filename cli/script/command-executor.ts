@@ -75,6 +75,14 @@ export var confirm = (): Promise<boolean> => {
 
 var connectionInfo: IConnectionInfo;
 
+function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
+    var hostname: string = os.hostname();
+    return sdk.addAccessKey(hostname, command.description)
+        .then((accessKey: AccessKey) => {
+            log("Created a new access key" + (command.description ? (" \"" + command.description + "\"") : "") + ": " + accessKey.name);
+        });
+}
+
 function accessKeyList(command: cli.IAccessKeyListCommand): Promise<void> {
     throwForInvalidOutputFormat(command.format);
 
@@ -298,6 +306,9 @@ export function execute(command: cli.ICommand): Promise<void> {
     return loginWithAccessToken()
         .then((): Promise<void> => {
             switch (command.type) {
+                case cli.CommandType.accessKeyAdd:
+                    return accessKeyAdd(<cli.IAccessKeyAddCommand>command);
+
                 case cli.CommandType.accessKeyList:
                     return accessKeyList(<cli.IAccessKeyListCommand>command);
 
@@ -438,9 +449,24 @@ function initiateExternalAuthenticationAsync(serverUrl: string, action: string):
 }
 
 function login(command: cli.ILoginCommand): Promise<void> {
-    initiateExternalAuthenticationAsync(command.serverUrl, "login");
+    // Check if one of the flags were provided.
+    if (command.accessKeyName || command.providerName || command.providerUniqueId) {
+        throwForMissingCredentials(command.accessKeyName, command.providerName, command.providerUniqueId);
+        
+        sdk = new AccountManager(command.serverUrl);
+        var accessToken: string = base64.encode(JSON.stringify({ accessKeyName: command.accessKeyName, providerName: command.providerName.toLowerCase(), providerUniqueId: command.providerUniqueId }));
+        return sdk.loginWithAccessToken(accessToken)
+            .then((): void => {
+                log("Log in successful.");
 
-    return loginWithAccessTokenInternal(command.serverUrl);
+                // The access token is valid.
+                serializeConnectionInfo(command.serverUrl, accessToken);
+            });
+    } else {
+        initiateExternalAuthenticationAsync(command.serverUrl, "login");
+
+        return loginWithAccessTokenInternal(command.serverUrl);
+    }
 }
 
 function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
@@ -551,19 +577,24 @@ function printList<T extends { id: string; name: string; }>(format: string, item
     }
 }
 
-function printAccessKeys<T extends { id: string; name: string; description: string }>(format: string, items: T[]): void {
+function printAccessKeys(format: string, keys: AccessKey[]): void {
     if (format === "json") {
         var dataSource: any[] = [];
 
-        items.forEach((item: T): void => {
-            dataSource.push({ "name": item.name, "id": item.id, "description": item.description });
+        keys.forEach((key: AccessKey): void => {
+            dataSource.push(key);
         });
 
         log(JSON.stringify(dataSource));
     } else if (format === "table") {
-        printTable(["Key", "Description"], (dataSource: any[]): void => {
-            items.forEach((item: T): void => {
-                dataSource.push([item.name, item.description]);
+        printTable(["Key", "Time Created", "Created From", "Description"], (dataSource: any[]): void => {
+            keys.forEach((key: AccessKey): void => {
+                dataSource.push([
+                    key.name, 
+                    key.datetime ? new Date(+key.datetime).toString() : "",
+                    key.machine ? key.machine : "", 
+                    key.description ? key.description : ""
+                ]);
             });
         });
     }
@@ -718,6 +749,13 @@ function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
     fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
 
     log("Login token persisted to file '" + configFilePath + "'. Run 'code-push logout' to remove the file.");
+}
+
+function throwForMissingCredentials(accessKeyName: string, providerName: string, providerUniqueId: string): void {
+    if (!accessKeyName) throw new Error("Access key is missing.");
+    if (!providerName) throw new Error("Provider name is missing.");
+    if (!providerUniqueId) throw new Error("Provider unique ID is missing.");
+    
 }
 
 function throwForInvalidAccessKeyId(accessKeyId: string, accessKeyName: string): void {

@@ -2,7 +2,9 @@ declare module "rest-definitions" {
     export interface AccessKey {
         id: string;
         name: string;
-        description: string;
+        datetime: number;
+        machine: string;
+        description?: string;
     }
 
     export interface PackageInfo {
