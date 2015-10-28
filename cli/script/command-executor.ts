@@ -328,6 +328,9 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.deploymentRename:
                     return deploymentRename(<cli.IDeploymentRenameCommand>command);
 
+                case cli.CommandType.promote:
+                    return promote(<cli.IPromoteCommand>command);
+
                 case cli.CommandType.release:
                     return release(<cli.IReleaseCommand>command);
 
@@ -581,6 +584,32 @@ function register(command: cli.IRegisterCommand): Promise<void> {
     initiateExternalAuthenticationAsync(command.serverUrl, "register");
 
     return loginWithAccessTokenInternal(command.serverUrl);
+}
+
+function promote(command: cli.IPromoteCommand): Promise<void> {
+    var appId: string;
+    var sourceDeploymentId: string;
+    var destDeploymentId: string;
+    
+    return getAppId(command.appName)
+        .then((appIdResult: string): Promise<string> => {
+            throwForInvalidAppId(appIdResult, command.appName);
+            appId = appIdResult;
+            return getDeploymentId(appId, command.sourceDeploymentName);
+        })
+        .then((deploymentId: string): Promise<string> => {
+            throwForInvalidDeploymentId(deploymentId, command.sourceDeploymentName, command.appName);
+            sourceDeploymentId = deploymentId;
+            return getDeploymentId(appId, command.destDeploymentName);
+        })
+        .then((deploymentId: string): Promise<void> => {
+            throwForInvalidDeploymentId(deploymentId, command.destDeploymentName, command.appName);
+            destDeploymentId = deploymentId;
+            return sdk.promotePackage(appId, sourceDeploymentId, destDeploymentId);
+        })
+        .then((): void => {
+            log("Promoted deployment \"" + command.sourceDeploymentName + "\" of app \"" + command.appName + "\" to deployment \"" + command.destDeploymentName + "\".");
+        });
 }
 
 function release(command: cli.IReleaseCommand): Promise<void> {
