@@ -12,8 +12,8 @@ export class SdkStub {
         return Q(<codePush.AccessKey>{
             id: "accessKeyId",
             name: "key123",
-            datetime: new Date().getTime(),
-            machine: os.hostname(),
+            createdTime: new Date().getTime(),
+            createdBy: os.hostname(),
             description: description
         });
     }
@@ -38,8 +38,8 @@ export class SdkStub {
         return Q([<codePush.AccessKey>{
             id: "7",
             name: "8",
-            datetime: 0,
-            machine: os.hostname(),
+            createdTime: 0,
+            createdBy: os.hostname(),
             description: "Test Description"
         }]);
     }
@@ -156,7 +156,7 @@ describe("CLI", () => {
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = "[{\"id\":\"7\",\"name\":\"8\",\"datetime\":0,\"machine\":\"" + os.hostname() + "\",\"description\":\"Test Description\"}]";
+                var expected = "[{\"id\":\"7\",\"name\":\"8\",\"createdTime\":0,\"createdBy\":\"" + os.hostname() + "\",\"description\":\"Test Description\"}]";
 
                 assert.equal(actual, expected);
                 done();

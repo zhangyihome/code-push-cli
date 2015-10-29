@@ -74,9 +74,7 @@ export interface IDeploymentRenameCommand extends ICommand {
 
 export interface ILoginCommand extends ICommand {
     serverUrl: string;
-    accessKeyName: string;
-    providerName: string;
-    providerUniqueId: string;
+    accessKey: string;
 }
 
 export interface IPromoteCommand extends ICommand {

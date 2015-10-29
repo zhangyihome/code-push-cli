@@ -4,7 +4,7 @@ import * as semver from "semver";
 import * as chalk from "chalk";
 
 const USAGE_PREFIX = "Usage: code-push";
-const CODE_PUSH_URL = "https://codepush.azurewebsites.net";
+const CODE_PUSH_URL = "http://codepush.azurewebsites.net";
 
 // Command categories are:  access-key, app, release, deployment, deployment-key, login, logout, register
 var isValidCommandCategory = false;
@@ -202,13 +202,11 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
     .command("login", "Authenticate with the CodePush server in order to begin managing your apps", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         isValidCommand = true;
-        yargs.usage(USAGE_PREFIX + " login [serverUrl] [--accessKey <accessKey>] [--providerName <github|microsoft>] [--providerUniqueId <providerUniqueId>]")
+        yargs.usage(USAGE_PREFIX + " login [serverUrl] [--accessKey <accessKey>]")
             .demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
             .example("login", "Logs in to " + CODE_PUSH_URL)
-            .example("login --key mykey -p microsoft --id myid", "Logs in on behalf of the user with Microsoft account \"myid\"")
+            .example("login --key mykey", "Logs in on behalf of the user who owns and created the access key \"mykey\"")
             .option("accessKey", { alias: "key", default: null, demand: false, description: "The access key to be used for this session", type: "string" })
-            .option("providerName", { alias: "p", default: null, demand: false, description: "The 3rd party provider name of the user's account", type: "string" })
-            .option("providerUniqueId", { alias: "id", default: null, demand: false, description: "The user's unique provider ID", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
         addCommonConfiguration(yargs);
@@ -370,9 +368,7 @@ function createCommand(): cli.ICommand {
                 var loginCommand = <cli.ILoginCommand>cmd;
 
                 loginCommand.serverUrl = getServerUrl(arg1);
-                loginCommand.accessKeyName = argv["accessKey"];
-                loginCommand.providerName = argv["providerName"];
-                loginCommand.providerUniqueId = argv["providerUniqueId"];
+                loginCommand.accessKey = argv["accessKey"];
                 break;
 
             case "logout":

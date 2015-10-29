@@ -60,40 +60,42 @@ export class AccountManager {
         return Promise<void>((resolve, reject, notify) => {
             var loginInfo: ILoginInfo = AccountManager.getLoginInfo(accessToken);
 
-            if (!loginInfo || !loginInfo.providerName || !loginInfo.providerUniqueId) {
-                reject(<CodePushError>{ message: "Invalid access key." });
-                return;
-            }
-
             var req = request.post(this.serverUrl + "/auth/login/accessToken");
-
             this.attachCredentials(req, request);
+            req = req.type("form")
 
-            req.type("form")
-                .send({ identity: JSON.stringify({ providerName: loginInfo.providerName, providerUniqueId: loginInfo.providerUniqueId }) })
-                .send({ token: loginInfo.accessKeyName })
-                .end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
+            if (loginInfo && loginInfo.providerName && loginInfo.providerUniqueId) {
+                // Login the old way.
+                req = req.send({ identity: JSON.stringify({ providerName: loginInfo.providerName, providerUniqueId: loginInfo.providerUniqueId }) })
+                    .send({ token: loginInfo.accessKeyName });
+            } else {
+                // Note: We can't send an empty identity string, or PassportAuth will short circuit and fail.
+                req = req.send({ identity: "accessKey" })
+                    .send({ token: accessToken });
+            }
+            
+            req.end((err: any, res: request.Response) => {
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
 
-                    if (this._saveAuthedAgent) {
-                        this._authedAgent = request.agent();
-                        this._authedAgent.saveCookies(res);
-                    }
+                if (this._saveAuthedAgent) {
+                    this._authedAgent = request.agent();
+                    this._authedAgent.saveCookies(res);
+                }
 
-                    if (res.ok) {
-                        resolve(null);
+                if (res.ok) {
+                    resolve(null);
+                } else {
+                    var body = tryJSON(res.text);
+                    if (body) {
+                        reject(<CodePushError>body);
                     } else {
-                        var body = tryJSON(res.text);
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
                     }
-                });
+                }
+            });
         });
     }
 
@@ -152,7 +154,7 @@ export class AccountManager {
 
     public addAccessKey(machine: string, description?: string): Promise<AccessKey> {
         return Promise<AccessKey>((resolve, reject, notify) => {
-            var accessKey: AccessKey = { id: null, name: uuid.v4(), datetime: new Date().getTime(), machine: machine, description: description };
+            var accessKey: AccessKey = { id: null, name: uuid.v4(), createdTime: new Date().getTime(), createdBy: machine, description: description };
             var requester: request.SuperAgent<any> = this._authedAgent ? this._authedAgent : request;
             var req = requester.post(this.serverUrl + "/accessKeys/");
 
@@ -889,9 +891,12 @@ export class AccountManager {
     }
 
     private static getLoginInfo(accessKey: string): ILoginInfo {
-        var decoded: string = base64.decode(accessKey);
-
-        return tryJSON(decoded);
+        try { 
+            var decoded: string = base64.decode(accessKey);
+            return tryJSON(decoded);
+        } catch (ex) {
+            return null;
+        }
     }
 
     private getErrorMessage(error: Error, response: request.Response): string {
