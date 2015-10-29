@@ -45,14 +45,10 @@ code-push access-key add --des \"VSO Integration\"
 You can generate additional access keys for your account with an optional description. This lets you log in to CodePush and manage your apps without going through the 3rd party authentication step, e.g. from a CI environment.
 
 ```
-code-push login --key myKey -p microsoft -id 0123456
+code-push login --key myKey
 ```
 
-After generating the access key, you can call the login command with the generated key along with your 3rd party (GitHub, Microsoft) ID. 
-
-You can find your GitHub ID [here](http://caius.github.io/github_id/). 
-
-To find your Microsoft ID, go to [https://profile.live.com/](https://profile.live.com/). You will be redirected to another page, e.g. https://profile.live.com/cid-*94c6d0c6e464f387*. In this example, the Microsoft ID is 94c6d0c6e464f387.
+After generating the access key, you can call the login command with the generated key.
 
 ```
 code-push access-key ls
