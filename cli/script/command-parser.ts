@@ -101,10 +101,10 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         isValidCommandCategory = true;
         yargs.usage(USAGE_PREFIX + " access-key <command>")
             .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
-            .command("list", "List the access keys associated with your account", (yargs: yargs.Argv) => accessKeyList("list", yargs))
-            .command("ls", "List the access keys associated with your account", (yargs: yargs.Argv) => accessKeyList("ls", yargs))
             .command("remove", "Remove an existing access key", (yargs: yargs.Argv) => accessKeyRemove("remove", yargs))
             .command("rm", "Remove an existing access key", (yargs: yargs.Argv) => accessKeyRemove("rm", yargs))
+            .command("list", "List the access keys associated with your account", (yargs: yargs.Argv) => accessKeyList("list", yargs))
+            .command("ls", "List the access keys associated with your account", (yargs: yargs.Argv) => accessKeyList("ls", yargs))
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
         addCommonConfiguration(yargs);
@@ -121,9 +121,8 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
                 addCommonConfiguration(yargs);
             })
-            .command("list", "List the apps associated with your account", (yargs: yargs.Argv) => appList("list", yargs))
-            .command("ls", "List the apps associated with your account", (yargs: yargs.Argv) => appList("ls", yargs))
             .command("remove", "Remove an app from your account", (yargs: yargs.Argv) => appRemove("remove", yargs))
+            .command("rm", "Remove an app from your account", (yargs: yargs.Argv) => appRemove("rm", yargs))
             .command("rename", "Rename an existing app", (yargs: yargs.Argv) => {
                 isValidCommand = true;
                 yargs.usage(USAGE_PREFIX + " app rename <currentAppName> <newAppName>")
@@ -132,7 +131,8 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
                 addCommonConfiguration(yargs);
             })
-            .command("rm", "Remove an app from your account", (yargs: yargs.Argv) => appRemove("rm", yargs))
+            .command("list", "List the apps associated with your account", (yargs: yargs.Argv) => appList("list", yargs))
+            .command("ls", "List the apps associated with your account", (yargs: yargs.Argv) => appList("ls", yargs))
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
         addCommonConfiguration(yargs);
@@ -171,9 +171,8 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
                 addCommonConfiguration(yargs);
             })
-            .command("list", "List the deployments associated with an app", (yargs: yargs.Argv) => deploymentList("list", yargs))
-            .command("ls", "List the deployments associated with an app", (yargs: yargs.Argv) => deploymentList("ls", yargs))
             .command("remove", "Remove a deployment from an app", (yargs: yargs.Argv) => deploymentRemove("remove", yargs))
+            .command("rm", "Remove a deployment from an app", (yargs: yargs.Argv) => deploymentRemove("rm", yargs))
             .command("rename", "Rename an existing deployment", (yargs: yargs.Argv) => {
                 isValidCommand = true;
                 yargs.usage(USAGE_PREFIX + " deployment rename <appName> <currentDeploymentName> <newDeploymentName>")
@@ -182,7 +181,8 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
                 addCommonConfiguration(yargs);
             })
-            .command("rm", "Remove a deployment from an app", (yargs: yargs.Argv) => deploymentRemove("rm", yargs))
+            .command("list", "List the deployments associated with an app", (yargs: yargs.Argv) => deploymentList("list", yargs))
+            .command("ls", "List the deployments associated with an app", (yargs: yargs.Argv) => deploymentList("ls", yargs))
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
         addCommonConfiguration(yargs);
