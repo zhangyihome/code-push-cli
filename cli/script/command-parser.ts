@@ -31,10 +31,9 @@ function showHelp(showRootDescription?: boolean): void {
 
 function accessKeyAdd(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
-    yargs.usage(USAGE_PREFIX + " access-key " + commandName + " --description <description>")
-        .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
-        .example("access-key " + commandName + " --des \"VSO Integration\"", "Generates a new access key with the description \"VSO Integration\"")
-        .option("description", { alias: "des", demand: true, description: "A short description to be tagged to this access key", type: "string" });
+    yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <description>")
+        .demand(/*count*/ 3, /*max*/ 3)  // Require exactly two non-option arguments.
+        .example("access-key " + commandName + " \"VSO Integration\"", "Generates a new access key with the description \"VSO Integration\"");
 
     addCommonConfiguration(yargs);
 }
@@ -248,8 +247,10 @@ function createCommand(): cli.ICommand {
             case "access-key":
                 switch (arg1) {
                     case "add":
-                        cmd = { type: cli.CommandType.accessKeyAdd };
-                        (<cli.IAccessKeyAddCommand>cmd).description = argv["description"];
+                        if (arg2) {
+                            cmd = { type: cli.CommandType.accessKeyAdd };
+                            (<cli.IAccessKeyAddCommand>cmd).description = arg2;
+                        }
                         break;
                         
                     case "list":

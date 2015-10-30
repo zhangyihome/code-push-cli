@@ -21,14 +21,14 @@ import Promise = Q.Promise;
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 
-interface StandardLoginConnectionInfo {
+interface IStandardLoginConnectionInfo {
     accessKeyName: string;
     providerName: string;
     providerUniqueId: string;
     serverUrl: string;
 }
 
-interface AccessKeyLoginConnectionInfo {
+interface IAccessKeyLoginConnectionInfo {
     accessKey: string;
     serverUrl: string;
 }
@@ -51,8 +51,8 @@ export var loginWithAccessToken = (): Promise<void> => {
     
     var accessToken: string;
     
-    var standardLoginConnectionInfo: StandardLoginConnectionInfo = <StandardLoginConnectionInfo>connectionInfo;
-    var accessKeyLoginConnectionInfo: AccessKeyLoginConnectionInfo = <AccessKeyLoginConnectionInfo>connectionInfo;
+    var standardLoginConnectionInfo: IStandardLoginConnectionInfo = <IStandardLoginConnectionInfo>connectionInfo;
+    var accessKeyLoginConnectionInfo: IAccessKeyLoginConnectionInfo = <IAccessKeyLoginConnectionInfo>connectionInfo;
     
     if (standardLoginConnectionInfo.providerName) {
         accessToken = base64.encode(JSON.stringify({ 
@@ -91,7 +91,7 @@ export var confirm = (): Promise<boolean> => {
     });
 }
 
-var connectionInfo: StandardLoginConnectionInfo|AccessKeyLoginConnectionInfo;
+var connectionInfo: IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo;
 
 function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
     var hostname: string = os.hostname();
@@ -117,7 +117,7 @@ function removeLocalAccessKey(): Promise<void> {
 }
 
 function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
-    if (command.accessKeyName === (<StandardLoginConnectionInfo>connectionInfo).accessKeyName || command.accessKeyName === (<AccessKeyLoginConnectionInfo>connectionInfo).accessKey) {
+    if (command.accessKeyName === (<IStandardLoginConnectionInfo>connectionInfo).accessKeyName || command.accessKeyName === (<IAccessKeyLoginConnectionInfo>connectionInfo).accessKey) {
         return removeLocalAccessKey();
     } else {
         return getAccessKeyId(command.accessKeyName)
@@ -285,7 +285,7 @@ function deploymentRename(command: cli.IDeploymentRenameCommand): Promise<void> 
         });
 }
 
-function deserializeConnectionInfo(): StandardLoginConnectionInfo|AccessKeyLoginConnectionInfo {
+function deserializeConnectionInfo(): IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo {
     var savedConnection: string;
 
     try {
@@ -294,7 +294,7 @@ function deserializeConnectionInfo(): StandardLoginConnectionInfo|AccessKeyLogin
         return;
     }
 
-    var credentialsObject: StandardLoginConnectionInfo|AccessKeyLoginConnectionInfo = tryJSON(savedConnection);
+    var credentialsObject: IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo = tryJSON(savedConnection);
     return credentialsObject;
 }
 
@@ -515,8 +515,8 @@ function logout(): Promise<void> {
     if (connectionInfo) {
         return loginWithAccessToken()
             .then((): Promise<string> => {
-                var standardLoginConnectionInfo: StandardLoginConnectionInfo = <StandardLoginConnectionInfo>connectionInfo;
-                var accessKeyLoginConnectionInfo: AccessKeyLoginConnectionInfo = <AccessKeyLoginConnectionInfo>connectionInfo;
+                var standardLoginConnectionInfo: IStandardLoginConnectionInfo = <IStandardLoginConnectionInfo>connectionInfo;
+                var accessKeyLoginConnectionInfo: IAccessKeyLoginConnectionInfo = <IAccessKeyLoginConnectionInfo>connectionInfo;
                 
                 if (standardLoginConnectionInfo.accessKeyName) return getAccessKeyId(standardLoginConnectionInfo.accessKeyName);
                 else return getAccessKeyId(accessKeyLoginConnectionInfo.accessKey);
@@ -760,7 +760,7 @@ function requestAccessToken(): Promise<string> {
 function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
     // The access token should have been validated already (i.e.:  logging in).
     var json: string = tryBase64Decode(accessToken);
-    var standardLoginConnectionInfo: StandardLoginConnectionInfo = tryJSON(json);
+    var standardLoginConnectionInfo: IStandardLoginConnectionInfo = tryJSON(json);
     
     if (standardLoginConnectionInfo) {
         // This is a normal login.
@@ -769,7 +769,7 @@ function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
         fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
     } else {
         // This login uses an access token
-        var accessKeyLoginConnectionInfo: AccessKeyLoginConnectionInfo = { serverUrl: serverUrl, accessKey: accessToken };
+        var accessKeyLoginConnectionInfo: IAccessKeyLoginConnectionInfo = { serverUrl: serverUrl, accessKey: accessToken };
         json = JSON.stringify(accessKeyLoginConnectionInfo);
         fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
     }
@@ -777,7 +777,7 @@ function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
     log("Login token persisted to file '" + configFilePath + "'. Run 'code-push logout' to remove the file.");
 }
 
-function tryBase64Decode(encoded: string) {
+function tryBase64Decode(encoded: string): string {
     try {
         return base64.decode(encoded);
     } catch (ex) {
