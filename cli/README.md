@@ -42,7 +42,7 @@ code-push access-key ls
 code-push access-key rm <accessKey>
 ```
 
-The list of access keys will display the name of the machine the token was created on, as well as the time the login occured. This should make it easy to spot keys you don't want to keep around.
+The list of access keys will display the name of the machine the token was created on, as well as the time the login occurred. This should make it easy to spot keys you don't want to keep around.
 
 ### App management
 Before you can deploy any updates, you need to register an app with the CodePush service
@@ -126,6 +126,6 @@ This provides an optional "change log" for the deployment. The value is simply r
 #### Mandatory parameter
 
 This specifies whether the update is mandatory or not (**true** or **false**). The value is simply roundtripped to the client,
-who can decide to actually enforce it or not. The default value is **false**
+who can decide to actually enforce it or not. The default value is **false**.
 
 *NOTE: This parameter can be set using either "--mandatory" or "-m"*
