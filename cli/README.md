@@ -36,7 +36,7 @@ code-push logout
 ```
 
 If you forget to logout from a machine you'd prefer not to leave a running session on (e.g. your friend's laptop), you can use the following commands to list and remove any "live" access tokens. 
-The list of access keys will display the name of the machine the token was created on, as well as the time the login occured. This should make it easy to spot keys you don't want to keep around.
+The list of access keys will display the name of the machine the token was created on, as well as the time the login occurred. This should make it easy to spot keys you don't want to keep around.
 
 ```
 code-push access-key ls
