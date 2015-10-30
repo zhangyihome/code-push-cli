@@ -36,13 +36,24 @@ code-push logout
 ```
 
 If you forget to logout from a machine you'd prefer not to leave a running session on (e.g. your friend's laptop), you can use the following commands to list and remove any "live" access tokens. 
+The list of access keys will display the name of the machine the token was created on, as well as the time the login occurred. This should make it easy to spot keys you don't want to keep around.
 
 ```
 code-push access-key ls
 code-push access-key rm <accessKey>
 ```
 
-The list of access keys will display the name of the machine the token was created on, as well as the time the login occurred. This should make it easy to spot keys you don't want to keep around.
+You can generate additional access keys for your account with a description tagged to each key. This lets you log in to CodePush and manage your apps without going through the 3rd party authentication step, e.g. from a CI environment.
+
+```
+code-push access-key add "VSO Integration"
+```
+
+After generating the access key, you can call the login command with the generated key.
+
+```
+code-push login --accessKey myKey
+```
 
 ### App management
 Before you can deploy any updates, you need to register an app with the CodePush service
@@ -129,3 +140,12 @@ This specifies whether the update is mandatory or not (**true** or **false**). T
 who can decide to actually enforce it or not. The default value is **false**.
 
 *NOTE: This parameter can be set using either "--mandatory" or "-m"*
+
+
+### Promote deployment
+
+You can also promote packages from one deployment to another, e.g. from Staging to Production.
+
+```
+code-push promote <appName> <sourceDeploymentName> <destDeploymentName>
+```

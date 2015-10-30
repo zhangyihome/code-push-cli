@@ -29,6 +29,15 @@ export function showHelp(showRootDescription?: boolean): void {
     }
 }
 
+function accessKeyAdd(commandName: string, yargs: yargs.Argv): void {
+    isValidCommand = true;
+    yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <description>")
+        .demand(/*count*/ 3, /*max*/ 3)  // Require exactly two non-option arguments.
+        .example("access-key " + commandName + " \"VSO Integration\"", "Generates a new access key with the description \"VSO Integration\"");
+
+    addCommonConfiguration(yargs);
+}
+
 function accessKeyList(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
     yargs.usage(USAGE_PREFIX + " access-key " + commandName + " [--format <format>]")
@@ -101,6 +110,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         isValidCommandCategory = true;
         yargs.usage(USAGE_PREFIX + " access-key <command>")
             .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
+            .command("add", "Create a new access key associated with your account", (yargs: yargs.Argv) => accessKeyAdd("add", yargs))
             .command("remove", "Remove an existing access key", (yargs: yargs.Argv) => accessKeyRemove("remove", yargs))
             .command("rm", "Remove an existing access key", (yargs: yargs.Argv) => accessKeyRemove("rm", yargs))
             .command("list", "List the access keys associated with your account", (yargs: yargs.Argv) => accessKeyList("list", yargs))
@@ -190,9 +200,11 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
     .command("login", "Authenticate with the CodePush server in order to begin managing your apps", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         isValidCommand = true;
-        yargs.usage(USAGE_PREFIX + " login [serverUrl]")
+        yargs.usage(USAGE_PREFIX + " login [serverUrl] [--accessKey <accessKey>]")
             .demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
             .example("login", "Logs in to " + CODE_PUSH_URL)
+            .example("login --accessKey mykey", "Logs in on behalf of the user who owns and created the access key \"mykey\"")
+            .option("accessKey", { alias: "key", default: null, demand: false, description: "The access key to be used for this session", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
         addCommonConfiguration(yargs);
@@ -234,6 +246,13 @@ function createCommand(): cli.ICommand {
         switch (arg0) {
             case "access-key":
                 switch (arg1) {
+                    case "add":
+                        if (arg2) {
+                            cmd = { type: cli.CommandType.accessKeyAdd };
+                            (<cli.IAccessKeyAddCommand>cmd).description = arg2;
+                        }
+                        break;
+                        
                     case "list":
                     case "ls":
                         cmd = { type: cli.CommandType.accessKeyList };
@@ -316,6 +335,7 @@ function createCommand(): cli.ICommand {
                             deploymentListCommand.verbose = argv["verbose"];
                         }
                         break;
+
                     case "remove":
                     case "rm":
                         if (arg2 && arg3) {
@@ -348,6 +368,7 @@ function createCommand(): cli.ICommand {
                 var loginCommand = <cli.ILoginCommand>cmd;
 
                 loginCommand.serverUrl = getServerUrl(arg1);
+                loginCommand.accessKey = argv["accessKey"];
                 break;
 
             case "logout":

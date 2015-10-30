@@ -21,10 +21,15 @@ import Promise = Q.Promise;
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 
-interface IConnectionInfo {
+interface IStandardLoginConnectionInfo {
     accessKeyName: string;
     providerName: string;
     providerUniqueId: string;
+    serverUrl: string;
+}
+
+interface IAccessKeyLoginConnectionInfo {
+    accessKey: string;
     serverUrl: string;
 }
 
@@ -43,9 +48,22 @@ export var loginWithAccessToken = (): Promise<void> => {
     }
 
     sdk = new AccountManager(connectionInfo.serverUrl);
-
-    var accessToken: string = base64.encode(JSON.stringify({ accessKeyName: connectionInfo.accessKeyName, providerName: connectionInfo.providerName, providerUniqueId: connectionInfo.providerUniqueId }));
-
+    
+    var accessToken: string;
+    
+    var standardLoginConnectionInfo: IStandardLoginConnectionInfo = <IStandardLoginConnectionInfo>connectionInfo;
+    var accessKeyLoginConnectionInfo: IAccessKeyLoginConnectionInfo = <IAccessKeyLoginConnectionInfo>connectionInfo;
+    
+    if (standardLoginConnectionInfo.providerName) {
+        accessToken = base64.encode(JSON.stringify({ 
+            accessKeyName: standardLoginConnectionInfo.accessKeyName, 
+            providerName: standardLoginConnectionInfo.providerName, 
+            providerUniqueId: standardLoginConnectionInfo.providerUniqueId 
+        }));
+    } else {
+        accessToken = accessKeyLoginConnectionInfo.accessKey;
+    }
+    
     return sdk.loginWithAccessToken(accessToken);
 }
 
@@ -73,7 +91,15 @@ export var confirm = (): Promise<boolean> => {
     });
 }
 
-var connectionInfo: IConnectionInfo;
+var connectionInfo: IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo;
+
+function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
+    var hostname: string = os.hostname();
+    return sdk.addAccessKey(hostname, command.description)
+        .then((accessKey: AccessKey) => {
+            log("Created a new access key" + (command.description ? (" \"" + command.description + "\"") : "") + ": " + accessKey.name);
+        });
+}
 
 function accessKeyList(command: cli.IAccessKeyListCommand): Promise<void> {
     throwForInvalidOutputFormat(command.format);
@@ -91,7 +117,7 @@ function removeLocalAccessKey(): Promise<void> {
 }
 
 function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
-    if (command.accessKeyName === connectionInfo.accessKeyName) {
+    if (command.accessKeyName === (<IStandardLoginConnectionInfo>connectionInfo).accessKeyName || command.accessKeyName === (<IAccessKeyLoginConnectionInfo>connectionInfo).accessKey) {
         return removeLocalAccessKey();
     } else {
         return getAccessKeyId(command.accessKeyName)
@@ -259,16 +285,17 @@ function deploymentRename(command: cli.IDeploymentRenameCommand): Promise<void> 
         });
 }
 
-function deserializeConnectionInfo(): IConnectionInfo {
-    var json: string;
+function deserializeConnectionInfo(): IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo {
+    var savedConnection: string;
 
     try {
-        json = fs.readFileSync(configFilePath, { encoding: "utf8" });
+        savedConnection = fs.readFileSync(configFilePath, { encoding: "utf8" });
     } catch (ex) {
         return;
     }
 
-    return tryJSON(json);
+    var credentialsObject: IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo = tryJSON(savedConnection);
+    return credentialsObject;
 }
 
 function notifyAlreadyLoggedIn(): Promise<void> {
@@ -298,6 +325,9 @@ export function execute(command: cli.ICommand): Promise<void> {
     return loginWithAccessToken()
         .then((): Promise<void> => {
             switch (command.type) {
+                case cli.CommandType.accessKeyAdd:
+                    return accessKeyAdd(<cli.IAccessKeyAddCommand>command);
+
                 case cli.CommandType.accessKeyList:
                     return accessKeyList(<cli.IAccessKeyListCommand>command);
 
@@ -438,9 +468,21 @@ function initiateExternalAuthenticationAsync(serverUrl: string, action: string):
 }
 
 function login(command: cli.ILoginCommand): Promise<void> {
-    initiateExternalAuthenticationAsync(command.serverUrl, "login");
+    // Check if one of the flags were provided.
+    if (command.accessKey) {
+        sdk = new AccountManager(command.serverUrl);
+        return sdk.loginWithAccessToken(command.accessKey)
+            .then((): void => {
+                log("Log in successful.");
 
-    return loginWithAccessTokenInternal(command.serverUrl);
+                // The access token is valid.
+                serializeConnectionInfo(command.serverUrl, command.accessKey);
+            });
+    } else {
+        initiateExternalAuthenticationAsync(command.serverUrl, "login");
+
+        return loginWithAccessTokenInternal(command.serverUrl);
+    }
 }
 
 function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
@@ -473,7 +515,11 @@ function logout(): Promise<void> {
     if (connectionInfo) {
         return loginWithAccessToken()
             .then((): Promise<string> => {
-                return getAccessKeyId(connectionInfo.accessKeyName);
+                var standardLoginConnectionInfo: IStandardLoginConnectionInfo = <IStandardLoginConnectionInfo>connectionInfo;
+                var accessKeyLoginConnectionInfo: IAccessKeyLoginConnectionInfo = <IAccessKeyLoginConnectionInfo>connectionInfo;
+                
+                if (standardLoginConnectionInfo.accessKeyName) return getAccessKeyId(standardLoginConnectionInfo.accessKeyName);
+                else return getAccessKeyId(accessKeyLoginConnectionInfo.accessKey);
             })
             .then((accessKeyId: string): Promise<void> => {
                 return sdk.removeAccessKey(accessKeyId);
@@ -499,7 +545,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
                         "appVersion": deployment.package.appVersion,
                         "isMandatory": deployment.package.isMandatory,
                         "packageHash": deployment.package.packageHash,
-                        "uploadTime": new Date(+deployment.package.uploadTime)
+                        "uploadTime": new Date(deployment.package.uploadTime)
                     };
                     if (deployment.package.description) strippedDeployment["package"]["description"] = deployment.package.description;
                 }
@@ -522,7 +568,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
                             "Minimum App Store Version: " + deployment.package.appVersion + "\n" +
                             "Mandatory: " + (deployment.package.isMandatory ? "Yes" : "No") + "\n" +
                             "Hash: " + deployment.package.packageHash + "\n" + 
-                            "Uploaded On: " + new Date(+deployment.package.uploadTime);
+                            "Uploaded On: " + new Date(deployment.package.uploadTime);
                         }
                         row.push(packageString);
                     }
@@ -551,19 +597,24 @@ function printList<T extends { id: string; name: string; }>(format: string, item
     }
 }
 
-function printAccessKeys<T extends { id: string; name: string; description: string }>(format: string, items: T[]): void {
+function printAccessKeys(format: string, keys: AccessKey[]): void {
     if (format === "json") {
         var dataSource: any[] = [];
 
-        items.forEach((item: T): void => {
-            dataSource.push({ "name": item.name, "id": item.id, "description": item.description });
+        keys.forEach((key: AccessKey): void => {
+            dataSource.push(key);
         });
 
         log(JSON.stringify(dataSource));
     } else if (format === "table") {
-        printTable(["Key", "Description"], (dataSource: any[]): void => {
-            items.forEach((item: T): void => {
-                dataSource.push([item.name, item.description]);
+        printTable(["Key", "Time Created", "Created From", "Description"], (dataSource: any[]): void => {
+            keys.forEach((key: AccessKey): void => {
+                dataSource.push([
+                    key.name, 
+                    key.createdTime ? new Date(key.createdTime) : "",
+                    key.createdBy ? key.createdBy : "", 
+                    key.description ? key.description : ""
+                ]);
             });
         });
     }
@@ -708,16 +759,37 @@ function requestAccessToken(): Promise<string> {
 
 function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
     // The access token should have been validated already (i.e.:  logging in).
-    var json: string = base64.decode(accessToken);
-    var info: IConnectionInfo = JSON.parse(json);
-
-    info.serverUrl = serverUrl;
-
-    json = JSON.stringify(info);
-
-    fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
+    var json: string = tryBase64Decode(accessToken);
+    var standardLoginConnectionInfo: IStandardLoginConnectionInfo = tryJSON(json);
+    
+    if (standardLoginConnectionInfo) {
+        // This is a normal login.
+        standardLoginConnectionInfo.serverUrl = serverUrl;
+        json = JSON.stringify(standardLoginConnectionInfo);
+        fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
+    } else {
+        // This login uses an access token
+        var accessKeyLoginConnectionInfo: IAccessKeyLoginConnectionInfo = { serverUrl: serverUrl, accessKey: accessToken };
+        json = JSON.stringify(accessKeyLoginConnectionInfo);
+        fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
+    }
 
     log("Login token persisted to file '" + configFilePath + "'. Run 'code-push logout' to remove the file.");
+}
+
+function tryBase64Decode(encoded: string): string {
+    try {
+        return base64.decode(encoded);
+    } catch (ex) {
+        return null;
+    }
+}
+
+function throwForMissingCredentials(accessKeyName: string, providerName: string, providerUniqueId: string): void {
+    if (!accessKeyName) throw new Error("Access key is missing.");
+    if (!providerName) throw new Error("Provider name is missing.");
+    if (!providerUniqueId) throw new Error("Provider unique ID is missing.");
+    
 }
 
 function throwForInvalidAccessKeyId(accessKeyId: string, accessKeyName: string): void {

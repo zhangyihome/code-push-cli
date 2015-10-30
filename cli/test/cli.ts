@@ -5,8 +5,19 @@ import Promise = Q.Promise;
 import * as codePush from "code-push";
 import * as cli from "../definitions/cli";
 import * as cmdexec from "../script/command-executor";
+import * as os from "os";
 
 export class SdkStub {
+    public addAccessKey(machine: string, description?: string): Promise<codePush.AccessKey> {
+        return Q(<codePush.AccessKey>{
+            id: "accessKeyId",
+            name: "key123",
+            createdTime: new Date().getTime(),
+            createdBy: os.hostname(),
+            description: description
+        });
+    }
+
     public addApp(name: string, description?: string): Promise<codePush.App> {
         return Q(<codePush.App>{
             description: description,
@@ -26,7 +37,10 @@ export class SdkStub {
     public getAccessKeys(): Promise<codePush.AccessKey[]> {
         return Q([<codePush.AccessKey>{
             id: "7",
-            name: "8"
+            name: "8",
+            createdTime: 0,
+            createdBy: os.hostname(),
+            description: "Test Description"
         }]);
     }
 
@@ -111,6 +125,25 @@ describe("CLI", () => {
         sandbox.restore();
     });
 
+    it("accessKeyAdd creates access key with description", (done: MochaDone): void => {
+        var command: cli.IAccessKeyAddCommand = {
+            type: cli.CommandType.accessKeyAdd,
+            description: "Test description"
+        };
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(log);
+                assert.equal(log.args[0].length, 1);
+
+                var actual: string = log.args[0][0];
+                var expected = "Created a new access key \"Test description\": key123";
+
+                assert.equal(actual, expected);
+                done();
+            });
+    });
+
     it("accessKeyList lists access key names and ID's", (done: MochaDone): void => {
         var command: cli.ICommand = {
             type: cli.CommandType.accessKeyList,
@@ -123,7 +156,7 @@ describe("CLI", () => {
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = "[{\"name\":\"8\",\"id\":\"7\"}]";
+                var expected = "[{\"id\":\"7\",\"name\":\"8\",\"createdTime\":0,\"createdBy\":\"" + os.hostname() + "\",\"description\":\"Test Description\"}]";
 
                 assert.equal(actual, expected);
                 done();

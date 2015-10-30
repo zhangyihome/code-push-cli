@@ -1,4 +1,5 @@
 ﻿export enum CommandType {
+    accessKeyAdd,
     accessKeyList,
     accessKeyRemove,
     appAdd,
@@ -18,6 +19,10 @@
 
 export interface ICommand {
     type: CommandType;
+}
+
+export interface IAccessKeyAddCommand extends ICommand {
+    description: string;
 }
 
 export interface IAccessKeyListCommand extends ICommand {
@@ -69,6 +74,7 @@ export interface IDeploymentRenameCommand extends ICommand {
 
 export interface ILoginCommand extends ICommand {
     serverUrl: string;
+    accessKey: string;
 }
 
 export interface IPromoteCommand extends ICommand {
