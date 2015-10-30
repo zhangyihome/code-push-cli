@@ -203,7 +203,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " login [serverUrl] [--accessKey <accessKey>]")
             .demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
             .example("login", "Logs in to " + CODE_PUSH_URL)
-            .example("login --key mykey", "Logs in on behalf of the user who owns and created the access key \"mykey\"")
+            .example("login --accessKey mykey", "Logs in on behalf of the user who owns and created the access key \"mykey\"")
             .option("accessKey", { alias: "key", default: null, demand: false, description: "The access key to be used for this session", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
