@@ -43,11 +43,10 @@ code-push access-key ls
 code-push access-key rm <accessKey>
 ```
 
-You can generate additional access keys for your account with an optional description. This lets you log in to CodePush and manage your apps without going through the 3rd party authentication step, e.g. from a CI environment.
+You can generate additional access keys for your account with a description tagged to each key. This lets you log in to CodePush and manage your apps without going through the 3rd party authentication step, e.g. from a CI environment.
 
 ```
-code-push access-key add
-code-push access-key add --des \"VSO Integration\"
+code-push access-key add "VSO Integration"
 ```
 
 After generating the access key, you can call the login command with the generated key.
