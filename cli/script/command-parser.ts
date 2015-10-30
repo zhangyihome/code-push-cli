@@ -31,11 +31,10 @@ function showHelp(showRootDescription?: boolean): void {
 
 function accessKeyAdd(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
-    yargs.usage(USAGE_PREFIX + " access-key " + commandName + " [--description <description>]")
+    yargs.usage(USAGE_PREFIX + " access-key " + commandName + " --description <description>")
         .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
-        .example("access-key " + commandName, "Generates a new access key with an empty description")
         .example("access-key " + commandName + " --des \"VSO Integration\"", "Generates a new access key with the description \"VSO Integration\"")
-        .option("description", { alias: "des", default: "", demand: false, description: "A short description to be tagged to this access key", type: "string" });
+        .option("description", { alias: "des", demand: true, description: "A short description to be tagged to this access key", type: "string" });
 
     addCommonConfiguration(yargs);
 }
