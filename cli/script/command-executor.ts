@@ -545,7 +545,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
                         "appVersion": deployment.package.appVersion,
                         "isMandatory": deployment.package.isMandatory,
                         "packageHash": deployment.package.packageHash,
-                        "uploadTime": new Date(+deployment.package.uploadTime)
+                        "uploadTime": new Date(deployment.package.uploadTime)
                     };
                     if (deployment.package.description) strippedDeployment["package"]["description"] = deployment.package.description;
                 }
@@ -568,7 +568,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
                             "Minimum App Store Version: " + deployment.package.appVersion + "\n" +
                             "Mandatory: " + (deployment.package.isMandatory ? "Yes" : "No") + "\n" +
                             "Hash: " + deployment.package.packageHash + "\n" + 
-                            "Uploaded On: " + new Date(+deployment.package.uploadTime);
+                            "Uploaded On: " + new Date(deployment.package.uploadTime);
                         }
                         row.push(packageString);
                     }
@@ -611,7 +611,7 @@ function printAccessKeys(format: string, keys: AccessKey[]): void {
             keys.forEach((key: AccessKey): void => {
                 dataSource.push([
                     key.name, 
-                    key.createdTime ? new Date(+key.createdTime).toString() : "",
+                    key.createdTime ? new Date(key.createdTime) : "",
                     key.createdBy ? key.createdBy : "", 
                     key.description ? key.description : ""
                 ]);

@@ -52,7 +52,7 @@ code-push access-key add "VSO Integration"
 After generating the access key, you can call the login command with the generated key.
 
 ```
-code-push login --key myKey
+code-push login --accessKey myKey
 ```
 
 ### App management
