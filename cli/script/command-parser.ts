@@ -4,7 +4,7 @@ import * as semver from "semver";
 import * as chalk from "chalk";
 
 const USAGE_PREFIX = "Usage: code-push";
-const CODE_PUSH_URL = "http://codepush.azurewebsites.net";
+const CODE_PUSH_URL = "https://codepush.azurewebsites.net";
 
 // Command categories are:  access-key, app, release, deployment, deployment-key, login, logout, register
 var isValidCommandCategory = false;
