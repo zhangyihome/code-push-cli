@@ -62,7 +62,7 @@ export class AccountManager {
 
             var req = request.post(this.serverUrl + "/auth/login/accessToken");
             this.attachCredentials(req, request);
-            req = req.type("form")
+            req = req.type("form");
 
             if (loginInfo && loginInfo.providerName && loginInfo.providerUniqueId) {
                 // Login the old way.
