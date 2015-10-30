@@ -1,7 +1,7 @@
 {
   "name": "code-push",
-  "version": "1.0.0-beta",
-  "description": "Source code for the CodePush service SDK",
+  "version": "1.1.0-beta",
+  "description": "Management SDK for the CodePush service",
   "main": "script/index.js",
   "scripts": {
     "test": "gulp"
@@ -10,7 +10,9 @@
     "type": "git",
     "url": "https://github.com/Microsoft/code-push.git"
   },
-  "author": "Microsoft",
+  "author": "Microsoft Corporation",
+  "license": "MIT",
+  "homepage": "https://microsoft.github.io/code-push",
   "dependencies": {
     "base-64": "^0.1.0",
     "fs": "0.0.2",
