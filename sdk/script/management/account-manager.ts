@@ -154,37 +154,39 @@ export class AccountManager {
 
     public addAccessKey(machine: string, description?: string): Promise<AccessKey> {
         return Promise<AccessKey>((resolve, reject, notify) => {
-            var accessKey: AccessKey = { id: null, name: uuid.v4(), createdTime: new Date().getTime(), createdBy: machine, description: description };
-            var requester: request.SuperAgent<any> = this._authedAgent ? this._authedAgent : request;
-            var req = requester.post(this.serverUrl + "/accessKeys/");
-
-            this.attachCredentials(req, requester);
-
-            req.set("Content-Type", "application/json;charset=UTF-8")
-                .send(JSON.stringify(accessKey))
-                .end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
-
-                    if (res.ok) {
-                        var location = res.header["location"];
-                        if (location && location.lastIndexOf("/") !== -1) {
-                            accessKey.id = location.substr(location.lastIndexOf("/") + 1);
-                            resolve(accessKey);
-                        } else {
-                            resolve(null);
+            return this.generateAccessKey().then((newAccessKey: string) => {
+                var accessKey: AccessKey = { id: null, name: newAccessKey, createdTime: new Date().getTime(), createdBy: machine, description: description };
+                var requester: request.SuperAgent<any> = this._authedAgent ? this._authedAgent : request;
+                var req = requester.post(this.serverUrl + "/accessKeys/");
+    
+                this.attachCredentials(req, requester);
+    
+                req.set("Content-Type", "application/json;charset=UTF-8")
+                    .send(JSON.stringify(accessKey))
+                    .end((err: any, res: request.Response) => {
+                        if (err) {
+                            reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                            return;
                         }
-                    } else {
-                        var body = tryJSON(res.text);
-                        if (body) {
-                            reject(<CodePushError>body);
+    
+                        if (res.ok) {
+                            var location = res.header["location"];
+                            if (location && location.lastIndexOf("/") !== -1) {
+                                accessKey.id = location.substr(location.lastIndexOf("/") + 1);
+                                resolve(accessKey);
+                            } else {
+                                resolve(null);
+                            }
                         } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                            var body = tryJSON(res.text);
+                            if (body) {
+                                reject(<CodePushError>body);
+                            } else {
+                                reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                            }
                         }
-                    }
-                });
+                    });
+            });
         });
     }
 
@@ -924,5 +926,18 @@ export class AccountManager {
         } else {
             request.withCredentials();
         }
+    }
+    
+    private generateAccessKey(): Promise<string> {
+        return this.getAccountInfo()
+            .then(() => {
+                var newAccessKey: string = uuid.v4();
+                newAccessKey = newAccessKey.replace(/-/g, "");
+                // Mix accountID into the key (user should be logged in).
+                console.log(this.accountId);
+                newAccessKey = newAccessKey + this.accountId;
+                // Shuffle the characters in the string 
+                return newAccessKey.split('').sort(function() { return 0.5-Math.random() }).join('');
+            })
     }
 }
