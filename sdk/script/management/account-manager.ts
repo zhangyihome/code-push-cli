@@ -934,7 +934,7 @@ export class AccountManager {
             // Strip off all the dashes.
             newAccessKey = newAccessKey.replace(/-/g, "");
             // Add accountID to the key.
-            newAccessKey = newAccessKey + this.accountId;
+            return newAccessKey + this.accountId;
         })
     }
 }
