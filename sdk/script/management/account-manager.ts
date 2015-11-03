@@ -929,15 +929,14 @@ export class AccountManager {
     }
     
     private generateAccessKey(): Promise<string> {
-        return this.getAccountInfo()
-            .then(() => {
-                var newAccessKey: string = uuid.v4();
-                // Strip off all the dashes.
-                newAccessKey = newAccessKey.replace(/-/g, "");
-                // Mix accountID into the key (user should be logged in).
-                newAccessKey = newAccessKey + this.accountId;
-                // Shuffle the characters in the string.
-                return newAccessKey.split('').sort(function() { return 0.5-Math.random() }).join('');
-            })
+        return this.getAccountInfo().then(() => {
+            var newAccessKey: string = uuid.v4();
+            // Strip off all the dashes.
+            newAccessKey = newAccessKey.replace(/-/g, "");
+            // Mix accountID into the key (user should be logged in).
+            newAccessKey = newAccessKey + this.accountId;
+            // Shuffle the characters in the string.
+            return newAccessKey.split('').sort(function() { return 0.5-Math.random() }).join('');
+        })
     }
 }
