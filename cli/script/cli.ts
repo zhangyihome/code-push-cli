@@ -13,7 +13,7 @@ function run(): void {
 
     execute(parser.command)
         .catch((error: any): void => {
-            console.error(chalk.red("[Error]  " + error.message))
+            console.error(chalk.red("[Error]  " + error.message));
             process.exit(1);
         })
         .done();
