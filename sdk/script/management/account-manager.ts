@@ -932,6 +932,7 @@ export class AccountManager {
         return this.getAccountInfo()
             .then(() => {
                 var newAccessKey: string = uuid.v4();
+                // Strip off all the dashes.
                 newAccessKey = newAccessKey.replace(/-/g, "");
                 // Mix accountID into the key (user should be logged in).
                 newAccessKey = newAccessKey + this.accountId;
