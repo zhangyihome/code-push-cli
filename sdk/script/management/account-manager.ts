@@ -934,9 +934,8 @@ export class AccountManager {
                 var newAccessKey: string = uuid.v4();
                 newAccessKey = newAccessKey.replace(/-/g, "");
                 // Mix accountID into the key (user should be logged in).
-                console.log(this.accountId);
                 newAccessKey = newAccessKey + this.accountId;
-                // Shuffle the characters in the string 
+                // Shuffle the characters in the string.
                 return newAccessKey.split('').sort(function() { return 0.5-Math.random() }).join('');
             })
     }
