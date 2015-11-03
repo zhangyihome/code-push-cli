@@ -111,9 +111,7 @@ function accessKeyList(command: cli.IAccessKeyListCommand): Promise<void> {
 }
 
 function removeLocalAccessKey(): Promise<void> {
-     return Promise<void>((resolve, reject, notify): void => {
-         log(chalk.red("[Error] Cannot remove the access key for the current session. Please run 'code-push logout' if you would like to remove this access key."));
-     });
+    return Q.fcall(() => { throw new Error("Cannot remove the access key for the current session. Please run 'code-push logout' if you would like to remove this access key."); });
 }
 
 function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
@@ -299,9 +297,7 @@ function deserializeConnectionInfo(): IStandardLoginConnectionInfo|IAccessKeyLog
 }
 
 function notifyAlreadyLoggedIn(): Promise<void> {
-     return Promise<void>((resolve, reject, notify): void => {
-         log("You are already logged in from this machine.");
-     });
+    return Q.fcall(() => { throw new Error("You are already logged in from this machine."); });
 }
 
 export function execute(command: cli.ICommand): Promise<void> {
@@ -494,9 +490,7 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
             }
 
             if (!accessToken) {
-                log("Invalid access token.");
-
-                return;
+                throw new Error("Invalid access token.");
             }
 
             sdk = new AccountManager(serverUrl);
@@ -531,7 +525,7 @@ function logout(): Promise<void> {
             });
     }
 
-    return Q(<void>null);
+    return Q.fcall(() => { throw new Error("You are not logged in."); });
 }
 
 function printDeploymentList(command: cli.IDeploymentListCommand, deployments: Deployment[], deploymentKeys: Array<string>): void {
