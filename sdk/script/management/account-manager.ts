@@ -4,7 +4,6 @@ import crypto = require("crypto");
 import tryJSON = require("try-json");
 import Promise = Q.Promise;
 import request = require("superagent");
-import * as uuid from "node-uuid";
 
 declare var fs: any;
 
@@ -931,12 +930,7 @@ export class AccountManager {
 
     private generateAccessKey(): Promise<string> {
         return this.getAccountInfo().then(() => {
-            var guidBytes = new Buffer(16);
-            uuid.v4(null, guidBytes, 0);
-            var randomBytes = crypto.randomBytes(14);
-            var combinedBuffer = Buffer.concat([guidBytes, randomBytes], 30);
-
-            var accessKey = combinedBuffer
+            var accessKey = crypto.randomBytes(21)
                 .toString("base64")
                 .replace("+", "_")  // URL-friendly characters
                 .replace("/", "-")
