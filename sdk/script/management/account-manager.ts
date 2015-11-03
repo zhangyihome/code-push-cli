@@ -933,10 +933,8 @@ export class AccountManager {
             var newAccessKey: string = uuid.v4();
             // Strip off all the dashes.
             newAccessKey = newAccessKey.replace(/-/g, "");
-            // Mix accountID into the key (user should be logged in).
+            // Add accountID to the key.
             newAccessKey = newAccessKey + this.accountId;
-            // Shuffle the characters in the string.
-            return newAccessKey.split('').sort(function() { return 0.5-Math.random() }).join('');
         })
     }
 }
