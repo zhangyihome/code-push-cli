@@ -525,7 +525,7 @@ function logout(): Promise<void> {
             });
     }
 
-    return Q.fcall(() => { throw new Error("You are already logged in from this machine."); });
+    return Q.fcall(() => { throw new Error("You are not logged in."); });
 }
 
 function printDeploymentList(command: cli.IDeploymentListCommand, deployments: Deployment[], deploymentKeys: Array<string>): void {
