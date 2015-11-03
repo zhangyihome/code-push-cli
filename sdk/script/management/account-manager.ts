@@ -1,5 +1,6 @@
 import * as base64 from "base-64";
 import Q = require("q");
+import crypto = require("crypto");
 import tryJSON = require("try-json");
 import Promise = Q.Promise;
 import request = require("superagent");
@@ -73,7 +74,7 @@ export class AccountManager {
                 req = req.send({ identity: "accessKey" })
                     .send({ token: accessToken });
             }
-            
+
             req.end((err: any, res: request.Response) => {
                 if (err) {
                     reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
@@ -158,9 +159,9 @@ export class AccountManager {
                 var accessKey: AccessKey = { id: null, name: newAccessKey, createdTime: new Date().getTime(), createdBy: machine, description: description };
                 var requester: request.SuperAgent<any> = this._authedAgent ? this._authedAgent : request;
                 var req = requester.post(this.serverUrl + "/accessKeys/");
-    
+
                 this.attachCredentials(req, requester);
-    
+
                 req.set("Content-Type", "application/json;charset=UTF-8")
                     .send(JSON.stringify(accessKey))
                     .end((err: any, res: request.Response) => {
@@ -168,7 +169,7 @@ export class AccountManager {
                             reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                             return;
                         }
-    
+
                         if (res.ok) {
                             var location = res.header["location"];
                             if (location && location.lastIndexOf("/") !== -1) {
@@ -841,7 +842,7 @@ export class AccountManager {
             var requester = (this._authedAgent ? this._authedAgent : request);
             var req = requester.post(this.serverUrl + "/apps/" + appId + "/deployments/" + sourceDeploymentId + "/promote/" + destDeploymentId);
             this.attachCredentials(req, requester);
-            
+
             req.end((err: any, res: request.Response) => {
                 if (err) {
                     reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
@@ -893,7 +894,7 @@ export class AccountManager {
     }
 
     private static getLoginInfo(accessKey: string): ILoginInfo {
-        try { 
+        try {
             var decoded: string = base64.decode(accessKey);
             return tryJSON(decoded);
         } catch (ex) {
@@ -927,14 +928,21 @@ export class AccountManager {
             request.withCredentials();
         }
     }
-    
+
     private generateAccessKey(): Promise<string> {
         return this.getAccountInfo().then(() => {
-            var newAccessKey: string = uuid.v4();
-            // Strip off all the dashes.
-            newAccessKey = newAccessKey.replace(/-/g, "");
-            // Add accountID to the key.
-            return newAccessKey + this.accountId;
+            var guidBytes = new Buffer(16);
+            uuid.v4(null, guidBytes, 0);
+            var randomBytes = crypto.randomBytes(14);
+            var combinedBuffer = Buffer.concat([guidBytes, randomBytes], 30);
+
+            var accessKey = combinedBuffer
+                .toString("base64")
+                .replace("+", "_")  // URL-friendly characters
+                .replace("/", "-")
+                .concat(this.accountId);
+
+            return accessKey;
         })
     }
 }
