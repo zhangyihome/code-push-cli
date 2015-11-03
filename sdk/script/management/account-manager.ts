@@ -932,8 +932,8 @@ export class AccountManager {
         return this.getAccountInfo().then(() => {
             var accessKey = crypto.randomBytes(21)
                 .toString("base64")
-                .replace("+", "_")  // URL-friendly characters
-                .replace("/", "-")
+                .replace(/\+/g, "_")  // URL-friendly characters
+                .replace(/\//g, "-")
                 .concat(this.accountId);
 
             return accessKey;
