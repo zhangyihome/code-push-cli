@@ -54,6 +54,12 @@ After creating the new key, you can specify its value using the `--accessKey` fl
 code-push login --accessKey <accessKey>
 ```
 
+After using the key, if you want to log out of your current session, but still want to be able to re-use the same key for future logins, run the following command:
+
+```
+code-push logout --local
+```
+
 ### App management
 Before you can deploy any updates, you need to register an app with the CodePush service
 using the following command:
