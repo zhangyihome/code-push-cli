@@ -86,7 +86,7 @@ function appRemove(commandName: string, yargs: yargs.Argv): void {
 
 function deploymentList(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
-    yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> [--format <format>] [--verbose <true|false>]")
+    yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> [--format <format>] [--verbose]")
         .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
         .example("deployment " + commandName + " MyApp", "Lists deployments for app \"MyApp\" in tabular format")
         .example("deployment " + commandName + " MyApp --format json", "Lists deployments for app \"MyApp\" in JSON format")
@@ -148,7 +148,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         addCommonConfiguration(yargs);
     })
     .command("release", "Release a new version of your app to a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " release <appName> <package> <appStoreVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory <true|false>]")
+        yargs.usage(USAGE_PREFIX + " release <appName> <package> <appStoreVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory]")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
             .example("release MyApp app.js 1.0.3", "Upload app.js to the default deployment for app \"MyApp\" with the minimum required semver compliant app store version of 1.0.3")
             .example("release MyApp ./platforms/ios/www 1.0.3 -d Production", "Upload the \"./platforms/ios/www\" folder and all its contents to the \"Production\" deployment for app \"MyApp\" with the minimum required semver compliant app store version of 1.0.3")
@@ -212,6 +212,12 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
     .command("logout", "Log out of the current session", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         isValidCommand = true;
+        yargs.usage(USAGE_PREFIX + " logout [--local]")
+            .demand(/*count*/ 1, /*max*/ 1)  // Require exactly one non-option argument.
+            .example("logout", "Log out and also remove the access key used for the current session.")
+            .example("logout --local", "Log out but allow the use of the same access key for future logins.")
+            .option("local", { demand: false, description: "Whether to delete the current session's access key on the server", type: "boolean" });
+        addCommonConfiguration(yargs);
     })
     // Disabling this for closed beta
     //.command("register", "Register a new account with a specific CodePush server", (yargs: yargs.Argv) => {
@@ -373,6 +379,10 @@ function createCommand(): cli.ICommand {
 
             case "logout":
                 cmd = { type: cli.CommandType.logout };
+                
+                var logoutCommand = <cli.ILogoutCommand>cmd;
+                
+                logoutCommand.isLocal = argv["local"];
                 break;
                 
             case "promote":
