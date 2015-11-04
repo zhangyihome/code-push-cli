@@ -116,7 +116,7 @@ Once your app has been configured to query for updates against the CodePush serv
 code-push release <appName> <package> <appStoreVersion>
 [--deploymentName <deploymentName>]
 [--description <description>]
-[--mandatory <true|false>]
+[--mandatory]
 ```
 
 #### Package parameter
