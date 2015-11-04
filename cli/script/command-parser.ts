@@ -216,7 +216,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .demand(/*count*/ 1, /*max*/ 1)  // Require exactly one non-option argument.
             .example("logout", "Log out and also remove the access key used for the current session.")
             .example("logout --local", "Log out but still allow the use of the same access key for future logins.")
-            .option("local", { demand: false, description: "Whether to delete the current session's access key on the server", type: "boolean" })
+            .option("local", { demand: false, description: "Whether to delete the current session's access key on the server", type: "boolean" });
         addCommonConfiguration(yargs);
     })
     // Disabling this for closed beta
