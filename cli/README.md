@@ -42,13 +42,13 @@ code-push access-key ls
 code-push access-key rm <accessKey>
 ```
 
-If you need additional keys, which can be used in a "headless" environment (particularly CI), without needing to give acces to your GitHub and/or Microsoft crendentials, you can run the following command to create one (along with a description of what it is for):
+If you need additional keys, that can be used to authenticate against the CodePush service without needing to give access to your GitHub and/or Microsoft crendentials, you can run the following command to create one (along with a description of what it is for):
 
 ```
 code-push access-key add "VSO Integration"
 ```
 
-After creating the new key, you can specify it's value using the `--accessKey` flag of the `login` command, which allows you to perform the "headless" authentication, as opposed to launching a browser.
+After creating the new key, you can specify its value using the `--accessKey` flag of the `login` command, which allows you to perform the "headless" authentication, as opposed to launching a browser.
 
 ```
 code-push login --accessKey <accessKey>
