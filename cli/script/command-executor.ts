@@ -562,7 +562,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
                             "Minimum App Store Version: " + deployment.package.appVersion + "\n" +
                             "Mandatory: " + (deployment.package.isMandatory ? "Yes" : "No") + "\n" +
                             "Hash: " + deployment.package.packageHash + "\n" + 
-                            "Uploaded On: " + new Date(deployment.package.uploadTime);
+                            "Uploaded On: " + new Date(deployment.package.uploadTime).toString();
                         }
                         row.push(packageString);
                     }
@@ -605,7 +605,7 @@ function printAccessKeys(format: string, keys: AccessKey[]): void {
             keys.forEach((key: AccessKey): void => {
                 dataSource.push([
                     key.name, 
-                    key.createdTime ? new Date(key.createdTime) : "",
+                    key.createdTime ? new Date(key.createdTime).toString() : "",
                     key.createdBy ? key.createdBy : "", 
                     key.description ? key.description : ""
                 ]);
