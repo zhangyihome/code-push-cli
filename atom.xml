@@ -4,13 +4,65 @@
  <title>CodePush</title>
  <link href="/atom.xml" rel="self"/>
  <link href="/"/>
- <updated>2015-10-29T18:20:59-07:00</updated>
+ <updated>2015-11-04T15:11:58-08:00</updated>
  <id></id>
  <author>
    <name></name>
    <email></email>
  </author>
 
+ 
+ <entry>
+   <title>CodePush 1.1 (beta) released</title>
+   <link href="/articles/CodePush1.1.html"/>
+   <updated>2015-11-04T00:00:00-08:00</updated>
+   <id>/articles/CodePush1.1</id>
+   <content type="html">&lt;p&gt;As part of our commitment to respond quickly to all of the great developer feedback we&amp;rsquo;ve been getting, we&amp;rsquo;ve released an update to the CodePush service, management CLI and client SDKs for both Cordova and React Native. You can update any of these components immediately via NPM, and then refer to the docs, which have been updated to account for the changes.&lt;/p&gt;
+
+&lt;p&gt;The 1.1 update includes a handful of bug fixes (thanks for everyone who helped report issues!) that we hope will improve reliability. Additionally, we also addressed the following feature requests that should help enable some important/common scenarios.&lt;/p&gt;
+
+&lt;h2&gt;CodePush.sync()&lt;/h2&gt;
+
+&lt;p&gt;Our client SDKs already included APIs which allowed your apps to check for the presence of an update and then subsequently download and apply it, customizing the user-experience however you wished. While we think this &amp;ldquo;advanced API&amp;rdquo; is critical in allowing unexpected and custom scenarios to be more easily achievable, we also wanted to provide an API that allowed some common experiences to be possible with very little code. After talking to many users, we were able to infer a common user-experience that we encapsulated in a new API method called &lt;code&gt;codePush.sync&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;CodePush.sync().then((status) =&amp;gt; {
+    if (status == codePush.SyncStatus.UPDATE_APPLIED) {
+        // Do any neccessary work here before the app
+        // is restarted in order to apply the update
+    }
+});
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The &lt;code&gt;sync&lt;/code&gt; method performs the update check, and handles displaying a notification to end-users when available. If a release is optional, the displayed dialog will allow ignoring it, otherwise, if the release is marked as mandatory, the end-user is required to install it before moving forward (this is useful for internal and testing scenarios). Additionally, you can choose to display your release description in the update notification and customize any string used in the dialog (e.g. buttons, header text).&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/116461/10925666/fca687b8-8244-11e5-919a-80e17a7d3156.png&quot; alt=&quot;CodePush update notification&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;We hope this helps lower the barrier for getting started with CodePush, and we are interested in helping simplify other scenarios beyond what &lt;code&gt;sync&lt;/code&gt; currently provides (e.g. enable &amp;ldquo;silent mode&amp;rdquo; background updates). Check out the docs on this new method for more info (&lt;a href=&quot;http://localhost:3000/code-push/docs/react-native.html#codepushsync&quot;&gt;React Native&lt;/a&gt;, &lt;a href=&quot;localhost:3000/code-push/docs/cordova.html#codepushsync&quot;&gt;Cordova&lt;/a&gt;).&lt;/p&gt;
+
+&lt;h2&gt;Release promotion&lt;/h2&gt;
+
+&lt;p&gt;A very common release practice is to submit an update to a dev or staging environment, test it, and then &amp;ldquo;promote&amp;rdquo; that update to your production environment. While this was possible previously by using the &lt;code&gt;code-push release&lt;/code&gt; command in our CLI, it wasn&amp;rsquo;t optimized for making this experience as simple as possible.&lt;/p&gt;
+
+&lt;p&gt;To better accomodate this common scenario, we introduced a new command to the management CLI called &lt;code&gt;promote&lt;/code&gt; that simply allows you to copy the contents and metadata (e.g. description, app store version, mandatory) from one deployment to another.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;code-push promote &amp;lt;appName&amp;gt; &amp;lt;sourceDeploymentName&amp;gt; &amp;lt;targetDeploymentName&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;With this addition, you can now easily do migrations between deployments (dev-&amp;gt;staging, staging-&amp;gt;production, etc.), which we hope should make your development process even smoother when using CodePush. Refer to the management CLI&amp;rsquo;s &lt;a href=&quot;http://localhost:3000/code-push/docs/cli.html&quot;&gt;documentation&lt;/a&gt; for more information.&lt;/p&gt;
+
+&lt;h2&gt;CI integration/&amp;ldquo;headless releases&amp;rdquo;&lt;/h2&gt;
+
+&lt;p&gt;Enabling &amp;ldquo;continous delivery&amp;rdquo; workflows are really important to us, and our current authentication support in the CLI didn&amp;rsquo;t lend itself very well to running &amp;ldquo;headlessly&amp;rdquo; in a CI environment. To better support this, we have made two new improvements to the CLI:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;There is a new &lt;code&gt;code-push access-key add&lt;/code&gt; command that allows you to generate new access tokens that can be used to login from a CI server. When you run &lt;code&gt;code-push access-key ls&lt;/code&gt;, the list will display the description of the key so that you can revoke it as soon as you no longer need it&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;The existing &lt;code&gt;code-push login&lt;/code&gt; command now accepts a &lt;code&gt;--accessKey&lt;/code&gt; flag that allows you to authenticate using a created access key, as opposed to laiunching a browser to authenticate with either GitHub or your Microsoft account&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;The existing &lt;code&gt;code-push logout&lt;/code&gt; command now accepts a &lt;code&gt;--local&lt;/code&gt; flag that you allows to specify that you want to logout of the current user session (e.g. remove the session file from the machine), but that you don&amp;rsquo;t want to delete the key from the server. This way you can reuse a key for all your builds in a CI environment, but you don&amp;rsquo;t need to worry about leaving any authentication credentials lying around on the build machine&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;With the ability to create and authenticate with new keys, you can now easily script release automation in your CI environment. Moving forward, we plan to provide even better integration experiences with certain CI solutions, but in the meantime, we hope that this helps unblocks folks who would like to implement a CodePush-based continous delivery workflow. Refer to the management CLI&amp;rsquo;s &lt;a href=&quot;http://localhost:3000/code-push/docs/cli.html&quot;&gt;documentation&lt;/a&gt; for more information.&lt;/p&gt;
+
+&lt;h2&gt;Thank you!&lt;/h2&gt;
+
+&lt;p&gt;It has been an absolute pleasure to engage with the Cordova and React Native communities thus far, and we want to continue saying thank you for all the bug reports, feedback, usage and overall awesomeness! We have many more improvements coming soon, and we would love to hear any any all suggestions, shout outs, hate mail, etc. that you have, so feel free to &lt;a href=&quot;mailto:codepushfeed@microsoft.com&quot;&gt;ping us&lt;/a&gt;.&lt;/p&gt;
+</content>
+ </entry>
  
 
 </feed>

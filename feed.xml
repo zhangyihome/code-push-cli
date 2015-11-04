@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+	<channel>
+		<title>CodePush</title>
+		<description>CodePush Blog</description>		
+		<link></link>
+		<atom:link href="/feed.xml" rel="self" type="application/rss+xml" />
+		
+			<item>
+				<title>CodePush 1.1 (beta) released</title>
+				
+					<dc:creator>Jonathan Carter</dc:creator>
+				        
+				
+					<description>&lt;p&gt;As part of our commitment to respond quickly to all of the great developer feedback we&amp;rsquo;ve been getting, we&amp;rsquo;ve released an update to the CodePush service, management CLI and client SDKs for both Cordova and React Native. You can update any of these components immediately via NPM, and then refer to the docs, which have been updated to account for the changes.&lt;/p&gt;
+</description>
+				
+				<pubDate>Wed, 04 Nov 2015 00:00:00 -0800</pubDate>
+				<link>/articles/CodePush1.1.html</link>
+				<guid isPermaLink="true">/articles/CodePush1.1.html</guid>
+			</item>
+		
+	</channel>
+</rss>
