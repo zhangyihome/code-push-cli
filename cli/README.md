@@ -1,9 +1,8 @@
 # CodePush management CLI
 
-CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users' devices. It works by acting as a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using provided client SDKs for
-[Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push)). This allows you to have a more deterministic and direct engagement model with your userbase, when addressing bugs and/or adding small features that don't require you to re-build a binary and re-distribute it through the respective app stores.
+CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users' devices. It works by acting as a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using provided client SDKs for [Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push)). This allows you to have a more deterministic and direct engagement model with your userbase, when addressing bugs and/or adding small features that don't require you to re-build a binary and re-distribute it through the respective app stores.
 
-![CodePush CLI](https://cloud.githubusercontent.com/assets/1646506/10623441/e355f1ec-7743-11e5-93f7-0223b5baeddc.png)
+![CodePush CLI](https://cloud.githubusercontent.com/assets/116461/10926209/b0c253f4-8249-11e5-95ec-194d2431d718.png)
 
 ## Installation
 
@@ -43,16 +42,16 @@ code-push access-key ls
 code-push access-key rm <accessKey>
 ```
 
-You can generate additional access keys for your account with a description tagged to each key. This lets you log in to CodePush and manage your apps without going through the 3rd party authentication step, e.g. from a CI environment.
+If you need additional keys, which can be used in a "headless" environment (particularly CI), without needing to give acces to your GitHub and/or Microsoft crendentials, you can run the following command to create one (along with a description of what it is for):
 
 ```
 code-push access-key add "VSO Integration"
 ```
 
-After generating the access key, you can call the login command with the generated key.
+After creating the new key, you can specify it's value using the `--accessKey` flag of the `login` command, which allows you to perform the "headless" authentication, as opposed to launching a browser.
 
 ```
-code-push login --accessKey myKey
+code-push login --accessKey <accessKey>
 ```
 
 ### App management
@@ -103,7 +102,7 @@ code-push deployment rm <appName> <deploymentName>
 code-push deployment ls <appName>
 ```
 
-### Update deployment
+### Releasing app updates
 
 Once your app has been configured to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
 
@@ -142,10 +141,10 @@ who can decide to actually enforce it or not. The default value is **false**.
 *NOTE: This parameter can be set using either "--mandatory" or "-m"*
 
 
-### Promote deployment
+### Promoting updates across deployments
 
-You can also promote packages from one deployment to another, e.g. from Staging to Production.
-
+Once you've tested an update to a specific deployment, and you want to promote it "downstream" (e.g. dev->staging, staging->production), you can simply use the following command to copy the code and metadata (e.g. mandatory, description, app store version) from one deployment to another:
 ```
 code-push promote <appName> <sourceDeploymentName> <destDeploymentName>
+code-push promote MyApp Staging Production
 ```
