@@ -1,6 +1,6 @@
 {
   "name": "code-push-cli",
-  "version": "1.0.4-beta",
+  "version": "1.1.0-beta",
   "description": "Management CLI for the CodePush service",
   "main": "script/cli.js",
   "scripts": {
@@ -20,10 +20,11 @@
     "react-native",
     "react"
   ],
+  "homepage": "https://microsoft.github.io/code-push",
   "author": "Microsoft Corporation",
   "license": "MIT",
   "dependencies": {
-    "code-push": "1.0.0-beta",
+    "code-push": "1.1.1-beta",
     "base-64": "^0.1.0",
     "chalk": "^1.1.0",
     "cli-table": "^0.3.1",
