@@ -212,6 +212,12 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
     .command("logout", "Log out of the current session", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         isValidCommand = true;
+        yargs.usage(USAGE_PREFIX + " logout [--local <true|false>]")
+            .demand(/*count*/ 1, /*max*/ 1)  // Require exactly one non-option argument.
+            .example("logout", "Log out and also remove the access key used for the current session.")
+            .example("logout --local", "Log out but still allow the use of the same access key for future logins.")
+            .option("local", { demand: false, description: "Whether to delete the current session's access key on the server", type: "boolean" })
+        addCommonConfiguration(yargs);
     })
     // Disabling this for closed beta
     //.command("register", "Register a new account with a specific CodePush server", (yargs: yargs.Argv) => {
@@ -373,6 +379,10 @@ function createCommand(): cli.ICommand {
 
             case "logout":
                 cmd = { type: cli.CommandType.logout };
+                
+                var logoutCommand = <cli.ILogoutCommand>cmd;
+                
+                logoutCommand.isLocal = argv["local"];
                 break;
                 
             case "promote":

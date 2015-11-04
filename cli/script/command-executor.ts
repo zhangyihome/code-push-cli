@@ -312,7 +312,7 @@ export function execute(command: cli.ICommand): Promise<void> {
             return login(<cli.ILoginCommand>command);
 
         case cli.CommandType.logout:
-            return logout();
+            return logout(<cli.ILogoutCommand>command);
 
         case cli.CommandType.register:
             return register(<cli.IRegisterCommand>command);
@@ -505,19 +505,33 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
         });
 }
 
-function logout(): Promise<void> {
+function logout(command: cli.ILogoutCommand): Promise<void> {
     if (connectionInfo) {
-        return loginWithAccessToken()
-            .then((): Promise<string> => {
-                var standardLoginConnectionInfo: IStandardLoginConnectionInfo = <IStandardLoginConnectionInfo>connectionInfo;
-                var accessKeyLoginConnectionInfo: IAccessKeyLoginConnectionInfo = <IAccessKeyLoginConnectionInfo>connectionInfo;
-                
-                if (standardLoginConnectionInfo.accessKeyName) return getAccessKeyId(standardLoginConnectionInfo.accessKeyName);
-                else return getAccessKeyId(accessKeyLoginConnectionInfo.accessKey);
-            })
-            .then((accessKeyId: string): Promise<void> => {
-                return sdk.removeAccessKey(accessKeyId);
-            })
+        var setupPromise: Promise<void> = loginWithAccessToken();
+        if (!command.isLocal) {
+            var accessKeyName: string;
+            setupPromise = setupPromise
+                .then((): Promise<string> => {
+                    var standardLoginConnectionInfo: IStandardLoginConnectionInfo = <IStandardLoginConnectionInfo>connectionInfo;
+                    var accessKeyLoginConnectionInfo: IAccessKeyLoginConnectionInfo = <IAccessKeyLoginConnectionInfo>connectionInfo;
+                    
+                    if (standardLoginConnectionInfo.accessKeyName) {
+                        accessKeyName = standardLoginConnectionInfo.accessKeyName;
+                        return getAccessKeyId(standardLoginConnectionInfo.accessKeyName);
+                    } else {
+                        accessKeyName = accessKeyLoginConnectionInfo.accessKey;
+                        return getAccessKeyId(accessKeyLoginConnectionInfo.accessKey);
+                    }
+                })
+                .then((accessKeyId: string): Promise<void> => {
+                    return sdk.removeAccessKey(accessKeyId);
+                })
+                .then((): void => {
+                    log("Removed access key " + accessKeyName + ".");
+                });
+        }
+        
+        return setupPromise
             .then((): Promise<void> => sdk.logout(), (): Promise<void> => sdk.logout())
             .then((): void => deleteConnectionInfoCache(), (): void => deleteConnectionInfoCache())
             .then((): void => {
