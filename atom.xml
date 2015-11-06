@@ -4,7 +4,7 @@
  <title>CodePush</title>
  <link href="/atom.xml" rel="self"/>
  <link href="/"/>
- <updated>2015-11-04T15:19:13-08:00</updated>
+ <updated>2015-11-06T11:26:21-08:00</updated>
  <id></id>
  <author>
    <name></name>
@@ -23,7 +23,7 @@
 
 &lt;h2&gt;CodePush.sync()&lt;/h2&gt;
 
-&lt;p&gt;Our client SDKs already included APIs which allowed your apps to check for the presence of an update and then subsequently download and apply it, customizing the user-experience however you wished. While we think this &amp;ldquo;advanced API&amp;rdquo; is critical in allowing unexpected and custom scenarios to be more easily achievable, we also wanted to provide an API that allowed some common experiences to be possible with very little code. After talking to many users, we were able to infer a common user-experience that we encapsulated in a new API method called &lt;code&gt;codePush.sync&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Our client SDKs already included APIs which allowed your apps to check for the presence of an update and then subsequently download and apply it, customizing the user experience however you wished. While we think this &amp;ldquo;advanced API&amp;rdquo; is critical in allowing unexpected and custom scenarios to be more easily achievable, we also wanted to provide an API that allowed some common experiences to be possible with very little code. After talking to many users, we were able to infer a common user experience that we encapsulated in a new API method called &lt;code&gt;codePush.sync&lt;/code&gt;.&lt;/p&gt;
 &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;CodePush.sync().then((status) =&amp;gt; {
     if (status == codePush.SyncStatus.UPDATE_APPLIED) {
         // Do any neccessary work here before the app
@@ -31,7 +31,7 @@
     }
 });
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;The &lt;code&gt;sync&lt;/code&gt; method performs the update check, and handles displaying a notification to end-users when available. If a release is optional, the displayed dialog will allow ignoring it, otherwise, if the release is marked as mandatory, the end-user is required to install it before moving forward (this is useful for internal and testing scenarios). Additionally, you can choose to display your release description in the update notification and customize any string used in the dialog (e.g. buttons, header text).&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;sync&lt;/code&gt; method performs the update check, and handles displaying a notification to end-users when available. If a release is optional, the displayed dialog will allow ignoring it; otherwise, if the release is marked as mandatory, the end-user is required to install it before moving forward (this is useful for internal and testing scenarios). Additionally, you can choose to display your release description in the update notification and customize any string used in the dialog (e.g. buttons, header text).&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/116461/10925666/fca687b8-8244-11e5-919a-80e17a7d3156.png&quot; alt=&quot;CodePush update notification&quot;&gt;&lt;/p&gt;
 
@@ -48,15 +48,15 @@
 
 &lt;h2&gt;CI integration/&amp;ldquo;headless releases&amp;rdquo;&lt;/h2&gt;
 
-&lt;p&gt;Enabling &amp;ldquo;continous delivery&amp;rdquo; workflows are really important to us, and our current authentication support in the CLI didn&amp;rsquo;t lend itself very well to running &amp;ldquo;headlessly&amp;rdquo; in a CI environment. To better support this, we have made two new improvements to the CLI:&lt;/p&gt;
+&lt;p&gt;Enabling &amp;ldquo;continuous delivery&amp;rdquo; workflows are really important to us, and our current authentication support in the CLI didn&amp;rsquo;t lend itself very well to running &amp;ldquo;headlessly&amp;rdquo; in a CI environment. To better support this, we have made three improvements to the CLI:&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;&lt;p&gt;There is a new &lt;code&gt;code-push access-key add&lt;/code&gt; command that allows you to generate new access tokens that can be used to login from a CI server. When you run &lt;code&gt;code-push access-key ls&lt;/code&gt;, the list will display the description of the key so that you can revoke it as soon as you no longer need it&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;The existing &lt;code&gt;code-push login&lt;/code&gt; command now accepts a &lt;code&gt;--accessKey&lt;/code&gt; flag that allows you to authenticate using a created access key, as opposed to laiunching a browser to authenticate with either GitHub or your Microsoft account&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;The existing &lt;code&gt;code-push logout&lt;/code&gt; command now accepts a &lt;code&gt;--local&lt;/code&gt; flag that you allows to specify that you want to logout of the current user session (e.g. remove the session file from the machine), but that you don&amp;rsquo;t want to delete the key from the server. This way you can reuse a key for all your builds in a CI environment, but you don&amp;rsquo;t need to worry about leaving any authentication credentials lying around on the build machine&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;There is a new &lt;code&gt;code-push access-key add&lt;/code&gt; command that allows you to generate new access tokens that can be used to login from a CI server. When you run &lt;code&gt;code-push access-key ls&lt;/code&gt;, the list will display the description of the key so that you can revoke it as soon as you no longer need it.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;The existing &lt;code&gt;code-push login&lt;/code&gt; command now accepts a &lt;code&gt;--accessKey&lt;/code&gt; flag that allows you to authenticate using a created access key, as opposed to launching a browser to authenticate with either GitHub or your Microsoft account.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;The existing &lt;code&gt;code-push logout&lt;/code&gt; command now accepts a &lt;code&gt;--local&lt;/code&gt; flag that allows you to specify that you want to logout of the current user session (e.g. remove the session file from the machine), but that you don&amp;rsquo;t want to delete the key from the server. This way you can reuse a key for all your builds in a CI environment, but you don&amp;rsquo;t need to worry about leaving any authentication credentials lying around on the build machine.&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;With the ability to create and authenticate with new keys, you can now easily script release automation in your CI environment. Moving forward, we plan to provide even better integration experiences with certain CI solutions, but in the meantime, we hope that this helps unblocks folks who would like to implement a CodePush-based continous delivery workflow. Refer to the management CLI&amp;rsquo;s &lt;a href=&quot;http://localhost:3000/code-push/docs/cli.html&quot;&gt;documentation&lt;/a&gt; for more information.&lt;/p&gt;
+&lt;p&gt;With the ability to create and authenticate with new keys, you can now easily script release automation in your CI environment. Moving forward, we plan to provide even better integration experiences with certain CI solutions, but in the meantime, we hope that this helps unblocks folks who would like to implement a CodePush-based continuous delivery workflow. Refer to the management CLI&amp;rsquo;s &lt;a href=&quot;http://localhost:3000/code-push/docs/cli.html&quot;&gt;documentation&lt;/a&gt; for more information.&lt;/p&gt;
 
 &lt;h2&gt;Thank you!&lt;/h2&gt;
 
