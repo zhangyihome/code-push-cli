@@ -86,12 +86,11 @@ function appRemove(commandName: string, yargs: yargs.Argv): void {
 
 function deploymentList(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
-    yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> [--format <format>] [--verbose]")
+    yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> [--format <format>]")
         .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
         .example("deployment " + commandName + " MyApp", "Lists deployments for app \"MyApp\" in tabular format")
         .example("deployment " + commandName + " MyApp --format json", "Lists deployments for app \"MyApp\" in JSON format")
         .option("format", { default: "table", demand: false, description: "The output format (\"json\" or \"table\")", type: "string" })
-        .option("verbose", { alias: "v", demand: false, description: "Show deployment description and package metadata", type: "boolean" })
     addCommonConfiguration(yargs);
 }
 
@@ -338,7 +337,6 @@ function createCommand(): cli.ICommand {
 
                             deploymentListCommand.appName = arg2;
                             deploymentListCommand.format = argv["format"];
-                            deploymentListCommand.verbose = argv["verbose"];
                         }
                         break;
 

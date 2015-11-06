@@ -138,7 +138,7 @@ function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
 }
 
 function appAdd(command: cli.IAppAddCommand): Promise<void> {
-    return sdk.addApp(command.appName, /*description*/ null)
+    return sdk.addApp(command.appName)
         .then((app: App): Promise<void> => {
             log("Successfully added app \"" + command.appName + "\".\nCreated two default deployments:");
             var deploymentListCommand: cli.IDeploymentListCommand = {
@@ -206,7 +206,7 @@ function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
         .then((appId: string): Promise<void> => {
             throwForInvalidAppId(appId, command.appName);
 
-            return sdk.addDeployment(appId, command.deploymentName, /*description*/ null)
+            return sdk.addDeployment(appId, command.deploymentName)
                 .then((deployment: Deployment): Promise<DeploymentKey[]> => {
                     return sdk.getDeploymentKeys(appId, deployment.id);
                 }).then((deploymentKeys: DeploymentKey[]) => {
@@ -547,39 +547,34 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
         var dataSource: any[] = [];
         deployments.forEach((deployment: Deployment, index: number) => {
             var strippedDeployment: any = { "name": deployment.name, "deploymentKey": deploymentKeys[index] };
-            if (command.verbose) {
-                if (deployment.package) {
-                    strippedDeployment["package"] = {
-                        "appVersion": deployment.package.appVersion,
-                        "isMandatory": deployment.package.isMandatory,
-                        "packageHash": deployment.package.packageHash,
-                        "uploadTime": new Date(deployment.package.uploadTime)
-                    };
-                    if (deployment.package.description) strippedDeployment["package"]["description"] = deployment.package.description;
-                }
+            if (deployment.package) {
+                strippedDeployment["package"] = {
+                    "appVersion": deployment.package.appVersion,
+                    "isMandatory": deployment.package.isMandatory,
+                    "packageHash": deployment.package.packageHash,
+                    "uploadTime": new Date(deployment.package.uploadTime)
+                };
+                if (deployment.package.description) strippedDeployment["package"]["description"] = deployment.package.description;
             }
             dataSource.push(strippedDeployment);
         });
         log(JSON.stringify(dataSource));
     } else if (command.format === "table") {
-        var headers = ["Name", "Deployment Key"];
-        if (command.verbose) headers.push("Package Metadata");
+        var headers = ["Name", "Deployment Key", "Package Metadata"];
         printTable(headers,
             (dataSource: any[]): void => {
                 deployments.forEach((deployment: Deployment, index: number): void => {
                     var row = [deployment.name, deploymentKeys[index]];
-                    if (command.verbose) {
-                        var packageString: string = "";
-                        if (deployment.package) {
-                            packageString =
+                    var packageString: string = "";
+                    if (deployment.package) {
+                        packageString =
                             (deployment.package.description ? wordwrap(30)("Description: " + deployment.package.description) + "\n" : "") +
                             "Minimum App Store Version: " + deployment.package.appVersion + "\n" +
                             "Mandatory: " + (deployment.package.isMandatory ? "Yes" : "No") + "\n" +
                             "Hash: " + deployment.package.packageHash + "\n" + 
                             "Uploaded On: " + new Date(deployment.package.uploadTime).toString();
-                        }
-                        row.push(packageString);
                     }
+                    row.push(packageString);
                     dataSource.push(row);
                 });
             }
