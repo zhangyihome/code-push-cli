@@ -892,6 +892,36 @@ export class AccountManager {
         });
     }
 
+    public getPackageHistory(appId: string, deploymentId: string): Promise<Package[]> {
+        return Promise<Package[]>((resolve, reject, notify) => {
+            var requester = (this._authedAgent ? this._authedAgent : request);
+            var req = requester.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/packageHistory");
+            this.attachCredentials(req, requester);
+
+            req.end((err: any, res: request.Response) => {
+                    if (err) {
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                        return;
+                    }
+
+                    var body = tryJSON(res.text);
+                    if (res.ok) {
+                        if (body) {
+                            resolve(body.packageHistory);
+                        } else {
+                            reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
+                        }
+                    } else {
+                        if (body) {
+                            reject(<CodePushError>body);
+                        } else {
+                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                        }
+                    }
+                });
+        });
+    }
+
     private static getLoginInfo(accessKey: string): ILoginInfo {
         try {
             var decoded: string = base64.decode(accessKey);
