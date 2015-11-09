@@ -558,7 +558,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
             }
             dataSource.push(strippedDeployment);
         });
-        log(JSON.stringify(dataSource));
+        printJson(dataSource);
     } else if (command.format === "table") {
         var headers = ["Name", "Deployment Key", "Package Metadata"];
         printTable(headers,
@@ -569,7 +569,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
                     if (deployment.package) {
                         packageString =
                             (deployment.package.description ? wordwrap(30)("Description: " + deployment.package.description) + "\n" : "") +
-                            "Minimum App Store Version: " + deployment.package.appVersion + "\n" +
+                            "App Store Version: " + deployment.package.appVersion + "\n" +
                             "Mandatory: " + (deployment.package.isMandatory ? "Yes" : "No") + "\n" +
                             "Hash: " + deployment.package.packageHash + "\n" + 
                             "Uploaded On: " + new Date(deployment.package.uploadTime).toString();
@@ -582,6 +582,10 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
     }
 }
 
+function printJson(object: any): void {
+    log(JSON.stringify(object, /*replacer=*/ null, /*spacing=*/ 2));
+}
+
 function printList<T extends { id: string; name: string; }>(format: string, items: T[]): void {
     if (format === "json") {
         var dataSource: any[] = [];
@@ -590,7 +594,7 @@ function printList<T extends { id: string; name: string; }>(format: string, item
             dataSource.push({ "name": item.name, "id": item.id });
         });
 
-        log(JSON.stringify(dataSource));
+        printJson(dataSource);
     } else if (format === "table") {
         printTable(["Name", "ID"], (dataSource: any[]): void => {
             items.forEach((item: T): void => {
@@ -602,13 +606,7 @@ function printList<T extends { id: string; name: string; }>(format: string, item
 
 function printAccessKeys(format: string, keys: AccessKey[]): void {
     if (format === "json") {
-        var dataSource: any[] = [];
-
-        keys.forEach((key: AccessKey): void => {
-            dataSource.push(key);
-        });
-
-        log(JSON.stringify(dataSource));
+        printJson(keys);
     } else if (format === "table") {
         printTable(["Key", "Time Created", "Created From", "Description"], (dataSource: any[]): void => {
             keys.forEach((key: AccessKey): void => {

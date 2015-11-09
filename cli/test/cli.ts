@@ -7,6 +7,11 @@ import * as cli from "../definitions/cli";
 import * as cmdexec from "../script/command-executor";
 import * as os from "os";
 
+function assertJsonDescribesObject(json: string, object: Object): void {
+    // Make sure JSON is indented correctly
+    assert.equal(json, JSON.stringify(object, /*replacer=*/ null, /*spacing=*/ 2)); 
+}
+
 export class SdkStub {
     public addAccessKey(machine: string, description?: string): Promise<codePush.AccessKey> {
         return Q(<codePush.AccessKey>{
@@ -156,9 +161,17 @@ describe("CLI", () => {
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = "[{\"id\":\"7\",\"name\":\"8\",\"createdTime\":0,\"createdBy\":\"" + os.hostname() + "\",\"description\":\"Test Description\"}]";
+                var expected = [
+                    {
+                        id: "7",
+                        name: "8",
+                        createdTime: 0,
+                        createdBy: os.hostname(),
+                        description: "Test Description"
+                    }
+                ];
 
-                assert.equal(actual, expected);
+                assertJsonDescribesObject(actual, expected);
                 done();
             });
     });
@@ -240,9 +253,12 @@ describe("CLI", () => {
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = "[{\"name\":\"a\",\"id\":\"1\"},{\"name\":\"b\",\"id\":\"2\"}]";
+                var expected = [
+                    { name: "a", id: "1" },
+                    { name: "b", id: "2" }
+                ];
 
-                assert.equal(actual, expected);
+                assertJsonDescribesObject(actual, expected);
                 done();
             });
     });
@@ -338,9 +354,25 @@ describe("CLI", () => {
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = "[{\"name\":\"Production\",\"deploymentKey\":\"6\"},{\"name\":\"Staging\",\"deploymentKey\":\"6\",\"package\":{\"appVersion\":\"1.0.0\",\"isMandatory\":true,\"packageHash\":\"jkl\",\"uploadTime\":" + JSON.stringify(new Date(1000)) + ",\"description\":\"fgh\"}}]";
+                var expected = [
+                    {
+                        name: "Production",
+                        deploymentKey: "6"
+                    },
+                    {
+                        name: "Staging",
+                        deploymentKey: "6",
+                        package: {
+                            appVersion: "1.0.0",
+                            isMandatory: true,
+                            packageHash: "jkl",
+                            uploadTime: "1970-01-01T00:00:01.000Z",
+                            description: "fgh"
+                        }
+                    }
+                ];
 
-                assert.equal(actual, expected);
+                assertJsonDescribesObject(actual, expected);
                 done();
             });
     });
