@@ -569,7 +569,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
                     if (deployment.package) {
                         packageString =
                             (deployment.package.description ? wordwrap(30)("Description: " + deployment.package.description) + "\n" : "") +
-                            "Minimum App Store Version: " + deployment.package.appVersion + "\n" +
+                            "App Store Version: " + deployment.package.appVersion + "\n" +
                             "Mandatory: " + (deployment.package.isMandatory ? "Yes" : "No") + "\n" +
                             "Hash: " + deployment.package.packageHash + "\n" + 
                             "Uploaded On: " + new Date(deployment.package.uploadTime).toString();
