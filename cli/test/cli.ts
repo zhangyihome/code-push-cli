@@ -7,7 +7,7 @@ import * as cli from "../definitions/cli";
 import * as cmdexec from "../script/command-executor";
 import * as os from "os";
 
-function assertJsonDescribesObject(json: string, object: Object) {
+function assertJsonDescribesObject(json: string, object: Object): void {
     // Make sure JSON is indented correctly
     assert.equal(json, JSON.stringify(object, /*replacer=*/ null, /*spacing=*/ 2)); 
 }

@@ -582,7 +582,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
     }
 }
 
-function printJson(object: any) {
+function printJson(object: any): void {
     log(JSON.stringify(object, /*replacer=*/ null, /*spacing=*/ 2));
 }
 
