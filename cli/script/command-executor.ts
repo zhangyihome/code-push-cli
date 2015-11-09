@@ -283,6 +283,12 @@ function deploymentRename(command: cli.IDeploymentRenameCommand): Promise<void> 
         });
 }
 
+function deploymentView(command: cli.IDeploymentViewCommand): Promise<void> {
+    throwForInvalidOutputFormat(command.format);
+
+    return Q(<void>null);
+}
+
 function deserializeConnectionInfo(): IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo {
     var savedConnection: string;
 
@@ -353,6 +359,9 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.deploymentRename:
                     return deploymentRename(<cli.IDeploymentRenameCommand>command);
+
+                case cli.CommandType.deploymentView:
+                    return deploymentView(<cli.IDeploymentViewCommand>command);
 
                 case cli.CommandType.promote:
                     return promote(<cli.IPromoteCommand>command);
