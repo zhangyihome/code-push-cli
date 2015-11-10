@@ -88,6 +88,28 @@ export class SdkStub {
         }]);
     }
 
+    public getPackageHistory(appId: string, deploymentId: string): Promise<codePush.Package[]> {
+        return Q([
+            <codePush.Package>{
+                appVersion: "1.0.0",
+                isMandatory: false,
+                packageHash: "463acc7d06adc9c46233481d87d9e8264b3e9ffe60fe98d721e6974209dc71a0",
+                blobUrl: "https://fakeblobstorage.net/storagev2/blobid1",
+                uploadTime: 1447113596270,
+                label: "v1"
+            },
+            <codePush.Package>{
+                description: "New update - this update does a whole bunch of things, including testing linewrapping",
+                appVersion: "1.0.1",
+                isMandatory: false,
+                packageHash: "463acc7d06adc9c46233481d87d9e8264b3e9ffe60fe98d721e6974209dc71a0",
+                blobUrl: "https://fakeblobstorage.net/storagev2/blobid2",
+                uploadTime: 1447118476669,
+                label: "v2"
+            }
+        ]);
+    }
+
     public removeAccessKey(accessKeyId: string): Promise<void> {
         return Q(<void>null);
     }
@@ -150,7 +172,7 @@ describe("CLI", () => {
     });
 
     it("accessKeyList lists access key names and ID's", (done: MochaDone): void => {
-        var command: cli.ICommand = {
+        var command: cli.IAccessKeyListCommand = {
             type: cli.CommandType.accessKeyList,
             format: "json"
         };
@@ -242,7 +264,7 @@ describe("CLI", () => {
     });
 
     it("appList lists app names and ID's", (done: MochaDone): void => {
-        var command: cli.ICommand = {
+        var command: cli.IAppListCommand = {
             type: cli.CommandType.appList,
             format: "json"
         };
@@ -434,6 +456,48 @@ describe("CLI", () => {
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Renamed deployment \"Staging\" to \"c\" for app \"a\".");
 
+                done();
+            });
+    });
+
+    it("deploymentHistory lists package history information", (done: MochaDone): void => {
+        var command: cli.IDeploymentHistoryCommand = {
+            type: cli.CommandType.deploymentHistory,
+            appName: "a",
+            deploymentName: "Staging",
+            format: "json"
+        };
+
+        var getPackageHistory: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getPackageHistory");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(getPackageHistory);
+                sinon.assert.calledOnce(log);
+                assert.equal(log.args[0].length, 1);
+
+                var actual: string = log.args[0][0];
+                var expected: codePush.Package[] = [
+                    <codePush.Package>{
+                        description: "New update - this update does a whole bunch of things, including testing linewrapping",
+                        appVersion: "1.0.1",
+                        isMandatory: false,
+                        packageHash: "463acc7d06adc9c46233481d87d9e8264b3e9ffe60fe98d721e6974209dc71a0",
+                        blobUrl: "https://fakeblobstorage.net/storagev2/blobid2",
+                        uploadTime: 1447118476669,
+                        label: "v2"
+                    },
+                    <codePush.Package>{
+                        appVersion: "1.0.0",
+                        isMandatory: false,
+                        packageHash: "463acc7d06adc9c46233481d87d9e8264b3e9ffe60fe98d721e6974209dc71a0",
+                        blobUrl: "https://fakeblobstorage.net/storagev2/blobid1",
+                        uploadTime: 1447113596270,
+                        label: "v1"
+                    }
+                ];
+
+                assertJsonDescribesObject(actual, expected);
                 done();
             });
     });

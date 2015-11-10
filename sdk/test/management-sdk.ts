@@ -235,6 +235,36 @@ describe("Management SDK", () => {
             done();
         }, rejectHandler);
     });
+
+    it("getPackageHistory handles success response with no packages", (done: MochaDone) => {
+        mockReturn(JSON.stringify({ packageHistory: [] }), 200);
+
+        manager.getPackageHistory("appId", "deploymentId").done((obj: any) => {
+            assert.ok(obj);
+            assert.equal(obj.length, 0);
+            done();
+        }, rejectHandler);
+    });
+
+    it("getPackageHistory handles success response with two packages", (done: MochaDone) => {
+        mockReturn(JSON.stringify({ packageHistory: [ { label: "v1" }, { label: "v2" } ] }), 200);
+
+        manager.getPackageHistory("appId", "deploymentId").done((obj: any) => {
+            assert.ok(obj);
+            assert.equal(obj.length, 2);
+            assert.equal(obj[0].label, "v1");
+            assert.equal(obj[1].label, "v2");
+            done();
+        }, rejectHandler);
+    });
+
+    it("getPackageHistory handles error response", (done: MochaDone) => {
+        mockReturn("", 404);
+
+        manager.getPackageHistory("appId", "deploymentId").done((obj: any) => {
+            throw new Error("Call should not complete successfully");
+        }, (error: Error) => done());
+    });
 });
 
 // Helper method that is used everywhere that an assert.fail() is needed in a promise handler

@@ -16,7 +16,7 @@ import * as yazl from "yazl";
 import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
-import { AccessKey, AccountManager, App, Deployment, DeploymentKey } from "code-push";
+import { AccessKey, AccountManager, App, Deployment, DeploymentKey, Package } from "code-push";
 import Promise = Q.Promise;
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
@@ -283,6 +283,27 @@ function deploymentRename(command: cli.IDeploymentRenameCommand): Promise<void> 
         });
 }
 
+function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void> {
+    throwForInvalidOutputFormat(command.format);
+    var storedAppId: string;
+
+    return getAppId(command.appName)
+        .then((appId: string): Promise<string> => {
+            throwForInvalidAppId(appId, command.appName);
+            storedAppId = appId;
+
+            return getDeploymentId(appId, command.deploymentName);
+        })
+        .then((deploymentId: string): Promise<Package[]> => {
+            throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
+
+            return sdk.getPackageHistory(storedAppId, deploymentId);
+        })
+        .then((packageHistory: Package[]): void => {
+            printDeploymentHistory(command, packageHistory);
+        });
+}
+
 function deserializeConnectionInfo(): IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo {
     var savedConnection: string;
 
@@ -353,6 +374,9 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.deploymentRename:
                     return deploymentRename(<cli.IDeploymentRenameCommand>command);
+
+                case cli.CommandType.deploymentHistory:
+                    return deploymentHistory(<cli.IDeploymentHistoryCommand>command);
 
                 case cli.CommandType.promote:
                     return promote(<cli.IPromoteCommand>command);
@@ -564,22 +588,44 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
         printTable(headers,
             (dataSource: any[]): void => {
                 deployments.forEach((deployment: Deployment, index: number): void => {
-                    var row = [deployment.name, deploymentKeys[index]];
-                    var packageString: string = "";
-                    if (deployment.package) {
-                        packageString =
-                            (deployment.package.description ? wordwrap(30)("Description: " + deployment.package.description) + "\n" : "") +
-                            "App Store Version: " + deployment.package.appVersion + "\n" +
-                            "Mandatory: " + (deployment.package.isMandatory ? "Yes" : "No") + "\n" +
-                            "Hash: " + deployment.package.packageHash + "\n" + 
-                            "Uploaded On: " + new Date(deployment.package.uploadTime).toString();
-                    }
-                    row.push(packageString);
+                    var row = [deployment.name, deploymentKeys[index], getPackageString(deployment.package)];
                     dataSource.push(row);
                 });
             }
         );
     }
+}
+
+function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageHistory: Package[]): void {
+    packageHistory.reverse(); // Reverse chronological order
+    if (command.format === "json") {
+        printJson(packageHistory);
+    } else if (command.format === "table") {
+        printTable(["Label", "Release Time", "App Store Version", "Mandatory", "Description"], (dataSource: any[]) => {
+            packageHistory.forEach((packageObject: Package) => {
+                dataSource.push([
+                    packageObject.label,
+                    new Date(packageObject.uploadTime).toString(),
+                    packageObject.appVersion,
+                    packageObject.isMandatory ? "Yes" : "No",
+                    packageObject.description ? wordwrap(30)(packageObject.description) : ""
+                ]);
+            });
+        });
+    }
+}
+
+function getPackageString(packageObject: Package): string {
+    if (!packageObject) {
+        return "";
+    }
+
+    return "Label: " + packageObject.label + "\n" +
+        (packageObject.description ? wordwrap(70)("Description: " + packageObject.description) + "\n" : "") +
+        "App Store Version: " + packageObject.appVersion + "\n" +
+        "Mandatory: " + (packageObject.isMandatory ? "Yes" : "No") + "\n" +
+        "Hash: " + packageObject.packageHash + "\n" + 
+        "Release Time: " + new Date(packageObject.uploadTime).toString();
 }
 
 function printJson(object: any): void {
