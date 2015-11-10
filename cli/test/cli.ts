@@ -94,7 +94,7 @@ export class SdkStub {
                 appVersion: "1.0.0",
                 isMandatory: false,
                 packageHash: "463acc7d06adc9c46233481d87d9e8264b3e9ffe60fe98d721e6974209dc71a0",
-                blobUrl: "https://codepushstaging.blob.core.windows.net/storagev2/416cfQ5Ge",
+                blobUrl: "https://fakeblobstorage.net/storagev2/blobid1",
                 uploadTime: 1447113596270,
                 label: "v1"
             },
@@ -103,7 +103,7 @@ export class SdkStub {
                 appVersion: "1.0.1",
                 isMandatory: false,
                 packageHash: "463acc7d06adc9c46233481d87d9e8264b3e9ffe60fe98d721e6974209dc71a0",
-                blobUrl: "https://codepushstaging.blob.core.windows.net/storagev2/4JpoBE5Gg",
+                blobUrl: "https://fakeblobstorage.net/storagev2/blobid2",
                 uploadTime: 1447118476669,
                 label: "v2"
             }
@@ -172,7 +172,7 @@ describe("CLI", () => {
     });
 
     it("accessKeyList lists access key names and ID's", (done: MochaDone): void => {
-        var command: cli.ICommand = {
+        var command: cli.IAccessKeyListCommand = {
             type: cli.CommandType.accessKeyList,
             format: "json"
         };
@@ -264,7 +264,7 @@ describe("CLI", () => {
     });
 
     it("appList lists app names and ID's", (done: MochaDone): void => {
-        var command: cli.ICommand = {
+        var command: cli.IAppListCommand = {
             type: cli.CommandType.appList,
             format: "json"
         };
@@ -483,7 +483,7 @@ describe("CLI", () => {
                         appVersion: "1.0.1",
                         isMandatory: false,
                         packageHash: "463acc7d06adc9c46233481d87d9e8264b3e9ffe60fe98d721e6974209dc71a0",
-                        blobUrl: "https://codepushstaging.blob.core.windows.net/storagev2/4JpoBE5Gg",
+                        blobUrl: "https://fakeblobstorage.net/storagev2/blobid2",
                         uploadTime: 1447118476669,
                         label: "v2"
                     },
@@ -491,7 +491,7 @@ describe("CLI", () => {
                         appVersion: "1.0.0",
                         isMandatory: false,
                         packageHash: "463acc7d06adc9c46233481d87d9e8264b3e9ffe60fe98d721e6974209dc71a0",
-                        blobUrl: "https://codepushstaging.blob.core.windows.net/storagev2/416cfQ5Ge",
+                        blobUrl: "https://fakeblobstorage.net/storagev2/blobid1",
                         uploadTime: 1447113596270,
                         label: "v1"
                     }

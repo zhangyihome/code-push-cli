@@ -899,26 +899,26 @@ export class AccountManager {
             this.attachCredentials(req, requester);
 
             req.end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
 
-                    var body = tryJSON(res.text);
-                    if (res.ok) {
-                        if (body) {
-                            resolve(body.packageHistory);
-                        } else {
-                            reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
-                        }
+                var body = tryJSON(res.text);
+                if (res.ok) {
+                    if (body) {
+                        resolve(body.packageHistory);
                     } else {
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
+                        reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
                     }
-                });
+                } else {
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
         });
     }
 
