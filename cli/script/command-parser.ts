@@ -103,12 +103,12 @@ function deploymentRemove(commandName: string, yargs: yargs.Argv): void {
     addCommonConfiguration(yargs);
 }
 
-function deploymentView(commandName: string, yargs: yargs.Argv): void {
+function deploymentHistory(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
     yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> <deploymentName> [--format <format>]")
         .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
-        .example("deployment " + commandName + " MyApp MyDeployment", "Views information for deployment \"MyDeployment\" from app \"MyApp\" in tabular format")
-        .example("deployment " + commandName + " MyApp MyDeployment --format json", "Views information for deployment \"MyDeployment\" from app \"MyApp\" in JSON format")
+        .example("deployment " + commandName + " MyApp MyDeployment", "Shows the release history for deployment \"MyDeployment\" from app \"MyApp\" in tabular format")
+        .example("deployment " + commandName + " MyApp MyDeployment --format json", "Shows the release history for deployment \"MyDeployment\" from app \"MyApp\" in JSON format")
         .option("format", { default: "table", demand: false, description: "The output format (\"json\" or \"table\")", type: "string" });
 
     addCommonConfiguration(yargs);
@@ -203,8 +203,8 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             })
             .command("list", "List the deployments associated with an app", (yargs: yargs.Argv) => deploymentList("list", yargs))
             .command("ls", "List the deployments associated with an app", (yargs: yargs.Argv) => deploymentList("ls", yargs))
-            .command("view", "View a specific deployment", (yargs: yargs.Argv) => deploymentView("view", yargs))
-            .command("v", "View a specific deployment", (yargs: yargs.Argv) => deploymentView("v", yargs))
+            .command("history", "Show the release history of a specific deployment", (yargs: yargs.Argv) => deploymentHistory("history", yargs))
+            .command("h", "Show the release history of a specific deployment", (yargs: yargs.Argv) => deploymentHistory("h", yargs))
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
         addCommonConfiguration(yargs);
@@ -377,16 +377,16 @@ function createCommand(): cli.ICommand {
                         }
                         break;
 
-                    case "view":
-                    case "v":
+                    case "history":
+                    case "h":
                         if (arg2 && arg3) {
-                            cmd = { type: cli.CommandType.deploymentView };
+                            cmd = { type: cli.CommandType.deploymentHistory };
 
-                            var deploymentViewCommand = <cli.IDeploymentViewCommand>cmd;
+                            var deploymentHistoryCommand = <cli.IDeploymentHistoryCommand>cmd;
 
-                            deploymentViewCommand.appName = arg2;
-                            deploymentViewCommand.deploymentName = arg3;
-                            deploymentViewCommand.format = argv["format"];
+                            deploymentHistoryCommand.appName = arg2;
+                            deploymentHistoryCommand.deploymentName = arg3;
+                            deploymentHistoryCommand.format = argv["format"];
                         }
                         break;
                 }

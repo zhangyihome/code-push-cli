@@ -10,7 +10,7 @@
     deploymentList,
     deploymentRemove,
     deploymentRename,
-    deploymentView,
+    deploymentHistory,
     login,
     logout,
     promote,
@@ -72,7 +72,7 @@ export interface IDeploymentRenameCommand extends ICommand {
     newDeploymentName: string;
 }
 
-export interface IDeploymentViewCommand extends ICommand {
+export interface IDeploymentHistoryCommand extends ICommand {
     appName: string;
     deploymentName: string;
     format: string;

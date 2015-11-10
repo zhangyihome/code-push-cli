@@ -283,7 +283,7 @@ function deploymentRename(command: cli.IDeploymentRenameCommand): Promise<void> 
         });
 }
 
-function deploymentView(command: cli.IDeploymentViewCommand): Promise<void> {
+function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void> {
     throwForInvalidOutputFormat(command.format);
     var storedAppId: string;
 
@@ -294,12 +294,13 @@ function deploymentView(command: cli.IDeploymentViewCommand): Promise<void> {
 
             return getDeploymentId(appId, command.deploymentName);
         })
-        .then((deploymentId: string): Promise<any>[] => {
+        .then((deploymentId: string): Promise<Package[]> => {
             throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
 
-            return [ sdk.getDeploymentKeys(storedAppId, deploymentId), sdk.getPackageHistory(storedAppId, deploymentId) ];
-        }).spread<void>((deploymentKeys: DeploymentKey[], packageHistory: Package[]): void => {
-            printDeployment(command, deploymentKeys[0], packageHistory);
+            return sdk.getPackageHistory(storedAppId, deploymentId);
+        })
+        .then((packageHistory: Package[]): void => {
+            printDeploymentHistory(command, packageHistory);
         });
 }
 
@@ -374,8 +375,8 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.deploymentRename:
                     return deploymentRename(<cli.IDeploymentRenameCommand>command);
 
-                case cli.CommandType.deploymentView:
-                    return deploymentView(<cli.IDeploymentViewCommand>command);
+                case cli.CommandType.deploymentHistory:
+                    return deploymentHistory(<cli.IDeploymentHistoryCommand>command);
 
                 case cli.CommandType.promote:
                     return promote(<cli.IPromoteCommand>command);
@@ -595,6 +596,25 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
     }
 }
 
+function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageHistory: Package[]): void {
+    packageHistory.reverse(); // Reverse chronological order
+    if (command.format === "json") {
+        printJson(packageHistory);
+    } else if (command.format === "table") {
+        printTable(["Label", "Description", "App Store Version", "Mandatory", "Uploaded On"], (dataSource: any[]) => {
+            packageHistory.forEach((packageObject: Package) => {
+                dataSource.push([
+                    packageObject.label,
+                    packageObject.description ? wordwrap(30)(packageObject.description) : "",
+                    packageObject.appVersion,
+                    packageObject.isMandatory ? "Yes" : "No",
+                    new Date(packageObject.uploadTime).toString()
+                ]);
+            });
+        });
+    }
+}
+
 function getPackageString(packageObject: Package): string {
     if (!packageObject) {
         return "";
@@ -641,26 +661,6 @@ function printAccessKeys(format: string, keys: AccessKey[]): void {
                     key.createdTime ? new Date(key.createdTime).toString() : "",
                     key.createdBy ? key.createdBy : "", 
                     key.description ? key.description : ""
-                ]);
-            });
-        });
-    }
-}
-
-function printDeployment(command: cli.IDeploymentViewCommand, deploymentKey: DeploymentKey, packageHistory: Package[]): void {
-    packageHistory.reverse(); // Reverse chronological order
-    if (command.format === "json") {
-        printJson(packageHistory);
-    } else if (command.format === "table") {
-        log(`\nThe "${ command.deploymentName }" deployment with key "${ deploymentKey.key }" has the following release history:`);
-        printTable(["Label", "Description", "App Store Version", "Mandatory", "Uploaded On"], (dataSource: any[]) => {
-            packageHistory.forEach((packageObject: Package) => {
-                dataSource.push([
-                    packageObject.label,
-                    packageObject.description ? wordwrap(30)(packageObject.description) : "",
-                    packageObject.appVersion,
-                    packageObject.isMandatory ? "Yes" : "No",
-                    new Date(packageObject.uploadTime).toString()
                 ]);
             });
         });

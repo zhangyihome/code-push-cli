@@ -460,9 +460,9 @@ describe("CLI", () => {
             });
     });
 
-    it("deploymentView lists package history information", (done: MochaDone): void => {
-        var command: cli.IDeploymentViewCommand = {
-            type: cli.CommandType.deploymentView,
+    it("deploymentHistory lists package history information", (done: MochaDone): void => {
+        var command: cli.IDeploymentHistoryCommand = {
+            type: cli.CommandType.deploymentHistory,
             appName: "a",
             deploymentName: "Staging",
             format: "json"
