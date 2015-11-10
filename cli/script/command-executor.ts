@@ -601,14 +601,14 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
     if (command.format === "json") {
         printJson(packageHistory);
     } else if (command.format === "table") {
-        printTable(["Label", "Description", "App Store Version", "Mandatory", "Uploaded On"], (dataSource: any[]) => {
+        printTable(["Label", "Uploaded On", "App Store Version", "Mandatory", "Description"], (dataSource: any[]) => {
             packageHistory.forEach((packageObject: Package) => {
                 dataSource.push([
                     packageObject.label,
-                    packageObject.description ? wordwrap(30)(packageObject.description) : "",
+                    new Date(packageObject.uploadTime).toString(),
                     packageObject.appVersion,
                     packageObject.isMandatory ? "Yes" : "No",
-                    new Date(packageObject.uploadTime).toString()
+                    packageObject.description ? wordwrap(30)(packageObject.description) : ""
                 ]);
             });
         });
