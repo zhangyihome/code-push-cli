@@ -621,7 +621,7 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
                 }
 
                 dataSource.push([
-                    chalk.green(packageObject.label),
+                    packageObject.label,
                     releaseTime,
                     packageObject.appVersion,
                     packageObject.isMandatory ? "Yes" : "No",
