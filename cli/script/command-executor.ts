@@ -568,10 +568,10 @@ function logout(command: cli.ILogoutCommand): Promise<void> {
 }
 
 function formatDate(unixOffset: number): string {
-    var date = moment(unixOffset);
-    var now = moment();
+    var date: moment.Moment = moment(unixOffset);
+    var now: moment.Moment = moment();
     if (now.diff(date, "days") < 30) {
-        return moment(unixOffset).fromNow();    // "2 hours ago"
+        return date.fromNow();                  // "2 hours ago"
     } else if (now.year() === date.year()) {
         return date.format("MMM D");            // "Nov 6"
     } else {
@@ -607,7 +607,7 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
     } else if (command.format === "table") {
         printTable(["Label", "Release Time", "App Version", "Mandatory", "Description"], (dataSource: any[]) => {
             packageHistory.forEach((packageObject: Package) => {
-                var releaseTime = formatDate(packageObject.uploadTime);
+                var releaseTime: string = formatDate(packageObject.uploadTime);
                 var releaseSource: string;
                 if (packageObject.releaseMethod === "Promote") {
                     releaseSource = `Promoted ${ packageObject.originalLabel } from "${ packageObject.originalDeployment }"`;
@@ -617,7 +617,7 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
 
                 if (releaseSource) {
                     // Need to word-wrap internally because wordwrap is not smart enough to ignore color characters
-                    releaseTime += "\n" + chalk.magenta(`(${releaseSource})`).toString()
+                    releaseTime += "\n" + chalk.magenta(`(${releaseSource})`).toString();
                 }
 
                 dataSource.push([
