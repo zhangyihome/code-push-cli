@@ -157,7 +157,7 @@ code-push promote MyApp Staging Production
 
 ### Viewing release history
 
-You can view a history of your releases using the following command:
+You can view a history of releases for a specific app deployment (including promotions) using the following command:
 
 ```
 code-push deployment history <appName> <deploymentName>
