@@ -154,3 +154,11 @@ Once you've tested an update to a specific deployment, and you want to promote i
 code-push promote <appName> <sourceDeploymentName> <destDeploymentName>
 code-push promote MyApp Staging Production
 ```
+
+### Viewing release history
+
+You can view a history of releases for a specific app deployment (including promotions) using the following command:
+
+```
+code-push deployment history <appName> <deploymentName>
+```
