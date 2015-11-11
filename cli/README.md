@@ -119,6 +119,12 @@ code-push release <appName> <package> <appStoreVersion>
 [--mandatory]
 ```
 
+You can view a history of your updates using the following command:
+
+```
+code-push deployment history <appName> <deploymentName>
+```
+
 #### Package parameter
 
 You can specify either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the /platforms/ios/www folder for a Cordova app). You don't need to zip up multiple files or directories in order to deploy those changes. The CLI will automatically zip them for you.
