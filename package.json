@@ -3,7 +3,7 @@
     "chmod": "^0.2.1",
     "del": "^1.2.0",
     "dotenv": "^1.2.0",
-    "dts-generator": "^1.5.0",
+    "dts-generator": "1.5.0",
     "express": "^4.13.1",
     "gulp": "^3.9.0",
     "gulp-debug": "^2.0.1",
