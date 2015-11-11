@@ -572,8 +572,10 @@ function formatDate(unixOffset: number): string {
     var now = moment();
     if (now.diff(date, "days") < 30) {
         return moment(unixOffset).fromNow();    // "2 hours ago"
-    } else {
+    } else if (now.year() === date.year()) {
         return date.format("MMM D");            // "Nov 6"
+    } else {
+        return date.format("MMM D, YYYY");      // "Nov 6, 2014"
     }
 }
 
