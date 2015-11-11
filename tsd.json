@@ -72,6 +72,12 @@
     },
     "applicationinsights/applicationinsights.d.ts": {
       "commit": "832c51db815c766fa42a2e995a7b3136ec6d15c2"
+    },
+    "moment/moment.d.ts": {
+      "commit": "708609e0764daeb5eb64104af7aca50c520c4e6e"
+    },
+    "moment/moment-node.d.ts": {
+      "commit": "708609e0764daeb5eb64104af7aca50c520c4e6e"
     }
   }
 }

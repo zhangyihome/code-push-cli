@@ -64,5 +64,8 @@ declare module "rest-definitions" {
         diffBlobUrl?: string;
         diffAgainstPackageHash?: string;
         uploadTime: number;
+        /*generated*/ releaseMethod?: string;       // "Upload", "Promote" or "Rollback". Unknown if unspecified
+        /*generated*/ originalLabel?: string;       // Set on "Promote" and "Rollback"
+        /*generated*/ originalDeployment?: string;  // Set on "Promote"
     }
 }

@@ -3,6 +3,7 @@
 import * as base64 from "base-64";
 import * as chalk from "chalk";
 import * as fs from "fs";
+import * as moment from "moment";
 var opener = require("opener");
 import * as os from "os";
 import * as path from "path";
@@ -566,20 +567,23 @@ function logout(command: cli.ILogoutCommand): Promise<void> {
     return Q.fcall(() => { throw new Error("You are not logged in."); });
 }
 
+function formatDate(unixOffset: number): string {
+    var date: moment.Moment = moment(unixOffset);
+    var now: moment.Moment = moment();
+    if (now.diff(date, "days") < 30) {
+        return date.fromNow();                  // "2 hours ago"
+    } else if (now.year() === date.year()) {
+        return date.format("MMM D");            // "Nov 6"
+    } else {
+        return date.format("MMM D, YYYY");      // "Nov 6, 2014"
+    }
+}
+
 function printDeploymentList(command: cli.IDeploymentListCommand, deployments: Deployment[], deploymentKeys: Array<string>): void {
     if (command.format === "json") {
         var dataSource: any[] = [];
         deployments.forEach((deployment: Deployment, index: number) => {
-            var strippedDeployment: any = { "name": deployment.name, "deploymentKey": deploymentKeys[index] };
-            if (deployment.package) {
-                strippedDeployment["package"] = {
-                    "appVersion": deployment.package.appVersion,
-                    "isMandatory": deployment.package.isMandatory,
-                    "packageHash": deployment.package.packageHash,
-                    "uploadTime": new Date(deployment.package.uploadTime)
-                };
-                if (deployment.package.description) strippedDeployment["package"]["description"] = deployment.package.description;
-            }
+            var strippedDeployment: any = { "name": deployment.name, "deploymentKey": deploymentKeys[index], "package": deployment.package };
             dataSource.push(strippedDeployment);
         });
         printJson(dataSource);
@@ -601,11 +605,24 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
     if (command.format === "json") {
         printJson(packageHistory);
     } else if (command.format === "table") {
-        printTable(["Label", "Release Time", "App Store Version", "Mandatory", "Description"], (dataSource: any[]) => {
+        printTable(["Label", "Release Time", "App Version", "Mandatory", "Description"], (dataSource: any[]) => {
             packageHistory.forEach((packageObject: Package) => {
+                var releaseTime: string = formatDate(packageObject.uploadTime);
+                var releaseSource: string;
+                if (packageObject.releaseMethod === "Promote") {
+                    releaseSource = `Promoted ${ packageObject.originalLabel } from "${ packageObject.originalDeployment }"`;
+                } else if (packageObject.releaseMethod === "Rollback") {
+                    releaseSource = `Rolled back to ${ packageObject.originalLabel }`;
+                }
+
+                if (releaseSource) {
+                    // Need to word-wrap internally because wordwrap is not smart enough to ignore color characters
+                    releaseTime += "\n" + chalk.magenta(`(${releaseSource})`).toString();
+                }
+
                 dataSource.push([
                     packageObject.label,
-                    new Date(packageObject.uploadTime).toString(),
+                    releaseTime,
                     packageObject.appVersion,
                     packageObject.isMandatory ? "Yes" : "No",
                     packageObject.description ? wordwrap(30)(packageObject.description) : ""
@@ -622,10 +639,10 @@ function getPackageString(packageObject: Package): string {
 
     return "Label: " + packageObject.label + "\n" +
         (packageObject.description ? wordwrap(70)("Description: " + packageObject.description) + "\n" : "") +
-        "App Store Version: " + packageObject.appVersion + "\n" +
+        "App Version: " + packageObject.appVersion + "\n" +
         "Mandatory: " + (packageObject.isMandatory ? "Yes" : "No") + "\n" +
         "Hash: " + packageObject.packageHash + "\n" + 
-        "Release Time: " + new Date(packageObject.uploadTime).toString();
+        "Release Time: " + formatDate(packageObject.uploadTime);
 }
 
 function printJson(object: any): void {
@@ -658,7 +675,7 @@ function printAccessKeys(format: string, keys: AccessKey[]): void {
             keys.forEach((key: AccessKey): void => {
                 dataSource.push([
                     key.name, 
-                    key.createdTime ? new Date(key.createdTime).toString() : "",
+                    key.createdTime ? formatDate(key.createdTime) : "",
                     key.createdBy ? key.createdBy : "", 
                     key.description ? key.description : ""
                 ]);
