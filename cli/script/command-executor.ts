@@ -45,7 +45,7 @@ export var log = (message: string | Chalk.ChalkChain): void => console.log(messa
 
 export var loginWithAccessToken = (): Promise<void> => {
     if (!connectionInfo) {
-        return Q.fcall(() => { throw new Error("You are not currently logged in."); });
+        return Q.fcall(() => { throw new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server."); });
     }
 
     sdk = new AccountManager(connectionInfo.serverUrl);
