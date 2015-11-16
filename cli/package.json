@@ -1,6 +1,6 @@
 {
   "name": "code-push-cli",
-  "version": "1.2.0-beta",
+  "version": "1.2.1-beta",
   "description": "Management CLI for the CodePush service",
   "main": "script/cli.js",
   "scripts": {
@@ -24,7 +24,7 @@
   "author": "Microsoft Corporation",
   "license": "MIT",
   "dependencies": {
-    "code-push": "1.1.1-beta",
+    "code-push": "1.2.0-beta",
     "base-64": "^0.1.0",
     "chalk": "^1.1.0",
     "cli-table": "^0.3.1",
