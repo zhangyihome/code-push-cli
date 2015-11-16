@@ -45,7 +45,7 @@ export var log = (message: string | Chalk.ChalkChain): void => console.log(messa
 
 export var loginWithAccessToken = (): Promise<void> => {
     if (!connectionInfo) {
-        return Q.fcall(() => { throw new Error("You are not logged in."); });
+        return Q.fcall(() => { throw new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server."); });
     }
 
     sdk = new AccountManager(connectionInfo.serverUrl);
@@ -98,7 +98,7 @@ function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
     var hostname: string = os.hostname();
     return sdk.addAccessKey(hostname, command.description)
         .then((accessKey: AccessKey) => {
-            log("Created a new access key" + (command.description ? (" \"" + command.description + "\"") : "") + ": " + accessKey.name);
+            log("Successfully created a new access key" + (command.description ? (" \"" + command.description + "\"") : "") + ": " + accessKey.name);
         });
 }
 
@@ -128,11 +128,11 @@ function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
                         if (wasConfirmed) {
                             return sdk.removeAccessKey(accessKeyId)
                                 .then((): void => {
-                                    log("Removed access key \"" + command.accessKeyName + "\".");
+                                    log("Successfully removed the \"" + command.accessKeyName + "\" access key.");
                                 });
                         }
 
-                        log("Remove cancelled.");
+                        log("Access key removal cancelled.");
                     });
             });
     }
@@ -141,7 +141,7 @@ function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
 function appAdd(command: cli.IAppAddCommand): Promise<void> {
     return sdk.addApp(command.appName)
         .then((app: App): Promise<void> => {
-            log("Successfully added app \"" + command.appName + "\".\nCreated two default deployments:");
+            log("Successfully added the \"" + command.appName + "\" app, along with the following default deployments:");
             var deploymentListCommand: cli.IDeploymentListCommand = {
                 type: cli.CommandType.deploymentList,
                 appName: app.name,
@@ -170,11 +170,11 @@ function appRemove(command: cli.IAppRemoveCommand): Promise<void> {
                     if (wasConfirmed) {
                         return sdk.removeApp(appId)
                             .then((): void => {
-                                log("Removed app \"" + command.appName + "\".");
+                                log("Successfully removed the \"" + command.appName + "\" app.");
                             });
                     }
 
-                    log("Remove cancelled.");
+                    log("App removal cancelled.");
                 });
         });
 }
@@ -189,7 +189,7 @@ function appRename(command: cli.IAppRenameCommand): Promise<void> {
             return sdk.updateApp(app);
         })
         .then((): void => {
-            log("Renamed app \"" + command.currentAppName + "\" to \"" + command.newAppName + "\".");
+            log("Successfully renamed the \"" + command.currentAppName + "\" app to \"" + command.newAppName + "\".");
         });
 }
 
@@ -211,7 +211,7 @@ function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
                 .then((deployment: Deployment): Promise<DeploymentKey[]> => {
                     return sdk.getDeploymentKeys(appId, deployment.id);
                 }).then((deploymentKeys: DeploymentKey[]) => {
-                    log("Added deployment \"" + command.deploymentName + "\" with key \"" + deploymentKeys[0].key + "\" to app \"" + command.appName + "\".");
+                    log("Successfully added the \"" + command.deploymentName + "\" deployment with key \"" + deploymentKeys[0].key + "\" to the \"" + command.appName + "\" app.");
                 });
         })
 }
@@ -255,11 +255,11 @@ function deploymentRemove(command: cli.IDeploymentRemoveCommand): Promise<void> 
                             if (wasConfirmed) {
                                 return sdk.removeDeployment(appId, deploymentId)
                                     .then((): void => {
-                                        log("Removed deployment \"" + command.deploymentName + "\" from app \"" + command.appName + "\".");
+                                        log("Successfully removed the \"" + command.deploymentName + "\" deployment from the \"" + command.appName + "\" app.");
                                     })
                             }
 
-                            log("Remove cancelled.");
+                            log("Deployment removal cancelled.");
                         });
                 });
         });
@@ -279,7 +279,7 @@ function deploymentRename(command: cli.IDeploymentRenameCommand): Promise<void> 
                     return sdk.updateDeployment(appId, deployment);
                 })
                 .then((): void => {
-                    log("Renamed deployment \"" + command.currentDeploymentName + "\" to \"" + command.newDeploymentName + "\" for app \"" + command.appName + "\".");
+                    log("Successfully renamed the \"" + command.currentDeploymentName + "\" deployment to \"" + command.newDeploymentName + "\" for the \"" + command.appName + "\" app.");
                 });
         });
 }
@@ -723,7 +723,7 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
             return sdk.promotePackage(appId, sourceDeploymentId, destDeploymentId);
         })
         .then((): void => {
-            log("Promoted deployment \"" + command.sourceDeploymentName + "\" of app \"" + command.appName + "\" to deployment \"" + command.destDeploymentName + "\".");
+            log("Successfully promoted the \"" + command.sourceDeploymentName + "\" deployment of the \"" + command.appName + "\" app to the \"" + command.destDeploymentName + "\" deployment.");
         });
 }
 
@@ -787,7 +787,7 @@ function release(command: cli.IReleaseCommand): Promise<void> {
                         .then((file: IPackageFile): Promise<void> => {
                             return sdk.addPackage(appId, deploymentId, file.path, command.description, /*label*/ null, command.appStoreVersion, command.mandatory)
                                 .then((): void => {
-                                    log("Released a new package containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment for \"" + command.appName + "\".");
+                                    log("Successfully released an update containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
 
                                     if (file.isTemporary) {
                                         fs.unlinkSync(filePath);
