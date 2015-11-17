@@ -197,7 +197,7 @@ function deleteConnectionInfoCache(): void {
     try {
         fs.unlinkSync(configFilePath);
 
-        log("Successfully logged-out. The session token file ('" + configFilePath + "') has been deleted.");
+        log("Successfully logged-out. The session token file located at " + chalk.cyan(configFilePath) + " has been deleted.\r\n");
     } catch (ex) {
     }
 }
@@ -476,15 +476,11 @@ function getDeploymentId(appId: string, deploymentName: string): Promise<string>
 }
 
 function initiateExternalAuthenticationAsync(serverUrl: string, action: string): void {
-    var message: string = "An internet browser will now launch to authenticate your identity.\r\n\r\n"
-        + "After completing in-browser authentication, please enter your access token to log in or use [CTRL]+[C] to exit.";
+    var message: string = "A browser is being launched to authenticate your account. Follow the instructions it displays to complete the login.\r\n";
 
     log(message);
     var hostname: string = os.hostname();
     var url: string = serverUrl + "/auth/" + action + "?hostname=" + hostname;
-
-    log("\r\nLaunching browser for " + url);
-
     opener(url);
 }
 
@@ -801,7 +797,7 @@ function requestAccessToken(): Promise<string> {
         prompt.get({
             properties: {
                 response: {
-                    description: chalk.cyan("Enter your access token:  ")
+                    description: chalk.cyan("Enter your access token: ")
                 }
             }
         }, (err: any, result: any): void => {
@@ -831,7 +827,7 @@ function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
         fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
     }
 
-    log("Successfully logged-in. Your session token was written to '" + configFilePath + "'. Run the 'code-push logout' command to delete this file and terminate your user session.");
+    log("\nSuccessfully logged-in. Your session token was written to " + chalk.cyan(configFilePath) + ". You can run the " + chalk.cyan("code-push logout") + " command at any time to delete this file and terminate your session.\r\n");
 }
 
 function tryBase64Decode(encoded: string): string {
