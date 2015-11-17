@@ -197,7 +197,7 @@ function deleteConnectionInfoCache(): void {
     try {
         fs.unlinkSync(configFilePath);
 
-        log("Deleted configuration file at '" + configFilePath + "'.");
+        log("Successfully logged-out. The session token file located at " + chalk.cyan(configFilePath) + " has been deleted.\r\n");
     } catch (ex) {
     }
 }
@@ -476,15 +476,11 @@ function getDeploymentId(appId: string, deploymentName: string): Promise<string>
 }
 
 function initiateExternalAuthenticationAsync(serverUrl: string, action: string): void {
-    var message: string = "An internet browser will now launch to authenticate your identity.\r\n\r\n"
-        + "After completing in-browser authentication, please enter your access token to log in or use [CTRL]+[C] to exit.";
+    var message: string = "A browser is being launched to authenticate your account. Follow the instructions it displays to complete the login.\r\n";
 
     log(message);
     var hostname: string = os.hostname();
     var url: string = serverUrl + "/auth/" + action + "?hostname=" + hostname;
-
-    log("\r\nLaunching browser for " + url);
-
     opener(url);
 }
 
@@ -494,8 +490,6 @@ function login(command: cli.ILoginCommand): Promise<void> {
         sdk = new AccountManager(command.serverUrl);
         return sdk.loginWithAccessToken(command.accessKey)
             .then((): void => {
-                log("Log in successful.");
-
                 // The access token is valid.
                 serializeConnectionInfo(command.serverUrl, command.accessKey);
             });
@@ -522,8 +516,6 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
 
             return sdk.loginWithAccessToken(accessToken)
                 .then((): void => {
-                    log("Log in successful.");
-
                     // The access token is valid.
                     serializeConnectionInfo(serverUrl, accessToken);
                 });
@@ -558,10 +550,7 @@ function logout(command: cli.ILogoutCommand): Promise<void> {
         
         return setupPromise
             .then((): Promise<void> => sdk.logout(), (): Promise<void> => sdk.logout())
-            .then((): void => deleteConnectionInfoCache(), (): void => deleteConnectionInfoCache())
-            .then((): void => {
-                log("Log out successful.");
-            });
+            .then((): void => deleteConnectionInfoCache(), (): void => deleteConnectionInfoCache());
     }
 
     return Q.fcall(() => { throw new Error("You are not logged in."); });
@@ -808,7 +797,7 @@ function requestAccessToken(): Promise<string> {
         prompt.get({
             properties: {
                 response: {
-                    description: chalk.cyan("Enter your access token:  ")
+                    description: chalk.cyan("Enter your access token: ")
                 }
             }
         }, (err: any, result: any): void => {
@@ -838,7 +827,7 @@ function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
         fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
     }
 
-    log("Login token persisted to file '" + configFilePath + "'. Run 'code-push logout' to remove the file.");
+    log("\r\nSuccessfully logged-in. Your session token was written to " + chalk.cyan(configFilePath) + ". You can run the " + chalk.cyan("code-push logout") + " command at any time to delete this file and terminate your session.\r\n");
 }
 
 function tryBase64Decode(encoded: string): string {
