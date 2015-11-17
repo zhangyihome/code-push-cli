@@ -827,7 +827,7 @@ function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
         fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
     }
 
-    log("\nSuccessfully logged-in. Your session token was written to " + chalk.cyan(configFilePath) + ". You can run the " + chalk.cyan("code-push logout") + " command at any time to delete this file and terminate your session.\r\n");
+    log("\r\nSuccessfully logged-in. Your session token was written to " + chalk.cyan(configFilePath) + ". You can run the " + chalk.cyan("code-push logout") + " command at any time to delete this file and terminate your session.\r\n");
 }
 
 function tryBase64Decode(encoded: string): string {
