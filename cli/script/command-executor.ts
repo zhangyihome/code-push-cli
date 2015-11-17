@@ -476,7 +476,8 @@ function getDeploymentId(appId: string, deploymentName: string): Promise<string>
 }
 
 function initiateExternalAuthenticationAsync(serverUrl: string, action: string): void {
-    var message: string = "A browser is being launched to authenticate your account. Follow the instructions it displays to complete the login.\r\n";
+    var message: string = `A browser is being launched to authenticate your account. Follow the instructions ` +
+                          `it displays to complete your ${action === "register" ? "registration" : "login"}.\r\n`;
 
     log(message);
     var hostname: string = os.hostname();

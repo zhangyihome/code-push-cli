@@ -212,9 +212,9 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
     .command("login", "Authenticate with the CodePush server in order to begin managing your apps", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         isValidCommand = true;
-        yargs.usage(USAGE_PREFIX + " login [serverUrl] [--accessKey <accessKey>]")
+        yargs.usage(USAGE_PREFIX + " login [--accessKey <accessKey>]")
             .demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
-            .example("login", "Logs in to " + CODE_PUSH_URL)
+            .example("login", "Logs in to the CodePush server")
             .example("login --accessKey mykey", "Logs in on behalf of the user who owns and created the access key \"mykey\"")
             .option("accessKey", { alias: "key", default: null, demand: false, description: "The access key to be used for this session", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
@@ -231,17 +231,16 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("local", { demand: false, description: "Whether to delete the current session's access key on the server", type: "boolean" });
         addCommonConfiguration(yargs);
     })
-    // Disabling this for closed beta
-    //.command("register", "Register a new account with a specific CodePush server", (yargs: yargs.Argv) => {
-        //isValidCommandCategory = true;
-        //isValidCommand = true;
-        //yargs.usage(USAGE_PREFIX + " register [serverUrl]")
-            //.demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
-            //.example("register", "Creates a new user account with " + CODE_PUSH_URL)
-            //.check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
+    .command("register", "Register a new account with the CodePush server", (yargs: yargs.Argv) => {
+        isValidCommandCategory = true;
+        isValidCommand = true;
+        yargs.usage(USAGE_PREFIX + " register")
+            .demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
+            .example("register", "Creates a new user account with " + CODE_PUSH_URL)
+            .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
-        //addCommonConfiguration(yargs);
-    //})
+        addCommonConfiguration(yargs);
+    })
     .alias("v", "version")
     .version(require("../package.json").version)
     .wrap(/*columnLimit*/ null)
