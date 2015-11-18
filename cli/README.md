@@ -125,7 +125,7 @@ You can specify either a single file (e.g. a JS bundle for a React Native app), 
 
 #### App store version parameter
 
-This specifies what the minimum app store version the code you are pushing depends on. This is important if your JavaScript/etc. takes a dependency on a new capabilitiy of the native side of your app (e.g. a Cordova plugin), and therefore, requires the user to update to the latest version from the app store.
+This specifies the semver compliant store version of the application you are pushing updates for. Only users running this version will receive the update. This is important if your JavaScript/etc. takes a dependency on a new capabilitiy of the native side of your app (e.g. a Cordova plugin), and therefore, requires the user to update to the latest version from the app store.
 
 #### Deployment name parameter
 
