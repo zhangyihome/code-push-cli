@@ -21,6 +21,20 @@
 			</item>
 		
 			<item>
+				<title>Continuous Delivery with CodePush and VSTS</title>
+				
+					<dc:creator>Jonathan Carter</dc:creator>
+				        
+				
+					<description>&lt;p&gt;While the &lt;a href=&quot;http://microsoft.github.io/code-push/docs/cli.html&quot;&gt;CodePush CLI&lt;/a&gt; provides a simple experience for managing your account, it could become pretty tedious doing manual deployments every time you need to release an update, particularly if you want to keep your dev/staging/etc. deployments always current. To better enable scripting a custom continuous delivery solution from your CI environment (e.g. Travis), we enhanced the CLI in the &lt;a href=&quot;http://microsoft.github.io/code-push/articles/CodePush1.1.html&quot;&gt;1.1 release&lt;/a&gt; with the ability to create access keys and authenticate with them &amp;ldquo;headlessly&amp;rdquo;, but we wanted to make it even simpler to automated this process E2E.&lt;/p&gt;
+</description>
+				
+				<pubDate>Wed, 18 Nov 2015 00:00:00 -0800</pubDate>
+				<link>/articles/CDWithCodePushAndVSTS.html</link>
+				<guid isPermaLink="true">/articles/CDWithCodePushAndVSTS.html</guid>
+			</item>
+		
+			<item>
 				<title>CodePush 1.1 (beta) released</title>
 				
 					<dc:creator>Jonathan Carter</dc:creator>

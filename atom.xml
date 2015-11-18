@@ -4,7 +4,7 @@
  <title>CodePush</title>
  <link href="/atom.xml" rel="self"/>
  <link href="/"/>
- <updated>2015-11-18T00:52:09-08:00</updated>
+ <updated>2015-11-18T08:04:18-08:00</updated>
  <id></id>
  <author>
    <name></name>
@@ -22,6 +22,65 @@
 &lt;p&gt;In order to improve our ability to engage with the community, and provide devs with a fully self-service experience for using CodePush, we are opening the beta program today so that anyone can get started immediately, without needing to explicitly request access from us! We&amp;rsquo;ve enabled this by simply adding a new &lt;code&gt;register&lt;/code&gt; command to the CLI, which provides the exact same experience as the existing &lt;code&gt;login&lt;/code&gt; command, but in addition to authenticating you, it creates a CodePush account that is linked to your GitHub or Microsoft account. Make sure you have the latest version of the CLI from NPM (&lt;code&gt;npm i -g code-push-cli@latest&lt;/code&gt;) and then check out the &lt;a href=&quot;http://microsoft.github.io/code-push/docs/getting-started.html&quot;&gt;docs&lt;/a&gt; for more details on getting started.&lt;/p&gt;
 
 &lt;p&gt;As of now, everyone that previously requested beta access has been approved, and we hope to hear from many more of you soon! Thanks again for your interest and feedback thus far. We have many more improvements coming very soon, and look forward to being able to get it into the hands of more developers! As always, please don&amp;rsquo;t hesitate to &lt;a href=&quot;mailto:codepushfeed@microsoft.com&quot;&gt;ping us&lt;/a&gt;.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Continuous Delivery with CodePush and VSTS</title>
+   <link href="/articles/CDWithCodePushAndVSTS.html"/>
+   <updated>2015-11-18T00:00:00-08:00</updated>
+   <id>/articles/CDWithCodePushAndVSTS</id>
+   <content type="html">&lt;p&gt;While the &lt;a href=&quot;http://microsoft.github.io/code-push/docs/cli.html&quot;&gt;CodePush CLI&lt;/a&gt; provides a simple experience for managing your account, it could become pretty tedious doing manual deployments every time you need to release an update, particularly if you want to keep your dev/staging/etc. deployments always current. To better enable scripting a custom continuous delivery solution from your CI environment (e.g. Travis), we enhanced the CLI in the &lt;a href=&quot;http://microsoft.github.io/code-push/articles/CodePush1.1.html&quot;&gt;1.1 release&lt;/a&gt; with the ability to create access keys and authenticate with them &amp;ldquo;headlessly&amp;rdquo;, but we wanted to make it even simpler to automated this process E2E.&lt;/p&gt;
+
+&lt;p&gt;To take advantage of the new marketplace for Visual Studio Team Services (formally &amp;ldquo;Visual Studio Online&amp;rdquo;), we created a &lt;a href=&quot;http://marketplace.visualstudio.com/items/ms-vsclient.code-push&quot;&gt;CodePush extension&lt;/a&gt; which makes adding a deployment step to your CI build pipeline pretty easy, and composes really well with the &lt;a href=&quot;http://marketplace.visualstudio.com/items/ms-vsclient.cordova-extension&quot;&gt;Cordova Build&lt;/a&gt; extension and existing &lt;a href=&quot;https://github.com/Microsoft/vso-agent-tasks&quot;&gt;core support&lt;/a&gt; for JavaScript apps (e.g. Running Gulp scripts, installing NPM dependencies). If you&amp;rsquo;re already using VSTS/VSO, then install the extension now and give it a shot! Otherwise, we encourage you to check it out if you&amp;rsquo;re in the market for a simple and great CI/ALM solution.&lt;/p&gt;
+
+&lt;h2&gt;Deploy Task&lt;/h2&gt;
+
+&lt;p&gt;The CodePush task itself is pretty simple, and if you&amp;rsquo;re already familiar with the CLI, it provides all of the same input options as the &lt;code&gt;release&lt;/code&gt; command. Addtitionally, in order to make it simple to authenticate with the service from CI, it provides an &lt;code&gt;Access Key&lt;/code&gt; input that accepts a key value which you can generate using the existing &lt;code&gt;code-push access-key add&lt;/code&gt; command &lt;em&gt;(NOTE: Give your key a recognizeable name)&lt;/em&gt;. The task will automatically handle logging-in, performing the release, and then logging-out so that your session information isn&amp;rsquo;t left around on the machine.&lt;/p&gt;
+
+&lt;p&gt;That&amp;rsquo;s it! Nothing too magical, but hopefully it makes the barrier of entry even simpler to perform these kind of automated deployments. For more info about the task inputs and/or how to get started with it, refer to the &lt;a href=&quot;https://github.com/Microsoft/code-push-vsts-extension#quick-start&quot;&gt;GitHub repo&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/116461/11203765/1aca758a-8cac-11e5-8f27-02efaafccbe5.png&quot; alt=&quot;Example&quot;&gt;&lt;/p&gt;
+
+&lt;h2&gt;Cordova&lt;/h2&gt;
+
+&lt;p&gt;While most of the task&amp;rsquo;s options are platform agnostic, in order to specify a valid value for the &lt;code&gt;Package Path&lt;/code&gt; field, you need to be able to easily build your app&amp;rsquo;s release assets from a CI environment. For Cordova, that means running either &lt;code&gt;cordova build &amp;lt;platformName&amp;gt;&lt;/code&gt; or &lt;code&gt;cordova prepare &amp;lt;platformName&amp;gt;&lt;/code&gt; (either is sufficient for a CodePush, but we recommend the later since it&amp;rsquo;s simpler), or the equivalent using a superset CLI (e.g. Ionic, PhoneGap, Tarifa, TACO).&lt;/p&gt;
+
+&lt;p&gt;While you could script this yourself, the &lt;a href=&quot;http://marketplace.visualstudio.com/items/ms-vsclient.cordova-extension&quot;&gt;Cordova Build&lt;/a&gt; extension makes this easy to do, since it provides tasks for running either a build (using the &lt;a href=&quot;http://msdn.microsoft.com/Library/vs/alm/Build/cordova/cordova-build&quot;&gt;Cordova Build&lt;/a&gt; task) or a prepare (using the &lt;a href=&quot;http://msdn.microsoft.com/Library/vs/alm/Build/cordova/cordova-command&quot;&gt;Cordova Command&lt;/a&gt; task or &lt;a href=&quot;http://msdn.microsoft.com/Library/vs/alm/Build/cordova/ionic-command&quot;&gt;Ionic Command&lt;/a&gt;, with the &lt;code&gt;Command&lt;/code&gt; input set to &lt;code&gt;prepare &amp;lt;platformName&amp;gt;&lt;/code&gt;).&lt;/p&gt;
+
+&lt;p&gt;Using these tasks, along with the CodePush deploy task,you can easily configure a build + deploy workflow. Additionally, if your app needs to acquire NPM/Bower dependencies and/or run any Gulp scripts, there are built-in tasks in VSTS for that (no extension needed!). For more info on the Cordova Build extension, including how to get started with it, refer to the &lt;a href=&quot;https://github.com/Microsoft/vso-cordova-tasks#5-step-quick-start&quot;&gt;GitHub repo&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/116461/11220739/3779322e-8d16-11e5-8443-1a3db51a88b6.png&quot; alt=&quot;Ionic Command Task&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;NOTE: There are plans to introduce additional tasks for other Cordova-based CLIs such as PhoneGap and TACO, so stay tuned for updates on that front.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2&gt;React Native&lt;/h2&gt;
+
+&lt;p&gt;Generating your release assets for a React Native app consists of calling the &lt;code&gt;react-native bundle&lt;/code&gt; CLI command, which produces the JS bundle you can subsequently pass to the &lt;code&gt;Package Path&lt;/code&gt; field of the CodePush task. The React Native CLI requires Node 4+, which isn&amp;rsquo;t installed by default on the VSTS hosted build machines, so your build script needs to &amp;ldquo;prime&amp;rdquo; the environment first, before being able to create the bundle (*).&lt;/p&gt;
+
+&lt;p&gt;Currently, there isn&amp;rsquo;t a React Native extension for VSTS that handles the Node/React Native CLI acquisition for you (yet!), however, there are core VSTS tasks for running shell scripts, which enables you to achieve just about anything when needed. To that end, we created some &lt;a href=&quot;https://github.com/Microsoft/code-push-vsts-extension/tree/master/vsts-scripts&quot;&gt;setup scripts&lt;/a&gt; (use the Windows or OS X ones depending on your environment), that you can add to your repo for now, and run as part of your build setup.&lt;/p&gt;
+
+&lt;p&gt;With these scripts in hand, your CI pipeline can be composed of the following three tasks/steps:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Shell script&lt;/strong&gt; or &lt;strong&gt;Batch Script&lt;/strong&gt; (depending on if you&amp;rsquo;re using a Windows or OSX build machine)&amp;ndash;that points at either the &lt;code&gt;setup-react-native.sh&lt;/code&gt; or &lt;code&gt;setup-react-native.bat&lt;/code&gt; file respectively&amp;ndash;which handles installing the right Node version as well as the React Native CLI globally&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Command Line&lt;/strong&gt; task, which can be used to run the &lt;code&gt;react-native bundle&lt;/code&gt; command, passing the neccessary parameters for your app (e.g. platform, entry file name)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;CodePush&lt;/strong&gt; deploy task, which points at the JS bundle created in #2&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/116461/11228630/da50e2fe-8d42-11e5-812b-713faa56d9bc.png&quot; alt=&quot;React CI&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;Beyond automating your CodePush deployments, if you want to setup an automated build for generating your  ipa and/or apk files, you can use the &lt;strong&gt;Xcode Build&lt;/strong&gt; and &lt;strong&gt;Gradle&lt;/strong&gt; tasks that are already built into VSTS. &lt;/p&gt;
+
+&lt;p&gt;Additionally, while VSTS provides Windows-based build machines, &lt;a href=&quot;http://connect.macincloud.com&quot;&gt;MacinCloud&lt;/a&gt; released first-class support today for running your VSTS builds on OSX machines, so that is definitely worth checking out once you need to run your automated iOS builds.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;(NOTE: Besides using the cloud-hosted build machines, VSTS also lets you setup and run your own build machine using their cross-platform &lt;a href=&quot;https://github.com/Microsoft/vso-agent&quot;&gt;build agent&lt;/a&gt;, which lets you install any additional dependecies your builds may require)&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2&gt;Send us feedback&lt;/h2&gt;
+
+&lt;p&gt;We&amp;rsquo;re pretty excited about this experience, and there&amp;rsquo;s lot of cool stuff happening for &amp;ldquo;mobile DevOps&amp;rdquo;, but we definitely want to continue making it simpler (including first-class support for React Native), so stay tuned!&lt;/p&gt;
+
+&lt;p&gt;In the meantime, if you have any feedback/comments/etc. please don&amp;rsquo;t hesitate to &lt;a href=&quot;mailto:codepushfeed@microsoft.com&quot;&gt;ping us&lt;/a&gt;. We need your help with ensuring we fully accomodate the CI/CD workflow for CodePush for any unique scenarios you may have. Thanks!&lt;/p&gt;
 </content>
  </entry>
  
