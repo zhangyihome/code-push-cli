@@ -160,7 +160,8 @@ who can decide to actually enforce it or not. The default value is **false**.
 
 ### Promoting updates across deployments
 
-Once you've tested an update to a specific deployment, and you want to promote it "downstream" (e.g. dev->staging, staging->production), you can simply use the following command to copy the code and metadata (e.g. mandatory, description, app store version) from one deployment to another:
+Once you've tested an update against a specific deployment, and you want to promote it "downstream" (e.g. dev->staging, staging->production), you can simply use the following command to copy the code and metadata (e.g. mandatory, description, app store version) from one deployment to another:
+
 ```
 code-push promote <appName> <sourceDeploymentName> <destDeploymentName>
 code-push promote MyApp Staging Production
