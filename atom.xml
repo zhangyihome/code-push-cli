@@ -4,13 +4,26 @@
  <title>CodePush</title>
  <link href="/atom.xml" rel="self"/>
  <link href="/"/>
- <updated>2015-11-06T11:26:21-08:00</updated>
+ <updated>2015-11-18T00:52:09-08:00</updated>
  <id></id>
  <author>
    <name></name>
    <email></email>
  </author>
 
+ 
+ <entry>
+   <title>CodePush enters "open beta"</title>
+   <link href="/articles/OpenBeta.html"/>
+   <updated>2015-11-18T00:00:00-08:00</updated>
+   <id>/articles/OpenBeta</id>
+   <content type="html">&lt;p&gt;It&amp;rsquo;s been roughly a month since we first released the CodePush &amp;ldquo;closed beta&amp;rdquo;, and we&amp;rsquo;ve received an unbelievable amount of support from the community in evaluating the service, filing bugs, giving feedback and helping improve overall quality. However, the amount of interest in the service far outweighed our expectations, and unfortunately, our ability to keep up with approving (and reaching out to) the incoming requests quickly became slower than we would have liked. Sorry to everyone that had to wait a while to get access!&lt;/p&gt;
+
+&lt;p&gt;In order to improve our ability to engage with the community, and provide devs with a fully self-service experience for using CodePush, we are opening the beta program today so that anyone can get started immediately, without needing to explicitly request access from us! We&amp;rsquo;ve enabled this by simply adding a new &lt;code&gt;register&lt;/code&gt; command to the CLI, which provides the exact same experience as the existing &lt;code&gt;login&lt;/code&gt; command, but in addition to authenticating you, it creates a CodePush account that is linked to your GitHub or Microsoft account. Make sure you have the latest version of the CLI from NPM (&lt;code&gt;npm i -g code-push-cli@latest&lt;/code&gt;) and then check out the &lt;a href=&quot;http://microsoft.github.io/code-push/docs/getting-started.html&quot;&gt;docs&lt;/a&gt; for more details on getting started.&lt;/p&gt;
+
+&lt;p&gt;As of now, everyone that previously requested beta access has been approved, and we hope to hear from many more of you soon! Thanks again for your interest and feedback thus far. We have many more improvements coming very soon, and look forward to being able to get it into the hands of more developers! As always, please don&amp;rsquo;t hesitate to &lt;a href=&quot;mailto:codepushfeed@microsoft.com&quot;&gt;ping us&lt;/a&gt;.&lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>CodePush 1.1 (beta) released</title>

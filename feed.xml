@@ -7,6 +7,20 @@
 		<atom:link href="/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>CodePush enters &quot;open beta&quot;</title>
+				
+					<dc:creator>Jonathan Carter</dc:creator>
+				        
+				
+					<description>&lt;p&gt;It&amp;rsquo;s been roughly a month since we first released the CodePush &amp;ldquo;closed beta&amp;rdquo;, and we&amp;rsquo;ve received an unbelievable amount of support from the community in evaluating the service, filing bugs, giving feedback and helping improve overall quality. However, the amount of interest in the service far outweighed our expectations, and unfortunately, our ability to keep up with approving (and reaching out to) the incoming requests quickly became slower than we would have liked. Sorry to everyone that had to wait a while to get access!&lt;/p&gt;
+</description>
+				
+				<pubDate>Wed, 18 Nov 2015 00:00:00 -0800</pubDate>
+				<link>/articles/OpenBeta.html</link>
+				<guid isPermaLink="true">/articles/OpenBeta.html</guid>
+			</item>
+		
+			<item>
 				<title>CodePush 1.1 (beta) released</title>
 				
 					<dc:creator>Jonathan Carter</dc:creator>
