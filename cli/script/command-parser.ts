@@ -236,7 +236,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         isValidCommand = true;
         yargs.usage(USAGE_PREFIX + " register")
             .demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
-            .example("register", "Creates a new user account with " + CODE_PUSH_URL)
+            .example("register", "Creates a new user account on the CodePush server")
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
         addCommonConfiguration(yargs);
