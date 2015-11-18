@@ -2,31 +2,42 @@
 
 CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users' devices. It works by acting as a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using provided client SDKs for [Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push)). This allows you to have a more deterministic and direct engagement model with your userbase, when addressing bugs and/or adding small features that don't require you to re-build a binary and re-distribute it through the respective app stores.
 
-![CodePush CLI](https://cloud.githubusercontent.com/assets/116461/10926209/b0c253f4-8249-11e5-95ec-194d2431d718.png)
+![CodePush CLI](https://cloud.githubusercontent.com/assets/116461/11233671/1d0329ae-8d75-11e5-8cf4-781109ca83b8.png)
 
 ## Installation
 
 * Install [Node.js](https://nodejs.org/) 
 * Install the CodePush CLI: `npm install -g code-push-cli`
 
-## Usage
+## Quick Start/Usage
 
-1. While the service is in beta, you need to [request access](https://microsoft.github.io/code-push)
-2. Once your request has been accepted, you can [authenticate](#authentication) using the CodePush CLI
-3. Register your [app](#app-management) with the service, and optionally create any additional [deployments](#deployment-management)
-4. CodePush-ify your app and point it at the deployment you wish to use ([Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push))
-5. [Deploy](#update-deployment) an update for your registered app
-6. Live long and prosper! ([details](https://en.wikipedia.org/wiki/Vulcan_salute))
+1. Create a [CodePush account](#account-creation) push using the CodePush CLI
+2. Register your [app](#app-management) with the service, and optionally create any additional [deployments](#deployment-management)
+3. CodePush-ify your app and point it at the deployment you wish to use ([Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push))
+4. [Deploy](#update-deployment) an update for your registered app
+5. Live long and prosper! ([details](https://en.wikipedia.org/wiki/Vulcan_salute))
+
+### Account creation
+
+Before you can begin releasing app updates, you need to create a CodePush account. You can do this by simply running the following command:
+
+```
+code-push register
+```
+
+This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. Once authenticated, it will create a CodePush account "linked" to your GitHub/MSA identify, and generate an access token you can copy/paste into the CLI in order to login. 
+
+*Note: After registering, you are automatically logged-in with the CLI, so until you explicitly log out, you don't need to login again from the same machine.*
 
 ### Authentication
 
-Every command within the CodePush CLI requires authentication, and therefore, before you can begin managing your account, you need to login using the Github or Microsoft account you used when requesting access to the service. You can do this by running the following command:
+Every command within the CodePush CLI requires authentication, and therefore, before you can begin managing your account, you need to login using the Github or Microsoft account you used when registering. You can do this by running the following command:
 
 ```
 code-push login
 ```
 
-This will launch a browser, asking you to authenticate with the appropriate identity provider. This will generate an access token that you need to copy/paste into the CLI (it will prompt you for it). You are now succesfully authenticated and can safely close your browser window.
+This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. This will generate an access token that you need to copy/paste into the CLI (it will prompt you for it). You are now succesfully authenticated and can safely close your browser window.
 
 When you login from the CLI, your access token (kind of like a cookie) is persisted to disk so that you don't have to login everytime you attempt to access your account. In order to delete this file from your computer, simply run the following command:
 
@@ -61,8 +72,8 @@ code-push logout --local
 ```
 
 ### App management
-Before you can deploy any updates, you need to register an app with the CodePush service
-using the following command:
+
+Before you can deploy any updates, you need to register an app with the CodePush service using the following command:
 
 ```
 code-push app add <appName>
