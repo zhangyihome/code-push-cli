@@ -228,16 +228,16 @@ export var deploymentList = (command: cli.IDeploymentListCommand): Promise<void>
             return sdk.getDeployments(appId);
         })
         .then((deployments: Deployment[]): Promise<void> => {
-            var deploymentKeyList: Array<string> = [];
-            var deploymentKeyPromises: Array<Promise<void>> = [];
-            deployments.forEach((deployment: Deployment, index: number) => {
-                deploymentKeyPromises.push(sdk.getDeploymentKeys(theAppId, deployment.id).then((deploymentKeys: DeploymentKey[]): void => {
-                    deploymentKeyList[index] = deploymentKeys[0].key;
-                }));
+            var deploymentKeyPromises: Promise<string>[] = deployments.map((deployment: Deployment) => {
+                return sdk.getDeploymentKeys(theAppId, deployment.id)
+                    .then((deploymentKeys: DeploymentKey[]): string => {
+                        return deploymentKeys[0].key;
+                    });
             });
-            return Q.all(deploymentKeyPromises).then(() => {
-                printDeploymentList(command, deployments, deploymentKeyList);
-            });
+            return Q.all(deploymentKeyPromises)
+                .then((deploymentKeyList: string[]) => {
+                    printDeploymentList(command, deployments, deploymentKeyList);
+                });
         });
 }
 
@@ -571,22 +571,18 @@ function formatDate(unixOffset: number): string {
 
 function printDeploymentList(command: cli.IDeploymentListCommand, deployments: Deployment[], deploymentKeys: Array<string>): void {
     if (command.format === "json") {
-        var dataSource: any[] = [];
-        deployments.forEach((deployment: Deployment, index: number) => {
-            var strippedDeployment: any = { "name": deployment.name, "deploymentKey": deploymentKeys[index], "package": deployment.package };
-            dataSource.push(strippedDeployment);
+        var dataSource: any[] = deployments.map((deployment: Deployment, index: number) => {
+            return { "name": deployment.name, "deploymentKey": deploymentKeys[index], "package": deployment.package };
         });
         printJson(dataSource);
     } else if (command.format === "table") {
         var headers = ["Name", "Deployment Key", "Package Metadata"];
-        printTable(headers,
-            (dataSource: any[]): void => {
-                deployments.forEach((deployment: Deployment, index: number): void => {
-                    var row = [deployment.name, deploymentKeys[index], getPackageString(deployment.package)];
-                    dataSource.push(row);
-                });
-            }
-        );
+        printTable(headers, (dataSource: any[]): void => {
+            deployments.forEach((deployment: Deployment, index: number): void => {
+                var row = [deployment.name, deploymentKeys[index], getPackageString(deployment.package)];
+                dataSource.push(row);
+            });
+        });
     }
 }
 
