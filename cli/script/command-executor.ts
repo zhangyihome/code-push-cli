@@ -153,10 +153,25 @@ function appAdd(command: cli.IAppAddCommand): Promise<void> {
 
 function appList(command: cli.IAppListCommand): Promise<void> {
     throwForInvalidOutputFormat(command.format);
+    var apps: App[];
 
     return sdk.getApps()
-        .then((apps: App[]): void => {
-            printList(command.format, apps);
+        .then((retrievedApps: App[]): Promise<string[]> => {
+            apps = retrievedApps;
+            var deploymentListPromises: Promise<string>[] = apps.map((app: App) => {
+                return sdk.getDeployments(app.id)
+                    .then((deployments: Deployment[]) => {
+                        var deploymentList: string = deployments
+                            .map((deployment: Deployment) => deployment.name)
+                            .sort()
+                            .join(", ");
+                        return deploymentList;
+                    });
+            });
+            return Q.all(deploymentListPromises);
+        })
+        .then((deploymentLists: string[]): void => {
+            printAppList(command.format, apps, deploymentLists);
         });
 }
 
@@ -569,6 +584,23 @@ function formatDate(unixOffset: number): string {
     }
 }
 
+function printAppList(format: string, apps: App[], deploymentLists: string[]): void {
+    if (format === "json") {
+        var dataSource: any[] = apps.map((app: App, index: number) => {
+            return { "name": app.name, "deployments": deploymentLists[index] };
+        });
+        printJson(dataSource);
+    } else if (format === "table") {
+        var headers = ["Name", "Deployments"];
+        printTable(headers, (dataSource: any[]): void => {
+            apps.forEach((app: App, index: number): void => {
+                var row = [app.name, deploymentLists[index]];
+                dataSource.push(row);
+            });
+        });
+    }
+}
+
 function printDeploymentList(command: cli.IDeploymentListCommand, deployments: Deployment[], deploymentKeys: Array<string>): void {
     if (command.format === "json") {
         var dataSource: any[] = deployments.map((deployment: Deployment, index: number) => {
@@ -633,24 +665,6 @@ function getPackageString(packageObject: Package): string {
 
 function printJson(object: any): void {
     log(JSON.stringify(object, /*replacer=*/ null, /*spacing=*/ 2));
-}
-
-function printList<T extends { id: string; name: string; }>(format: string, items: T[]): void {
-    if (format === "json") {
-        var dataSource: any[] = [];
-
-        items.forEach((item: T): void => {
-            dataSource.push({ "name": item.name, "id": item.id });
-        });
-
-        printJson(dataSource);
-    } else if (format === "table") {
-        printTable(["Name", "ID"], (dataSource: any[]): void => {
-            items.forEach((item: T): void => {
-                dataSource.push([item.name, item.id]);
-            });
-        });
-    }
 }
 
 function printAccessKeys(format: string, keys: AccessKey[]): void {
