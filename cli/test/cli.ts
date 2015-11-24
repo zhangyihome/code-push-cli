@@ -276,8 +276,8 @@ describe("CLI", () => {
 
                 var actual: string = log.args[0][0];
                 var expected = [
-                    { name: "a", id: "1" },
-                    { name: "b", id: "2" }
+                    { name: "a", deployments: ["Production", "Staging"] },
+                    { name: "b", deployments: ["Production", "Staging"] }
                 ];
 
                 assertJsonDescribesObject(actual, expected);

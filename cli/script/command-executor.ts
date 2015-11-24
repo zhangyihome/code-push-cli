@@ -10,6 +10,7 @@ import * as path from "path";
 var prompt = require("prompt");
 import * as Q from "q";
 import * as recursiveFs from "recursive-fs";
+import * as semver from "semver";
 import slash = require("slash");
 import tryJSON = require("try-json");
 var Table = require("cli-table");
@@ -153,10 +154,26 @@ function appAdd(command: cli.IAppAddCommand): Promise<void> {
 
 function appList(command: cli.IAppListCommand): Promise<void> {
     throwForInvalidOutputFormat(command.format);
+    var apps: App[];
 
     return sdk.getApps()
-        .then((apps: App[]): void => {
-            printList(command.format, apps);
+        .then((retrievedApps: App[]): Promise<string[][]> => {
+            apps = retrievedApps;
+            var deploymentListPromises: Promise<string[]>[] = apps.map((app: App) => {
+                return sdk.getDeployments(app.id)
+                    .then((deployments: Deployment[]) => {
+                        var deploymentList: string[] = deployments
+                            .map((deployment: Deployment) => deployment.name)
+                            .sort((first: string, second: string) => {
+                                return first.toLowerCase().localeCompare(second.toLowerCase());
+                            });
+                        return deploymentList;
+                    });
+            });
+            return Q.all(deploymentListPromises);
+        })
+        .then((deploymentLists: string[][]): void => {
+            printAppList(command.format, apps, deploymentLists);
         });
 }
 
@@ -228,16 +245,16 @@ export var deploymentList = (command: cli.IDeploymentListCommand): Promise<void>
             return sdk.getDeployments(appId);
         })
         .then((deployments: Deployment[]): Promise<void> => {
-            var deploymentKeyList: Array<string> = [];
-            var deploymentKeyPromises: Array<Promise<void>> = [];
-            deployments.forEach((deployment: Deployment, index: number) => {
-                deploymentKeyPromises.push(sdk.getDeploymentKeys(theAppId, deployment.id).then((deploymentKeys: DeploymentKey[]): void => {
-                    deploymentKeyList[index] = deploymentKeys[0].key;
-                }));
+            var deploymentKeyPromises: Promise<string>[] = deployments.map((deployment: Deployment) => {
+                return sdk.getDeploymentKeys(theAppId, deployment.id)
+                    .then((deploymentKeys: DeploymentKey[]): string => {
+                        return deploymentKeys[0].key;
+                    });
             });
-            return Q.all(deploymentKeyPromises).then(() => {
-                printDeploymentList(command, deployments, deploymentKeyList);
-            });
+            return Q.all(deploymentKeyPromises)
+                .then((deploymentKeyList: string[]) => {
+                    printDeploymentList(command, deployments, deploymentKeyList);
+                });
         });
 }
 
@@ -569,24 +586,37 @@ function formatDate(unixOffset: number): string {
     }
 }
 
+function printAppList(format: string, apps: App[], deploymentLists: string[][]): void {
+    if (format === "json") {
+        var dataSource: any[] = apps.map((app: App, index: number) => {
+            return { "name": app.name, "deployments": deploymentLists[index] };
+        });
+        printJson(dataSource);
+    } else if (format === "table") {
+        var headers = ["Name", "Deployments"];
+        printTable(headers, (dataSource: any[]): void => {
+            apps.forEach((app: App, index: number): void => {
+                var row = [app.name, wordwrap(50)(deploymentLists[index].join(", "))];
+                dataSource.push(row);
+            });
+        });
+    }
+}
+
 function printDeploymentList(command: cli.IDeploymentListCommand, deployments: Deployment[], deploymentKeys: Array<string>): void {
     if (command.format === "json") {
-        var dataSource: any[] = [];
-        deployments.forEach((deployment: Deployment, index: number) => {
-            var strippedDeployment: any = { "name": deployment.name, "deploymentKey": deploymentKeys[index], "package": deployment.package };
-            dataSource.push(strippedDeployment);
+        var dataSource: any[] = deployments.map((deployment: Deployment, index: number) => {
+            return { "name": deployment.name, "deploymentKey": deploymentKeys[index], "package": deployment.package };
         });
         printJson(dataSource);
     } else if (command.format === "table") {
         var headers = ["Name", "Deployment Key", "Package Metadata"];
-        printTable(headers,
-            (dataSource: any[]): void => {
-                deployments.forEach((deployment: Deployment, index: number): void => {
-                    var row = [deployment.name, deploymentKeys[index], getPackageString(deployment.package)];
-                    dataSource.push(row);
-                });
-            }
-        );
+        printTable(headers, (dataSource: any[]): void => {
+            deployments.forEach((deployment: Deployment, index: number): void => {
+                var row = [deployment.name, deploymentKeys[index], getPackageString(deployment.package)];
+                dataSource.push(row);
+            });
+        });
     }
 }
 
@@ -606,7 +636,6 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
                 }
 
                 if (releaseSource) {
-                    // Need to word-wrap internally because wordwrap is not smart enough to ignore color characters
                     releaseTime += "\n" + chalk.magenta(`(${releaseSource})`).toString();
                 }
 
@@ -637,24 +666,6 @@ function getPackageString(packageObject: Package): string {
 
 function printJson(object: any): void {
     log(JSON.stringify(object, /*replacer=*/ null, /*spacing=*/ 2));
-}
-
-function printList<T extends { id: string; name: string; }>(format: string, items: T[]): void {
-    if (format === "json") {
-        var dataSource: any[] = [];
-
-        items.forEach((item: T): void => {
-            dataSource.push({ "name": item.name, "id": item.id });
-        });
-
-        printJson(dataSource);
-    } else if (format === "table") {
-        printTable(["Name", "ID"], (dataSource: any[]): void => {
-            items.forEach((item: T): void => {
-                dataSource.push([item.name, item.id]);
-            });
-        });
-    }
 }
 
 function printAccessKeys(format: string, keys: AccessKey[]): void {
@@ -718,6 +729,10 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
 }
 
 function release(command: cli.IReleaseCommand): Promise<void> {
+    if (semver.valid(command.appStoreVersion) === null) {
+        throw new Error("Please use a semver compliant app store version, for example \"1.0.3\".");
+    }
+
     return getAppId(command.appName)
         .then((appId: string): Promise<void> => {
             throwForInvalidAppId(appId, command.appName);
