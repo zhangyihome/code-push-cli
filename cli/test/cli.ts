@@ -164,7 +164,7 @@ describe("CLI", () => {
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = "Created a new access key \"Test description\": key123";
+                var expected = "Successfully created a new access key \"Test description\": key123";
 
                 assert.equal(actual, expected);
                 done();
@@ -211,7 +211,7 @@ describe("CLI", () => {
                 sinon.assert.calledOnce(removeAccessKey);
                 sinon.assert.calledWithExactly(removeAccessKey, "7");
                 sinon.assert.calledOnce(log);
-                sinon.assert.calledWithExactly(log, "Removed access key \"8\".");
+                sinon.assert.calledWithExactly(log, "Successfully removed the \"8\" access key.");
 
                 done();
             });
@@ -231,7 +231,7 @@ describe("CLI", () => {
             .done((): void => {
                 sinon.assert.notCalled(removeAccessKey);
                 sinon.assert.calledOnce(log);
-                sinon.assert.calledWithExactly(log, "Remove cancelled.");
+                sinon.assert.calledWithExactly(log, "Access key removal cancelled.");
 
                 done();
             });
@@ -256,7 +256,7 @@ describe("CLI", () => {
             .done((): void => {
                 sinon.assert.calledOnce(addApp);
                 sinon.assert.calledTwice(log);
-                sinon.assert.calledWithExactly(log, "Successfully added app \"a\".\nCreated two default deployments:");
+                sinon.assert.calledWithExactly(log, "Successfully added the \"a\" app, along with the following default deployments:");
                 sinon.assert.calledOnce(deploymentList);
                 sinon.assert.calledWithExactly(deploymentList, deploymentListCommand);
                 done();
@@ -298,7 +298,7 @@ describe("CLI", () => {
                 sinon.assert.calledOnce(removeApp);
                 sinon.assert.calledWithExactly(removeApp, "1");
                 sinon.assert.calledOnce(log);
-                sinon.assert.calledWithExactly(log, "Removed app \"a\".");
+                sinon.assert.calledWithExactly(log, "Successfully removed the \"a\" app.");
 
                 done();
             });
@@ -318,7 +318,7 @@ describe("CLI", () => {
             .done((): void => {
                 sinon.assert.notCalled(removeApp);
                 sinon.assert.calledOnce(log);
-                sinon.assert.calledWithExactly(log, "Remove cancelled.");
+                sinon.assert.calledWithExactly(log, "App removal cancelled.");
 
                 done();
             });
@@ -337,7 +337,7 @@ describe("CLI", () => {
             .done((): void => {
                 sinon.assert.calledOnce(updateApp);
                 sinon.assert.calledOnce(log);
-                sinon.assert.calledWithExactly(log, "Renamed app \"a\" to \"c\".");
+                sinon.assert.calledWithExactly(log, "Successfully renamed the \"a\" app to \"c\".");
 
                 done();
             });
@@ -358,7 +358,7 @@ describe("CLI", () => {
                 sinon.assert.calledOnce(addDeployment);
                 sinon.assert.calledOnce(getDeploymentKeys);
                 sinon.assert.calledOnce(log);
-                sinon.assert.calledWithExactly(log, "Added deployment \"b\" with key \"6\" to app \"a\".");
+                sinon.assert.calledWithExactly(log, "Successfully added the \"b\" deployment with key \"6\" to the \"a\" app.");
                 done();
             });
     });
@@ -386,10 +386,13 @@ describe("CLI", () => {
                         deploymentKey: "6",
                         package: {
                             appVersion: "1.0.0",
-                            isMandatory: true,
+                            description: "fgh",
+                            label: "ghi",
                             packageHash: "jkl",
-                            uploadTime: "1970-01-01T00:00:01.000Z",
-                            description: "fgh"
+                            isMandatory: true,
+                            size: 10,
+                            blobUrl: "http://mno.pqr",
+                            uploadTime: +1000
                         }
                     }
                 ];
@@ -413,7 +416,7 @@ describe("CLI", () => {
                 sinon.assert.calledOnce(removeDeployment);
                 sinon.assert.calledWithExactly(removeDeployment, "1", "4");
                 sinon.assert.calledOnce(log);
-                sinon.assert.calledWithExactly(log, "Removed deployment \"Staging\" from app \"a\".");
+                sinon.assert.calledWithExactly(log, "Successfully removed the \"Staging\" deployment from the \"a\" app.");
 
                 done();
             });
@@ -434,7 +437,7 @@ describe("CLI", () => {
             .done((): void => {
                 sinon.assert.notCalled(removeDeployment);
                 sinon.assert.calledOnce(log);
-                sinon.assert.calledWithExactly(log, "Remove cancelled.");
+                sinon.assert.calledWithExactly(log, "Deployment removal cancelled.");
 
                 done();
             });
@@ -454,7 +457,7 @@ describe("CLI", () => {
             .done((): void => {
                 sinon.assert.calledOnce(updateDeployment);
                 sinon.assert.calledOnce(log);
-                sinon.assert.calledWithExactly(log, "Renamed deployment \"Staging\" to \"c\" for app \"a\".");
+                sinon.assert.calledWithExactly(log, "Successfully renamed the \"Staging\" deployment to \"c\" for the \"a\" app.");
 
                 done();
             });
