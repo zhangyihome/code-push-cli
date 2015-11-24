@@ -597,7 +597,7 @@ function printAppList(format: string, apps: App[], deploymentLists: string[]): v
         var headers = ["Name", "Deployments"];
         printTable(headers, (dataSource: any[]): void => {
             apps.forEach((app: App, index: number): void => {
-                var row = [app.name, deploymentLists[index]];
+                var row = [app.name, wordwrap(50)(deploymentLists[index])];
                 dataSource.push(row);
             });
         });
@@ -637,7 +637,6 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
                 }
 
                 if (releaseSource) {
-                    // Need to word-wrap internally because wordwrap is not smart enough to ignore color characters
                     releaseTime += "\n" + chalk.magenta(`(${releaseSource})`).toString();
                 }
 
