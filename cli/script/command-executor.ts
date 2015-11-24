@@ -164,7 +164,9 @@ function appList(command: cli.IAppListCommand): Promise<void> {
                     .then((deployments: Deployment[]) => {
                         var deploymentList: string = deployments
                             .map((deployment: Deployment) => deployment.name)
-                            .sort()
+                            .sort((first: string, second: string) => {
+                                return first.toLowerCase().localeCompare(second.toLowerCase());
+                            })
                             .join(", ");
                         return deploymentList;
                     });
