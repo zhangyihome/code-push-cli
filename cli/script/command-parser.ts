@@ -1,6 +1,5 @@
 ﻿import * as yargs from "yargs";
 import * as cli from "../definitions/cli";
-import * as semver from "semver";
 import * as chalk from "chalk";
 
 const USAGE_PREFIX = "Usage: code-push";
@@ -164,11 +163,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .example("release MyApp ./platforms/ios/www 1.0.3 -d Production", "Upload the \"./platforms/ios/www\" folder and all its contents to the \"Production\" deployment for app \"MyApp\" with the required semver compliant app store version of 1.0.3")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
-            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
-            .check((argv: any, aliases: { [alias: string]: string }) => {
-                var appStoreVersion: string = argv._[3];
-                return semver.valid(appStoreVersion) !== null;
-            });
+            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" });
 
         addCommonConfiguration(yargs);
     })

@@ -10,6 +10,7 @@ import * as path from "path";
 var prompt = require("prompt");
 import * as Q from "q";
 import * as recursiveFs from "recursive-fs";
+import * as semver from "semver";
 import slash = require("slash");
 import tryJSON = require("try-json");
 var Table = require("cli-table");
@@ -728,6 +729,10 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
 }
 
 function release(command: cli.IReleaseCommand): Promise<void> {
+    if (semver.valid(command.appStoreVersion) === null) {
+        throw new Error("Please use a semver compliant app store version, for example \"1.0.3\".");
+    }
+
     return getAppId(command.appName)
         .then((appId: string): Promise<void> => {
             throwForInvalidAppId(appId, command.appName);
