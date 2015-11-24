@@ -157,23 +157,22 @@ function appList(command: cli.IAppListCommand): Promise<void> {
     var apps: App[];
 
     return sdk.getApps()
-        .then((retrievedApps: App[]): Promise<string[]> => {
+        .then((retrievedApps: App[]): Promise<string[][]> => {
             apps = retrievedApps;
-            var deploymentListPromises: Promise<string>[] = apps.map((app: App) => {
+            var deploymentListPromises: Promise<string[]>[] = apps.map((app: App) => {
                 return sdk.getDeployments(app.id)
                     .then((deployments: Deployment[]) => {
-                        var deploymentList: string = deployments
+                        var deploymentList: string[] = deployments
                             .map((deployment: Deployment) => deployment.name)
                             .sort((first: string, second: string) => {
                                 return first.toLowerCase().localeCompare(second.toLowerCase());
-                            })
-                            .join(", ");
+                            });
                         return deploymentList;
                     });
             });
             return Q.all(deploymentListPromises);
         })
-        .then((deploymentLists: string[]): void => {
+        .then((deploymentLists: string[][]): void => {
             printAppList(command.format, apps, deploymentLists);
         });
 }
@@ -587,7 +586,7 @@ function formatDate(unixOffset: number): string {
     }
 }
 
-function printAppList(format: string, apps: App[], deploymentLists: string[]): void {
+function printAppList(format: string, apps: App[], deploymentLists: string[][]): void {
     if (format === "json") {
         var dataSource: any[] = apps.map((app: App, index: number) => {
             return { "name": app.name, "deployments": deploymentLists[index] };
@@ -597,7 +596,7 @@ function printAppList(format: string, apps: App[], deploymentLists: string[]): v
         var headers = ["Name", "Deployments"];
         printTable(headers, (dataSource: any[]): void => {
             apps.forEach((app: App, index: number): void => {
-                var row = [app.name, wordwrap(50)(deploymentLists[index])];
+                var row = [app.name, wordwrap(50)(deploymentLists[index].join(", "))];
                 dataSource.push(row);
             });
         });
