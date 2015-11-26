@@ -134,7 +134,7 @@ code-push release <appName> <package> <appStoreVersion>
 
 This specifies the location of the content you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the `/platforms/ios/www` folder for a Cordova app). You don't need to zip up multiple files or directories in order to deploy those changes, since the CLI will automatically zip them for you. 
 
-It's important that the path you specify to this parameter refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you need to run on your source code in order to generate the release-ready app assets, as well as the location of the content that you can subsequently pass to the `package` parameter:
+It's important that the path you specify refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you should run before releasing, as well as the location you can subsequently point at using the `package` parameter: 
 
 | Platform               | Prepare command                                                                                  | Package path (relative to project root)    |              
 |------------------------|--------------------------------------------------------------------------------------------------|--------------------------------------------|
