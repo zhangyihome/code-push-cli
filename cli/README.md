@@ -19,13 +19,13 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
 
 ### Account creation
 
-Before you can begin releasing app updates, you need to create a CodePush account. You can do this by simply running the following command:
+Before you can begin releasing app updates, you need to create a CodePush account. You can do this by simply running the following command once you've installed the CLI:
 
 ```
 code-push register
 ```
 
-This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. Once authenticated, it will create a CodePush account "linked" to your GitHub/MSA identify, and generate an access token you can copy/paste into the CLI in order to login. 
+This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. Once authenticated, it will create a CodePush account "linked" to your GitHub/MSA identity, and generate an access token you can copy/paste into the CLI in order to login. 
 
 *Note: After registering, you are automatically logged-in with the CLI, so until you explicitly log out, you don't need to login again from the same machine.*
 
@@ -132,15 +132,32 @@ code-push release <appName> <package> <appStoreVersion>
 
 #### Package parameter
 
-You can specify either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the /platforms/ios/www folder for a Cordova app). You don't need to zip up multiple files or directories in order to deploy those changes. The CLI will automatically zip them for you.
+This specifies the location of the content you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the `/platforms/ios/www` folder for a Cordova app). You don't need to zip up multiple files or directories in order to deploy those changes, since the CLI will automatically zip them for you. 
+
+It's important that the path you specify to this parameter refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you need to run on your source code in order to generate the release-ready app assets, as well as the location of the content that you can subsequently pass to the `package` parameter:
+
+| Platform               | Prepare command                                                                                  | Package path (relative to project root)    |              
+|------------------------|--------------------------------------------------------------------------------------------------|--------------------------------------------|
+| Cordova (Android)      | `cordova prepare android`                                                                        | `./platforms/android/assets/www` directory |                      
+| Cordova (iOS)          | `cordova prepare ios`                                                                            | `./platforms/ios/www ` directory           |               
+| React Native (Android) | `react-native bundle --platform ios --entry-file <entryFile> --bundle-output <bundleOutput>`     | Value of the `--bundle-output` option      |
+| React Native (iOS)     | `react-native bundle --platform android --entry-file <entryFile> --bundle-output <bundleOutput>` | Value of the `--bundle-output` option      |
 
 #### App store version parameter
 
-This specifies the semver compliant store version of the application you are pushing updates for. Only users running this version will receive the update. This is important if your JavaScript/etc. takes a dependency on a new capabilitiy of the native side of your app (e.g. a Cordova plugin), and therefore, requires the user to update to the latest version from the app store.
+This specifies the semver compliant store/binary version of the application you are releasing the update for. Only users running this exact version will receive the update. This is important if your JavaScript/etc. takes a dependency on a new capabilitiy of the native side of your app (e.g. a Cordova plugin), and therefore, requires the user to update to the latest version from the app store before being able to get it.
+
+The following table outlines the value that CodePush expects you to provide for each respective app type:
+
+| Platform               | Source of app store version                                                  |
+|------------------------|------------------------------------------------------------------------------|
+| Cordova                | The `<widget version>` attribute in the `config.xml` file                    | 
+| React Native (Android) | The `android.defaultConfig.versionName` property in your `build.gradle` file |
+| React Native (iOS)     | The `CFBundleShortVersionString` key in the `Info.plist` file                |
 
 #### Deployment name parameter
 
-This specifies which deployment you want to deploy the update. This defaults to "Staging", but when you're ready to deploy to "Production", or one of your own custom deployments, just explicitly set this argument.
+This specifies which deployment you want to release the update to. This defaults to `Staging`, but when you're ready to deploy to `Production`, or one of your own custom deployments, just explicitly set this argument.
 
 *NOTE: The parameter can be set using either "--deploymentName" or "-d".*
 
@@ -174,3 +191,5 @@ You can view a history of releases for a specific app deployment (including prom
 ```
 code-push deployment history <appName> <deploymentName>
 ```
+
+*NOTE: The history command can also be run using the "h" alias*
