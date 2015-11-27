@@ -1,27 +1,580 @@
-<!DOCTYPE html><html xmlns=http://www.w3.org/1999/xhtml xml:lang=en lang=en-us><head><link href=http://gmpg.org/xfn/11 rel=profile><meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1"><meta http-equiv=content-type content="text/html; charset=utf-8"><meta property=og:title content="CodePush"><meta property=og:site_name content="CodePush"><meta property=og:description content="CodePush Blog"><meta property=og:image content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG"><meta name=twitter:card content=summary_large_image><meta name=twitter:site content=@Microsoft><meta name=twitter:title content=CodePush><meta name=twitter:description content="CodePush Blog"><meta name=twitter:image content=https://microsoft.github.io/code-push/assets/images/fbshare.PNG><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta name=viewport content="user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1,width=device-width"><meta name=description content="CodePush Blog"><title>Management CLI &middot; CodePush</title><link rel=stylesheet href=/code-push/assets/css/vendor.a6bad8f4.css><link rel=stylesheet href=/code-push/assets/css/style.min.f86c2639.css><link rel=apple-touch-icon sizes=57x57 href=/code-push/assets/images/icons/apple-icon-57x57.png><link rel=apple-touch-icon sizes=60x60 href=/code-push/assets/images/icons/apple-icon-60x60.png><link rel=apple-touch-icon sizes=72x72 href=/code-push/assets/images/icons/apple-icon-72x72.png><link rel=apple-touch-icon sizes=76x76 href=/code-push/assets/images/icons/apple-icon-76x76.png><link rel=apple-touch-icon sizes=114x114 href=/code-push/assets/images/icons/apple-icon-114x114.png><link rel=apple-touch-icon sizes=120x120 href=/code-push/assets/images/icons/apple-icon-120x120.png><link rel=apple-touch-icon sizes=144x144 href=/code-push/assets/images/icons/apple-icon-144x144.png><link rel=apple-touch-icon sizes=152x152 href=/code-push/assets/images/icons/apple-icon-152x152.png><link rel=apple-touch-icon sizes=180x180 href=/code-push/assets/images/icons/apple-icon-180x180.png><link rel=icon type=image/png sizes=192x192 href=/code-push/assets/images/icons/android-icon-192x192.png><link rel=icon type=image/png sizes=32x32 href=/code-push/assets/images/icons/favicon-32x32.png><link rel=icon type=image/png sizes=96x96 href=/code-push/assets/images/icons/favicon-96x96.png><link rel=icon type=image/png sizes=16x16 href=/code-push/assets/images/icons/favicon-16x16.png><link rel=manifest href=/code-push/assets/images/icons/manifest.json><meta name=msapplication-TileColor content=#294E80><meta name=msapplication-TileImage content=/code-push/assets/images/icons/ms-icon-144x144.png><meta name=theme-color content=#ffffff><script src=/code-push/assets/js/vendors.1b3c7c06.js></script><script src=/code-push/assets/js/all.min.bff0ba3c.js></script><link rel=alternate type=application/rss+xml title=RSS href=/code-push/atom.xml></head><body><header role=banner><nav class="navbar navbar-default navbar-fixed-top"><div class=container-fluid><div class=navbar-header><button type=button class="navbar-toggle pull-left collapsed" data-toggle=collapse data-target=#bs-example-navbar-collapse-1><span class=sr-only>Toggle navigation</span> <span class=icon-bar></span> <span class=icon-bar></span> <span class=icon-bar></span></button> <a class=navbar-brand href=/code-push/index.html><img class=navbar-logo src="/code-push/assets/images/codepush_navbar_logo.svg"></a></div><div class="collapse navbar-collapse navbar_center" id=bs-example-navbar-collapse-1><ul class="nav navbar-nav"><li class=""><a href=/code-push/index.html#getting_started>Get Started</a></li><li class=active><a href=/code-push/docs/index.html>Documentation</a></li><li class=""><a href=/code-push/faq/index.html>FAQ</a></li><li class=""><a href=/code-push/blog/index.html>Blog</a></li></ul></div></div></nav></header><div class=top_navbar_spacer></div><div class=docs><div id=content class="container main_content"><div class="col-md-3 toc-container hidden-sm hidden-xs"><div class=row><div class=site-toc-container><h2 class=site-toc-title>Table of Contents</h2><ul class=site-toc><li><a class="" href=/code-push/docs/getting-started.html>Getting Started</a></li><li><a class=this-page href=/code-push/docs/cli.html>Management CLI</a><div id=page-toc class=page-toc></div></li><li><a class="" href=/code-push/docs/cordova.html>Cordova Client SDK</a></li><li><a class="" href=/code-push/docs/react-native.html>React Native Client SDK</a></li></ul></div></div></div><div class="col-md-7 col-md-offset-1"><div class=row><div class="xs-toc-container visible-sm visible-xs"><nav class=xs-toc><div class="toc-dropdown dropdown"><h2 class=site-toc-title>Table of Contents</h2><a class="dropdown-toggle btn" data-toggle=dropdown href=#>Select topic <span class=caret></span></a><ul class=dropdown-menu><li><a href=/code-push/docs/getting-started.html>Getting Started</a></li><li><a href=/code-push/docs/cli.html>Management CLI</a></li><li><a href=/code-push/docs/cordova.html>Cordova Client SDK</a></li><li><a href=/code-push/docs/react-native.html>React Native Client SDK</a></li></ul></div></nav></div></div><div class=row><header class=doc-header><h1 class=doc-title>Management CLI</h1></header><article class=doc-content><p><img src=https://cloud.githubusercontent.com/assets/116461/11233671/1d0329ae-8d75-11e5-8cf4-781109ca83b8.png alt="CodePush CLI"></p><h2>Installation</h2><ul><li>Install <a href="https://nodejs.org/">Node.js</a></li><li>Install the CodePush CLI: <code>npm install -g code-push-cli</code></li></ul><h2>Quick Start/Usage</h2><ol><li>Create a <a href=#account-creation>CodePush account</a> push using the CodePush CLI</li><li>Register your <a href=#app-management>app</a> with the service, and optionally create any additional <a href=#deployment-management>deployments</a></li><li>CodePush-ify your app and point it at the deployment you wish to use (<a href=http://github.com/Microsoft/cordova-plugin-code-push>Cordova</a> and <a href=http://github.com/Microsoft/react-native-code-push>React Native</a>)</li><li><a href=#update-deployment>Deploy</a> an update for your registered app</li><li>Live long and prosper! (<a href=https://en.wikipedia.org/wiki/Vulcan_salute>details</a>)</li></ol><h3>Account creation</h3><p>Before you can begin releasing app updates, you need to create a CodePush account. You can do this by simply running the following command:</p><div class=highlight><pre><code class=language-text data-lang=text>code-push register
-</code></pre></div><p>This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. Once authenticated, it will create a CodePush account &ldquo;linked&rdquo; to your GitHub/MSA identify, and generate an access token you can copy/paste into the CLI in order to login.</p><p><em>Note: After registering, you are automatically logged-in with the CLI, so until you explicitly log out, you don&rsquo;t need to login again from the same machine.</em></p><h3>Authentication</h3><p>Every command within the CodePush CLI requires authentication, and therefore, before you can begin managing your account, you need to login using the Github or Microsoft account you used when registering. You can do this by running the following command:</p><div class=highlight><pre><code class=language-text data-lang=text>code-push login
-</code></pre></div><p>This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. This will generate an access token that you need to copy/paste into the CLI (it will prompt you for it). You are now succesfully authenticated and can safely close your browser window.</p><p>When you login from the CLI, your access token (kind of like a cookie) is persisted to disk so that you don&rsquo;t have to login everytime you attempt to access your account. In order to delete this file from your computer, simply run the following command:</p><div class=highlight><pre><code class=language-text data-lang=text>code-push logout
-</code></pre></div><p>If you forget to logout from a machine you&rsquo;d prefer not to leave a running session on (e.g. your friend&rsquo;s laptop), you can use the following commands to list and remove any &ldquo;live&rdquo; access tokens. The list of access keys will display the name of the machine the token was created on, as well as the time the login occurred. This should make it easy to spot keys you don&rsquo;t want to keep around.</p><div class=highlight><pre><code class=language-text data-lang=text>code-push access-key ls
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta property="og:title" content="CodePush" />
+  <meta property="og:site_name" content="CodePush"/>
+  <meta property="og:description" content="CodePush Blog" />
+  <meta property="og:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG" />
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@Microsoft">
+  <meta name="twitter:title" content="CodePush">
+  <meta name="twitter:description" content="CodePush Blog">
+  <meta name="twitter:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+  <meta name="description" content="CodePush Blog">
+
+  <title>
+    
+      Management CLI &middot; CodePush
+    
+  </title>
+  
+  <!-- build:css  /assets/css/vendor.css -->
+  <link rel="stylesheet" href="/libraries/bootstrap/dist/css/bootstrap.css" />
+  <link rel="stylesheet" href="/libraries/highlightjs/styles/solarized_light.css">
+  <link rel="stylesheet" href="/libraries/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/libraries/github-fork-ribbon-css/gh-fork-ribbon.css">
+  <!-- endbuild -->
+  
+  <!-- CSS -->
+  <!-- build:css /assets/css/style.min.css -->
+  <link rel="stylesheet" href="/assets/stylesheets/style.css">
+  <!-- endbuild -->             
+
+  <!-- Icons --> <!-- TODO: Check that these all wok -->
+  <link rel="apple-touch-icon" sizes="57x57" href="/code-push/assets/images/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/code-push/assets/images/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/code-push/assets/images/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/code-push/assets/images/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/code-push/assets/images/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/code-push/assets/images/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/code-push/assets/images/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/code-push/assets/images/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/code-push/assets/images/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/code-push/assets/images/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/code-push/assets/images/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/code-push/assets/images/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/code-push/assets/images/icons/favicon-16x16.png">
+  <link rel="manifest" href="/code-push/assets/images/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#294E80">
+  <meta name="msapplication-TileImage" content="/code-push/assets/images/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- JS -->    
+	<!-- build:js  /assets/js/vendors.js  -->	
+	<script src="/libraries/jquery/dist/jquery.min.js"></script>
+	<script src="/libraries/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="/libraries/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+  <script src="/libraries/anchorific.js/min/anchorific.min.js"></script>
+  <script src="/libraries/toc/dist/toc.min.js"></script>
+  <script src="/libraries/highlightjs/highlight.pack.min.js"></script>
+  <!-- endbuild -->   
+  
+  <!-- build:js /assets/js/all.min.js -->
+  <script src="/assets/javascript/global.js"></script>
+  <script src="/assets/javascript/home.js"></script>  
+  <script src="/assets/javascript/docs.js"></script>
+  <script src="/assets/javascript/faq.js"></script>
+  <!-- endbuild -->
+ 
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/code-push/atom.xml">
+
+    
+</head>
+<body>
+    <header role="banner">
+	<nav class="navbar navbar-default navbar-fixed-top">
+		 <div class="container-fluid">
+        	<!--<img class="fork-me-ribbon pull-right" src="../assets/images/fork_me_ribbon.svg" />-->
+		    <!-- Brand and toggle get grouped for better mobile display -->
+		    <div class="navbar-header">
+		      <button type="button" class="navbar-toggle pull-left collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+		        <span class="sr-only">Toggle navigation</span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		      </button>
+		      <a class="navbar-brand" href="/code-push/index.html"><img class="navbar-logo" src="/code-push/assets/images/codepush_navbar_logo.svg" /></a>
+		    </div>
+		    <!-- Collect the nav links, forms, and other content for toggling -->
+		    <div class="collapse navbar-collapse navbar_center" id="bs-example-navbar-collapse-1">
+		      <ul class="nav navbar-nav">
+				<li class=""><a href="/code-push/index.html#getting_started">Get Started</a></li>
+				<li class="active"><a href="/code-push/docs/index.html">Documentation</a></li>
+		        <li class=""><a href="/code-push/faq/index.html">FAQ</a></li>
+				<li class=""><a href="/code-push/blog/index.html">Blog</a></li>
+		      </ul>
+		    </div><!-- /.navbar-collapse -->
+		</div><!-- /.container-fluid -->
+	</nav>				   		
+</header>
+<div class="top_navbar_spacer"></div>
+	<div class="docs">
+    <div id="content" class="container main_content">                       
+        <div class="col-md-3 toc-container hidden-sm hidden-xs">
+            <div class="row">
+<div class='site-toc-container'>
+  <h2 class="site-toc-title">Table of Contents</h2>
+  <ul class="site-toc">
+    
+      
+        
+          
+          
+        
+          
+          
+        
+          
+          
+          <li>
+            <a class="" href="/code-push/docs/getting-started.html">
+                Getting Started
+            </a>
+            
+          </li>
+          
+        
+          
+          
+        
+          
+          
+        
+      
+        
+          
+          
+          <li>
+            <a class="this-page" href="/code-push/docs/cli.html">
+                Management CLI
+            </a>
+            
+                <div id="page-toc" class="page-toc"></div>
+            
+          </li>
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+        
+          
+          
+        
+          
+          
+          <li>
+            <a class="" href="/code-push/docs/cordova.html">
+                Cordova Client SDK
+            </a>
+            
+          </li>
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+          <li>
+            <a class="" href="/code-push/docs/react-native.html">
+                React Native Client SDK
+            </a>
+            
+          </li>
+          
+        
+          
+          
+        
+      
+          
+  </ul>
+</div>
+</div>                          
+        </div>      
+        <div class="col-md-7 col-md-offset-1">
+            <div class="row">
+                <div class="xs-toc-container visible-sm visible-xs">        
+                    <nav class='xs-toc'>
+  <div class="toc-dropdown dropdown">
+    <h2 class="site-toc-title">Table of Contents</h2>
+    <a class="dropdown-toggle btn" data-toggle="dropdown" href="#">
+      Select topic
+      <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu">
+          
+            
+              
+                
+                
+              
+                
+                
+              
+                
+                
+                <li>
+                  <a href=/code-push/docs/getting-started.html>Getting Started</a>
+                </li>
+                
+              
+                
+                
+              
+                
+                
+              
+            
+              
+                
+                
+                <li>
+                  <a href=/code-push/docs/cli.html>Management CLI</a>
+                </li>
+                
+              
+                
+                
+              
+                
+                
+              
+                
+                
+              
+                
+                
+              
+            
+              
+                
+                
+              
+                
+                
+                <li>
+                  <a href=/code-push/docs/cordova.html>Cordova Client SDK</a>
+                </li>
+                
+              
+                
+                
+              
+                
+                
+              
+                
+                
+              
+            
+              
+                
+                
+              
+                
+                
+              
+                
+                
+              
+                
+                
+                <li>
+                  <a href=/code-push/docs/react-native.html>React Native Client SDK</a>
+                </li>
+                
+              
+                
+                
+              
+            
+      
+    </ul>
+  </div>    
+</nav>
+
+
+                </div>            
+            </div>
+            <div class="row">  
+                <header class="doc-header">
+                    <h1 class="doc-title">Management CLI</h1>
+                    <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/CLI.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
+                </header>  
+                <article class="doc-content">               
+                    <p><img src="https://cloud.githubusercontent.com/assets/116461/11233671/1d0329ae-8d75-11e5-8cf4-781109ca83b8.png" alt="CodePush CLI"></p>
+
+<h2>Installation</h2>
+
+<ul>
+<li>Install <a href="https://nodejs.org/">Node.js</a> </li>
+<li>Install the CodePush CLI: <code>npm install -g code-push-cli</code></li>
+</ul>
+
+<h2>Quick Start</h2>
+
+<ol>
+<li>Create a <a href="#account-creation">CodePush account</a> push using the CodePush CLI</li>
+<li>Register your <a href="#app-management">app</a> with the service, and optionally create any additional <a href="#deployment-management">deployments</a></li>
+<li>CodePush-ify your app and point it at the deployment you wish to use (<a href="http://github.com/Microsoft/cordova-plugin-code-push">Cordova</a> and <a href="http://github.com/Microsoft/react-native-code-push">React Native</a>)</li>
+<li><a href="#update-deployment">Deploy</a> an update for your registered app</li>
+<li>Live long and prosper! (<a href="https://en.wikipedia.org/wiki/Vulcan_salute">details</a>)</li>
+</ol>
+
+<h2>Account creation</h2>
+
+<p>Before you can begin releasing app updates, you need to create a CodePush account. You can do this by simply running the following command once you&rsquo;ve installed the CLI:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push register
+</code></pre></div>
+<p>This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. Once authenticated, it will create a CodePush account &ldquo;linked&rdquo; to your GitHub/MSA identity, and generate an access token you can copy/paste into the CLI in order to login. </p>
+
+<p><em>Note: After registering, you are automatically logged-in with the CLI, so until you explicitly log out, you don&rsquo;t need to login again from the same machine.</em></p>
+
+<h2>Authentication</h2>
+
+<p>Every command within the CodePush CLI requires authentication, and therefore, before you can begin managing your account, you need to login using the Github or Microsoft account you used when registering. You can do this by running the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push login
+</code></pre></div>
+<p>This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. This will generate an access token that you need to copy/paste into the CLI (it will prompt you for it). You are now succesfully authenticated and can safely close your browser window.</p>
+
+<p>When you login from the CLI, your access token (kind of like a cookie) is persisted to disk so that you don&rsquo;t have to login everytime you attempt to access your account. In order to delete this file from your computer, simply run the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push logout
+</code></pre></div>
+<p>If you forget to logout from a machine you&rsquo;d prefer not to leave a running session on (e.g. your friend&rsquo;s laptop), you can use the following commands to list and remove any &ldquo;live&rdquo; access tokens. 
+The list of access keys will display the name of the machine the token was created on, as well as the time the login occurred. This should make it easy to spot keys you don&rsquo;t want to keep around.</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push access-key ls
 code-push access-key rm &lt;accessKey&gt;
-</code></pre></div><p>If you need additional keys, that can be used to authenticate against the CodePush service without needing to give access to your GitHub and/or Microsoft crendentials, you can run the following command to create one (along with a description of what it is for):</p><div class=highlight><pre><code class=language-text data-lang=text>code-push access-key add &quot;VSO Integration&quot;
-</code></pre></div><p>After creating the new key, you can specify its value using the <code>--accessKey</code> flag of the <code>login</code> command, which allows you to perform the &ldquo;headless&rdquo; authentication, as opposed to launching a browser.</p><div class=highlight><pre><code class=language-text data-lang=text>code-push login --accessKey &lt;accessKey&gt;
-</code></pre></div><p>If you want to log out of your current session, but still be able to reuse the same key for future logins, run the following command:</p><div class=highlight><pre><code class=language-text data-lang=text>code-push logout --local
-</code></pre></div><h3>App management</h3><p>Before you can deploy any updates, you need to register an app with the CodePush service using the following command:</p><div class=highlight><pre><code class=language-text data-lang=text>code-push app add &lt;appName&gt;
-</code></pre></div><p>All new apps automatically come with two deployments (Staging and Production) so that you can begin distributing updates to multiple channels without needing to do anything extra (see deployment instructions below). After you create an app, the CLI will output the deployment keys for the Staging and Production channels, which you can begin using to configure your clients via their respective SDKs (details for <a href=http://github.com/cordova-plugin-code-push>Cordova</a> and <a href=http://github.com/react-native-code-push>React Native</a>).</p><p>If you don&rsquo;t like the name you gave an app, you can rename it using the following command:</p><div class=highlight><pre><code class=language-text data-lang=text>code-push app rename &lt;appName&gt; &lt;newAppName&gt;
-</code></pre></div><p>The app&rsquo;s name is only meant to be recognizeable from the management side, and therefore, you can feel free to rename it as neccessary. It won&rsquo;t actually impact the running app, since update queries are made via deployment keys.</p><p>If at some point you no longer need an app, you can remove it from the server using the following command:</p><div class=highlight><pre><code class=language-text data-lang=text>code-push app rm &lt;appName&gt;
-</code></pre></div><p>Do this with caution since any apps that have been configured to use it will obviously stop receiving updates.</p><p>Finally, if you want to list all apps that you&rsquo;ve registered with the CodePush server, you can run the following command:</p><div class=highlight><pre><code class=language-text data-lang=text>code-push app ls
-</code></pre></div><h3>Deployment management</h3><p>As mentioned above, every created app automatically includes two deployments: <strong>Staging</strong> and <strong>Production</strong>. This allows you to have multiple versions of your app in flight at any given time, while still using the CodePush server to distribute the updates. If having a staging and production version of your app is enough to meet your needs, then you don&rsquo;t need to do anything else. However, if you want an alpha, dev, etc. deployment, you can easily create them using the following command:</p><div class=highlight><pre><code class=language-text data-lang=text>code-push deployment add &lt;appName&gt; &lt;deploymentName&gt;
-</code></pre></div><p>Just like with apps, you can remove, rename and list deployments as well, using the following commands respectively:</p><div class=highlight><pre><code class=language-text data-lang=text>code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploymentName&gt;
+</code></pre></div>
+<p>If you need additional keys, that can be used to authenticate against the CodePush service without needing to give access to your GitHub and/or Microsoft crendentials, you can run the following command to create one (along with a description of what it is for):</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push access-key add &quot;VSO Integration&quot;
+</code></pre></div>
+<p>After creating the new key, you can specify its value using the <code>--accessKey</code> flag of the <code>login</code> command, which allows you to perform the &ldquo;headless&rdquo; authentication, as opposed to launching a browser.</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push login --accessKey &lt;accessKey&gt;
+</code></pre></div>
+<p>If you want to log out of your current session, but still be able to reuse the same key for future logins, run the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push logout --local
+</code></pre></div>
+<h2>App management</h2>
+
+<p>Before you can deploy any updates, you need to register an app with the CodePush service using the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push app add &lt;appName&gt;
+</code></pre></div>
+<p>All new apps automatically come with two deployments (Staging and Production) so that you can begin distributing updates to multiple channels without needing to do anything extra (see deployment instructions below). After you create an app, the CLI will output the deployment keys for the Staging and Production channels, which you can begin using to configure your clients via their respective SDKs (details for <a href="http://github.com/cordova-plugin-code-push">Cordova</a> and <a href="http://github.com/react-native-code-push">React Native</a>).</p>
+
+<p>If you don&rsquo;t like the name you gave an app, you can rename it using the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push app rename &lt;appName&gt; &lt;newAppName&gt;
+</code></pre></div>
+<p>The app&rsquo;s name is only meant to be recognizeable from the management side, and therefore, you can feel free to rename it as neccessary. It won&rsquo;t actually impact the running app, since update queries are made via deployment keys.</p>
+
+<p>If at some point you no longer need an app, you can remove it from the server using the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push app rm &lt;appName&gt;
+</code></pre></div>
+<p>Do this with caution since any apps that have been configured to use it will obviously stop receiving updates.</p>
+
+<p>Finally, if you want to list all apps that you&rsquo;ve registered with the CodePush server,
+you can run the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push app ls
+</code></pre></div>
+<h2>Deployment management</h2>
+
+<p>As mentioned above, every created app automatically includes two deployments: <strong>Staging</strong> and <strong>Production</strong>. This allows you to have multiple versions of your app in flight at any given time, while still using the CodePush server to distribute the updates. If having a staging and production version of your app is enough to meet your needs, then you don&rsquo;t need to do anything else. However, if you want an alpha, dev, etc. deployment, you can easily create them using the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment add &lt;appName&gt; &lt;deploymentName&gt;
+</code></pre></div>
+<p>Just like with apps, you can remove, rename and list deployments as well, using the following commands respectively:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploymentName&gt;
 code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 code-push deployment ls &lt;appName&gt;
-</code></pre></div><h3>Releasing app updates</h3><p>Once your app has been configured to query for updates against the CodePush service&ndash;using your desired deployment&ndash;you can begin pushing updates to it using the following command:</p><div class=highlight><pre><code class=language-text data-lang=text>code-push release &lt;appName&gt; &lt;package&gt; &lt;appStoreVersion&gt;
+</code></pre></div>
+<h2>Releasing app updates</h2>
+
+<p>Once your app has been configured to query for updates against the CodePush service&ndash;using your desired deployment&ndash;you can begin pushing updates to it using the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push release &lt;appName&gt; &lt;package&gt; &lt;appStoreVersion&gt;
 [--deploymentName &lt;deploymentName&gt;]
 [--description &lt;description&gt;]
 [--mandatory]
-</code></pre></div><h4>Package parameter</h4><p>You can specify either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the /platforms/ios/www folder for a Cordova app). You don&rsquo;t need to zip up multiple files or directories in order to deploy those changes. The CLI will automatically zip them for you.</p><h4>App store version parameter</h4><p>This specifies the semver compliant store version of the application you are pushing updates for. Only users running this version will receive the update. This is important if your JavaScript/etc. takes a dependency on a new capabilitiy of the native side of your app (e.g. a Cordova plugin), and therefore, requires the user to update to the latest version from the app store.</p><h4>Deployment name parameter</h4><p>This specifies which deployment you want to deploy the update. This defaults to &ldquo;Staging&rdquo;, but when you&rsquo;re ready to deploy to &ldquo;Production&rdquo;, or one of your own custom deployments, just explicitly set this argument.</p><p><em>NOTE: The parameter can be set using either &ldquo;&ndash;deploymentName&rdquo; or &ldquo;-d&rdquo;.</em></p><h4>Description parameter</h4><p>This provides an optional &ldquo;change log&rdquo; for the deployment. The value is simply roundtripped to the client so that when the update is detected, your app can choose to display it to the end-user.</p><p><em>NOTE: This parameter can be set using either &ldquo;&ndash;description&rdquo; or &ldquo;-desc&rdquo;</em></p><h4>Mandatory parameter</h4><p>This specifies whether the update is mandatory or not (<strong>true</strong> or <strong>false</strong>). The value is simply roundtripped to the client, who can decide to actually enforce it or not. The default value is <strong>false</strong>.</p><p><em>NOTE: This parameter can be set using either &ldquo;&ndash;mandatory&rdquo; or &ldquo;-m&rdquo;</em></p><h3>Promoting updates across deployments</h3><p>Once you&rsquo;ve tested an update against a specific deployment, and you want to promote it &ldquo;downstream&rdquo; (e.g. dev-&gt;staging, staging-&gt;production), you can simply use the following command to copy the code and metadata (e.g. mandatory, description, app store version) from one deployment to another:</p><div class=highlight><pre><code class=language-text data-lang=text>code-push promote &lt;appName&gt; &lt;sourceDeploymentName&gt; &lt;destDeploymentName&gt;
+</code></pre></div>
+<h3>Package parameter</h3>
+
+<p>This specifies the location of the content you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the <code>/platforms/ios/www</code> folder for a Cordova app). You don&rsquo;t need to zip up multiple files or directories in order to deploy those changes, since the CLI will automatically zip them for you. </p>
+
+<p>It&rsquo;s important that the path you specify refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you should run before releasing, as well as the location you can subsequently point at using the <code>package</code> parameter: </p>
+
+<table><thead>
+<tr>
+<th>Platform</th>
+<th>Prepare command</th>
+<th>Package path (relative to project root)</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Cordova (Android)</td>
+<td><code>cordova prepare android</code></td>
+<td><code>./platforms/android/assets/www</code> directory</td>
+</tr>
+<tr>
+<td>Cordova (iOS)</td>
+<td><code>cordova prepare ios</code></td>
+<td><code>./platforms/ios/www</code> directory</td>
+</tr>
+<tr>
+<td>React Native (Android)</td>
+<td><code>react-native bundle --platform ios --entry-file &lt;entryFile&gt; --bundle-output &lt;bundleOutput&gt;</code></td>
+<td>Value of the <code>--bundle-output</code> option</td>
+</tr>
+<tr>
+<td>React Native (iOS)</td>
+<td><code>react-native bundle --platform android --entry-file &lt;entryFile&gt; --bundle-output &lt;bundleOutput&gt;</code></td>
+<td>Value of the <code>--bundle-output</code> option</td>
+</tr>
+</tbody></table>
+
+<h3>App store version parameter</h3>
+
+<p>This specifies the semver compliant store/binary version of the application you are releasing the update for. Only users running this exact version will receive the update. This is important if your JavaScript/etc. takes a dependency on a new capabilitiy of the native side of your app (e.g. a Cordova plugin), and therefore, requires the user to update to the latest version from the app store before being able to get it.</p>
+
+<p>The following table outlines the value that CodePush expects you to provide for each respective app type:</p>
+
+<table><thead>
+<tr>
+<th>Platform</th>
+<th>Source of app store version</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Cordova</td>
+<td>The <code>&lt;widget version&gt;</code> attribute in the <code>config.xml</code> file</td>
+</tr>
+<tr>
+<td>React Native (Android)</td>
+<td>The <code>android.defaultConfig.versionName</code> property in your <code>build.gradle</code> file</td>
+</tr>
+<tr>
+<td>React Native (iOS)</td>
+<td>The <code>CFBundleShortVersionString</code> key in the <code>Info.plist</code> file</td>
+</tr>
+</tbody></table>
+
+<h3>Deployment name parameter</h3>
+
+<p>This specifies which deployment you want to release the update to. This defaults to <code>Staging</code>, but when you&rsquo;re ready to deploy to <code>Production</code>, or one of your own custom deployments, just explicitly set this argument.</p>
+
+<p><em>NOTE: The parameter can be set using either &ldquo;&ndash;deploymentName&rdquo; or &ldquo;-d&rdquo;.</em></p>
+
+<h3>Description parameter</h3>
+
+<p>This provides an optional &ldquo;change log&rdquo; for the deployment. The value is simply roundtripped to the client so that when the update is detected, your app can choose to display it to the end-user.</p>
+
+<p><em>NOTE: This parameter can be set using either &ldquo;&ndash;description&rdquo; or &ldquo;-desc&rdquo;</em></p>
+
+<h3>Mandatory parameter</h3>
+
+<p>This specifies whether the update is mandatory or not (<strong>true</strong> or <strong>false</strong>). The value is simply roundtripped to the client,
+who can decide to actually enforce it or not. The default value is <strong>false</strong>.</p>
+
+<p><em>NOTE: This parameter can be set using either &ldquo;&ndash;mandatory&rdquo; or &ldquo;-m&rdquo;</em></p>
+
+<h2>Promoting updates across deployments</h2>
+
+<p>Once you&rsquo;ve tested an update against a specific deployment, and you want to promote it &ldquo;downstream&rdquo; (e.g. dev-&gt;staging, staging-&gt;production), you can simply use the following command to copy the code and metadata (e.g. mandatory, description, app store version) from one deployment to another:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push promote &lt;appName&gt; &lt;sourceDeploymentName&gt; &lt;destDeploymentName&gt;
 code-push promote MyApp Staging Production
-</code></pre></div><h3>Viewing release history</h3><p>You can view a history of releases for a specific app deployment (including promotions) using the following command:</p><div class=highlight><pre><code class=language-text data-lang=text>code-push deployment history &lt;appName&gt; &lt;deploymentName&gt;
-</code></pre></div></article></div></div></div></div><footer><div class=footer-container><div class=container id=footer><div class=row><div class=col-sm-9><div class=row><div class=col-sm-4><h4>General</h4><ul class=nav><li><a href=https://github.com/Microsoft/code-push/blob/master/LICENSE.md target=_blank>License</a></li><li><a href=https://www.visualstudio.com/en-us/privacy-policy-vs target=_blank>Privacy</a></li><li><a href=https://msdn.microsoft.com/en-us/cc300389 target=_blank>Terms of Service</a></li></ul></div><div class=col-sm-4><h4>Community</h4><ul class=nav><li><a href="https://github.com/Microsoft/code-push/" target=_blank>GitHub Project</a></li><li><a href=https://stackoverflow.com/questions/tagged/codepush target=_blank>Stack Overflow</a></li><li><a href=https://twitter.com/hashtag/codepush target=_blank>#CodePush</a></li></ul></div><div class=col-sm-4><h4>Documentation</h4><ul class=nav><li><a href=https://github.com/Microsoft/code-push/blob/master/cli/README.md target=_blank>CLI Docs</a></li><li><a href=https://github.com/Microsoft/cordova-plugin-code-push/blob/master/README.md target=_blank>Cordova Plugin Docs</a></li><li><a href=https://github.com/Microsoft/react-native-code-push/blob/master/README.md target=_blank>React Native Plugin Docs</a></li></ul></div></div></div><div class=col-sm-3><h3><i class="fa fa-comment"></i> Talk to us!</h3><p>If you have any feedback or suggestions on how we can make CodePush more awesome, please <a href=mailto:codepushfeed@microsoft.com>email us</a> or ping us in the <a href=https://discord.gg/0ZcbPKXt5bWxFdFu>#code-push</a> channel on Reactiflux (for React Native).</p></div></div></div></div><div class="container-fluid signature-container"><div class=container><div class="row signature"><p class="pull-left hidden-xs">Made with <span class="glyphicon glyphicon-heart"></span> in Redmond</p><div class=pull-right><p class="copyright pull-left">&copy;2012-2015 Microsoft <img class=ms-logo-footer src="/code-push/assets/images/Microsoft_logo.svg"></p></div></div></div></div></footer><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+</code></pre></div>
+<h2>Viewing release history</h2>
+
+<p>You can view a history of releases for a specific app deployment (including promotions) using the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment history &lt;appName&gt; &lt;deploymentName&gt;
+</code></pre></div>
+<p><em>NOTE: The history command can also be run using the &ldquo;h&rdquo; alias</em></p>
+  
+                </article>
+            </div>  
+        </div>           
+    </div>
+</div>
+	<footer>
+    <div class="footer-container">
+        <div class="container" id="footer">
+            <div class="row">
+                <div class="col-sm-9">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <h4>General</h4>
+                            <ul class="nav">
+                                <!--TODO: CHECK LINKS-->
+                                <li><a href="https://github.com/Microsoft/code-push/blob/master/LICENSE.md" target="_blank">License</a></li>
+                                <li><a href="https://www.visualstudio.com/en-us/privacy-policy-vs" target="_blank">Privacy</a></li>
+                                <li><a href="https://msdn.microsoft.com/en-us/cc300389" target="_blank">Terms of Service</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-4">
+                            <h4>Community</h4>
+                            <ul class="nav">
+                                <li><a href="https://github.com/Microsoft/code-push/" target="_blank">GitHub Project</a></li>
+                                <li><a href="https://stackoverflow.com/questions/tagged/codepush" target="_blank">Stack Overflow</a></li>
+                                <li><a href="https://twitter.com/hashtag/codepush" target="_blank">#CodePush</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-4">
+                            <h4>Documentation</h4>
+                            <ul class="nav">
+                                <li><a href="https://github.com/Microsoft/code-push/blob/master/cli/README.md" target="_blank">CLI Docs</a></li>
+                                <li><a href="https://github.com/Microsoft/cordova-plugin-code-push/blob/master/README.md" target="_blank">Cordova Plugin Docs</a></li>
+                                <li><a href="https://github.com/Microsoft/react-native-code-push/blob/master/README.md" target="_blank">React Native Plugin Docs</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <h3><i class="fa fa-comment"></i> Talk to us!</h3>
+                    <p>If you have any feedback or suggestions on how we can make CodePush more awesome, please <a href=mailto:codepushfeed@microsoft.com>email us</a> or ping us in the <a href="https://discord.gg/0ZcbPKXt5bWxFdFu">#code-push</a> channel on Reactiflux (for React Native).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid signature-container">
+        <div class="container">
+            <div class="row signature">          
+                <p class="pull-left hidden-xs">Made with <span class="glyphicon glyphicon-heart"></span> in Redmond</p> 
+                <div class="pull-right">
+                    <p class="copyright pull-left">&copy;2012-2015 Microsoft
+                    <img class="ms-logo-footer" src="/code-push/assets/images/Microsoft_logo.svg"/></p>
+                </div>              
+            </div>
+        </div>        
+    </div>
+</footer>
+
+	<script>
+    
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
@@ -38,4 +591,8 @@ code-push promote MyApp Staging Production
     
     window.onhashchange = function () {
         ga("send", "pageview", window.location.pathname.toLowerCase() + window.location.hash);
-    };</script></body></html>
+    };    
+    
+</script>
+</body>	
+</html>

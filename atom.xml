@@ -4,7 +4,7 @@
  <title>CodePush</title>
  <link href="/atom.xml" rel="self"/>
  <link href="/"/>
- <updated>2015-11-18T08:04:18-08:00</updated>
+ <updated>2015-11-27T12:38:24-08:00</updated>
  <id></id>
  <author>
    <name></name>
@@ -32,7 +32,7 @@
    <id>/articles/CDWithCodePushAndVSTS</id>
    <content type="html">&lt;p&gt;While the &lt;a href=&quot;http://microsoft.github.io/code-push/docs/cli.html&quot;&gt;CodePush CLI&lt;/a&gt; provides a simple experience for managing your account, it could become pretty tedious doing manual deployments every time you need to release an update, particularly if you want to keep your dev/staging/etc. deployments always current. To better enable scripting a custom continuous delivery solution from your CI environment (e.g. Travis), we enhanced the CLI in the &lt;a href=&quot;http://microsoft.github.io/code-push/articles/CodePush1.1.html&quot;&gt;1.1 release&lt;/a&gt; with the ability to create access keys and authenticate with them &amp;ldquo;headlessly&amp;rdquo;, but we wanted to make it even simpler to automated this process E2E.&lt;/p&gt;
 
-&lt;p&gt;To take advantage of the new marketplace for Visual Studio Team Services (formally &amp;ldquo;Visual Studio Online&amp;rdquo;), we created a &lt;a href=&quot;http://marketplace.visualstudio.com/items/ms-vsclient.code-push&quot;&gt;CodePush extension&lt;/a&gt; which makes adding a deployment step to your CI build pipeline pretty easy, and composes really well with the &lt;a href=&quot;http://marketplace.visualstudio.com/items/ms-vsclient.cordova-extension&quot;&gt;Cordova Build&lt;/a&gt; extension and existing &lt;a href=&quot;https://github.com/Microsoft/vso-agent-tasks&quot;&gt;core support&lt;/a&gt; for JavaScript apps (e.g. Running Gulp scripts, installing NPM dependencies). If you&amp;rsquo;re already using VSTS/VSO, then install the extension now and give it a shot! Otherwise, we encourage you to check it out if you&amp;rsquo;re in the market for a simple and great CI/ALM solution.&lt;/p&gt;
+&lt;p&gt;To take advantage of the new &lt;a href=&quot;https://marketplace.visualstudio.com/#VSTS&quot;&gt;marketplace&lt;/a&gt; for Visual Studio Team Services (formally &amp;ldquo;Visual Studio Online&amp;rdquo;), we created a &lt;a href=&quot;http://marketplace.visualstudio.com/items/ms-vsclient.code-push&quot;&gt;CodePush extension&lt;/a&gt; which makes adding a deployment step to your CI build pipeline pretty easy, and composes really well with the &lt;a href=&quot;http://marketplace.visualstudio.com/items/ms-vsclient.cordova-extension&quot;&gt;Cordova Build&lt;/a&gt; extension and existing &lt;a href=&quot;https://github.com/Microsoft/vso-agent-tasks&quot;&gt;core support&lt;/a&gt; for JavaScript apps (e.g. Running Gulp scripts, installing NPM dependencies). If you&amp;rsquo;re already using VSTS/VSO, then install the extension now and give it a shot! Otherwise, we encourage you to check it out if you&amp;rsquo;re in the market for a simple and great CI/ALM solution.&lt;/p&gt;
 
 &lt;h2&gt;Deploy Task&lt;/h2&gt;
 
@@ -48,7 +48,7 @@
 
 &lt;p&gt;While you could script this yourself, the &lt;a href=&quot;http://marketplace.visualstudio.com/items/ms-vsclient.cordova-extension&quot;&gt;Cordova Build&lt;/a&gt; extension makes this easy to do, since it provides tasks for running either a build (using the &lt;a href=&quot;http://msdn.microsoft.com/Library/vs/alm/Build/cordova/cordova-build&quot;&gt;Cordova Build&lt;/a&gt; task) or a prepare (using the &lt;a href=&quot;http://msdn.microsoft.com/Library/vs/alm/Build/cordova/cordova-command&quot;&gt;Cordova Command&lt;/a&gt; task or &lt;a href=&quot;http://msdn.microsoft.com/Library/vs/alm/Build/cordova/ionic-command&quot;&gt;Ionic Command&lt;/a&gt;, with the &lt;code&gt;Command&lt;/code&gt; input set to &lt;code&gt;prepare &amp;lt;platformName&amp;gt;&lt;/code&gt;).&lt;/p&gt;
 
-&lt;p&gt;Using these tasks, along with the CodePush deploy task,you can easily configure a build + deploy workflow. Additionally, if your app needs to acquire NPM/Bower dependencies and/or run any Gulp scripts, there are built-in tasks in VSTS for that (no extension needed!). For more info on the Cordova Build extension, including how to get started with it, refer to the &lt;a href=&quot;https://github.com/Microsoft/vso-cordova-tasks#5-step-quick-start&quot;&gt;GitHub repo&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Using these tasks, along with the CodePush deploy task, you can easily configure a build + deploy workflow. Additionally, if your app needs to acquire NPM/Bower dependencies and/or run any Gulp scripts, there are built-in tasks in VSTS for that (no extension needed!). For more info on the Cordova Build extension, including how to get started with it, refer to the &lt;a href=&quot;https://github.com/Microsoft/vso-cordova-tasks#5-step-quick-start&quot;&gt;GitHub repo&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/116461/11220739/3779322e-8d16-11e5-8443-1a3db51a88b6.png&quot; alt=&quot;Ionic Command Task&quot;&gt;&lt;/p&gt;
 
