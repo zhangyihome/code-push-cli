@@ -9,7 +9,7 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
 * Install [Node.js](https://nodejs.org/) 
 * Install the CodePush CLI: `npm install -g code-push-cli`
 
-## Quick Start/Usage
+## Quick Start
 
 1. Create a [CodePush account](#account-creation) push using the CodePush CLI
 2. Register your [app](#app-management) with the service, and optionally create any additional [deployments](#deployment-management)
@@ -17,7 +17,7 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
 4. [Deploy](#update-deployment) an update for your registered app
 5. Live long and prosper! ([details](https://en.wikipedia.org/wiki/Vulcan_salute))
 
-### Account creation
+## Account creation
 
 Before you can begin releasing app updates, you need to create a CodePush account. You can do this by simply running the following command once you've installed the CLI:
 
@@ -29,7 +29,7 @@ This will launch a browser, asking you to authenticate with either your GitHub o
 
 *Note: After registering, you are automatically logged-in with the CLI, so until you explicitly log out, you don't need to login again from the same machine.*
 
-### Authentication
+## Authentication
 
 Every command within the CodePush CLI requires authentication, and therefore, before you can begin managing your account, you need to login using the Github or Microsoft account you used when registering. You can do this by running the following command:
 
@@ -71,7 +71,7 @@ If you want to log out of your current session, but still be able to reuse the s
 code-push logout --local
 ```
 
-### App management
+## App management
 
 Before you can deploy any updates, you need to register an app with the CodePush service using the following command:
 
@@ -104,7 +104,7 @@ you can run the following command:
 code-push app ls
 ```
 
-### Deployment management
+## Deployment management
 As mentioned above, every created app automatically includes two deployments: **Staging** and **Production**. This allows you to have multiple versions of your app in flight at any given time, while still using the CodePush server to distribute the updates. If having a staging and production version of your app is enough to meet your needs, then you don't need to do anything else. However, if you want an alpha, dev, etc. deployment, you can easily create them using the following command:
 
 ```
@@ -130,7 +130,7 @@ code-push release <appName> <package> <appStoreVersion>
 [--mandatory]
 ```
 
-#### Package parameter
+### Package parameter
 
 This specifies the location of the content you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the `/platforms/ios/www` folder for a Cordova app). You don't need to zip up multiple files or directories in order to deploy those changes, since the CLI will automatically zip them for you. 
 
@@ -143,7 +143,7 @@ It's important that the path you specify refers to the platform-specific, prepar
 | React Native (Android) | `react-native bundle --platform ios --entry-file <entryFile> --bundle-output <bundleOutput>`     | Value of the `--bundle-output` option      |
 | React Native (iOS)     | `react-native bundle --platform android --entry-file <entryFile> --bundle-output <bundleOutput>` | Value of the `--bundle-output` option      |
 
-#### App store version parameter
+### App store version parameter
 
 This specifies the semver compliant store/binary version of the application you are releasing the update for. Only users running this exact version will receive the update. This is important if your JavaScript/etc. takes a dependency on a new capabilitiy of the native side of your app (e.g. a Cordova plugin), and therefore, requires the user to update to the latest version from the app store before being able to get it.
 
@@ -155,19 +155,19 @@ The following table outlines the value that CodePush expects you to provide for 
 | React Native (Android) | The `android.defaultConfig.versionName` property in your `build.gradle` file |
 | React Native (iOS)     | The `CFBundleShortVersionString` key in the `Info.plist` file                |
 
-#### Deployment name parameter
+### Deployment name parameter
 
 This specifies which deployment you want to release the update to. This defaults to `Staging`, but when you're ready to deploy to `Production`, or one of your own custom deployments, just explicitly set this argument.
 
 *NOTE: The parameter can be set using either "--deploymentName" or "-d".*
 
-#### Description parameter
+### Description parameter
 
 This provides an optional "change log" for the deployment. The value is simply roundtripped to the client so that when the update is detected, your app can choose to display it to the end-user.
 
 *NOTE: This parameter can be set using either "--description" or "-desc"*
 
-#### Mandatory parameter
+### Mandatory parameter
 
 This specifies whether the update is mandatory or not (**true** or **false**). The value is simply roundtripped to the client,
 who can decide to actually enforce it or not. The default value is **false**.
@@ -175,7 +175,7 @@ who can decide to actually enforce it or not. The default value is **false**.
 *NOTE: This parameter can be set using either "--mandatory" or "-m"*
 
 
-### Promoting updates across deployments
+## Promoting updates across deployments
 
 Once you've tested an update against a specific deployment, and you want to promote it "downstream" (e.g. dev->staging, staging->production), you can simply use the following command to copy the code and metadata (e.g. mandatory, description, app store version) from one deployment to another:
 
@@ -184,7 +184,7 @@ code-push promote <appName> <sourceDeploymentName> <destDeploymentName>
 code-push promote MyApp Staging Production
 ```
 
-### Viewing release history
+## Viewing release history
 
 You can view a history of releases for a specific app deployment (including promotions) using the following command:
 
