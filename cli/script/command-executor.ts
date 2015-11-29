@@ -621,7 +621,6 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
 }
 
 function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageHistory: Package[]): void {
-    packageHistory.reverse(); // Reverse chronological order
     if (command.format === "json") {
         printJson(packageHistory);
     } else if (command.format === "table") {

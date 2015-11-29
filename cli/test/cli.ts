@@ -9,7 +9,7 @@ import * as os from "os";
 
 function assertJsonDescribesObject(json: string, object: Object): void {
     // Make sure JSON is indented correctly
-    assert.equal(json, JSON.stringify(object, /*replacer=*/ null, /*spacing=*/ 2)); 
+    assert.equal(json, JSON.stringify(object, /*replacer=*/ null, /*spacing=*/ 2));
 }
 
 export class SdkStub {
@@ -482,6 +482,14 @@ describe("CLI", () => {
                 var actual: string = log.args[0][0];
                 var expected: codePush.Package[] = [
                     <codePush.Package>{
+                        appVersion: "1.0.0",
+                        isMandatory: false,
+                        packageHash: "463acc7d06adc9c46233481d87d9e8264b3e9ffe60fe98d721e6974209dc71a0",
+                        blobUrl: "https://fakeblobstorage.net/storagev2/blobid1",
+                        uploadTime: 1447113596270,
+                        label: "v1"
+                    },
+                    <codePush.Package>{
                         description: "New update - this update does a whole bunch of things, including testing linewrapping",
                         appVersion: "1.0.1",
                         isMandatory: false,
@@ -489,14 +497,6 @@ describe("CLI", () => {
                         blobUrl: "https://fakeblobstorage.net/storagev2/blobid2",
                         uploadTime: 1447118476669,
                         label: "v2"
-                    },
-                    <codePush.Package>{
-                        appVersion: "1.0.0",
-                        isMandatory: false,
-                        packageHash: "463acc7d06adc9c46233481d87d9e8264b3e9ffe60fe98d721e6974209dc71a0",
-                        blobUrl: "https://fakeblobstorage.net/storagev2/blobid1",
-                        uploadTime: 1447113596270,
-                        label: "v1"
                     }
                 ];
 
