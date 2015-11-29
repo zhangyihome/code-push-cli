@@ -50,22 +50,22 @@ export var loginWithAccessToken = (): Promise<void> => {
     }
 
     sdk = new AccountManager(connectionInfo.serverUrl);
-    
+
     var accessToken: string;
-    
+
     var standardLoginConnectionInfo: IStandardLoginConnectionInfo = <IStandardLoginConnectionInfo>connectionInfo;
     var accessKeyLoginConnectionInfo: IAccessKeyLoginConnectionInfo = <IAccessKeyLoginConnectionInfo>connectionInfo;
-    
+
     if (standardLoginConnectionInfo.providerName) {
-        accessToken = base64.encode(JSON.stringify({ 
-            accessKeyName: standardLoginConnectionInfo.accessKeyName, 
-            providerName: standardLoginConnectionInfo.providerName, 
-            providerUniqueId: standardLoginConnectionInfo.providerUniqueId 
+        accessToken = base64.encode(JSON.stringify({
+            accessKeyName: standardLoginConnectionInfo.accessKeyName,
+            providerName: standardLoginConnectionInfo.providerName,
+            providerUniqueId: standardLoginConnectionInfo.providerUniqueId
         }));
     } else {
         accessToken = accessKeyLoginConnectionInfo.accessKey;
     }
-    
+
     return sdk.loginWithAccessToken(accessToken);
 }
 
@@ -148,7 +148,7 @@ function appAdd(command: cli.IAppAddCommand): Promise<void> {
                 appName: app.name,
                 format: "table"
             };
-            return deploymentList(deploymentListCommand);
+            return deploymentList(deploymentListCommand, /*showPackage=*/ false);
         });
 }
 
@@ -233,7 +233,7 @@ function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
         })
 }
 
-export var deploymentList = (command: cli.IDeploymentListCommand): Promise<void> => {
+export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: boolean = true): Promise<void> => {
     throwForInvalidOutputFormat(command.format);
     var theAppId: string;
 
@@ -253,7 +253,7 @@ export var deploymentList = (command: cli.IDeploymentListCommand): Promise<void>
             });
             return Q.all(deploymentKeyPromises)
                 .then((deploymentKeyList: string[]) => {
-                    printDeploymentList(command, deployments, deploymentKeyList);
+                    printDeploymentList(command, deployments, deploymentKeyList, showPackage);
                 });
         });
 }
@@ -549,7 +549,7 @@ function logout(command: cli.ILogoutCommand): Promise<void> {
                 .then((): Promise<string> => {
                     var standardLoginConnectionInfo: IStandardLoginConnectionInfo = <IStandardLoginConnectionInfo>connectionInfo;
                     var accessKeyLoginConnectionInfo: IAccessKeyLoginConnectionInfo = <IAccessKeyLoginConnectionInfo>connectionInfo;
-                    
+
                     if (standardLoginConnectionInfo.accessKeyName) {
                         accessKeyName = standardLoginConnectionInfo.accessKeyName;
                         return getAccessKeyId(standardLoginConnectionInfo.accessKeyName);
@@ -565,7 +565,7 @@ function logout(command: cli.ILogoutCommand): Promise<void> {
                     log("Removed access key " + accessKeyName + ".");
                 });
         }
-        
+
         return setupPromise
             .then((): Promise<void> => sdk.logout(), (): Promise<void> => sdk.logout())
             .then((): void => deleteConnectionInfoCache(), (): void => deleteConnectionInfoCache());
@@ -603,17 +603,23 @@ function printAppList(format: string, apps: App[], deploymentLists: string[][]):
     }
 }
 
-function printDeploymentList(command: cli.IDeploymentListCommand, deployments: Deployment[], deploymentKeys: Array<string>): void {
+function printDeploymentList(command: cli.IDeploymentListCommand, deployments: Deployment[], deploymentKeys: Array<string>, showPackage: boolean = true): void {
     if (command.format === "json") {
         var dataSource: any[] = deployments.map((deployment: Deployment, index: number) => {
             return { "name": deployment.name, "deploymentKey": deploymentKeys[index], "package": deployment.package };
         });
         printJson(dataSource);
     } else if (command.format === "table") {
-        var headers = ["Name", "Deployment Key", "Package Metadata"];
+        var headers = ["Name", "Deployment Key"];
+        if (showPackage) {
+            headers.push("Package Metadata");
+        }
         printTable(headers, (dataSource: any[]): void => {
             deployments.forEach((deployment: Deployment, index: number): void => {
-                var row = [deployment.name, deploymentKeys[index], getPackageString(deployment.package)];
+                var row = [deployment.name, deploymentKeys[index]];
+                if (showPackage) {
+                    row.push(getPackageString(deployment.package));
+                }
                 dataSource.push(row);
             });
         });
@@ -659,7 +665,7 @@ function getPackageString(packageObject: Package): string {
         (packageObject.description ? wordwrap(70)("Description: " + packageObject.description) + "\n" : "") +
         "App Version: " + packageObject.appVersion + "\n" +
         "Mandatory: " + (packageObject.isMandatory ? "Yes" : "No") + "\n" +
-        "Hash: " + packageObject.packageHash + "\n" + 
+        "Hash: " + packageObject.packageHash + "\n" +
         "Release Time: " + formatDate(packageObject.uploadTime);
 }
 
@@ -674,9 +680,9 @@ function printAccessKeys(format: string, keys: AccessKey[]): void {
         printTable(["Key", "Time Created", "Created From", "Description"], (dataSource: any[]): void => {
             keys.forEach((key: AccessKey): void => {
                 dataSource.push([
-                    key.name, 
+                    key.name,
                     key.createdTime ? formatDate(key.createdTime) : "",
-                    key.createdBy ? key.createdBy : "", 
+                    key.createdBy ? key.createdBy : "",
                     key.description ? key.description : ""
                 ]);
             });
@@ -705,7 +711,7 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
     var appId: string;
     var sourceDeploymentId: string;
     var destDeploymentId: string;
-    
+
     return getAppId(command.appName)
         .then((appIdResult: string): Promise<string> => {
             throwForInvalidAppId(appIdResult, command.appName);
@@ -829,7 +835,7 @@ function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
     // The access token should have been validated already (i.e.:  logging in).
     var json: string = tryBase64Decode(accessToken);
     var standardLoginConnectionInfo: IStandardLoginConnectionInfo = tryJSON(json);
-    
+
     if (standardLoginConnectionInfo) {
         // This is a normal login.
         standardLoginConnectionInfo.serverUrl = serverUrl;
@@ -857,7 +863,7 @@ function throwForMissingCredentials(accessKeyName: string, providerName: string,
     if (!accessKeyName) throw new Error("Access key is missing.");
     if (!providerName) throw new Error("Provider name is missing.");
     if (!providerUniqueId) throw new Error("Provider unique ID is missing.");
-    
+
 }
 
 function throwForInvalidAccessKeyId(accessKeyId: string, accessKeyName: string): void {

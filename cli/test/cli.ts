@@ -242,12 +242,6 @@ describe("CLI", () => {
             type: cli.CommandType.appAdd,
             appName: "a"
         };
-        
-        var deploymentListCommand: cli.IDeploymentListCommand = {
-            type: cli.CommandType.deploymentList,
-            appName: "a",
-            format: "table"
-        };
 
         var addApp: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "addApp");
         var deploymentList: Sinon.SinonSpy = sandbox.spy(cmdexec, "deploymentList");
@@ -258,7 +252,6 @@ describe("CLI", () => {
                 sinon.assert.calledTwice(log);
                 sinon.assert.calledWithExactly(log, "Successfully added the \"a\" app, along with the following default deployments:");
                 sinon.assert.calledOnce(deploymentList);
-                sinon.assert.calledWithExactly(deploymentList, deploymentListCommand);
                 done();
             });
     });
