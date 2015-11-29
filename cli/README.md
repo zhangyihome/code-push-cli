@@ -6,7 +6,7 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
 
 ## Installation
 
-* Install [Node.js](https://nodejs.org/) 
+* Install [Node.js](https://nodejs.org/)
 * Install the CodePush CLI: `npm install -g code-push-cli`
 
 ## Quick Start
@@ -25,7 +25,7 @@ Before you can begin releasing app updates, you need to create a CodePush accoun
 code-push register
 ```
 
-This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. Once authenticated, it will create a CodePush account "linked" to your GitHub/MSA identity, and generate an access token you can copy/paste into the CLI in order to login. 
+This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. Once authenticated, it will create a CodePush account "linked" to your GitHub/MSA identity, and generate an access token you can copy/paste into the CLI in order to login.
 
 *Note: After registering, you are automatically logged-in with the CLI, so until you explicitly log out, you don't need to login again from the same machine.*
 
@@ -45,7 +45,7 @@ When you login from the CLI, your access token (kind of like a cookie) is persis
 code-push logout
 ```
 
-If you forget to logout from a machine you'd prefer not to leave a running session on (e.g. your friend's laptop), you can use the following commands to list and remove any "live" access tokens. 
+If you forget to logout from a machine you'd prefer not to leave a running session on (e.g. your friend's laptop), you can use the following commands to list and remove any "live" access tokens.
 The list of access keys will display the name of the machine the token was created on, as well as the time the login occurred. This should make it easy to spot keys you don't want to keep around.
 
 ```
@@ -132,14 +132,14 @@ code-push release <appName> <package> <appStoreVersion>
 
 ### Package parameter
 
-This specifies the location of the content you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the `/platforms/ios/www` folder for a Cordova app). You don't need to zip up multiple files or directories in order to deploy those changes, since the CLI will automatically zip them for you. 
+This specifies the location of the content you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the `/platforms/ios/www` folder for a Cordova app). You don't need to zip up multiple files or directories in order to deploy those changes, since the CLI will automatically zip them for you.
 
-It's important that the path you specify refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you should run before releasing, as well as the location you can subsequently point at using the `package` parameter: 
+It's important that the path you specify refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you should run before releasing, as well as the location you can subsequently point at using the `package` parameter:
 
-| Platform               | Prepare command                                                                                  | Package path (relative to project root)    |              
+| Platform               | Prepare command                                                                                  | Package path (relative to project root)    |
 |------------------------|--------------------------------------------------------------------------------------------------|--------------------------------------------|
-| Cordova (Android)      | `cordova prepare android`                                                                        | `./platforms/android/assets/www` directory |                      
-| Cordova (iOS)          | `cordova prepare ios`                                                                            | `./platforms/ios/www ` directory           |               
+| Cordova (Android)      | `cordova prepare android`                                                                        | `./platforms/android/assets/www` directory |
+| Cordova (iOS)          | `cordova prepare ios`                                                                            | `./platforms/ios/www ` directory           |
 | React Native (Android) | `react-native bundle --platform ios --entry-file <entryFile> --bundle-output <bundleOutput>`     | Value of the `--bundle-output` option      |
 | React Native (iOS)     | `react-native bundle --platform android --entry-file <entryFile> --bundle-output <bundleOutput>` | Value of the `--bundle-output` option      |
 
@@ -151,7 +151,7 @@ The following table outlines the value that CodePush expects you to provide for 
 
 | Platform               | Source of app store version                                                  |
 |------------------------|------------------------------------------------------------------------------|
-| Cordova                | The `<widget version>` attribute in the `config.xml` file                    | 
+| Cordova                | The `<widget version>` attribute in the `config.xml` file                    |
 | React Native (Android) | The `android.defaultConfig.versionName` property in your `build.gradle` file |
 | React Native (iOS)     | The `CFBundleShortVersionString` key in the `Info.plist` file                |
 
@@ -186,7 +186,7 @@ code-push promote MyApp Staging Production
 
 ## Viewing release history
 
-You can view a history of releases for a specific app deployment (including promotions) using the following command:
+You can view a history of the 50 most recent releases for a specific app deployment (including promotions) using the following command:
 
 ```
 code-push deployment history <appName> <deploymentName>
