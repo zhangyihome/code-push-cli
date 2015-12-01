@@ -41,6 +41,7 @@ interface ILoginInfo {
 export class AccountManager {
     private _authedAgent: request.SuperAgent<any>;
     private _saveAuthedAgent: boolean = false;
+    private _userAgent: string;
 
     public account: Account;
     public serverUrl: string = "http://localhost:3000";
@@ -49,10 +50,11 @@ export class AccountManager {
         return this.account.id;
     }
 
-    constructor(serverUrl?: string) {
+    constructor(serverUrl: string, userAgent: string) {
         // If window is not defined, it means we are in the node environment and not a browser.
         this._saveAuthedAgent = (typeof window === "undefined");
 
+        this._userAgent = userAgent;
         this.serverUrl = serverUrl;
     }
 
@@ -955,6 +957,10 @@ export class AccountManager {
             }
         } else {
             request.withCredentials();
+        }
+
+        if (this._userAgent) {
+            request.set("User-Agent", this._userAgent);
         }
     }
 
