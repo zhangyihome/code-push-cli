@@ -734,7 +734,9 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
 }
 
 function release(command: cli.IReleaseCommand): Promise<void> {
-    if (semver.valid(command.appStoreVersion) === null) {
+    if (command.package.search(/\.zip$/) !== -1) {
+        throw new Error("It is unnecessary to package releases in a .zip file. Please specify the path of the desired directory or file directly.");
+    } else if (semver.valid(command.appStoreVersion) === null) {
         throw new Error("Please use a semver compliant app store version, for example \"1.0.3\".");
     }
 
