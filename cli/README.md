@@ -140,8 +140,8 @@ It's important that the path you specify refers to the platform-specific, prepar
 |------------------------|--------------------------------------------------------------------------------------------------|--------------------------------------------|
 | Cordova (Android)      | `cordova prepare android`                                                                        | `./platforms/android/assets/www` directory |
 | Cordova (iOS)          | `cordova prepare ios`                                                                            | `./platforms/ios/www ` directory           |
-| React Native (Android) | `react-native bundle --platform ios --entry-file <entryFile> --bundle-output <bundleOutput>`     | Value of the `--bundle-output` option      |
-| React Native (iOS)     | `react-native bundle --platform android --entry-file <entryFile> --bundle-output <bundleOutput>` | Value of the `--bundle-output` option      |
+| React Native (Android) | `react-native bundle --platform android --entry-file <entryFile> --bundle-output <bundleOutput>`     | Value of the `--bundle-output` option      |
+| React Native (iOS)     | `react-native bundle --platform ios --entry-file <entryFile> --bundle-output <bundleOutput>` | Value of the `--bundle-output` option      |
 
 ### App store version parameter
 
