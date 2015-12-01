@@ -19,9 +19,11 @@ import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
 import { AccessKey, AccountManager, App, Deployment, DeploymentKey, Package } from "code-push";
+var packageJson = require("../package.json");
 import Promise = Q.Promise;
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
+var userAgent: string = packageJson.name + "/" + packageJson.version;
 
 interface IStandardLoginConnectionInfo {
     accessKeyName: string;
@@ -49,7 +51,7 @@ export var loginWithAccessToken = (): Promise<void> => {
         return Q.fcall(() => { throw new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server."); });
     }
 
-    sdk = new AccountManager(connectionInfo.serverUrl);
+    sdk = new AccountManager(connectionInfo.serverUrl, userAgent);
 
     var accessToken: string;
 
@@ -505,7 +507,7 @@ function initiateExternalAuthenticationAsync(serverUrl: string, action: string):
 function login(command: cli.ILoginCommand): Promise<void> {
     // Check if one of the flags were provided.
     if (command.accessKey) {
-        sdk = new AccountManager(command.serverUrl);
+        sdk = new AccountManager(command.serverUrl, userAgent);
         return sdk.loginWithAccessToken(command.accessKey)
             .then((): void => {
                 // The access token is valid.
@@ -530,7 +532,7 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
                 throw new Error("Invalid access token.");
             }
 
-            sdk = new AccountManager(serverUrl);
+            sdk = new AccountManager(serverUrl, userAgent);
 
             return sdk.loginWithAccessToken(accessToken)
                 .then((): void => {
@@ -734,7 +736,9 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
 }
 
 function release(command: cli.IReleaseCommand): Promise<void> {
-    if (semver.valid(command.appStoreVersion) === null) {
+    if (command.package.search(/\.zip$/) !== -1) {
+        throw new Error("It is unnecessary to package releases in a .zip file. Please specify the path of the desired directory or file directly.");
+    } else if (semver.valid(command.appStoreVersion) === null) {
         throw new Error("Please use a semver compliant app store version, for example \"1.0.3\".");
     }
 
