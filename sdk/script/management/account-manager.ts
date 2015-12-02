@@ -815,21 +815,24 @@ export class AccountManager {
                 file = fileOrPath;
             }
 
+            var green = '\u001b[42m \u001b[0m';
+            var red = '\u001b[41m \u001b[0m';
             var progressBar: any = new progress("Upload progress: [:bar] :percent :etas", { 
-                complete: '=',
-                incomplete: ' ',
+                complete: green,
+                incomplete: red,
                 width: 50,
                 total: 100
             });
 
-            var lastProgressPercentage: number = 0;
+            var lastTotalProgress: number = 0;
+            var currentProgress: number = 0;
 
             req.attach("package", file)
                 .field("packageInfo", JSON.stringify(packageInfo))
                 .on("progress", (event: any) => {
-                    var currentProgressPercentage: number = (event.loaded/event.total) * 100 - lastProgressPercentage;
-                    progressBar.tick(currentProgressPercentage);
-                    lastProgressPercentage += currentProgressPercentage;
+                    currentProgress = (event.loaded/event.total) * 100;
+                    progressBar.tick(currentProgress - lastTotalProgress);
+                    lastTotalProgress = currentProgress;
                 })
                 .end((err: any, res: request.Response) => {
                     if (err) {
