@@ -817,9 +817,9 @@ export class AccountManager {
 
             var green = '\u001b[42m \u001b[0m';
             var red = '\u001b[41m \u001b[0m';
-            var progressBar: any = new progress("Upload progress: [:bar] :percent :etas", { 
-                complete: green,
-                incomplete: red,
+            var progressBar: any = new progress("Upload progress:[:bar] :percent :etas", { 
+                complete: "=",
+                incomplete: " ",
                 width: 50,
                 total: 100
             });
