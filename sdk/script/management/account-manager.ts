@@ -4,6 +4,7 @@ import crypto = require("crypto");
 import tryJSON = require("try-json");
 import Promise = Q.Promise;
 import request = require("superagent");
+var progress = require("progress");
 
 declare var fs: any;
 
@@ -814,8 +815,22 @@ export class AccountManager {
                 file = fileOrPath;
             }
 
-            req.field("package", file)
+            var progressBar: any = new progress("Upload progress: [:bar] :percent :etas", { 
+                complete: '=',
+                incomplete: ' ',
+                width: 50,
+                total: 100
+            });
+
+            var lastProgressPercentage: number = 0;
+
+            req.attach("package", file)
                 .field("packageInfo", JSON.stringify(packageInfo))
+                .on("progress", (event: any) => {
+                    var currentProgressPercentage: number = (event.loaded/event.total) * 100 - lastProgressPercentage;
+                    progressBar.tick(currentProgressPercentage);
+                    lastProgressPercentage += currentProgressPercentage;
+                })
                 .end((err: any, res: request.Response) => {
                     if (err) {
                         reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
