@@ -432,17 +432,6 @@ function createCommand(): cli.ICommand {
                 }
                 break;
 
-            case "rollback":
-                if (arg1 && arg2) {
-                    cmd = { type: cli.CommandType.rollback };
-
-                    var deploymentRollbackCommand = <cli.IRollbackCommand>cmd;
-
-                    deploymentRollbackCommand.appName = arg1;
-                    deploymentRollbackCommand.deploymentName = arg2;
-                }
-                break;
-
             case "register":
                 cmd = { type: cli.CommandType.register };
 
@@ -463,6 +452,17 @@ function createCommand(): cli.ICommand {
                     releaseCommand.deploymentName = argv["deploymentName"];
                     releaseCommand.description = argv["description"];
                     releaseCommand.mandatory = argv["mandatory"];
+                }
+                break;
+
+            case "rollback":
+                if (arg1 && arg2) {
+                    cmd = { type: cli.CommandType.rollback };
+
+                    var deploymentRollbackCommand = <cli.IRollbackCommand>cmd;
+
+                    deploymentRollbackCommand.appName = arg1;
+                    deploymentRollbackCommand.deploymentName = arg2;
                 }
                 break;
         }

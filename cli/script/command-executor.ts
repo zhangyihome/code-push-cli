@@ -401,11 +401,11 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.promote:
                     return promote(<cli.IPromoteCommand>command);
 
-                case cli.CommandType.rollback:
-                    return rollback(<cli.IRollbackCommand>command);
-
                 case cli.CommandType.release:
                     return release(<cli.IReleaseCommand>command);
+
+                case cli.CommandType.rollback:
+                    return rollback(<cli.IRollbackCommand>command);
 
                 default:
                     // We should never see this message as invalid commands should be caught by the argument parser.
@@ -738,24 +738,6 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
         });
 }
 
-function rollback(command: cli.IRollbackCommand): Promise<void> {
-    var appId: string;
-
-    return getAppId(command.appName)
-        .then((appIdResult: string): Promise<string> => {
-            throwForInvalidAppId(appIdResult, command.appName);
-            appId = appIdResult;
-            return getDeploymentId(appId, command.deploymentName);
-        })
-        .then((deploymentId: string): Promise<void> => {
-            throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
-            return sdk.rollbackPackage(appId, deploymentId);
-        })
-        .then((): void => {
-            log("Successfully performed a rollback on the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
-        });
-}
-
 function release(command: cli.IReleaseCommand): Promise<void> {
     if (command.package.search(/\.zip$/i) !== -1) {
         throw new Error("It is unnecessary to package releases in a .zip file. Please specify the path of the desired directory or file directly.");
@@ -830,6 +812,24 @@ function release(command: cli.IReleaseCommand): Promise<void> {
                                 });
                         });
                 });
+        });
+}
+
+function rollback(command: cli.IRollbackCommand): Promise<void> {
+    var appId: string;
+
+    return getAppId(command.appName)
+        .then((appIdResult: string): Promise<string> => {
+            throwForInvalidAppId(appIdResult, command.appName);
+            appId = appIdResult;
+            return getDeploymentId(appId, command.deploymentName);
+        })
+        .then((deploymentId: string): Promise<void> => {
+            throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
+            return sdk.rollbackPackage(appId, deploymentId);
+        })
+        .then((): void => {
+            log("Successfully performed a rollback on the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
         });
 }
 
