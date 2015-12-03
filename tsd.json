@@ -78,6 +78,9 @@
     },
     "moment/moment-node.d.ts": {
       "commit": "708609e0764daeb5eb64104af7aca50c520c4e6e"
+    },
+    "update-notifier/update-notifier.d.ts": {
+      "commit": "715df764419937a75a25dcd76bfc954157bc7b96"
     }
   }
 }
