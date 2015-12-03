@@ -4,7 +4,6 @@ import crypto = require("crypto");
 import tryJSON = require("try-json");
 import Promise = Q.Promise;
 import request = require("superagent");
-var progress = require("progress");
 
 declare var fs: any;
 
@@ -803,7 +802,7 @@ export class AccountManager {
         });
     }
 
-    public addPackage(appId: string, deploymentId: string, fileOrPath: File | string, description: string, label: string, appVersion: string, isMandatory: boolean = false): Promise<void> {
+    public addPackage(appId: string, deploymentId: string, fileOrPath: File | string, description: string, label: string, appVersion: string, isMandatory: boolean = false, callback?: (progress: number) => void): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             var packageInfo: PackageToUpload = this.generatePackageInfo(description, label, appVersion, isMandatory);
             var requester = (this._authedAgent ? this._authedAgent : request);
@@ -817,24 +816,13 @@ export class AccountManager {
                 file = fileOrPath;
             }
 
-            var green = '\u001b[42m \u001b[0m';
-            var red = '\u001b[41m \u001b[0m';
-            var progressBar: any = new progress("Upload progress:[:bar] :percent :etas", { 
-                complete: "=",
-                incomplete: " ",
-                width: 50,
-                total: 100
-            });
-
-            var lastTotalProgress: number = 0;
-            var currentProgress: number = 0;
-
             req.attach("package", file)
                 .field("packageInfo", JSON.stringify(packageInfo))
                 .on("progress", (event: any) => {
-                    currentProgress = (event.loaded/event.total) * 100;
-                    progressBar.tick(currentProgress - lastTotalProgress);
-                    lastTotalProgress = currentProgress;
+                    if (callback) {
+                        var currentProgress: number = (event.loaded/event.total) * 100; 
+                        callback(currentProgress);
+                    }
                 })
                 .end((err: any, res: request.Response) => {
                     if (err) {

@@ -17,7 +17,6 @@
     "base-64": "^0.1.0",
     "fs": "0.0.2",
     "node-uuid": "^1.4.3",
-    "progress": "^1.1.8",
     "q": "^1.4.1",
     "superagent": "git://github.com/visionmedia/superagent.git#45a1290b2fe5a56a1d77ca74e0b236178d58d848",
     "try-json": "^1.0.0"
