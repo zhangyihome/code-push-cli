@@ -14,6 +14,7 @@
     login,
     logout,
     promote,
+    rollback,
     register,
     release
 }
@@ -91,6 +92,11 @@ export interface IPromoteCommand extends ICommand {
     appName: string;
     sourceDeploymentName: string;
     destDeploymentName: string;
+}
+
+export interface IRollbackCommand extends ICommand {
+    appName: string;
+    deploymentName: string;
 }
 
 export interface IRegisterCommand extends ICommand {

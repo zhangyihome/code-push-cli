@@ -401,6 +401,9 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.promote:
                     return promote(<cli.IPromoteCommand>command);
 
+                case cli.CommandType.rollback:
+                    return rollback(<cli.IRollbackCommand>command);
+
                 case cli.CommandType.release:
                     return release(<cli.IReleaseCommand>command);
 
@@ -732,6 +735,24 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
         })
         .then((): void => {
             log("Successfully promoted the \"" + command.sourceDeploymentName + "\" deployment of the \"" + command.appName + "\" app to the \"" + command.destDeploymentName + "\" deployment.");
+        });
+}
+
+function rollback(command: cli.IRollbackCommand): Promise<void> {
+    var appId: string;
+
+    return getAppId(command.appName)
+        .then((appIdResult: string): Promise<string> => {
+            throwForInvalidAppId(appIdResult, command.appName);
+            appId = appIdResult;
+            return getDeploymentId(appId, command.deploymentName);
+        })
+        .then((deploymentId: string): Promise<void> => {
+            throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
+            return sdk.rollbackPackage(appId, deploymentId);
+        })
+        .then((): void => {
+            log("Successfully performed a rollback on the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
         });
 }
 
