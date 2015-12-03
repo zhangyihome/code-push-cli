@@ -19,7 +19,7 @@ export function showHelp(showRootDescription?: boolean): void {
             console.log(chalk.cyan("  _____        __  " + chalk.green("  ___           __ ")));
             console.log(chalk.cyan(" / ___/__  ___/ /__" + chalk.green(" / _ \\__ _____ / / ")));
             console.log(chalk.cyan("/ /__/ _ \\/ _  / -_)" + chalk.green(" ___/ // (_-</ _ \\")));
-            console.log(chalk.cyan("\\___/\\___/\\_,_/\\__/" + chalk.green("_/   \\_,_/___/_//_/")) + "    CLI v" + require("../package.json").version);
+            console.log(chalk.cyan("\\___/\\___/\\_,_/\\__/" + chalk.green("_/   \\_,_/___/_//_/")) + "    CLI v" + packageJson.version);
             console.log(chalk.cyan("======================================"));
             console.log("");
             console.log("CodePush is a service that allows you to publish mobile app updates directly to your users' devices.\n");
@@ -32,7 +32,7 @@ export function showHelp(showRootDescription?: boolean): void {
 }
 
 function updateCheck(): void {
-    var notifier: updateNotifier.IResult = updateNotifier({ packageJson });
+    var notifier: updateNotifier.IResult = updateNotifier({ pkg: packageJson });
     if (notifier.update) {
         notifier.notify();
     }
