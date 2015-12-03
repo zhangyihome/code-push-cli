@@ -3,7 +3,7 @@ import * as cli from "../definitions/cli";
 import * as chalk from "chalk";
 import * as updateNotifier from "update-notifier";
 
-var pkg = require("../package.json");
+var packageJson = require("../package.json");
 const USAGE_PREFIX = "Usage: code-push";
 const CODE_PUSH_URL = "https://codepush.azurewebsites.net";
 
@@ -32,7 +32,7 @@ export function showHelp(showRootDescription?: boolean): void {
 }
 
 function updateCheck() {
-    var notifier = updateNotifier({ pkg });
+    var notifier: updateNotifier.IResult = updateNotifier({ packageJson });
     if (notifier.update) {
         notifier.notify();
     }
