@@ -802,7 +802,7 @@ export class AccountManager {
         });
     }
 
-    public addPackage(appId: string, deploymentId: string, fileOrPath: File | string, description: string, label: string, appVersion: string, isMandatory: boolean = false, callback?: (progress: number) => void): Promise<void> {
+    public addPackage(appId: string, deploymentId: string, fileOrPath: File | string, description: string, label: string, appVersion: string, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             var packageInfo: PackageToUpload = this.generatePackageInfo(description, label, appVersion, isMandatory);
             var requester = (this._authedAgent ? this._authedAgent : request);
@@ -819,9 +819,9 @@ export class AccountManager {
             req.attach("package", file)
                 .field("packageInfo", JSON.stringify(packageInfo))
                 .on("progress", (event: any) => {
-                    if (callback) {
-                        var currentProgress: number = (event.loaded/event.total) * 100; 
-                        callback(currentProgress);
+                    if (uploadProgressCallback) {
+                        var currentProgress: number = (event.loaded/event.total) * 100;
+                        uploadProgressCallback(currentProgress);
                     }
                 })
                 .end((err: any, res: request.Response) => {

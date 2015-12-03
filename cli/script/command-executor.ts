@@ -798,8 +798,6 @@ function release(command: cli.IReleaseCommand): Promise<void> {
                         getPackageFilePromise = Q({ isTemporary: false, path: filePath });
                     }
 
-                    var green = '\u001b[42m \u001b[0m';
-                    var red = '\u001b[41m \u001b[0m';
                     var lastTotalProgress = 0;
                     var progressBar = new progress("Upload progress:[:bar] :percent :etas", { 
                         complete: "=",
