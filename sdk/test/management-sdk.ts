@@ -11,7 +11,7 @@ var manager: AccountManager;
 describe("Management SDK", () => {
 
     beforeEach(() => {
-        manager = new AccountManager("http://localhost");
+        manager = new AccountManager(/*serverUrl=*/ "http://localhost", /*userAgent=*/ "unit-test/1.0.0");
     });
 
     after(() => {
