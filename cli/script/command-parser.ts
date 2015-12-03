@@ -1,7 +1,9 @@
 ﻿import * as yargs from "yargs";
 import * as cli from "../definitions/cli";
 import * as chalk from "chalk";
+import * as updateNotifier from "update-notifier";
 
+var pkg = require("../package.json");
 const USAGE_PREFIX = "Usage: code-push";
 const CODE_PUSH_URL = "https://codepush.azurewebsites.net";
 
@@ -21,10 +23,18 @@ export function showHelp(showRootDescription?: boolean): void {
             console.log(chalk.cyan("======================================"));
             console.log("");
             console.log("CodePush is a service that allows you to publish mobile app updates directly to your users' devices.\n");
+            updateCheck();
         }
-        
+
         yargs.showHelp();
         wasHelpShown = true;
+    }
+}
+
+function updateCheck() {
+    var notifier = updateNotifier({ pkg });
+    if (notifier.update) {
+        notifier.notify();
     }
 }
 
