@@ -405,6 +405,9 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.release:
                     return release(<cli.IReleaseCommand>command);
 
+                case cli.CommandType.rollback:
+                    return rollback(<cli.IRollbackCommand>command);
+
                 default:
                     // We should never see this message as invalid commands should be caught by the argument parser.
                     log("Invalid command:  " + JSON.stringify(command));
@@ -640,7 +643,9 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
                 if (packageObject.releaseMethod === "Promote") {
                     releaseSource = `Promoted ${ packageObject.originalLabel } from "${ packageObject.originalDeployment }"`;
                 } else if (packageObject.releaseMethod === "Rollback") {
-                    releaseSource = `Rolled back to ${ packageObject.originalLabel }`;
+                    var labelNumber: number = parseInt(packageObject.label.substring(1));
+                    var lastLabel: string = "v" + (labelNumber - 1);
+                    releaseSource = `Rolled back ${ lastLabel } to ${ packageObject.originalLabel }`;
                 }
 
                 if (releaseSource) {
@@ -822,6 +827,32 @@ function release(command: cli.IReleaseCommand): Promise<void> {
                                     }
                                 });
                         });
+                });
+        });
+}
+
+function rollback(command: cli.IRollbackCommand): Promise<void> {
+    var appId: string;
+
+    return confirm()
+        .then((wasConfirmed: boolean) => {
+            if (!wasConfirmed) {
+                log("Rollback cancelled.")
+                return;
+            }
+
+            return getAppId(command.appName)
+                .then((appIdResult: string): Promise<string> => {
+                    throwForInvalidAppId(appIdResult, command.appName);
+                    appId = appIdResult;
+                    return getDeploymentId(appId, command.deploymentName);
+                })
+                .then((deploymentId: string): Promise<void> => {
+                    throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
+                    return sdk.rollbackPackage(appId, deploymentId);
+                })
+                .then((): void => {
+                    log("Successfully performed a rollback on the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
                 });
         });
 }

@@ -870,6 +870,32 @@ export class AccountManager {
         });
     }
 
+    public rollbackPackage(appId: string, deploymentId: string): Promise<void> {
+        return Promise<void>((resolve, reject, notify) => {
+            var requester = (this._authedAgent ? this._authedAgent : request);
+            var req = requester.post(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/rollback");
+            this.attachCredentials(req, requester);
+
+            req.end((err: any, res: request.Response) => {
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
+
+                if (res.ok) {
+                    resolve(<void>null);
+                } else {
+                    var body = tryJSON(res.text);
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
+        });
+    }
+
     public getPackage(appId: string, deploymentId: string): Promise<Package> {
         return Promise<Package>((resolve, reject, notify) => {
             var requester = (this._authedAgent ? this._authedAgent : request);

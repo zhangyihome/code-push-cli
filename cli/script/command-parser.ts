@@ -184,6 +184,13 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             
         addCommonConfiguration(yargs);
     })
+    .command("rollback", "Performs a rollback on the latest package of a specific deployment", (yargs: yargs.Argv) => {
+        yargs.usage(USAGE_PREFIX + " rollback <appName> <deploymentName>")
+            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
+            .example("rollback MyApp Production", "Perform a rollback on the \"Production\" deployment of \"MyApp\"");
+            
+        addCommonConfiguration(yargs);
+    })
     .command("deployment", "View and manage the deployments for your apps", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         yargs.usage(USAGE_PREFIX + " deployment <command>")
@@ -412,7 +419,7 @@ function createCommand(): cli.ICommand {
                 
                 logoutCommand.isLocal = argv["local"];
                 break;
-                
+
             case "promote":
                 if (arg1 && arg2 && arg3) {
                     cmd = { type: cli.CommandType.promote };
@@ -445,6 +452,17 @@ function createCommand(): cli.ICommand {
                     releaseCommand.deploymentName = argv["deploymentName"];
                     releaseCommand.description = argv["description"];
                     releaseCommand.mandatory = argv["mandatory"];
+                }
+                break;
+
+            case "rollback":
+                if (arg1 && arg2) {
+                    cmd = { type: cli.CommandType.rollback };
+
+                    var deploymentRollbackCommand = <cli.IRollbackCommand>cmd;
+
+                    deploymentRollbackCommand.appName = arg1;
+                    deploymentRollbackCommand.deploymentName = arg2;
                 }
                 break;
         }

@@ -15,7 +15,8 @@
     logout,
     promote,
     register,
-    release
+    release,
+    rollback
 }
 
 export interface ICommand {
@@ -104,4 +105,9 @@ export interface IReleaseCommand extends ICommand {
     mandatory: boolean;
     appStoreVersion: string;
     package: string;
+}
+
+export interface IRollbackCommand extends ICommand {
+    appName: string;
+    deploymentName: string;
 }
