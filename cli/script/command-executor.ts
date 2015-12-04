@@ -21,6 +21,7 @@ import * as cli from "../definitions/cli";
 import { AccessKey, AccountManager, App, Deployment, DeploymentKey, Package } from "code-push";
 var packageJson = require("../package.json");
 import Promise = Q.Promise;
+var progress = require("progress");
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var userAgent: string = packageJson.name + "/" + packageJson.version;
@@ -797,9 +798,22 @@ function release(command: cli.IReleaseCommand): Promise<void> {
                         getPackageFilePromise = Q({ isTemporary: false, path: filePath });
                     }
 
+                    var lastTotalProgress = 0;
+                    var progressBar = new progress("Upload progress:[:bar] :percent :etas", { 
+                        complete: "=",
+                        incomplete: " ",
+                        width: 50,
+                        total: 100
+                    });
+
+                    var uploadProgress = (currentProgress: number): void => {
+                        progressBar.tick(currentProgress - lastTotalProgress);
+                        lastTotalProgress = currentProgress;
+                    }
+
                     return getPackageFilePromise
                         .then((file: IPackageFile): Promise<void> => {
-                            return sdk.addPackage(appId, deploymentId, file.path, command.description, /*label*/ null, command.appStoreVersion, command.mandatory)
+                            return sdk.addPackage(appId, deploymentId, file.path, command.description, /*label*/ null, command.appStoreVersion, command.mandatory, uploadProgress)
                                 .then((): void => {
                                     log("Successfully released an update containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
 
