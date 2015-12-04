@@ -819,8 +819,8 @@ export class AccountManager {
             req.attach("package", file)
                 .field("packageInfo", JSON.stringify(packageInfo))
                 .on("progress", (event: any) => {
-                    if (uploadProgressCallback) {
-                        var currentProgress: number = (event.loaded/event.total) * 100;
+                    if (uploadProgressCallback && event && event.total > 0) {
+                        var currentProgress: number = event.loaded / event.total * 100;
                         uploadProgressCallback(currentProgress);
                     }
                 })
