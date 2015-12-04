@@ -642,7 +642,9 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
                 if (packageObject.releaseMethod === "Promote") {
                     releaseSource = `Promoted ${ packageObject.originalLabel } from "${ packageObject.originalDeployment }"`;
                 } else if (packageObject.releaseMethod === "Rollback") {
-                    releaseSource = `Rolled back to ${ packageObject.originalLabel }`;
+                    var labelNumber: number = parseInt(packageObject.label.substring(1));
+                    var lastLabel: string = "v" + (labelNumber - 1);
+                    releaseSource = `Rolled back ${ lastLabel } to ${ packageObject.originalLabel }`;
                 }
 
                 if (releaseSource) {
