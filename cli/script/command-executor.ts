@@ -820,18 +820,26 @@ function release(command: cli.IReleaseCommand): Promise<void> {
 function rollback(command: cli.IRollbackCommand): Promise<void> {
     var appId: string;
 
-    return getAppId(command.appName)
-        .then((appIdResult: string): Promise<string> => {
-            throwForInvalidAppId(appIdResult, command.appName);
-            appId = appIdResult;
-            return getDeploymentId(appId, command.deploymentName);
-        })
-        .then((deploymentId: string): Promise<void> => {
-            throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
-            return sdk.rollbackPackage(appId, deploymentId);
-        })
-        .then((): void => {
-            log("Successfully performed a rollback on the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
+    return confirm()
+        .then((wasConfirmed: boolean) => {
+            if (!wasConfirmed) {
+                log("Rollback cancelled.")
+                return;
+            }
+
+            return getAppId(command.appName)
+                .then((appIdResult: string): Promise<string> => {
+                    throwForInvalidAppId(appIdResult, command.appName);
+                    appId = appIdResult;
+                    return getDeploymentId(appId, command.deploymentName);
+                })
+                .then((deploymentId: string): Promise<void> => {
+                    throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
+                    return sdk.rollbackPackage(appId, deploymentId);
+                })
+                .then((): void => {
+                    log("Successfully performed a rollback on the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
+                });
         });
 }
 
