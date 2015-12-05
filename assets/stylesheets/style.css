@@ -365,8 +365,8 @@ img {
 
 .navbar-logo {
   width: 200px;
-  -webkit-transition: all .1s ease-in-out;
-          transition: all .1s ease-in-out;
+  -webkit-transition: all 0.1s ease-in-out;
+          transition: all 0.1s ease-in-out;
   padding-top: 7px;
   padding-left: 3px; }
   .navbar-logo:hover {
@@ -1033,7 +1033,7 @@ table {
   width: 100%; }
 
 td, th {
-  padding: .25rem .5rem;
+  padding: 0.25rem 0.5rem;
   border: 2px solid #000; }
 
 th {
@@ -1151,7 +1151,8 @@ th {
   list-style-type: none;
   padding-bottom: 20px; }
 
-.blog .blog-list .posts li:first-child header .adorner {
+.blog .blog-list .posts
+li:first-child header .adorner {
   background-color: #3992ab; }
 
 .blog .blog-list .posts header {

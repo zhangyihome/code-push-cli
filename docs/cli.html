@@ -330,12 +330,12 @@
                     <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/CLI.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
                 </header>  
                 <article class="doc-content">               
-                    <p><img src="https://cloud.githubusercontent.com/assets/116461/11233671/1d0329ae-8d75-11e5-8cf4-781109ca83b8.png" alt="CodePush CLI"></p>
+                    <p><img src="https://cloud.githubusercontent.com/assets/696206/11605036/5a934e56-9aaa-11e5-87ad-01cddeaf07dc.PNG" alt="CodePush CLI"></p>
 
 <h2>Installation</h2>
 
 <ul>
-<li>Install <a href="https://nodejs.org/">Node.js</a> </li>
+<li>Install <a href="https://nodejs.org/">Node.js</a></li>
 <li>Install the CodePush CLI: <code>npm install -g code-push-cli</code></li>
 </ul>
 
@@ -354,7 +354,7 @@
 <p>Before you can begin releasing app updates, you need to create a CodePush account. You can do this by simply running the following command once you&rsquo;ve installed the CLI:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push register
 </code></pre></div>
-<p>This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. Once authenticated, it will create a CodePush account &ldquo;linked&rdquo; to your GitHub/MSA identity, and generate an access token you can copy/paste into the CLI in order to login. </p>
+<p>This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. Once authenticated, it will create a CodePush account &ldquo;linked&rdquo; to your GitHub/MSA identity, and generate an access token you can copy/paste into the CLI in order to login.</p>
 
 <p><em>Note: After registering, you are automatically logged-in with the CLI, so until you explicitly log out, you don&rsquo;t need to login again from the same machine.</em></p>
 
@@ -368,7 +368,7 @@
 <p>When you login from the CLI, your access token (kind of like a cookie) is persisted to disk so that you don&rsquo;t have to login everytime you attempt to access your account. In order to delete this file from your computer, simply run the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push logout
 </code></pre></div>
-<p>If you forget to logout from a machine you&rsquo;d prefer not to leave a running session on (e.g. your friend&rsquo;s laptop), you can use the following commands to list and remove any &ldquo;live&rdquo; access tokens. 
+<p>If you forget to logout from a machine you&rsquo;d prefer not to leave a running session on (e.g. your friend&rsquo;s laptop), you can use the following commands to list and remove any &ldquo;live&rdquo; access tokens.
 The list of access keys will display the name of the machine the token was created on, as well as the time the login occurred. This should make it easy to spot keys you don&rsquo;t want to keep around.</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push access-key ls
 code-push access-key rm &lt;accessKey&gt;
@@ -413,7 +413,7 @@ you can run the following command:</p>
 code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 code-push deployment ls &lt;appName&gt;
 </code></pre></div>
-<h2>Releasing app updates</h2>
+<h3>Releasing app updates</h3>
 
 <p>Once your app has been configured to query for updates against the CodePush service&ndash;using your desired deployment&ndash;you can begin pushing updates to it using the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push release &lt;appName&gt; &lt;package&gt; &lt;appStoreVersion&gt;
@@ -423,9 +423,9 @@ code-push deployment ls &lt;appName&gt;
 </code></pre></div>
 <h3>Package parameter</h3>
 
-<p>This specifies the location of the content you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the <code>/platforms/ios/www</code> folder for a Cordova app). You don&rsquo;t need to zip up multiple files or directories in order to deploy those changes, since the CLI will automatically zip them for you. </p>
+<p>This specifies the location of the content you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the <code>/platforms/ios/www</code> folder for a Cordova app). You don&rsquo;t need to zip up multiple files or directories in order to deploy those changes, since the CLI will automatically zip them for you.</p>
 
-<p>It&rsquo;s important that the path you specify refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you should run before releasing, as well as the location you can subsequently point at using the <code>package</code> parameter: </p>
+<p>It&rsquo;s important that the path you specify refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you should run before releasing, as well as the location you can subsequently point at using the <code>package</code> parameter:</p>
 
 <table><thead>
 <tr>
@@ -507,11 +507,25 @@ who can decide to actually enforce it or not. The default value is <strong>false
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push promote &lt;appName&gt; &lt;sourceDeploymentName&gt; &lt;destDeploymentName&gt;
 code-push promote MyApp Staging Production
 </code></pre></div>
+<p>The release produced by a promotion will be annotated in the output of the <code>deployment history</code> command.</p>
+
+<h2>Rolling back undesired updates</h2>
+
+<p>If you release an update that is broken or contains unintended features, it is easy to roll it back using the <code>rollback</code> command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push rollback &lt;appName&gt; &lt;deploymentName&gt;
+code-push rollback MyApp Production
+</code></pre></div>
+<p>This has the effect of issuing another release with the same contents and metadata as the version prior to the latest one. Note that this means that issuing a second consecutive <code>rollback</code> command simply cancels out the first one.</p>
+
+<p>The release produced by a rollback will be annotated in the output of the <code>deployment history</code> command.</p>
+
 <h2>Viewing release history</h2>
 
-<p>You can view a history of releases for a specific app deployment (including promotions) using the following command:</p>
+<p>You can view a history of the 50 most recent releases for a specific app deployment using the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment history &lt;appName&gt; &lt;deploymentName&gt;
 </code></pre></div>
+<p><img src="https://cloud.githubusercontent.com/assets/696206/11605068/14e440d0-9aab-11e5-8837-69ab09bfb66c.PNG" alt="Deployment History"></p>
+
 <p><em>NOTE: The history command can also be run using the &ldquo;h&rdquo; alias</em></p>
   
                 </article>

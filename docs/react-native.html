@@ -347,7 +347,7 @@
 <li>Android</li>
 </ul>
 
-<p><i>Note: CodePush now requires at least v0.14.0 of React Native.</i></p>
+<p><em>Note: CodePush v1.3.0 requires v0.14.0+ of React Native, and CodePush v1.4.0 requires v0.15.0+ of React Native, so make sure you are using the right version of the CodePush plugin.</em></p>
 
 <h2>Getting Started</h2>
 
@@ -367,6 +367,11 @@
 <li><p>Drag <code>libCodePush.a</code> from <code>Libraries/CodePush.xcodeproj/Products</code> into the &ldquo;Link Binary With Libraries&rdquo; secton of your project&rsquo;s &ldquo;Build Phases&rdquo; configuration.</p>
 
 <p><img src="https://cloud.githubusercontent.com/assets/516559/10322221/a75ea066-6c31-11e5-9d88-ff6f6a4d6968.png" alt="Link CodePush during build"></p></li>
+<li><p>Click the plus sign underneath the &ldquo;Link Binary With Libraries&rdquo; list and select the <code>libz.tbd</code> library underneath the <code>iOS 9.1</code> node. </p>
+
+<p><img src="https://cloud.githubusercontent.com/assets/116461/11605042/6f786e64-9aaa-11e5-8ca7-14b852f808b1.png" alt="Libz reference"></p>
+
+<p><em>Note: Alternatively, if you prefer, you can add the <code>-lz</code> flag to the <code>Other Linker Flags</code> field in the <code>Linking</code> section of the <code>Build Settings</code>.</em></p></li>
 <li><p>Under the &ldquo;Build Settings&rdquo; tab of your project configuration, find the &ldquo;Header Search Paths&rdquo; section and edit the value.
 Add a new value, <code>$(SRCROOT)/../node_modules/react-native-code-push</code> and select &ldquo;recursive&rdquo; in the dropdown.</p>
 
@@ -414,8 +419,10 @@ dependencies {
 <p>To let the CodePush runtime know which deployment it should query for updates against, perform the following steps:</p>
 
 <ol>
-<li>Open your app&rsquo;s <code>Info.plist</code> and add a new <code>CodePushDeploymentKey</code> entry, whose value is the key of the deployment you want to configure this app against (e.g. the Staging deployment for FooBar app). You can retreive this value by running <code>code-push deployment ls &lt;appName&gt;</code> in the CodePush CLI, and copying the value of the <code>Deployment Key</code> column which corresponds to the deployment you want to use. </li>
-<li>In your app&rsquo;s <code>Info.plist</code> make sure your <code>CFBundleShortVersionString</code> value is a valid <a href="http://semver.org/">semver</a> version (e.g. 1.0.0 not 1.0)</li>
+<li><p>Open your app&rsquo;s <code>Info.plist</code> file and add a new entry named <code>CodePushDeploymentKey</code>, whose value is the key of the deployment you want to configure this app against (e.g. the key for the <code>Staging</code> deployment for the <code>FooBar</code> app). You can retrieve this value by running <code>code-push deployment ls &lt;appName&gt;</code> in the CodePush CLI, and copying the value of the <code>Deployment Key</code> column which corresponds to the deployment you want to use (see below). Note that using the deployment&rsquo;s name (e.g. Staging) will not work. That &ldquo;friendly name&rdquo; is intended only for authenticated management usage from the CLI, and not for public consumption within your app.</p>
+
+<p><img src="https://cloud.githubusercontent.com/assets/116461/11601733/13011d5e-9a8a-11e5-9ce2-b100498ffb34.png" alt="Deployment list"></p></li>
+<li><p>In your app&rsquo;s <code>Info.plist</code> make sure your <code>CFBundleShortVersionString</code> value is a valid <a href="http://semver.org/">semver</a> version (e.g. 1.0.0 not 1.0)</p></li>
 </ol>
 
 <h2>Plugin Configuration - Android</h2>
@@ -423,7 +430,7 @@ dependencies {
 <p>After installing the plugin and syncing your Android Studio project with Gradle, you need to configure your app to consult CodePush for the location of your JS bundle, since it will &ldquo;take control&rdquo; of managing the current and all future versions. To do this, perform the following steps:</p>
 
 <ol>
-<li><p>Update the <code>MainActivity.java</code> file to use CodePush.</p>
+<li><p>Update the <code>MainActivity.java</code> file to use CodePush via the following changes:</p>
 <div class="highlight"><pre><code class="language-java" data-lang="java">...
 // 1. Import the plugin class
 import com.microsoft.codepush.react.CodePush;
@@ -454,7 +461,7 @@ public class MainActivity extends FragmentActivity implements DefaultHardwareBac
     }
 }
 </code></pre></div></li>
-<li><p>Ensure that the versionName property in your <code>android/app/build.gradle</code> file is set to a semver compliant value.</p>
+<li><p>Ensure that the <code>android.defaultConfig.versionName</code> property in your <code>android/app/build.gradle</code> file is set to a semver compliant value (i.e. &ldquo;1.0.0&rdquo; not &ldquo;1.0&rdquo;)</p>
 <div class="highlight"><pre><code class="language-gradle" data-lang="gradle">android {
     ...
     defaultConfig {
@@ -498,7 +505,26 @@ public class MainActivity extends FragmentActivity implements DefaultHardwareBac
 <li>Execute <code>code-push release &lt;appName&gt; &lt;jsBundleFilePath&gt; &lt;appVersion&gt; --deploymentName &lt;deploymentName&gt;</code> in order to publish the generated JS bundle to the server. Assuming your CWD is the root directory of your React Native app, <code>&lt;jsBundleFilePath&gt;</code> could be <code>iOS/main.jsbundle</code> for iOS, or <code>android/app/src/main/assets/index.android.jsbundle</code> for Android.</li>
 </ol>
 
-<p>And that&rsquo;s it! For more information regarding the CodePush API, including the various options you can pass to the <code>sync</code> method, refer to the reference section below. Additionally, for more information regarding the CLI and how the release (or promote) commands work, refer to it&rsquo;s <a href="http://microsoft.github.io/code-push/docs/cli.html">documentation</a>.</p>
+<p>And that&rsquo;s it! For more information regarding the CodePush API, including the various options you can pass to the <code>sync</code> method, refer to the reference section below. Additionally, for more information regarding the CLI and how the release (or promote and rollback) commands work, refer to the <a href="http://microsoft.github.io/code-push/docs/cli.html">documentation</a>.</p>
+
+<h2>Releasing asset updates - iOS</h2>
+
+<p>If you are using the new React Native <a href="https://facebook.github.io/react-native/docs/images.html#content">assets system</a>, as opposed to loading your images from the network and/or platform-specific mechanisms (e.g. iOS asset catalogs), then you can&rsquo;t simply pass your jsbundle to CodePush as demonstrated above. You need to provide your images as well. To do this, simply use the following workflow:</p>
+
+<ol>
+<li><p>When calling <code>react-native bundle</code>, specify that your assets and JS bundle go into a new &ldquo;release&rdquo; folder (you can call this anything, but it shouldn&rsquo;t contain any other files). For example:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">react-native bundle \
+--platform ios \
+--entry-file index.ios.js \
+--bundle-output ./release/main.jsbundle \
+--assets-dest ./release
+</code></pre></div></li>
+<li><p>Execute <code>code-push release</code>, passing the path to the directory you used in #1 as the &ldquo;package&rdquo; parameter (e.g. <code>code-push release Foo ./release 1.0.0</code>). The code-push CLI will automatically handle zipping up the contents for you, so don&rsquo;t worry about handling that yourself.</p></li>
+</ol>
+
+<p>Additionally, the CodePush client supports differential updates, so even though you are releasing your JS bundle and assets on every update, your end-users will only actually download the files they need. The service handles this automatically so that you can focus on creating awesome apps and we can worry about optimizing end-user downloads.</p>
+
+<p><em>Note: Releasing assets via CodePush is currently only supported on iOS, and requires that you&rsquo;re using React Native v0.15.0+.</em></p>
 
 <hr>
 
@@ -539,7 +565,7 @@ public class MainActivity extends FragmentActivity implements DefaultHardwareBac
 <h3>codePush.getCurrentPackage</h3>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.getCurrentPackage(): Promise&lt;LocalPackage&gt;;
 </code></pre></div>
-<p>Retreives the metadata about the currently installed &ldquo;package&rdquo; (e.g. description, installation time). This can be useful for scenarios such as displaying a &ldquo;what&rsquo;s new?&rdquo; dialog after an update has been applied.</p>
+<p>Retrieves the metadata about the currently installed &ldquo;package&rdquo; (e.g. description, installation time). This can be useful for scenarios such as displaying a &ldquo;what&rsquo;s new?&rdquo; dialog after an update has been applied.</p>
 
 <p>This method returns a <code>Promise</code> which resolves to the <code>LocalPackage</code> instance that represents the currently running update. </p>
 
