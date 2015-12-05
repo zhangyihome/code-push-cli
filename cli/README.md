@@ -2,7 +2,7 @@
 
 CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users' devices. It works by acting as a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using provided client SDKs for [Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push)). This allows you to have a more deterministic and direct engagement model with your userbase, when addressing bugs and/or adding small features that don't require you to re-build a binary and re-distribute it through the respective app stores.
 
-![CodePush CLI](https://cloud.githubusercontent.com/assets/116461/11233671/1d0329ae-8d75-11e5-8cf4-781109ca83b8.png)
+![CodePush CLI](https://cloud.githubusercontent.com/assets/696206/11605036/5a934e56-9aaa-11e5-87ad-01cddeaf07dc.PNG)
 
 ## Installation
 
@@ -184,12 +184,29 @@ code-push promote <appName> <sourceDeploymentName> <destDeploymentName>
 code-push promote MyApp Staging Production
 ```
 
+The release produced by a promotion will be annotated in the output of the `deployment history` command.
+
+## Rolling back undesired updates
+
+If you release an update that is broken or contains unintended features, it is easy to roll it back using the `rollback` command:
+
+```
+code-push rollback <appName> <deploymentName>
+code-push rollback MyApp Production
+```
+
+This has the effect of issuing another release with the same contents and metadata as the version prior to the latest one. Note that this means that issuing a second consecutive `rollback` command simply cancels out the first one.
+
+The release produced by a rollback will be annotated in the output of the `deployment history` command.
+
 ## Viewing release history
 
-You can view a history of the 50 most recent releases for a specific app deployment (including promotions) using the following command:
+You can view a history of the 50 most recent releases for a specific app deployment using the following command:
 
 ```
 code-push deployment history <appName> <deploymentName>
 ```
+
+![Deployment History](https://cloud.githubusercontent.com/assets/696206/11605068/14e440d0-9aab-11e5-8837-69ab09bfb66c.PNG)
 
 *NOTE: The history command can also be run using the "h" alias*
