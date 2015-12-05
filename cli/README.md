@@ -207,6 +207,6 @@ You can view a history of the 50 most recent releases for a specific app deploym
 code-push deployment history <appName> <deploymentName>
 ```
 
-![Deployment History](https://cloud.githubusercontent.com/assets/696206/11604911/2ef6d044-9aa8-11e5-84a3-5b04e4929b35.png)
+![Deployment History](https://cloud.githubusercontent.com/assets/696206/11605068/14e440d0-9aab-11e5-8837-69ab09bfb66c.PNG)
 
 *NOTE: The history command can also be run using the "h" alias*
