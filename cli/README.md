@@ -119,7 +119,7 @@ code-push deployment rm <appName> <deploymentName>
 code-push deployment ls <appName>
 ```
 
-### Releasing app updates
+## Releasing app updates
 
 Once your app has been configured to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
 
