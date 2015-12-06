@@ -3,8 +3,8 @@
 	<channel>
 		<title>CodePush</title>
 		<description>CodePush Blog</description>		
-		<link></link>
-		<atom:link href="/feed.xml" rel="self" type="application/rss+xml" />
+		<link>http://microsoft.github.io/code-push/blog</link>
+		<atom:link href="http://microsoft.github.io/code-push/blog/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
 				<title>CodePush enters &quot;open beta&quot;</title>
@@ -16,8 +16,8 @@
 </description>
 				
 				<pubDate>Wed, 18 Nov 2015 00:00:00 -0800</pubDate>
-				<link>/articles/OpenBeta.html</link>
-				<guid isPermaLink="true">/articles/OpenBeta.html</guid>
+				<link>http://microsoft.github.io/code-push/blog/articles/OpenBeta.html</link>
+				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/OpenBeta.html</guid>
 			</item>
 		
 			<item>
@@ -30,8 +30,8 @@
 </description>
 				
 				<pubDate>Wed, 18 Nov 2015 00:00:00 -0800</pubDate>
-				<link>/articles/CDWithCodePushAndVSTS.html</link>
-				<guid isPermaLink="true">/articles/CDWithCodePushAndVSTS.html</guid>
+				<link>http://microsoft.github.io/code-push/blog/articles/CDWithCodePushAndVSTS.html</link>
+				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/CDWithCodePushAndVSTS.html</guid>
 			</item>
 		
 			<item>
@@ -44,8 +44,8 @@
 </description>
 				
 				<pubDate>Wed, 04 Nov 2015 00:00:00 -0800</pubDate>
-				<link>/articles/CodePush1.1.html</link>
-				<guid isPermaLink="true">/articles/CodePush1.1.html</guid>
+				<link>http://microsoft.github.io/code-push/blog/articles/CodePush1.1.html</link>
+				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/CodePush1.1.html</guid>
 			</item>
 		
 	</channel>
