@@ -141,7 +141,7 @@ and <a href="https://github.com/Microsoft/react-native-code-push">React Native S
 
 <h3>5. Which React Native platforms are supported?</h3>
 
-<p>Our <a href="https://github.com/Microsoft/react-native-code-push">React Native plugin</a> currently only supports iOS. We have an internal prototype of Android support, but we&rsquo;re waiting for this <a href="https://github.com/facebook/react-native/pull/3189">PR</a> to merge since it will enable a much cleaner developer experience.</p>
+<p>Our <a href="https://github.com/Microsoft/react-native-code-push">React Native plugin</a> supports both iOS and Android. As new platforms are introduced to React Native (e.g. Windows), we will add CodePush support as well.</p>
 
 <hr>
 
@@ -153,7 +153,7 @@ and <a href="https://github.com/Microsoft/react-native-code-push">React Native S
 
 <h3>7. Is the service really limited to pushing just &ldquo;code&rdquo;?</h3>
 
-<p>The CodePush service itself is concerned simply with synchronizing files between developers and their end-users. It is our client SDKs that layer the opinion on top regarding the types of files they help synchronize. For example, the Cordova plugin will sync any files which live in the platform-specific www folder (including images, etc.), and the React Native plugin will sync any content which is combined together by the packager into the app&rsquo;s JavaScript bundle.</p>
+<p>The CodePush service itself is concerned simply with synchronizing files between developers and their end-users. It is our client SDKs that layer the opinion on top regarding the types of files they help synchronize. For example, the Cordova plugin will sync any files which live in the platform-specific www folder (including images, etc.), and the React Native plugin will sync your JS bundle file and any image assets.</p>
 
 <p>In the future, we are excited to experiment/implement client SDKs that enable new compelling scenarios, as well as support app platforms other then those which are JavaScript-based. If you have any suggestions or feedback here, please <a href="mailto:codepushfeed@microsoft.com">let us know</a>!</p>
 
