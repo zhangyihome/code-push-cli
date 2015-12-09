@@ -651,42 +651,6 @@ export class AccountManager {
         });
     }
 
-    // Deployment key
-    public addDeploymentKey(appId: string, deploymentId: string, name: string, description?: string): Promise<DeploymentKey> {
-        return Promise<DeploymentKey>((resolve, reject, notify) => {
-            var deploymentKey: DeploymentKey = this.generateDeploymentKey(name, description, /*isPrimary*/ false);
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.post(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/deploymentKeys")
-            this.attachCredentials(req, requester);
-
-            req.set("Content-Type", "application/json;charset=UTF-8")
-                .send(JSON.stringify(deploymentKey))
-                .end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
-
-                    if (res.ok) {
-                        var body = tryJSON(res.text);
-                        if (res.ok) {
-                            if (body) {
-                                resolve(body.deploymentKey);
-                            } else {
-                                reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
-                            }
-                        } else {
-                            if (body) {
-                                reject(<CodePushError>body);
-                            } else {
-                                reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                            }
-                        }
-                    }
-                });
-        });
-    }
-
     public getDeploymentKeys(appId: string, deploymentId: string): Promise<DeploymentKey[]> {
         return Promise<DeploymentKey[]>((resolve, reject, notify) => {
             var requester = (this._authedAgent ? this._authedAgent : request);
@@ -694,111 +658,26 @@ export class AccountManager {
             this.attachCredentials(req, requester);
 
             req.end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
 
-                    var body = tryJSON(res.text);
-                    if (res.ok) {
-                        if (body) {
-                            resolve(body.deploymentKeys);
-                        } else {
-                            reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
-                        }
+                var body = tryJSON(res.text);
+                if (res.ok) {
+                    if (body) {
+                        resolve(body.deploymentKeys);
                     } else {
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
+                        reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
                     }
-                });
-        });
-    }
-
-    public getDeploymentKey(appId: string, deploymentId: string, deploymentKeyId: string): Promise<DeploymentKey> {
-        return Promise<DeploymentKey>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/deploymentKeys/" + deploymentKeyId)
-            this.attachCredentials(req, requester);
-
-            req.end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
-
-                    var body = tryJSON(res.text);
-                    if (res.ok) {
-                        if (body) {
-                            resolve(body.deploymentKey);
-                        } else {
-                            reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
-                        }
+                } else {
+                    if (body) {
+                        reject(<CodePushError>body);
                     } else {
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
                     }
-                });
-        });
-    }
-
-    public updateDeploymentKey(appId: string, deploymentId: string, deploymentKeyId: string, infoToChange: any): Promise<void> {
-        return Promise<void>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.put(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/deploymentKeys/" + deploymentKeyId)
-            this.attachCredentials(req, requester);
-
-            req.set("Content-Type", "application/json;charset=UTF-8")
-                .send(JSON.stringify(infoToChange))
-                .end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
-
-                    if (res.ok) {
-                        resolve(null);
-                    } else {
-                        var body = tryJSON(res.text);
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
-                    }
-                });
-        });
-    }
-
-    public deleteDeploymentKey(appId: string, deploymentId: string, deploymentKey: DeploymentKey | string): Promise<void> {
-        var id: string = (typeof deploymentKey === "string") ? deploymentKey : deploymentKey.id;
-        return Promise<void>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.del(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/deploymentKeys/" + id)
-            this.attachCredentials(req, requester);
-
-            req.end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
-
-                    if (res.ok) {
-                        resolve(null);
-                    } else {
-                        var body = tryJSON(res.text);
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
-                    }
-                });
+                }
+            });
         });
     }
 

@@ -34,9 +34,7 @@ describe("Management SDK", () => {
             manager.updateDeployment.bind(manager, "appId", { id: "deploymentToChange" }),
             manager.removeDeployment.bind(manager, "appId", { id: "deploymentToChange" }),
 
-            manager.getDeploymentKey.bind(manager, "appId", "deploymentId", "deploymentKeyId"),
             manager.getDeploymentKeys.bind(manager, "appId", "deploymentId"),
-            manager.updateDeploymentKey.bind(manager, "appId", "deploymentId", "deploymentKeyId", {}),
 
             manager.getPackage.bind(manager, ""),
             manager.logout.bind(manager),
@@ -191,38 +189,11 @@ describe("Management SDK", () => {
         }, rejectHandler);
     });
 
-    it("getDeploymentKey handles JSON response", (done: MochaDone) => {
-        mockReturn(JSON.stringify({ deploymentKey: {} }), 200, {});
-
-        manager.getDeploymentKey("appId", "deploymentId", "deploymentKeyId").done((obj: any) => {
-            assert.ok(obj);
-            done();
-        }, rejectHandler);
-    });
-
     it("getDeploymentKeys handles JSON response", (done: MochaDone) => {
         mockReturn(JSON.stringify({ deploymentKeys: [] }), 200, {});
 
         manager.getDeploymentKeys("appId", "deploymentId").done((obj: any) => {
             assert.ok(obj);
-            done();
-        }, rejectHandler);
-    });
-
-    it("removeDeploymentKey handles success response", (done: MochaDone) => {
-        mockReturn("", 200, {});
-
-        manager.updateDeploymentKey("appId", "deploymentId", "deploymentKeyId", <any>{}).done((obj: any) => {
-            assert.ok(!obj);
-            done();
-        }, rejectHandler);
-    });
-
-    it("removeDeploymentKey handles success response", (done: MochaDone) => {
-        mockReturn("", 200, {});
-
-        manager.deleteDeploymentKey("appId", "deploymentId", "deploymentKeyId").done((obj: any) => {
-            assert.ok(!obj);
             done();
         }, rejectHandler);
     });
