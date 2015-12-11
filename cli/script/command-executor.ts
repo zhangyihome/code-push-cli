@@ -199,63 +199,6 @@ function appRemove(command: cli.IAppRemoveCommand): Promise<void> {
         });
 }
 
-function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
-    return sdk.addApp(command.appName)
-        .then((app: App): Promise<void> => {
-            log("Successfully added the \"" + command.appName + "\" app, along with the following default deployments:");
-            var deploymentListCommand: cli.IDeploymentListCommand = {
-                type: cli.CommandType.deploymentList,
-                appName: app.name,
-                format: "table"
-            };
-            return deploymentList(deploymentListCommand, /*showPackage=*/ false);
-        });
-}
-
-function listCollaborators(command: cli.ICollaboratorListCommand): Promise<void> {
-    throwForInvalidOutputFormat(command.format);
-    var apps: App[];
-
-    return sdk.getApps()
-        .then((retrievedApps: App[]): Promise<string[][]> => {
-            apps = retrievedApps;
-            var deploymentListPromises: Promise<string[]>[] = apps.map((app: App) => {
-                return sdk.getDeployments(app.id)
-                    .then((deployments: Deployment[]) => {
-                        var deploymentList: string[] = deployments
-                            .map((deployment: Deployment) => deployment.name)
-                            .sort((first: string, second: string) => {
-                                return first.toLowerCase().localeCompare(second.toLowerCase());
-                            });
-                        return deploymentList;
-                    });
-            });
-            return Q.all(deploymentListPromises);
-        })
-        .then((deploymentLists: string[][]): void => {
-            printAppList(command.format, apps, deploymentLists);
-        });
-}
-
-function removeCollaborator(command: cli.ICollaboratorRemoveCommand): Promise<void> {
-    return getAppId(command.appName)
-        .then((appId: string): Promise<void> => {
-            throwForInvalidAppId(appId, command.appName);
-
-            return confirm()
-                .then((wasConfirmed: boolean): Promise<void> => {
-                    if (wasConfirmed) {
-                        return sdk.removeApp(appId)
-                            .then((): void => {
-                                log("Successfully removed the \"" + command.appName + "\" app.");
-                            });
-                    }
-
-                    log("App removal cancelled.");
-                });
-        });
-}
-
 function appRename(command: cli.IAppRenameCommand): Promise<void> {
     return getApp(command.currentAppName)
         .then((app: App): Promise<void> => {
@@ -267,6 +210,57 @@ function appRename(command: cli.IAppRenameCommand): Promise<void> {
         })
         .then((): void => {
             log("Successfully renamed the \"" + command.currentAppName + "\" app to \"" + command.newAppName + "\".");
+        });
+}
+
+function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
+    return getAppId(command.appName)
+        .then((appId: string): Promise<void> => {
+            throwForInvalidAppId(appId, command.appName);
+
+            return sdk.addCollaborator(appId, command.email)
+                .then((app: App): Promise<void> => {
+                    log("Successfully added the \"" + command.email + "\" app as a collaborator to \"" + command.appName +"\".");
+                    var collaboratorListCommand: cli.IDeploymentListCommand = {
+                        type: cli.CommandType.collaboratorList,
+                        appName: app.name,
+                        format: "table"
+                    };
+
+                    return listCollaborators(collaboratorListCommand);
+                });
+        });
+}
+
+function listCollaborators(command: cli.ICollaboratorListCommand): Promise<void> {
+    throwForInvalidOutputFormat(command.format);
+    return getAppId(command.appName)
+        .then((appId: string): Promise<void> => {
+            throwForInvalidAppId(appId, command.appName);
+
+            return sdk.getCollaboratorsList(appId)
+                .then((retrievedCollaborators: any[]): void => { //TODO: type - Collaborators[]
+                    printCollaboratorsList(command.format, retrievedCollaborators);
+                });
+        });
+}
+
+function removeCollaborator(command: cli.ICollaboratorRemoveCommand): Promise<void> {
+    return getAppId(command.appName)
+        .then((appId: string): Promise<void> => {
+            throwForInvalidAppId(appId, command.appName);
+
+            return confirm()
+                .then((wasConfirmed: boolean): Promise<void> => {
+                    if (wasConfirmed) {
+                        return sdk.removeCollaborator(appId, command.email)
+                            .then((): void => {
+                                log("Successfully removed the \"" + command.appName + "\" app.");
+                            });
+                    }
+
+                    log("App removal cancelled.");
+                });
         });
 }
 
@@ -663,12 +657,31 @@ function printAppList(format: string, apps: App[], deploymentLists: string[][]):
         var dataSource: any[] = apps.map((app: App, index: number) => {
             return { "name": app.name, "deployments": deploymentLists[index] };
         });
+
         printJson(dataSource);
     } else if (format === "table") {
         var headers = ["Name", "Deployments"];
         printTable(headers, (dataSource: any[]): void => {
             apps.forEach((app: App, index: number): void => {
                 var row = [app.name, wordwrap(50)(deploymentLists[index].join(", "))];
+                dataSource.push(row);
+            });
+        });
+    }
+}
+
+function printCollaboratorsList(format: string, collaborators: any[]): void { // TODO: Type - Collaborators[]
+    if (format === "json") {
+        var dataSource: any[] = collaborators.map((collaborator: any) => {
+            return { "email": collaborator.email };
+        });
+
+        printJson(dataSource);
+    } else if (format === "table") {
+        var headers = ["Collaborators"];
+        printTable(headers, (dataSource: any[]): void => {
+            collaborators.forEach((collaborator: any, index: number): void => {
+                var row = [collaborator.email];
                 dataSource.push(row);
             });
         });
