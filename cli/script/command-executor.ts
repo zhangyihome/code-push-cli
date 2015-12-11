@@ -219,11 +219,11 @@ function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
             throwForInvalidAppId(appId, command.appName);
 
             return sdk.addCollaborator(appId, command.email)
-                .then((app: App): Promise<void> => {
+                .then((): Promise<void> => {
                     log("Successfully added the \"" + command.email + "\" app as a collaborator to \"" + command.appName +"\".");
                     var collaboratorListCommand: cli.IDeploymentListCommand = {
                         type: cli.CommandType.collaboratorList,
-                        appName: app.name,
+                        appName: command.appName,
                         format: "table"
                     };
 

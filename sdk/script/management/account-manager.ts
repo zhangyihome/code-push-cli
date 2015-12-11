@@ -499,6 +499,95 @@ export class AccountManager {
         });
     }
 
+    // Collaborators
+    public getCollaboratorsList(appId: string): Promise<App[]> {
+        return Promise<App[]>((resolve, reject, notify) => {
+            var requester = (this._authedAgent ? this._authedAgent : request);
+
+            var req = requester.get(this.serverUrl + "/apps/" + appId + "/collaborators");
+            this.attachCredentials(req, requester);
+
+            req.end((err: any, res: request.Response) => {
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
+
+                var body = tryJSON(res.text);
+                if (res.ok) {
+                    if (body) {
+                        resolve(body.apps);
+                    } else {
+                        reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
+                    }
+                } else {
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
+        });
+    }
+
+    public addCollaborator(appId: string, email: string): Promise<void> {
+        // TODO: sanitize email
+        return Promise<void>((resolve, reject, notify) => {
+            var requester = (this._authedAgent ? this._authedAgent : request);
+
+            var req = requester.post(this.serverUrl + "/apps/" + appId + "/collaborators/" + email);
+            this.attachCredentials(req, requester);
+
+            req.end((err: any, res: request.Response) => {
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
+
+                if (res.ok) {
+                    resolve(null);
+                } else {
+                    var body = tryJSON(res.text);
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
+        });
+    }
+
+    public removeCollaborator(app: App | string, email: string): Promise<void> {
+        // TODO: sanitize email
+        return Promise<void>((resolve, reject, notify) => {
+            var id: string = (typeof app === "string") ? app : app.id;
+            var requester = (this._authedAgent ? this._authedAgent : request);
+
+            var req = requester.del(this.serverUrl + "/apps/" + id + "/collaborators/" + email);
+            this.attachCredentials(req, requester);
+
+            req.end((err: any, res: request.Response) => {
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
+
+                if (res.ok) {
+                    resolve(null);
+                } else {
+                    var body = tryJSON(res.text);
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
+        });
+    }
+
     // Deployments
     public addDeployment(appId: string, name: string, description?: string): Promise<Deployment> {
         return Promise<Deployment>((resolve, reject, notify) => {
