@@ -199,6 +199,63 @@ function appRemove(command: cli.IAppRemoveCommand): Promise<void> {
         });
 }
 
+function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
+    return sdk.addApp(command.appName)
+        .then((app: App): Promise<void> => {
+            log("Successfully added the \"" + command.appName + "\" app, along with the following default deployments:");
+            var deploymentListCommand: cli.IDeploymentListCommand = {
+                type: cli.CommandType.deploymentList,
+                appName: app.name,
+                format: "table"
+            };
+            return deploymentList(deploymentListCommand, /*showPackage=*/ false);
+        });
+}
+
+function listCollaborators(command: cli.ICollaboratorListCommand): Promise<void> {
+    throwForInvalidOutputFormat(command.format);
+    var apps: App[];
+
+    return sdk.getApps()
+        .then((retrievedApps: App[]): Promise<string[][]> => {
+            apps = retrievedApps;
+            var deploymentListPromises: Promise<string[]>[] = apps.map((app: App) => {
+                return sdk.getDeployments(app.id)
+                    .then((deployments: Deployment[]) => {
+                        var deploymentList: string[] = deployments
+                            .map((deployment: Deployment) => deployment.name)
+                            .sort((first: string, second: string) => {
+                                return first.toLowerCase().localeCompare(second.toLowerCase());
+                            });
+                        return deploymentList;
+                    });
+            });
+            return Q.all(deploymentListPromises);
+        })
+        .then((deploymentLists: string[][]): void => {
+            printAppList(command.format, apps, deploymentLists);
+        });
+}
+
+function removeCollaborator(command: cli.ICollaboratorRemoveCommand): Promise<void> {
+    return getAppId(command.appName)
+        .then((appId: string): Promise<void> => {
+            throwForInvalidAppId(appId, command.appName);
+
+            return confirm()
+                .then((wasConfirmed: boolean): Promise<void> => {
+                    if (wasConfirmed) {
+                        return sdk.removeApp(appId)
+                            .then((): void => {
+                                log("Successfully removed the \"" + command.appName + "\" app.");
+                            });
+                    }
+
+                    log("App removal cancelled.");
+                });
+        });
+}
+
 function appRename(command: cli.IAppRenameCommand): Promise<void> {
     return getApp(command.currentAppName)
         .then((app: App): Promise<void> => {
@@ -380,6 +437,15 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.appRemove:
                     return appRemove(<cli.IAppRemoveCommand>command);
+
+                case cli.CommandType.collaboratorAdd:
+                    return addCollaborator(<cli.ICollaboratorAddCommand>command);
+
+                case cli.CommandType.collaboratorList:
+                    return listCollaborators(<cli.ICollaboratorListCommand>command);
+
+                case cli.CommandType.collaboratorRemove:
+                    return removeCollaborator(<cli.ICollaboratorRemoveCommand>command);
 
                 case cli.CommandType.appRename:
                     return appRename(<cli.IAppRenameCommand>command);

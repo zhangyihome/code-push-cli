@@ -6,6 +6,9 @@
     appList,
     appRemove,
     appRename,
+    collaboratorAdd,
+    collaboratorList,
+    collaboratorRemove,
     deploymentAdd,
     deploymentList,
     deploymentRemove,
@@ -50,6 +53,21 @@ export interface IAppRemoveCommand extends ICommand {
 export interface IAppRenameCommand extends ICommand {
     currentAppName: string;
     newAppName: string;
+}
+
+export interface ICollaboratorAddCommand extends ICommand {
+    appName: string;
+    email: string;
+}
+
+export interface ICollaboratorListCommand extends ICommand {
+    appName: string;
+    format: string;
+}
+
+export interface ICollaboratorRemoveCommand extends ICommand {
+    appName: string;
+    email: string;
 }
 
 export interface IDeploymentAddCommand extends ICommand {

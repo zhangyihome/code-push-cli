@@ -93,6 +93,26 @@ function appRemove(commandName: string, yargs: yargs.Argv): void {
     addCommonConfiguration(yargs);
 }
 
+function listCollaborators(commandName: string, yargs: yargs.Argv): void {
+    isValidCommand = true;
+    yargs.usage(USAGE_PREFIX + " collaborator " + commandName + " <appName> [--format <format>]")
+        .demand(/*count*/ 3, /*max*/ 3)  // Require exactly two non-option arguments.
+        .example("collaborator " + commandName + " MyApp", "Lists collaborators for app \"MyApp\" in tabular format")
+        .example("collaborator " + commandName + " MyApp --format json", "Lists collaborators for app \"MyApp\" in JSON format")
+        .option("format", { default: "table", demand: false, description: "The output format (\"json\" or \"table\")", type: "string" });
+
+    addCommonConfiguration(yargs);
+}
+
+function removeCollaborator(commandName: string, yargs: yargs.Argv): void {
+    isValidCommand = true;
+    yargs.usage(USAGE_PREFIX + " collaborator " + commandName + " <appName> <email>")
+        .demand(/*count*/ 4, /*max*/ 4)  // Require exactly three non-option arguments.
+        .example("collaborator " + commandName + " MyApp foo@bar.com", "Removes foo@bar.com from app \"MyApp\" as a collaborator");
+
+    addCommonConfiguration(yargs);
+}
+
 function deploymentList(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
     yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> [--format <format>]")
@@ -182,6 +202,26 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
             .example("promote MyApp Staging Production", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\"");
             
+        addCommonConfiguration(yargs);
+    })
+    .command("collaborator", "View and manage collaborators for a given app", (yargs: yargs.Argv) => {
+        isValidCommandCategory = true;
+        yargs.usage(USAGE_PREFIX + " collaborator <command>")
+            .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
+            .command("add", "Add a new collaborator to the given app", (yargs: yargs.Argv): void => {
+                isValidCommand = true;
+                yargs.usage(USAGE_PREFIX + " collaborator add <appName> <email>")
+                    .demand(/*count*/ 4, /*max*/ 4)  // Require exactly three non-option arguments.
+                    .example("collaborator add MyApp foo@bar.com", "Adds foo@bar.com as a collaborator to app \"MyApp\"");
+
+                addCommonConfiguration(yargs);
+            })
+            .command("remove", "Remove an app from your account", (yargs: yargs.Argv) => removeCollaborator("remove", yargs))
+            .command("rm", "Remove an app from your account", (yargs: yargs.Argv) => removeCollaborator("rm", yargs))
+            .command("list", "List the apps associated with your account", (yargs: yargs.Argv) => listCollaborators("list", yargs))
+            .command("ls", "List the apps associated with your account", (yargs: yargs.Argv) => listCollaborators("ls", yargs))
+            .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
+
         addCommonConfiguration(yargs);
     })
     .command("rollback", "Performs a rollback on the latest package of a specific deployment", (yargs: yargs.Argv) => {
@@ -334,6 +374,39 @@ function createCommand(): cli.ICommand {
 
                             appRenameCommand.currentAppName = arg2;
                             appRenameCommand.newAppName = arg3;
+                        }
+                        break;
+                }
+                break;
+
+            case "collaborator":
+                switch (arg1) {
+                    case "add":
+                        if (arg2 && arg3) {
+                            cmd = { type: cli.CommandType.collaboratorAdd };
+
+                            (<cli.ICollaboratorAddCommand>cmd).appName = arg2;
+                            (<cli.ICollaboratorAddCommand>cmd).email = arg3;
+                        }
+                        break;
+
+                    case "list":
+                    case "ls":
+                        if (arg2) {
+                            cmd = { type: cli.CommandType.collaboratorList };
+
+                            (<cli.ICollaboratorListCommand>cmd).appName = arg2;
+                            (<cli.ICollaboratorListCommand>cmd).format = argv["format"];
+                        }
+                        break;
+
+                    case "remove":
+                    case "rm":
+                        if (arg2 && arg3) {
+                            cmd = { type: cli.CommandType.collaboratorRemove };
+
+                            (<cli.ICollaboratorRemoveCommand>cmd).appName = arg2;
+                            (<cli.ICollaboratorAddCommand>cmd).email = arg3;
                         }
                         break;
                 }
