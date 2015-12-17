@@ -185,10 +185,12 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         addCommonConfiguration(yargs);
     })
     .command("rollback", "Performs a rollback on the latest package of a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " rollback <appName> <deploymentName>")
+        yargs.usage(USAGE_PREFIX + " rollback <appName> <deploymentName> [--targetRelease <releaseLabel>]")
             .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
-            .example("rollback MyApp Production", "Perform a rollback on the \"Production\" deployment of \"MyApp\"");
-            
+            .example("rollback MyApp Production", "Perform a rollback on the \"Production\" deployment of \"MyApp\"")
+            .example("rollback MyApp Production --targetRelease v4", "Perform a rollback on the \"Production\" deployment of \"MyApp\" to the v4 release.")
+            .option("targetRelease", { alias: "r", default: null, demand: false, description: "The label of the release to be rolled back to", type: "string" });
+
         addCommonConfiguration(yargs);
     })
     .command("deployment", "View and manage the deployments for your apps", (yargs: yargs.Argv) => {
@@ -459,10 +461,11 @@ function createCommand(): cli.ICommand {
                 if (arg1 && arg2) {
                     cmd = { type: cli.CommandType.rollback };
 
-                    var deploymentRollbackCommand = <cli.IRollbackCommand>cmd;
+                    var rollbackCommand = <cli.IRollbackCommand>cmd;
 
-                    deploymentRollbackCommand.appName = arg1;
-                    deploymentRollbackCommand.deploymentName = arg2;
+                    rollbackCommand.appName = arg1;
+                    rollbackCommand.deploymentName = arg2;
+                    rollbackCommand.targetRelease = argv["targetRelease"];
                 }
                 break;
         }
