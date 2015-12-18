@@ -189,7 +189,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
             .example("rollback MyApp Production", "Perform a rollback on the \"Production\" deployment of \"MyApp\"")
             .example("rollback MyApp Production --targetRelease v4", "Perform a rollback on the \"Production\" deployment of \"MyApp\" to the v4 release.")
-            .option("targetRelease", { alias: "r", default: null, demand: false, description: "The label of the release to be rolled back to", type: "string" });
+            .option("targetRelease", { alias: "r", default: null, demand: false, description: "The label of the release to be rolled back to (e.g. v4)", type: "string" });
 
         addCommonConfiguration(yargs);
     })
