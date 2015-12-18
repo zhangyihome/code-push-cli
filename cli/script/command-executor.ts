@@ -849,7 +849,7 @@ function rollback(command: cli.IRollbackCommand): Promise<void> {
                 })
                 .then((deploymentId: string): Promise<void> => {
                     throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
-                    return sdk.rollbackPackage(appId, deploymentId);
+                    return sdk.rollbackPackage(appId, deploymentId, command.targetRelease || undefined);
                 })
                 .then((): void => {
                     log("Successfully performed a rollback on the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
