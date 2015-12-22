@@ -27,6 +27,7 @@ declare module "rest-definitions" {
         appVersion: string;
         packageHash: string;
         isCompanion: boolean;
+        label: string;
     }
 
     export interface Account {

@@ -77,7 +77,8 @@ class Server {
             deploymentKey: params.deploymentKey,
             appVersion: params.appVersion,
             packageHash: params.packageHash,
-            isCompanion: !!(params.isCompanion)
+            isCompanion: !!(params.isCompanion),
+            label: params.label
         };
 
         if (!updateRequest.deploymentKey || !updateRequest.appVersion) {
