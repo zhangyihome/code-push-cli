@@ -336,7 +336,7 @@
 
 <p>A React Native app is composed of JavaScript files and any accompanying <a href="https://facebook.github.io/react-native/docs/images.html#content">images</a>, which are bundled together by the <a href="https://github.com/facebook/react-native/tree/master/packager">packager</a> and distributed as part of a platform-specific binary (i.e. an <code>.ipa</code> or <code>.apk</code> file). Once the app is released, updating either the JavaScript code (e.g. making bug fixes, adding new features) or image assets, requires you to recompile and redistribute the entire binary, which of course, includes any review time associated with the store(s) you are publishing to.</p>
 
-<p>The CodePush plugin helps get product improvements in front of your end-users instantly, by keeping your JavaScript and images synchronized with updates you release to the CodePush server. This way, your app gets the benefits of an offline mobile experience, as well as the &ldquo;web-like&rdquo; agility of side-loading updates as soon as they are available. It&rsquo;s a win-win!</p>
+<p>The CodePush plugin helps get product improvements in front of your end users instantly, by keeping your JavaScript and images synchronized with updates you release to the CodePush server. This way, your app gets the benefits of an offline mobile experience, as well as the &ldquo;web-like&rdquo; agility of side-loading updates as soon as they are available. It&rsquo;s a win-win!</p>
 
 <p><em>Note: Any product changes which touch native code (e.g. modifying your <code>AppDelegate.m</code>/<code>MainActivity.java</code> file, adding a new plugin) cannot be distributed via CodePush, and therefore, must be updated via the appropriate store(s).</em></p>
 
@@ -344,7 +344,7 @@
 
 <ul>
 <li>iOS</li>
-<li>Android</li>
+<li>Android (asset support coming soon!)</li>
 </ul>
 
 <p><em>Note: CodePush v1.3.0 requires v0.14.0+ of React Native, and CodePush v1.4.0 requires v0.15.0+ of React Native, so make sure you are using the right version of the CodePush plugin.</em></p>
@@ -442,6 +442,7 @@ dependencies {
 import com.microsoft.codepush.react.CodePush;
 
 // 2. Optional: extend FragmentActivity if you intend to show a dialog prompting users about updates.
+//    If you do this, make sure to also add &quot;import android.support.v4.app.FragmentActivity&quot; below #1.
 public class MainActivity extends FragmentActivity implements DefaultHardwareBackBtnHandler {
     ...
 
@@ -486,7 +487,7 @@ public class MainActivity extends FragmentActivity implements DefaultHardwareBac
 
 <ol>
 <li>When (and how often) to check for an update? (e.g. app start, in response to clicking a button in a settings page, periodically at some fixed interval)</li>
-<li>When an update is available, how to present it to the end-user?</li>
+<li>When an update is available, how to present it to the end user?</li>
 </ol>
 
 <p>The simplest way to do this is to perform the following in your app&rsquo;s root component:</p>
@@ -500,19 +501,19 @@ public class MainActivity extends FragmentActivity implements DefaultHardwareBac
 </code></pre></div></li>
 </ol>
 
-<p>If an update is available, it will be silently downloaded, and installed the next time the app is restarted (either explicitly by the end-user or by the OS), which ensures the least invasive experience for your end-users. If you would like to display a confirmation dialog (an &ldquo;active install&rdquo;), or customize the update experience in any way, refer to the <code>sync</code> method&rsquo;s <a href="#codepushsync">API reference</a> for information on how to tweak this default behavior.</p>
+<p>If an update is available, it will be silently downloaded, and installed the next time the app is restarted (either explicitly by the end user or by the OS), which ensures the least invasive experience for your end users. If you would like to display a confirmation dialog (an &ldquo;active install&rdquo;), or customize the update experience in any way, refer to the <code>sync</code> method&rsquo;s <a href="#codepushsync">API reference</a> for information on how to tweak this default behavior.</p>
 
 <h2>Releasing Updates (JavaScript-only)</h2>
 
 <p>Once your app has been configured and distributed to your users, and you&rsquo;ve made some JS changes, it&rsquo;s time to release it to them instantly! If you&rsquo;re not using React Native to bundle images (via <code>require(&#39;./foo.png&#39;)</code>), then perform the following steps. Otherwise, skip to the next section instead:</p>
 
 <ol>
-<li><p>Execute <code>react-native bundle</code> (passing the appropriate parameters) in order to generate the updated JS bundle for your app. You can place this file wherever you want via the <code>--bundle-output</code> flag, since the exact location isn&rsquo;t relevant for CodePush purposes.</p></li>
-<li><p>Execute <code>code-push release &lt;appName&gt; &lt;jsBundleFilePath&gt; &lt;appStoreVersion&gt; --deploymentName &lt;deploymentName&gt;</code> in order to publish the generated JS bundle to the server. The <code>&lt;jsBundleFilePath&gt;</code> parameter should equal the value you provided to the <code>--bundle-output</code> flag in step #1. Additionally, the <code>&lt;appStoreVersion&gt;</code> parameter should equal the exact app store version (i.e. the semver version end-users would see when installing it) you want this CodePush update to target.</p></li>
+<li><p>Execute <code>react-native bundle</code> (passing the appropriate parameters, see example below) in order to generate the updated JS bundle for your app. You can place this file wherever you want via the <code>--bundle-output</code> flag, since the exact location isn&rsquo;t relevant for CodePush purposes. It&rsquo;s important, however, that you set <code>--dev false</code> so that your JS code is optimized appropriately and any &ldquo;yellow box&rdquo; warnings won&rsquo;t be displayed.</p></li>
+<li><p>Execute <code>code-push release &lt;appName&gt; &lt;jsBundleFilePath&gt; &lt;appStoreVersion&gt; --deploymentName &lt;deploymentName&gt;</code> in order to publish the generated JS bundle to the server. The <code>&lt;jsBundleFilePath&gt;</code> parameter should equal the value you provided to the <code>--bundle-output</code> flag in step #1. Additionally, the <code>&lt;appStoreVersion&gt;</code> parameter should equal the exact app store version (i.e. the semver version end users would see when installing it) you want this CodePush update to target.</p></li>
 </ol>
 
 <p>Example Usage:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">react-native bundle --platform ios --entry-file index.ios.js --bundle-output codepush.js
+<div class="highlight"><pre><code class="language-text" data-lang="text">react-native bundle --platform ios --entry-file index.ios.js --bundle-output codepush.js --dev false
 code-push release MyApp codepush.js 1.0.2
 </code></pre></div>
 <p>And that&rsquo;s it! for more information regarding the CLI and how the release (or promote and rollback) commands work, refer to the <a href="http://microsoft.github.io/code-push/docs/cli.html">documentation</a>.</p>
@@ -521,38 +522,53 @@ code-push release MyApp codepush.js 1.0.2
 
 <h2>Releasing Updates (JavaScript + images)</h2>
 
-<p>If you are using the new React Native <a href="https://facebook.github.io/react-native/docs/images.html#content">assets system</a>, as opposed to loading your images from the network and/or platform-specific mechanisms (e.g. iOS asset catalogs), then you can&rsquo;t simply pass your jsbundle to CodePush as demonstrated above. You need to provide your images as well. To do this, simply use the following workflow:</p>
+<p><em>Note: Android doesn&rsquo;t currently support deploying assets, so you must use the previous release strategy instead.</em></p>
+
+<p>If you are using the new React Native <a href="https://facebook.github.io/react-native/docs/images.html#content">assets system</a>, as opposed to loading your images from the network and/or platform-specific mechanisms (e.g. iOS asset catalogs), then you can&rsquo;t simply pass your jsbundle to CodePush as demonstrated above. You <strong>MUST</strong> provide your images as well. To do this, simply use the following workflow:</p>
 
 <ol>
-<li><p>When calling <code>react-native bundle</code>, specify that your assets and JS bundle go into a new &ldquo;release&rdquo; folder (you can call this anything, but it shouldn&rsquo;t contain any other files). For example:</p>
+<li><p>Create a new directory that can be used to organize your app&rsquo;s release assets (i.e. the JS bundle and your images). We recommend calling this directory &ldquo;release&rdquo; but it can be named anything. If you create this directory within your project&rsquo;s directory, make sure to add it to your <code>.gitignore</code> file, since you don&rsquo;t want it checked into source control.</p></li>
+<li><p>When calling <code>react-native bundle</code>, specify that your assets and JS bundle go into the directory you created in #1, and that you want a non-dev build for your respective platform and entry file. For example, assuming you called this directory &ldquo;release&rdquo;, you could run the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">react-native bundle \
 --platform ios \
 --entry-file index.ios.js \
 --bundle-output ./release/main.jsbundle \
 --assets-dest ./release
+--dev false
 </code></pre></div></li>
-<li><p>Execute <code>code-push release</code>, passing the path to the directory you used in #1 as the &ldquo;package&rdquo; parameter (e.g. <code>code-push release Foo ./release 1.0.0</code>). The code-push CLI will automatically handle zipping up the contents for you, so don&rsquo;t worry about handling that yourself.</p></li>
+<li><p>Execute <code>code-push release</code>, passing the path to the directory you created in #1 as the &ldquo;package&rdquo; parameter (e.g. <code>code-push release Foo ./release 1.0.0</code>). The code-push CLI will automatically handle zipping up the contents for you, so don&rsquo;t worry about handling that yourself.</p></li>
 </ol>
 
-<p>Additionally, the CodePush client supports differential updates, so even though you are releasing your JS bundle and assets on every update, your end-users will only actually download the files they need. The service handles this automatically so that you can focus on creating awesome apps and we can worry about optimizing end-user downloads.</p>
+<p>Additionally, the CodePush client supports differential updates, so even though you are releasing your JS bundle and assets on every update, your end users will only actually download the files they need. The service handles this automatically so that you can focus on creating awesome apps and we can worry about optimizing end user downloads.</p>
 
-<p><em>Note: Releasing assets via CodePush is currently only supported on iOS, and requires that you&rsquo;re using React Native v0.15.0+.</em></p>
+<p><em>Note: Releasing assets via CodePush is currently only supported on iOS, and requires that you&rsquo;re using React Native v0.15.0+ and CodePush 1.4.0+. If you are using assets and an older version of the CodePush plugin, you should not release updates via CodePush, because it will break your app&rsquo;s ability to load images from the binary. Please test and release appropriately!</em></p>
 
 <hr>
 
 <h2>API Reference</h2>
+
+<p>The CodePush plugin is made up of two components:</p>
+
+<ol>
+<li><p>A JavaScript module, which can be imported/required, and allows the app to interact with the service during runtime (e.g. check for updates, inspect the metadata about the currently running app update).</p></li>
+<li><p>A native API (Objective-C and Java) which allows the React Native app host to bootstrap itself with the right JS bundle location.</p></li>
+</ol>
+
+<p>The following sections describe the shape and behavior of these APIs in detail:</p>
+
+<h3>JavaScript API Reference</h3>
 
 <p>When you require <code>react-native-code-push</code>, the module object provides the following top-level methods:</p>
 
 <ul>
 <li><p><a href="#codepushcheckforupdate">checkForUpdate</a>: Asks the CodePush service whether the configured app deployment has an update available. </p></li>
 <li><p><a href="#codepushgetcurrentpackage">getCurrentPackage</a>: Retrieves the metadata about the currently installed update (e.g. description, installation time, size).</p></li>
-<li><p><a href="#codepushnotifyapplicationready">notifyApplicationReady</a>: Notifies the CodePush runtime that an installed update is considered successful. This is an optional API, but is useful when you want to expicitly enable &ldquo;rollback protection&rdquo; in the event that an exception occurs in code that you&rsquo;ve deployed to production. </p></li>
-<li><p><a href="#codepushrestartapp">restartApp</a>: Immediately restarts the app. If there is an update pending, it will be immediately displayed to the end-user, and the rollback timer (if specified when installing the update) will begin. Otherwise, calling this method simply has the same behavior as the end-user killing and restarting the process.</p></li>
+<li><p><a href="#codepushnotifyapplicationready">notifyApplicationReady</a>: Notifies the CodePush runtime that an installed update is considered successful. If you are manually checking for and installing updates (i.e. not using the <a href="#codepushsync">sync</a> method to handle it all for you), then this method <strong>MUST</strong> be called; otherwise CodePush will treat the update as failed and rollback to the previous version when the app next restarts.</p></li>
+<li><p><a href="#codepushrestartapp">restartApp</a>: Immediately restarts the app. If there is an update pending, it will be immediately displayed to the end user. Otherwise, calling this method simply has the same behavior as the end user killing and restarting the process.</p></li>
 <li><p><a href="#codepushsync">sync</a>: Allows checking for an update, downloading it and installing it, all with a single call. Unless you need custom UI and/or behavior, we recommend most developers to use this method when integrating CodePush into their apps</p></li>
 </ul>
 
-<h3>codePush.checkForUpdate</h3>
+<h4>codePush.checkForUpdate</h4>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.checkForUpdate(deploymentKey: String = null): Promise&lt;RemotePackage&gt;;
 </code></pre></div>
 <p>Queries the CodePush service to see whether the configured app deployment has an update available. By default, it will use the deployment key that is configured in your <code>Info.plist</code> file (iOS), or <code>MainActivity.java</code> file (Android), but you can override that by specifying a value via the optional <code>deploymentKey</code> parameter. This can be useful when you want to dynamically &ldquo;redirect&rdquo; a user to a specific deployment, such as allowing &ldquo;Early access&rdquo; via an easter egg or a user setting switch.</p>
@@ -574,7 +590,7 @@ code-push release MyApp codepush.js 1.0.2
     }
 });
 </code></pre></div>
-<h3>codePush.getCurrentPackage</h3>
+<h4>codePush.getCurrentPackage</h4>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.getCurrentPackage(): Promise&lt;LocalPackage&gt;;
 </code></pre></div>
 <p>Retrieves the metadata about the currently installed &ldquo;package&rdquo; (e.g. description, installation time). This can be useful for scenarios such as displaying a &ldquo;what&rsquo;s new?&rdquo; dialog after an update has been applied.</p>
@@ -586,32 +602,30 @@ code-push release MyApp codepush.js 1.0.2
 .then((update) =&gt; {
     // If the current app &quot;session&quot; represents the first time
     // this update has run, and it had a description provided
-    // with it upon release, let&#39;s show it to the end-user
+    // with it upon release, let&#39;s show it to the end user
     if (update.isFirstRun &amp;&amp; update.description) {
         // Display a &quot;what&#39;s new?&quot; modal
     }
 });
 </code></pre></div>
-<h3>codePush.notifyApplicationReady</h3>
+<h4>codePush.notifyApplicationReady</h4>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.notifyApplicationReady(): Promise&lt;void&gt;;
 </code></pre></div>
-<p>Notifies the CodePush runtime that a freshly installed update should be considered successful, and therefore, an automatic client-side rollback isn&rsquo;t necessary. Calling this function is required whenever the <code>rollbackTimeout</code> parameter is specified when calling either <code>LocalPackage.install</code> or <code>sync</code>. If you specify a <code>rollbackTimeout</code>, and don&rsquo;t call <code>notifyApplicationReady</code>, the CodePush runtime will assume that the installed update has failed and roll back to the previous version. This behavior exists to help ensure that your end-users aren&rsquo;t blocked by a broken update.</p>
-
-<p>If the <code>rollbackTimeout</code> parameter was not specified, the CodePush runtime will not enforce any automatic rollback behavior, and therefore, calling this function is not required and will result in a no-op.</p>
+<p>Notifies the CodePush runtime that a freshly installed update should be considered successful, and therefore, an automatic client-side rollback isn&rsquo;t necessary. It is mandatory to call this function somewhere in the code of the updated bundle. Otherwise, when the app next restarts, the CodePush runtime will assume that the installed update has failed and roll back to the previous version. This behavior exists to help ensure that your end users aren&rsquo;t blocked by a broken update.</p>
 
 <p>If you are using the <code>sync</code> function, and doing your update check on app start, then you don&rsquo;t need to manually call <code>notifyApplicationReady</code> since <code>sync</code> will call it for you. This behavior exists due to the assumption that the point at which <code>sync</code> is called in your app represents a good approximation of a successful startup.</p>
 
-<h3>codePush.restartApp</h3>
+<h4>codePush.restartApp</h4>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.restartApp(): void;        
 </code></pre></div>
-<p>Immediately restarts the app. If there is an update pending, it will be presented to the end-user and the rollback timer (if specified when installing the update) will begin. Otherwise, calling this method simply has the same behavior as the end-user killing and restarting the process. This method is for advanced scenarios, and is primarily useful when the following conditions are true:       </p>
+<p>Immediately restarts the app. If there is an update pending, it will be presented to the end user and the rollback timer (if specified when installing the update) will begin. Otherwise, calling this method simply has the same behavior as the end user killing and restarting the process. This method is for advanced scenarios, and is primarily useful when the following conditions are true:       </p>
 
 <ol>
-<li>Your app is specifying an install mode value of <code>ON_NEXT_RESTART</code> or <code>ON_NEXT_RESUME</code> when calling the <code>sync</code> or <code>LocalPackage.install</code> methods. This has the effect of not applying your update until the app has been restarted (by either the end-user or OS) or resumed, and therefore, the update won&rsquo;t be immediately displayed to the end-user    .</li>
-<li>You have an app-specific user event (e.g. the end-user navigated back to the app&rsquo;s home route) that allows you to apply the update in an unobtrusive way, and potentially gets the update in front of the end-user sooner then waiting until the next restart or resume.<br></li>
+<li>Your app is specifying an install mode value of <code>ON_NEXT_RESTART</code> or <code>ON_NEXT_RESUME</code> when calling the <code>sync</code> or <code>LocalPackage.install</code> methods. This has the effect of not applying your update until the app has been restarted (by either the end user or OS) or resumed, and therefore, the update won&rsquo;t be immediately displayed to the end user    .</li>
+<li>You have an app-specific user event (e.g. the end user navigated back to the app&rsquo;s home route) that allows you to apply the update in an unobtrusive way, and potentially gets the update in front of the end user sooner then waiting until the next restart or resume.<br></li>
 </ol>
 
-<h3>codePush.sync</h3>
+<h4>codePush.sync</h4>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.sync(options: Object, syncStatusChangeCallback: function(syncStatus: Number), downloadProgressCallback: function(progress: DownloadProgress)): Promise&lt;Number&gt;;
 </code></pre></div>
 <p>Synchronizes your app&rsquo;s JavaScript bundle and image assets with the latest release to the configured deployment. Unlike the <code>checkForUpdate</code> method, which simply checks for the presence of an update, and let&rsquo;s you control what to do next, <code>sync</code> handles the update check, download and installation experience for you.</p>
@@ -619,40 +633,39 @@ code-push release MyApp codepush.js 1.0.2
 <p>This method provides support for two different (but customizable) &ldquo;modes&rdquo; to easily enable apps with different requirements:</p>
 
 <ol>
-<li><p><strong>Silent mode</strong> <em>(the default behavior)</em>, which automatically downloads available updates, and applies them the next time the app restarts. This way, the entire update experience is &ldquo;silent&rdquo; to the end-user, since they don&rsquo;t see any update prompt and/or &ldquo;synthetic&rdquo; app restarts.</p></li>
-<li><p><strong>Active mode</strong>, which when an update is available, prompts the end-user for permission before downloading it, and then immediately applies the update. If an update was released using the <code>mandatory</code> flag, the end-user would still be notified about the update, but they wouldn&rsquo;t have the choice to ignore it.</p></li>
+<li><p><strong>Silent mode</strong> <em>(the default behavior)</em>, which automatically downloads available updates, and applies them the next time the app restarts. This way, the entire update experience is &ldquo;silent&rdquo; to the end user, since they don&rsquo;t see any update prompt and/or &ldquo;synthetic&rdquo; app restarts.</p></li>
+<li><p><strong>Active mode</strong>, which when an update is available, prompts the end user for permission before downloading it, and then immediately applies the update. If an update was released using the <code>mandatory</code> flag, the end user would still be notified about the update, but they wouldn&rsquo;t have the choice to ignore it.</p></li>
 </ol>
 
 <p>Example Usage: </p>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">// Fully silent update which keeps the app in
 // sync with the server, without ever 
-// interrupting the end-user
+// interrupting the end user
 codePush.sync();
 
-// Active update, which lets the end-user know
+// Active update, which lets the end user know
 // about each update, and displays it to them
 // immediately after downloading it
 codePush.sync({ updateDialog: true, installMode: codePush.InstallMode.IMMEDIATE });
 </code></pre></div>
-<p><em>Note: If you want to decide whether you check and/or download an available update based on the end-user&rsquo;s device battery level, network conditions, etc. then simply wrap the call to <code>sync</code> in a condition that ensures you only call it when desired.</em></p>
+<p><em>Note: If you want to decide whether you check and/or download an available update based on the end user&rsquo;s device battery level, network conditions, etc. then simply wrap the call to <code>sync</code> in a condition that ensures you only call it when desired.</em></p>
 
 <p>While the <code>sync</code> method tries to make it easy to perform silent and active updates with little configuration, it accepts an &ldquo;options&rdquo; object that allows you to customize numerous aspects of the default behavior mentioned above:</p>
 
 <ul>
 <li><p><strong>deploymentKey</strong> <em>(String)</em> - Specifies the deployment key you want to query for an update against. By default, this value is derived from the <code>Info.plist</code> file (iOS) and <code>MainActivity.java</code> file (Android), but this option allows you to override it from the script-side if you need to dynamically use a different deployment for a specific call to <code>sync</code>.</p></li>
 <li><p><strong>installMode</strong> <em>(CodePush.InstallMode)</em> - Indicates when you would like to &ldquo;install&rdquo; the update after downloading it, which includes reloading the JS bundle in order for any changes to take affect. Defaults to <code>CodePush.InstallMode.ON_NEXT_RESTART</code>. Refer to the <a href="#installmode"><code>InstallMode</code></a> enum reference for a description of the available options and what they do.</p></li>
-<li><p><strong>rollbackTimeout</strong> <em>(Number)</em> - The number of milliseconds that you want the runtime to wait after an update has been installed before considering it failed and rolling it back. Defaults to <code>0</code>, which disables rollback protection. Note that if you set this parameter to a non-zero number, and are calling <code>sync</code> during app start, you don&rsquo;t need to call <code>notifyApplicationReady</code>. However, if you&rsquo;re calling <code>sync</code> from a non-app start scenario (e.g. a button click), then you need to manually call <code>notifyApplicationReady</code> when specifying a rollback timeout.</p></li>
-<li><p><strong>updateDialog</strong> <em>(UpdateDialogOptions)</em> - An &ldquo;options&rdquo; object used to determine whether a confirmation dialog should be displayed to the end-user when an update is available, and if so, what strings to use. Defaults to <code>null</code>, which has the effect of disabling the dialog completely. Setting this to any truthy value will enable the dialog with the default strings, and passing an object to this parameter allows enabling the dialog as well as overriding one or more of the default strings. The following list represents the available options and their defaults:</p>
+<li><p><strong>updateDialog</strong> <em>(UpdateDialogOptions)</em> - An &ldquo;options&rdquo; object used to determine whether a confirmation dialog should be displayed to the end user when an update is available, and if so, what strings to use. Defaults to <code>null</code>, which has the effect of disabling the dialog completely. Setting this to any truthy value will enable the dialog with the default strings, and passing an object to this parameter allows enabling the dialog as well as overriding one or more of the default strings. The following list represents the available options and their defaults:</p>
 
 <ul>
-<li><strong>appendReleaseDescription</strong> <em>(Boolean)</em> - Indicates whether you would like to append the description of an available release to the notification message which is displayed to the end-user. Defaults to <code>false</code>.</li>
-<li><strong>descriptionPrefix</strong> <em>(String)</em> - Indicates the string you would like to prefix the release description with, if any, when displaying the update notification to the end-user. Defaults to <code>&quot; Description: &quot;</code></li>
-<li><strong>mandatoryContinueButtonLabel</strong> <em>(String)</em> - The text to use for the button the end-user must press in order to install a mandatory update. Defaults to <code>&quot;Continue&quot;</code>.</li>
+<li><strong>appendReleaseDescription</strong> <em>(Boolean)</em> - Indicates whether you would like to append the description of an available release to the notification message which is displayed to the end user. Defaults to <code>false</code>.</li>
+<li><strong>descriptionPrefix</strong> <em>(String)</em> - Indicates the string you would like to prefix the release description with, if any, when displaying the update notification to the end user. Defaults to <code>&quot; Description: &quot;</code></li>
+<li><strong>mandatoryContinueButtonLabel</strong> <em>(String)</em> - The text to use for the button the end user must press in order to install a mandatory update. Defaults to <code>&quot;Continue&quot;</code>.</li>
 <li><strong>mandatoryUpdateMessage</strong> <em>(String)</em> - The text used as the body of an update notification, when the update is specified as mandatory. Defaults to <code>&quot;An update is available that must be installed.&quot;</code>.</li>
-<li><strong>optionalIgnoreButtonLabel</strong> <em>(String)</em> - The text to use for the button the end-user can press in order to ignore an optional update that is available. Defaults to <code>&quot;Ignore&quot;</code>.</li>
-<li><strong>optionalInstallButtonLabel</strong> <em>(String)</em> - The text to use for the button the end-user can press in order to install an optional update. Defaults to <code>&quot;Install&quot;</code>.</li>
+<li><strong>optionalIgnoreButtonLabel</strong> <em>(String)</em> - The text to use for the button the end user can press in order to ignore an optional update that is available. Defaults to <code>&quot;Ignore&quot;</code>.</li>
+<li><strong>optionalInstallButtonLabel</strong> <em>(String)</em> - The text to use for the button the end user can press in order to install an optional update. Defaults to <code>&quot;Install&quot;</code>.</li>
 <li><strong>optionalUpdateMessage</strong> <em>(String)</em> - The text used as the body of an update notification, when the update is optional. Defaults to <code>&quot;An update is available. Would you like to install it?&quot;</code>.</li>
-<li><strong>title</strong> <em>(String)</em> - The text used as the header of an update notification that is displayed to the end-user. Defaults to <code>&quot;Update available&quot;</code>.</li>
+<li><strong>title</strong> <em>(String)</em> - The text used as the header of an update notification that is displayed to the end user. Defaults to <code>&quot;Update available&quot;</code>.</li>
 </ul></li>
 </ul>
 
@@ -701,7 +714,7 @@ codePush.sync({ updateDialog: true }, (status) =&gt; {
 
 <ul>
 <li><strong>CodePush.SyncStatus.UP_TO_DATE</strong> <em>(4)</em> - The app is up-to-date with the CodePush server.</li>
-<li><strong>CodePush.SyncStatus.UPDATE_IGNORED</strong> <em>(5)</em> - The app had an optional update which the end-user chose to ignore. (This is only applicable when the <code>updateDialog</code> is used)</li>
+<li><strong>CodePush.SyncStatus.UPDATE_IGNORED</strong> <em>(5)</em> - The app had an optional update which the end user chose to ignore. (This is only applicable when the <code>updateDialog</code> is used)</li>
 <li><strong>CodePush.SyncStatus.UPDATE_INSTALLED</strong> <em>(6)</em> - The update has been installed and will be run either immediately after the <code>syncStatusChangedCallback</code> function returns or the next time the app resumes/restarts, depending on the <code>InstallMode</code> specified in <code>SyncOptions</code>.</li>
 </ul>
 
@@ -709,7 +722,7 @@ codePush.sync({ updateDialog: true }, (status) =&gt; {
 
 <p>The <code>sync</code> method can be called anywhere you&rsquo;d like to check for an update. That could be in the <code>componentWillMount</code> lifecycle event of your root component, the onPress handler of a <code>&lt;TouchableHighlight&gt;</code> component, in the callback of a periodic timer, or whatever else makes sense for your needs. Just like the <code>checkForUpdate</code> method, it will perform the network request to check for an update in the background, so it won&rsquo;t impact your UI thread and/or JavaScript thread&rsquo;s responsiveness.</p>
 
-<h3>Package objects</h3>
+<h4>Package objects</h4>
 
 <p>The <code>checkForUpdate</code> and <code>getCurrentPackage</code> methods return promises, that when resolved, provide acces to &quot;package&rdquo; objects. The package represents your code update as well as any extra metadata (e.g. description, mandatory?). The CodePush API has the distinction between the following types of packages:</p>
 
@@ -718,39 +731,36 @@ codePush.sync({ updateDialog: true }, (status) =&gt; {
 <li><a href="#remotepackage">RemotePackage</a>: Represents an available update on the CodePush server that hasn&rsquo;t been downloaded yet.</li>
 </ul>
 
-<h4>LocalPackage</h4>
+<h5>LocalPackage</h5>
 
 <p>Contains details about an update that has been downloaded locally or already installed. You can get a reference to an instance of this object either by calling the module-level <code>getCurrentPackage</code> method, or as the value of the promise returned by the <code>RemotePackage.download</code> method.</p>
 
-<h5>Properties</h5>
+<h6>Properties</h6>
 
 <ul>
 <li><strong>appVersion</strong>: The app binary version that this update is dependent on. This is the value that was specified via the <code>appStoreVersion</code> parameter when calling the CLI&rsquo;s <code>release</code> command. <em>(String)</em></li>
 <li><strong>deploymentKey</strong>: The deployment key that was used to originally download this update. <em>(String)</em></li>
 <li><strong>description</strong>: The description of the update. This is the same value that you specified in the CLI when you released the update. <em>(String)</em></li>
 <li><strong>failedInstall</strong>: Indicates whether this update has been previously installed but was rolled back. The <code>sync</code> method will automatically ignore updates which have previously failed, so you only need to worry about this property if using <code>checkForUpdate</code>. <em>(Boolean)</em></li>
-<li><strong>isFirstRun</strong>: Indicates whether this is the first time the update has been run after being installed. This is useful for determining whether you would like to show a &ldquo;What&rsquo;s New?&rdquo; UI to the end-user after installing an update. <em>(Boolean)</em></li>
+<li><strong>isFirstRun</strong>: Indicates whether this is the first time the update has been run after being installed. This is useful for determining whether you would like to show a &ldquo;What&rsquo;s New?&rdquo; UI to the end user after installing an update. <em>(Boolean)</em></li>
 <li><strong>isMandatory</strong>: Indicates whether the update is considered mandatory.  This is the value that was specified in the CLI when the update was released. <em>(Boolean)</em></li>
+<li><strong>isPending</strong>: Indicates whether this update is in a &ldquo;pending&rdquo; state. When <code>true</code>, that means the update has been downloaded and installed, but the app restart needed to apply it hasn&rsquo;t occurred yet, and therefore, it&rsquo;s changes aren&rsquo;t currently visible to the end-user. <em>(Boolean)</em></li>
 <li><strong>label</strong>: The internal label automatically given to the update by the CodePush server. This value uniquely identifies the update within it&rsquo;s deployment. <em>(String)</em></li>
 <li><strong>packageHash</strong>: The SHA hash value of the update. <em>(String)</em></li>
 <li><strong>packageSize</strong>: The size of the code contained within the update, in bytes. <em>(Number)</em></li>
 </ul>
 
-<h5>Methods</h5>
+<h6>Methods</h6>
 
 <ul>
-<li><strong>install(rollbackTimeout: Number = 0, installMode: CodePush.InstallMode = CodePush.InstallMode.ON_NEXT_RESTART): Promise&lt;void&gt;</strong>: Installs the update by saving it to the location on disk where the runtime expects to find the latest version of the app. The <code>installMode</code> parameter controls when the changes are actually presented to the end-user. The default value is to wait until the next app restart to display the changes, but you can refer to the <a href="#installmode"><code>InstallMode</code></a> enum reference for a description of the available options and what they do.
-<br /><br />
-If a value greater than zero is provided to the <code>rollbackTimeout</code> parameter, the application will wait for the <code>notifyApplicationReady</code> method to be called for the given number of milliseconds before considering the update failed and automatically rolling back to the previous version.
-<br /><br />
-<em>Note: The &ldquo;rollback timer&rdquo; doesn&rsquo;t start until the update has actually become active. If the <code>installMode</code> is <code>IMMEDIATE</code>, then the rollback timer will also start immediately. However, if the <code>installMode</code> is <code>UPDATE_ON_RESTART</code> or <code>UPDATE_ON_RESUME</code>, then the rollback timer will start the next time the app starts or resumes, not at the point that you called <code>install</code>.</em></li>
+<li><strong>install(installMode: CodePush.InstallMode = CodePush.InstallMode.ON_NEXT_RESTART): Promise&lt;void&gt;</strong>: Installs the update by saving it to the location on disk where the runtime expects to find the latest version of the app. The <code>installMode</code> parameter controls when the changes are actually presented to the end user. The default value is to wait until the next app restart to display the changes, but you can refer to the <a href="#installmode"><code>InstallMode</code></a> enum reference for a description of the available options and what they do.</li>
 </ul>
 
-<h4>RemotePackage</h4>
+<h5>RemotePackage</h5>
 
 <p>Contains details about an update that is available for download from the CodePush server. You get a reference to an instance of this object by calling the <code>checkForUpdate</code> method when an update is available. If you are using the <code>sync</code> API, you don&rsquo;t need to worry about the <code>RemotePackage</code>, since it will handle the download and installation process automatically for you.</p>
 
-<h5>Properties</h5>
+<h6>Properties</h6>
 
 <p>The <code>RemotePackage</code> inherits all of the same properties as the <code>LocalPackage</code>, but includes one additional one:</p>
 
@@ -758,39 +768,87 @@ If a value greater than zero is provided to the <code>rollbackTimeout</code> par
 <li><strong>downloadUrl</strong>: The URL at which the package is available for download. This property is only needed for advanced usage, since the <code>download</code> method will automatically handle the acquisition of updates for you. <em>(String)</em></li>
 </ul>
 
-<h5>Methods</h5>
+<h6>Methods</h6>
 
 <ul>
 <li><strong>download(downloadProgressCallback?: Function): Promise&lt;LocalPackage&gt;</strong>: Downloads the available update from the CodePush service. If a <code>downloadProgressCallback</code> is specified, it will be called periodically with a <code>DownloadProgress</code> object (<code>{ totalBytes: Number, receivedBytes: Number }</code>) that reports the progress of the download until it completes. Returns a Promise that resolves with the <code>LocalPackage</code>.</li>
 </ul>
 
-<h3>Enums</h3>
+<h4>Enums</h4>
 
 <p>The CodePush API includes the following enums which can be used to customize the update experience:</p>
 
-<h4>InstallMode</h4>
+<h5>InstallMode</h5>
 
 <p>This enum specified when you would like an installed update to actually be applied, and can be passed to either the <code>sync</code> or <code>LocalPackage.install</code> methods. It includes the following values:
 * <strong>CodePush.InstallMode.IMMEDIATE</strong> <em>(0)</em> - Indicates that you want to install the update and restart the app immediately. This value is appropriate for debugging scenarios as well as when displaying an update prompt to the user, since they would expect to see the changes immediately after accepting the installation.</p>
 
 <ul>
-<li><p><strong>CodePush.InstallMode.ON_NEXT_RESTART</strong> <em>(1)</em> - Indicates that you want to install the update, but not forcibly restart the app. When the app is &ldquo;naturally&rdquo; restarted (due the OS or end-user killing it), the update will be seamlessly picked up. This value is appropriate when performing silent updates, since it would likely be disruptive to the end-user if the app suddenly restarted out of nowhere, since they wouldn&rsquo;t have realized an update was even downloaded. This is the default mode used for both the <code>sync</code> and <code>LocalPackage.install</code> methods.</p></li>
-<li><p><strong>CodePush.InstallMode.ON_NEXT_RESUME</strong> <em>(2)</em> - Indicates that you want to install the update, but don&rsquo;t want to restart the app until the next time the end-user resumes it from the background. This way, you don&rsquo;t disrupt their current session, but you can get the update in front of them sooner then having to wait for the next natural restart. This value is appropriate for silent installs that can be applied on resume in a non-invasive way.</p></li>
+<li><p><strong>CodePush.InstallMode.ON_NEXT_RESTART</strong> <em>(1)</em> - Indicates that you want to install the update, but not forcibly restart the app. When the app is &ldquo;naturally&rdquo; restarted (due the OS or end user killing it), the update will be seamlessly picked up. This value is appropriate when performing silent updates, since it would likely be disruptive to the end user if the app suddenly restarted out of nowhere, since they wouldn&rsquo;t have realized an update was even downloaded. This is the default mode used for both the <code>sync</code> and <code>LocalPackage.install</code> methods.</p></li>
+<li><p><strong>CodePush.InstallMode.ON_NEXT_RESUME</strong> <em>(2)</em> - Indicates that you want to install the update, but don&rsquo;t want to restart the app until the next time the end user resumes it from the background. This way, you don&rsquo;t disrupt their current session, but you can get the update in front of them sooner then having to wait for the next natural restart. This value is appropriate for silent installs that can be applied on resume in a non-invasive way.</p></li>
 </ul>
 
-<h4>SyncStatus</h4>
+<h5>SyncStatus</h5>
 
 <p>This enum is provided to the <code>syncStatusChangedCallback</code> function that can be passed to the <code>sync</code> method, in order to hook into the overall update process. It includes the following values:</p>
 
 <ul>
 <li><strong>CodePush.SyncStatus.CHECKING_FOR_UPDATE</strong> <em>(0)</em> - The CodePush server is being queried for an update.</li>
-<li><strong>CodePush.SyncStatus.AWAITING_USER_ACTION</strong> <em>(1)</em> - An update is available, and a confirmation dialog was shown to the end-user. (This is only applicable when the <code>updateDialog</code> is used)</li>
+<li><strong>CodePush.SyncStatus.AWAITING_USER_ACTION</strong> <em>(1)</em> - An update is available, and a confirmation dialog was shown to the end user. (This is only applicable when the <code>updateDialog</code> is used)</li>
 <li><strong>CodePush.SyncStatus.DOWNLOADING_PACKAGE</strong> <em>(2)</em> - An available update is being downloaded from the CodePush server.</li>
 <li><strong>CodePush.SyncStatus.INSTALLING_UPDATE</strong> <em>(3)</em> - An available update was downloaded and is about to be installed.</li>
 <li><strong>CodePush.SyncStatus.UP_TO_DATE</strong> <em>(4)</em> - The app is fully up-to-date with the configured deployment.</li>
-<li><strong>CodePush.SyncStatus.UPDATE_IGNORED</strong> <em>(5)</em> - The app has an optional update, which the end-user chose to ignore. (This is only applicable when the <code>updateDialog</code> is used)</li>
+<li><strong>CodePush.SyncStatus.UPDATE_IGNORED</strong> <em>(5)</em> - The app has an optional update, which the end user chose to ignore. (This is only applicable when the <code>updateDialog</code> is used)</li>
 <li><strong>CodePush.SyncStatus.UPDATE_INSTALLED</strong> <em>(6)</em> - An available update has been installed and will be run either immediately after the <code>syncStatusChangedCallback</code> function returns or the next time the app resumes/restarts, depending on the <code>InstallMode</code> specified in <code>SyncOptions</code>.</li>
 <li><strong>CodePush.SyncStatus.UNKNOWN_ERROR</strong> <em>(-1)</em> - The sync operation encountered an unknown error. </li>
+</ul>
+
+<h3>Objective-C API Reference (iOS)</h3>
+
+<p>The Objective-C API is made available by importing the <code>CodePush.h</code> header into your <code>AppDelegate.m</code> file, and consists of a single public class named <code>CodePush</code>.</p>
+
+<h4>CodePush</h4>
+
+<p>Contains static methods for retreiving the <code>NSURL</code> that represents the most recent JavaScript bundle file, and can be passed to the <code>RCTRootView</code>&rsquo;s <code>initWithBundleURL</code> method when bootstrapping your app in the <code>AppDelegate.m</code> file. </p>
+
+<p>The <code>CodePush</code> class&rsquo; methods can be thought of as composite resolvers which always load the appropriate bundle, in order to accomodate the following scenarios:</p>
+
+<ol>
+<li><p>When an end-user installs your app from the store (e.g. <code>1.0.0</code>), they will get the JS bundle that is contained within the binary. This is the behavior you would get without using CodePush, but we make sure it doesn&rsquo;t break :)</p></li>
+<li><p>As soon as you begin releasing CodePush updates, your end-users will get the JS bundle that represents the latest release for the configured deployment. This is the behavior that allows you to iterate beyond what you shipped to the store.</p></li>
+<li><p>As soon as you release an update to the app store (e.g. <code>1.1.0</code>), and your end-users update it, they will once again get the JS bundle that is contained within the binary. This behavior ensures that CodePush updates that targetted a previous app store version aren&rsquo;t used (since we don&rsquo;t know it they would work), and your end-users always have a working version of your app.</p></li>
+<li><p>Repeat #2 and #3 as the CodePush releases and app store releases continue on into infinity (and beyond?)</p></li>
+</ol>
+
+<p>Because of this behavior, you can safely deploy updates to both the app store(s) and CodePush as neccesary, and rest assured that your end-users will always get the most recent version.  </p>
+
+<h5>Methods</h5>
+
+<ul>
+<li><p><strong>(NSURL *)bundleURL</strong> - Returns the most recent JS bundle <code>NSURL</code> as described above. This method assumes that the name of the JS bundle contained within your app binary is <code>main.jsbundle</code>.</p></li>
+<li><p><strong>(NSURL *)bundleURLForResource:(NSString *)resourceName</strong> - Equivalent to the <code>bundleURL</code> method, but also allows customizing the name of the JS bundle that is looked for within the app binary. This is useful if you aren&rsquo;t naming this file <code>main</code> (which is the default convention). This method assumes that the JS bundle&rsquo;s extension is <code>*.jsbundle</code>.</p></li>
+<li><p><strong>(NSURL *)bundleURLForResource:(NSString *)resourceName withExtension:(NSString *)resourceExtension</strong>: Equivalent to the <code>bundleURLForResource:</code> method, but also allows customizing the extension used by the JS bundle that is looked for within the app binary. This is useful if you aren&rsquo;t naming this file <code>*.jsbundle</code> (which is the default convention).</p></li>
+</ul>
+
+<h3>Java API Reference (Android)</h3>
+
+<p>The Java API is made available by importing the <code>com.microsoft.codepush.react.CodePush</code> class into your <code>MainActivity.java</code> file, and consists of a single public class named <code>CodePush</code>.</p>
+
+<h4>CodePush</h4>
+
+<p>Constructs the CodePush client runtime and includes methods for integrating CodePush into your app&rsquo;s <code>ReactInstanceManager</code>.</p>
+
+<h5>Constructors</h5>
+
+<ul>
+<li><strong>CodePush(String deploymentKey, Activity mainActivity)</strong> - Creates a new instance of the CodePush runtime, that will be used to query the service for updates via the provided deployment key. The <code>mainActivity</code> parameter should always be set to <code>this</code> when configuring your <code>ReactInstanceManager</code> inside the <code>MainActivity</code> class.</li>
+</ul>
+
+<h5>Methods</h5>
+
+<ul>
+<li><p><strong>getBundleUrl(String bundleName)</strong> - Returns the path to the most recent version of your app&rsquo;s JS bundle file, using the specified resource name (e.g. <code>index.android.bundle</code>). This method has the same resolution behavior as the Objective-C equivalent described above.</p></li>
+<li><p><strong>getReactPackage()</strong> - Returns a <code>ReactPackage</code> object that should be added to your <code>ReactInstanceManager</code> via its <code>addPackage</code> method. Without this, the <code>react-native-code-push</code> JS module won&rsquo;t be available to your script.</p></li>
 </ul>
   
                 </article>
