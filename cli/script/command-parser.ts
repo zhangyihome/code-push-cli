@@ -2,6 +2,7 @@
 import * as cli from "../definitions/cli";
 import * as chalk from "chalk";
 import * as updateNotifier from "update-notifier";
+import backslash = require("backslash");
 
 var packageJson = require("../package.json");
 const USAGE_PREFIX = "Usage: code-push";
@@ -452,7 +453,7 @@ function createCommand(): cli.ICommand {
                     releaseCommand.package = arg2;
                     releaseCommand.appStoreVersion = arg3;
                     releaseCommand.deploymentName = argv["deploymentName"];
-                    releaseCommand.description = argv["description"];
+                    releaseCommand.description = backslash(argv["description"]);
                     releaseCommand.mandatory = argv["mandatory"];
                 }
                 break;
