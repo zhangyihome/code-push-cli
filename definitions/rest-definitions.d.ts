@@ -33,20 +33,17 @@ declare module "rest-definitions" {
         id: string;
         username: string;
         name: string;
-        description: string;
         email: string;
     }
 
     export interface App {
         id: string;
         name: string;
-        description: string;
     }
 
     export interface Deployment {
         id: string;
         name: string;
-        description: string;
         package?: Package
     }
 
