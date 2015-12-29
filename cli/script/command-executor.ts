@@ -672,7 +672,6 @@ function getPackageString(packageObject: Package): string {
     return chalk.green("Label: ") + packageObject.label + "\n" +
         chalk.green("App Version: ") + packageObject.appVersion + "\n" +
         chalk.green("Mandatory: ") + (packageObject.isMandatory ? "Yes" : "No") + "\n" +
-        chalk.green("Hash: ") + packageObject.packageHash + "\n" +
         chalk.green("Release Time: ") + formatDate(packageObject.uploadTime) +
         (packageObject.description ? wordwrap(70)("\n" + chalk.green("Description: ") + packageObject.description): "");
 }
