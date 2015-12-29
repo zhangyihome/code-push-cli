@@ -669,12 +669,12 @@ function getPackageString(packageObject: Package): string {
         return "";
     }
 
-    return "Label: " + packageObject.label + "\n" +
-        (packageObject.description ? wordwrap(70)("Description: " + packageObject.description) + "\n" : "") +
-        "App Version: " + packageObject.appVersion + "\n" +
-        "Mandatory: " + (packageObject.isMandatory ? "Yes" : "No") + "\n" +
-        "Hash: " + packageObject.packageHash + "\n" +
-        "Release Time: " + formatDate(packageObject.uploadTime);
+    return chalk.green("Label: ") + packageObject.label + "\n" +
+        chalk.green("App Version: ") + packageObject.appVersion + "\n" +
+        chalk.green("Mandatory: ") + (packageObject.isMandatory ? "Yes" : "No") + "\n" +
+        chalk.green("Hash: ") + packageObject.packageHash + "\n" +
+        chalk.green("Release Time: ") + formatDate(packageObject.uploadTime) +
+        (packageObject.description ? wordwrap(70)("\n" + chalk.green("Description: ") + packageObject.description): "");
 }
 
 function printJson(object: any): void {
