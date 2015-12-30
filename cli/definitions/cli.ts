@@ -128,4 +128,5 @@ export interface IReleaseCommand extends ICommand {
 export interface IRollbackCommand extends ICommand {
     appName: string;
     deploymentName: string;
+    targetRelease: string;
 }

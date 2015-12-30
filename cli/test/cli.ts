@@ -23,17 +23,15 @@ export class SdkStub {
         });
     }
 
-    public addApp(name: string, description?: string): Promise<codePush.App> {
+    public addApp(name: string): Promise<codePush.App> {
         return Q(<codePush.App>{
-            description: description,
             id: "appId",
             name: name
         });
     }
 
-    public addDeployment(appId: string, name: string, description?: string): Promise<codePush.Deployment> {
+    public addDeployment(appId: string, name: string): Promise<codePush.Deployment> {
         return Q(<codePush.Deployment>{
-            description: description,
             id: "deploymentId",
             name: name
         });
@@ -74,7 +72,6 @@ export class SdkStub {
         }, <codePush.Deployment>{
             id: "4",
             name: "Staging",
-            description: "cde",
             package: {
                 appVersion: "1.0.0",
                 description: "fgh",

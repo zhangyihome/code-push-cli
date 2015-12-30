@@ -18,7 +18,7 @@ var configuration: acquisitionSdk.Configuration = {
 var templateCurrentPackage: acquisitionSdk.Package = {
     deploymentKey: mockApi.validDeploymentKey,
     description: "sdfsdf",
-    label: "0.0.1",
+    label: "v1",
     appVersion: latestPackage.appVersion,
     packageHash: "hash001",
     isMandatory: false,

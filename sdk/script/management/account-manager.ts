@@ -407,9 +407,9 @@ export class AccountManager {
         });
     }
 
-    public addApp(appName: string, description?: string): Promise<App> {
+    public addApp(appName: string): Promise<App> {
         return Promise<App>((resolve, reject, notify) => {
-            var app = <App>{ name: appName, description: description };
+            var app = <App>{ name: appName };
             var requester = (this._authedAgent ? this._authedAgent : request);
 
             var req = requester.post(this.serverUrl + "/apps/");
@@ -589,9 +589,9 @@ export class AccountManager {
     }
 
     // Deployments
-    public addDeployment(appId: string, name: string, description?: string): Promise<Deployment> {
+    public addDeployment(appId: string, name: string): Promise<Deployment> {
         return Promise<Deployment>((resolve, reject, notify) => {
-            var deployment = <Deployment>{ name: name, description: description };
+            var deployment = <Deployment>{ name: name };
 
             var requester = (this._authedAgent ? this._authedAgent : request);
             var req = requester.post(this.serverUrl + "/apps/" + appId + "/deployments/");;
@@ -838,10 +838,10 @@ export class AccountManager {
         });
     }
 
-    public rollbackPackage(appId: string, deploymentId: string): Promise<void> {
+    public rollbackPackage(appId: string, deploymentId: string, targetRelease?: string): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.post(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/rollback");
+            var req = requester.post(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/rollback/" + (targetRelease || ""));
             this.attachCredentials(req, requester);
 
             req.end((err: any, res: request.Response) => {

@@ -2,6 +2,7 @@
 import * as cli from "../definitions/cli";
 import * as chalk from "chalk";
 import * as updateNotifier from "update-notifier";
+import backslash = require("backslash");
 
 var packageJson = require("../package.json");
 const USAGE_PREFIX = "Usage: code-push";
@@ -201,7 +202,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName>")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
             .example("promote MyApp Staging Production", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\"");
-            
+
         addCommonConfiguration(yargs);
     })
     .command("collaborator", "View and manage collaborators for a given app", (yargs: yargs.Argv) => {
@@ -225,10 +226,12 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         addCommonConfiguration(yargs);
     })
     .command("rollback", "Performs a rollback on the latest package of a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " rollback <appName> <deploymentName>")
+        yargs.usage(USAGE_PREFIX + " rollback <appName> <deploymentName> [--targetRelease <releaseLabel>]")
             .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
-            .example("rollback MyApp Production", "Perform a rollback on the \"Production\" deployment of \"MyApp\"");
-            
+            .example("rollback MyApp Production", "Perform a rollback on the \"Production\" deployment of \"MyApp\"")
+            .example("rollback MyApp Production --targetRelease v4", "Perform a rollback on the \"Production\" deployment of \"MyApp\" to the v4 release.")
+            .option("targetRelease", { alias: "r", default: null, demand: false, description: "The label of the release to be rolled back to (e.g. v4)", type: "string" });
+
         addCommonConfiguration(yargs);
     })
     .command("deployment", "View and manage the deployments for your apps", (yargs: yargs.Argv) => {
@@ -321,7 +324,7 @@ function createCommand(): cli.ICommand {
                             (<cli.IAccessKeyAddCommand>cmd).description = arg2;
                         }
                         break;
-                        
+
                     case "list":
                     case "ls":
                         cmd = { type: cli.CommandType.accessKeyList };
@@ -487,9 +490,9 @@ function createCommand(): cli.ICommand {
 
             case "logout":
                 cmd = { type: cli.CommandType.logout };
-                
+
                 var logoutCommand = <cli.ILogoutCommand>cmd;
-                
+
                 logoutCommand.isLocal = argv["local"];
                 break;
 
@@ -512,7 +515,7 @@ function createCommand(): cli.ICommand {
 
                 registerCommand.serverUrl = getServerUrl(arg1);
                 break;
-            
+
             case "release":
                 if (arg1 && arg2 && arg3) {
                     cmd = { type: cli.CommandType.release };
@@ -523,7 +526,7 @@ function createCommand(): cli.ICommand {
                     releaseCommand.package = arg2;
                     releaseCommand.appStoreVersion = arg3;
                     releaseCommand.deploymentName = argv["deploymentName"];
-                    releaseCommand.description = argv["description"];
+                    releaseCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseCommand.mandatory = argv["mandatory"];
                 }
                 break;
@@ -532,10 +535,11 @@ function createCommand(): cli.ICommand {
                 if (arg1 && arg2) {
                     cmd = { type: cli.CommandType.rollback };
 
-                    var deploymentRollbackCommand = <cli.IRollbackCommand>cmd;
+                    var rollbackCommand = <cli.IRollbackCommand>cmd;
 
-                    deploymentRollbackCommand.appName = arg1;
-                    deploymentRollbackCommand.deploymentName = arg2;
+                    rollbackCommand.appName = arg1;
+                    rollbackCommand.deploymentName = arg2;
+                    rollbackCommand.targetRelease = argv["targetRelease"];
                 }
                 break;
         }

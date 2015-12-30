@@ -83,7 +83,8 @@ export class AcquisitionManager {
             deploymentKey: this._deploymentKey,
             appVersion: currentPackage.appVersion,
             packageHash: currentPackage.packageHash,
-            isCompanion: this._ignoreAppVersion
+            isCompanion: this._ignoreAppVersion,
+            label: currentPackage.label
         };
 
         var requestUrl: string = this._serverUrl + "updateCheck?" + queryStringify(updateRequest);
