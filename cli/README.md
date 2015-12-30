@@ -14,7 +14,7 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
 1. Create a [CodePush account](#account-creation) push using the CodePush CLI
 2. Register your [app](#app-management) with the service, and optionally create any additional [deployments](#deployment-management)
 3. CodePush-ify your app and point it at the deployment you wish to use ([Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push))
-4. [Deploy](#update-deployment) an update for your registered app
+4. [Deploy](#releasing-app-updates) an update for your registered app
 5. Live long and prosper! ([details](https://en.wikipedia.org/wiki/Vulcan_salute))
 
 ## Account creation
@@ -156,13 +156,13 @@ It's important that the path you specify refers to the platform-specific, prepar
 | Cordova (iOS)                | `cordova prepare ios`                                                                                                                                  | `./platforms/ios/www ` directory          																	 |
 | React Native (Android)       | `react-native bundle --platform android --entry-file <entryFile> --bundle-output <bundleOutput> --dev false`                                           | Value of the `--bundle-output` option      																 |
 | React Native wo/assets (iOS) | `react-native bundle --platform ios --entry-file <entryFile> --bundle-output <bundleOutput> --dev false`                                               | Value of the `--bundle-output` option                                                                       |
-| React Native w/assets (iOS)  | `react-native bundle --platform ios --entry-file <entryFile> --bundle-output <releaseFolder>/<bundleOutput> --assets-dest <releaseFolder> --dev false` | Value of the `--assets-dest` option, which should be a created directory includes your assets and JS bundle |
+| React Native w/assets (iOS)  | `react-native bundle --platform ios --entry-file <entryFile> --bundle-output <releaseFolder>/<bundleOutput> --assets-dest <releaseFolder> --dev false` | Value of the `--assets-dest` option, which should represent a newly created directory that includes your assets and JS bundle |
 
 *NOTE: Our support for React Native on Android doesn't currently support distributing updates to assets.*
  
 ### App store version parameter
 
-This specifies the semver compliant store/binary version of the application you are releasing the update for. Only users running this **exact version** will receive the update. This is important if your JavaScript/etc. takes a dependency on a new capabilitiy of the native side of your app (e.g. a Cordova plugin), and therefore, requires the user to update to the latest version from the app store before being able to get it.
+This specifies the semver compliant store/binary version of the application you are releasing the update for. Only users running this **exact version** will receive the update. This is important if your JavaScript takes a dependency on a new capability of the native side of your app (e.g. a Cordova plugin), and therefore, requires the user to update to the latest version from the app store before being able to get it.
 
 The following table outlines the value that CodePush expects you to provide for each respective app type:
 
