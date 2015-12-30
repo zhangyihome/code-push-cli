@@ -182,7 +182,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName>")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
             .example("promote MyApp Staging Production", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\"");
-            
+
         addCommonConfiguration(yargs);
     })
     .command("rollback", "Performs a rollback on the latest package of a specific deployment", (yargs: yargs.Argv) => {
@@ -284,7 +284,7 @@ function createCommand(): cli.ICommand {
                             (<cli.IAccessKeyAddCommand>cmd).description = arg2;
                         }
                         break;
-                        
+
                     case "list":
                     case "ls":
                         cmd = { type: cli.CommandType.accessKeyList };
@@ -417,9 +417,9 @@ function createCommand(): cli.ICommand {
 
             case "logout":
                 cmd = { type: cli.CommandType.logout };
-                
+
                 var logoutCommand = <cli.ILogoutCommand>cmd;
-                
+
                 logoutCommand.isLocal = argv["local"];
                 break;
 
@@ -442,7 +442,7 @@ function createCommand(): cli.ICommand {
 
                 registerCommand.serverUrl = getServerUrl(arg1);
                 break;
-            
+
             case "release":
                 if (arg1 && arg2 && arg3) {
                     cmd = { type: cli.CommandType.release };
@@ -453,7 +453,7 @@ function createCommand(): cli.ICommand {
                     releaseCommand.package = arg2;
                     releaseCommand.appStoreVersion = arg3;
                     releaseCommand.deploymentName = argv["deploymentName"];
-                    releaseCommand.description = backslash(argv["description"]);
+                    releaseCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseCommand.mandatory = argv["mandatory"];
                 }
                 break;
