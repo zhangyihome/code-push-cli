@@ -1,6 +1,6 @@
 # CodePush management CLI
 
-CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users' devices. It works by acting as a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using provided client SDKs for [Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push)). This allows you to have a more deterministic and direct engagement model with your userbase, when addressing bugs and/or adding small features that don't require you to re-build a binary and re-distribute it through the respective app stores.
+CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users' devices. It works by acting as a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using the provided client SDKs for [Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push)). This allows you to have a more deterministic and direct engagement model with your userbase, when addressing bugs and/or adding small features that don't require you to re-build a binary and re-distribute it through the respective app stores.
 
 ![CodePush CLI](https://cloud.githubusercontent.com/assets/116461/12046296/624c5d66-ae6b-11e5-9e0f-6f2f43e46eed.png)
 
@@ -146,7 +146,7 @@ code-push release <appName> <package> <appStoreVersion>
 
 ### Package parameter
 
-This specifies the location of the content you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the `/platforms/ios/www` folder for a Cordova app). You don't need to zip up multiple files or directories in order to deploy those changes, since the CLI will automatically zip them for you.
+This specifies the location of the code and assets you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the `/platforms/ios/www` folder for a Cordova app). You don't need to zip up multiple files or directories in order to deploy those changes, since the CLI will automatically zip them for you.
 
 It's important that the path you specify refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you should run before releasing, as well as the location you can subsequently point at using the `package` parameter:
 
@@ -158,11 +158,15 @@ It's important that the path you specify refers to the platform-specific, prepar
 | React Native wo/assets (iOS) | `react-native bundle --platform ios --entry-file <entryFile> --bundle-output <bundleOutput> --dev false`                                               | Value of the `--bundle-output` option                                                                       |
 | React Native w/assets (iOS)  | `react-native bundle --platform ios --entry-file <entryFile> --bundle-output <releaseFolder>/<bundleOutput> --assets-dest <releaseFolder> --dev false` | Value of the `--assets-dest` option, which should represent a newly created directory that includes your assets and JS bundle |
 
-*NOTE: Our support for React Native on Android doesn't currently support distributing updates to assets.*
+*NOTE: Our support for React Native on Android doesn't currently support distributing updates to assets. This will be coming soon!*
  
 ### App store version parameter
 
-This specifies the semver compliant store/binary version of the application you are releasing the update for. Only users running this **exact version** will receive the update. This is important if your JavaScript takes a dependency on a new capability of the native side of your app (e.g. a Cordova plugin), and therefore, requires the user to update to the latest version from the app store before being able to get it.
+This specifies the semver compliant (e.g. `1.0.0` not `1.0`) store/binary version of the application you are releasing the update for. Only users running this **exact version** will receive the update. Users running an older and/or newer version of the app binary will not receive this update, for the following reasons:
+
+1. If a user is running an older binary version, it's possible that there are breaking changes in the CodePush update that wouldn't be compatible with what they're running.
+
+2. If a user is running a newer binary version, then it's presumed that what they are running is newer (and potentially imcompatible) with the CodePush update.  
 
 The following table outlines the value that CodePush expects you to provide for each respective app type:
 
