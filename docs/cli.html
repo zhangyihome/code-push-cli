@@ -330,7 +330,7 @@
                     <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/CLI.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
                 </header>  
                 <article class="doc-content">               
-                    <p><img src="https://cloud.githubusercontent.com/assets/696206/11605036/5a934e56-9aaa-11e5-87ad-01cddeaf07dc.PNG" alt="CodePush CLI"></p>
+                    <p><img src="https://cloud.githubusercontent.com/assets/116461/12046296/624c5d66-ae6b-11e5-9e0f-6f2f43e46eed.png" alt="CodePush CLI"></p>
 
 <h2>Installation</h2>
 
@@ -345,7 +345,7 @@
 <li>Create a <a href="#account-creation">CodePush account</a> push using the CodePush CLI</li>
 <li>Register your <a href="#app-management">app</a> with the service, and optionally create any additional <a href="#deployment-management">deployments</a></li>
 <li>CodePush-ify your app and point it at the deployment you wish to use (<a href="http://github.com/Microsoft/cordova-plugin-code-push">Cordova</a> and <a href="http://github.com/Microsoft/react-native-code-push">React Native</a>)</li>
-<li><a href="#update-deployment">Deploy</a> an update for your registered app</li>
+<li><a href="#releasing-app-updates">Deploy</a> an update for your registered app</li>
 <li>Live long and prosper! (<a href="https://en.wikipedia.org/wiki/Vulcan_salute">details</a>)</li>
 </ol>
 
@@ -387,9 +387,13 @@ code-push access-key rm &lt;accessKey&gt;
 <p>Before you can deploy any updates, you need to register an app with the CodePush service using the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push app add &lt;appName&gt;
 </code></pre></div>
-<p>All new apps automatically come with two deployments (Staging and Production) so that you can begin distributing updates to multiple channels without needing to do anything extra (see deployment instructions below). After you create an app, the CLI will output the deployment keys for the Staging and Production channels, which you can begin using to configure your clients via their respective SDKs (details for <a href="http://github.com/cordova-plugin-code-push">Cordova</a> and <a href="http://github.com/react-native-code-push">React Native</a>).</p>
+<p>If your app targets both iOS and Android, we recommend creating separate apps with CodePush. One for each platform. This way, you can manage and release updates to them seperately, which in the long run, tends to make things simpler. The naming convention that most folks use is to suffix the app name with <code>-iOS</code> and <code>-Android</code>. For example:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push app add MyApp-Android
+code-push app add MyApp-iOS
+</code></pre></div>
+<p>All new apps automatically come with two deployments (<code>Staging</code> and <code>Production</code>) so that you can begin distributing updates to multiple channels without needing to do anything extra (see deployment instructions below). After you create an app, the CLI will output the deployment keys for the <code>Staging</code> and <code>Production</code> deployments, which you can begin using to configure your mobile clients via their respective SDKs (details for <a href="http://github.com/Microsoft/cordova-plugin-code-push">Cordova</a> and <a href="http://github.com/Microsoft/react-native-code-push">React Native</a>).</p>
 
-<p>If you don&rsquo;t like the name you gave an app, you can rename it using the following command:</p>
+<p>If you decide that you don&rsquo;t like the name you gave to an app, you can rename it at any time using the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push app rename &lt;appName&gt; &lt;newAppName&gt;
 </code></pre></div>
 <p>The app&rsquo;s name is only meant to be recognizeable from the management side, and therefore, you can feel free to rename it as neccessary. It won&rsquo;t actually impact the running app, since update queries are made via deployment keys.</p>
@@ -397,7 +401,7 @@ code-push access-key rm &lt;accessKey&gt;
 <p>If at some point you no longer need an app, you can remove it from the server using the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push app rm &lt;appName&gt;
 </code></pre></div>
-<p>Do this with caution since any apps that have been configured to use it will obviously stop receiving updates.</p>
+<p>Do this with caution since any apps that have been configured to use it will obviously stop receiving updates. </p>
 
 <p>Finally, if you want to list all apps that you&rsquo;ve registered with the CodePush server,
 you can run the following command:</p>
@@ -405,7 +409,13 @@ you can run the following command:</p>
 </code></pre></div>
 <h2>Deployment management</h2>
 
-<p>As mentioned above, every created app automatically includes two deployments: <strong>Staging</strong> and <strong>Production</strong>. This allows you to have multiple versions of your app in flight at any given time, while still using the CodePush server to distribute the updates. If having a staging and production version of your app is enough to meet your needs, then you don&rsquo;t need to do anything else. However, if you want an alpha, dev, etc. deployment, you can easily create them using the following command:</p>
+<p>From the CodePush perspective, an app is simply a named grouping for one or more things called &ldquo;deployments&rdquo;. While the app represents a conceptual &ldquo;namespace&rdquo; or &ldquo;scope&rdquo; for a platform-specific version of an app (e.g. the iOS port of Foo app), it&rsquo;s deployments represent the actual target for releasing updates (for developers) and synchronizing updates (for end-users). Deployments allow you to have multiple &ldquo;environments&rdquo; for each app in-flight at any given time, and help model the reality that apps typically move from a dev&rsquo;s personal environment to a testing/QA/staging environment, before finally making their way into production.</p>
+
+<p><em>NOTE: As you&rsquo;ll see below, the <code>release</code>, <code>promote</code> and <code>rollback</code> commands require both an app name and a deployment name is order to work, because it is the combination of the two that uniquely identifies a point of distribution (e.g. I want to release an update of my iOS app to my beta testers).</em></p>
+
+<p>Whenever an app is registered with the CodePush service, it includes two deployments by default: <code>Staging</code> and <code>Production</code>. This allows you to immediately begin releasing updates to an internal environment, where you can thoroughly test each update before pushing them out to your end-users. This workflow is critical for ensuring your releases are ready for mass-consumption, and is a practice that has been established in the web for a long time.</p>
+
+<p>If having a staging and production version of your app is enough to meet your needs, then you don&rsquo;t need to do anything else. However, if you want an alpha, dev, etc. deployment, you can easily create them using the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment add &lt;appName&gt; &lt;deploymentName&gt;
 </code></pre></div>
 <p>Just like with apps, you can remove, rename and list deployments as well, using the following commands respectively:</p>
@@ -423,7 +433,7 @@ code-push deployment ls &lt;appName&gt;
 </code></pre></div>
 <h3>Package parameter</h3>
 
-<p>This specifies the location of the content you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the <code>/platforms/ios/www</code> folder for a Cordova app). You don&rsquo;t need to zip up multiple files or directories in order to deploy those changes, since the CLI will automatically zip them for you.</p>
+<p>This specifies the location of the code and assets you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the <code>/platforms/ios/www</code> folder for a Cordova app). You don&rsquo;t need to zip up multiple files or directories in order to deploy those changes, since the CLI will automatically zip them for you.</p>
 
 <p>It&rsquo;s important that the path you specify refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you should run before releasing, as well as the location you can subsequently point at using the <code>package</code> parameter:</p>
 
@@ -446,19 +456,31 @@ code-push deployment ls &lt;appName&gt;
 </tr>
 <tr>
 <td>React Native (Android)</td>
-<td><code>react-native bundle --platform android --entry-file &lt;entryFile&gt; --bundle-output &lt;bundleOutput&gt;</code></td>
+<td><code>react-native bundle --platform android --entry-file &lt;entryFile&gt; --bundle-output &lt;bundleOutput&gt; --dev false</code></td>
 <td>Value of the <code>--bundle-output</code> option</td>
 </tr>
 <tr>
-<td>React Native (iOS)</td>
-<td><code>react-native bundle --platform ios --entry-file &lt;entryFile&gt; --bundle-output &lt;bundleOutput&gt;</code></td>
+<td>React Native wo/assets (iOS)</td>
+<td><code>react-native bundle --platform ios --entry-file &lt;entryFile&gt; --bundle-output &lt;bundleOutput&gt; --dev false</code></td>
 <td>Value of the <code>--bundle-output</code> option</td>
+</tr>
+<tr>
+<td>React Native w/assets (iOS)</td>
+<td><code>react-native bundle --platform ios --entry-file &lt;entryFile&gt; --bundle-output &lt;releaseFolder&gt;/&lt;bundleOutput&gt; --assets-dest &lt;releaseFolder&gt; --dev false</code></td>
+<td>Value of the <code>--assets-dest</code> option, which should represent a newly created directory that includes your assets and JS bundle</td>
 </tr>
 </tbody></table>
 
+<p><em>NOTE: Our support for React Native on Android doesn&rsquo;t currently support distributing updates to assets. This will be coming soon!</em></p>
+
 <h3>App store version parameter</h3>
 
-<p>This specifies the semver compliant store/binary version of the application you are releasing the update for. Only users running this exact version will receive the update. This is important if your JavaScript/etc. takes a dependency on a new capabilitiy of the native side of your app (e.g. a Cordova plugin), and therefore, requires the user to update to the latest version from the app store before being able to get it.</p>
+<p>This specifies the semver compliant (e.g. <code>1.0.0</code> not <code>1.0</code>) store/binary version of the application you are releasing the update for. Only users running this <strong>exact version</strong> will receive the update. Users running an older and/or newer version of the app binary will not receive this update, for the following reasons:</p>
+
+<ol>
+<li><p>If a user is running an older binary version, it&rsquo;s possible that there are breaking changes in the CodePush update that wouldn&rsquo;t be compatible with what they&rsquo;re running.</p></li>
+<li><p>If a user is running a newer binary version, then it&rsquo;s presumed that what they are running is newer (and potentially imcompatible) with the CodePush update.  </p></li>
+</ol>
 
 <p>The following table outlines the value that CodePush expects you to provide for each respective app type:</p>
 
@@ -490,40 +512,462 @@ code-push deployment ls &lt;appName&gt;
 
 <h3>Description parameter</h3>
 
-<p>This provides an optional &ldquo;change log&rdquo; for the deployment. The value is simply roundtripped to the client so that when the update is detected, your app can choose to display it to the end-user.</p>
+<p>This provides an optional &ldquo;change log&rdquo; for the deployment. The value is simply roundtripped to the client so that when the update is detected, your app can choose to display it to the end-user (e.g. via a &ldquo;What&rsquo;s new?&rdquo; dialog). This string accepts control characters such as <code>\n</code> and <code>\t</code> so that you can include whitespace formatting within your descriptions for improved readability.</p>
 
 <p><em>NOTE: This parameter can be set using either &ldquo;&ndash;description&rdquo; or &ldquo;-desc&rdquo;</em></p>
 
 <h3>Mandatory parameter</h3>
 
-<p>This specifies whether the update is mandatory or not (<strong>true</strong> or <strong>false</strong>). The value is simply roundtripped to the client,
-who can decide to actually enforce it or not. The default value is <strong>false</strong>.</p>
+<p>This specifies whether the update should be considered mandatory or not (e.g. it includes a critical security fix). This attribute is simply roundtripped to the client, who can then decide if and how they would like to enforce it.</p>
+
+<p><em>NOTE: This parameter is simply a &ldquo;flag&rdquo;, and therefore, it&rsquo;s absence indicates that the release is optional, and it&rsquo;s presence indicates that it&rsquo;s mandatory. You can provide a value to it (e.g. <code>--mandatory true</code>), however, simply specifying <code>--mandatory</code> is sufficient for marking a release as mandatory.</em></p>
+
+<p>The mandatory attribute is unique because the server will dynamically modify it as neccessary in order to ensure that the semantics of your releases are maintained for your end-users. For example, imagine that you released the following three updates to your app:</p>
+
+<table><thead>
+<tr>
+<th>Release</th>
+<th>Mandatory?</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>v1</td>
+<td>No</td>
+</tr>
+<tr>
+<td>v2</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>v3</td>
+<td>No</td>
+</tr>
+</tbody></table>
+
+<p>If an end-user is currently running <code>v1</code>, and they query the server for an update, it wil respond with <code>v3</code> (since that is the latest), but it will dynamically convert the release to mandatory, since a mandatory update was released in between. This behavior is important since the code contained in <code>v3</code> is incremental to that included in <code>v2</code>, and therefore, whatever made <code>v2</code> mandatory, continues to make <code>v3</code> mandatory for anyone that didn&rsquo;t already acquire <code>v2</code>.</p>
+
+<p>If an end-user is currently running <code>v2</code>, and they query the server for an update, it will respond with <code>v3</code>, but leave the release as optional. This is because they already received the mandatory update, and therefore, there isn&rsquo;t a need to modify the policy of <code>v3</code>. This behavior is why we say that the server will &ldquo;dynamically convert&rdquo; the mandatory flag, because as far as the release goes, it&rsquo;s mandatory attribute will always be stored using the value you specified when releasing it. It is only changed on-the-fly as neccesary when responding to an update check from an end-user.</p>
+
+<p>If you never release an update that is marked as mandatory, then the above behavior doesn&rsquo;t apply to you, since the server will never change an optional release to mandatory unless there were intermingled mandatory updates as illustrated above. Additionally, if a release is marked as mandatory, it will never be converted to optional, since that wouldn&rsquo;t make any sense. The server will only change an optional release to mandatory in order to respect the semantics described above.</p>
 
 <p><em>NOTE: This parameter can be set using either &ldquo;&ndash;mandatory&rdquo; or &ldquo;-m&rdquo;</em></p>
 
 <h2>Promoting updates across deployments</h2>
 
-<p>Once you&rsquo;ve tested an update against a specific deployment, and you want to promote it &ldquo;downstream&rdquo; (e.g. dev-&gt;staging, staging-&gt;production), you can simply use the following command to copy the code and metadata (e.g. mandatory, description, app store version) from one deployment to another:</p>
+<p>Once you&rsquo;ve tested an update against a specific deployment (e.g. <code>Staging</code>), and you want to promote it &ldquo;downstream&rdquo; (e.g. dev-&gt;staging, staging-&gt;production), you can simply use the following command to copy the release from one deployment to another:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push promote &lt;appName&gt; &lt;sourceDeploymentName&gt; &lt;destDeploymentName&gt;
 code-push promote MyApp Staging Production
 </code></pre></div>
-<p>The release produced by a promotion will be annotated in the output of the <code>deployment history</code> command.</p>
+<p>The <code>promote</code> command wil create a new release for the destination deployment, which includes the <strong>exact code and metadata</strong> (description, mandatory and app store version) from the latest release of the source deployment. While you could use the <code>release</code> command to &ldquo;manually&rdquo; migrate an update from one environment to another, the <code>promote</code> command has the following benefits:</p>
+
+<ol>
+<li><p>It&rsquo;s quicker, since you don&rsquo;t need to re-assemble the release assets you want to publish or remember the description/app store version that are associated with the source deployment&rsquo;s release.</p></li>
+<li><p>It&rsquo;s less error-prone, since the promote operartion ensures that the exact thing that you already tested in the source deployment (e.g. <code>Staging</code>) will become active in the destination deployment (e.g. <code>Production</code>). </p></li>
+</ol>
+
+<p>We recommend that all users take advantage of the automatically created <code>Staging</code> and <code>Production</code> environments, and do all releases directly to <code>Staging</code>, and then perform a <code>promote</code> from <code>Staging</code> to <code>Production</code> after performing the appropriate testing.</p>
+
+<p><em>NOTE: The release produced by a promotion will be annotated in the output of the <code>deployment history</code> command to help identify them more easily.</em></p>
 
 <h2>Rolling back undesired updates</h2>
 
-<p>If you release an update that is broken or contains unintended features, it is easy to roll it back using the <code>rollback</code> command:</p>
+<p>A deployment&rsquo;s release history is immutable, so you cannot delete or remove an update once it has been released. However, if you release an update that is broken or contains unintended features, it is easy to roll it back using the <code>rollback</code> command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push rollback &lt;appName&gt; &lt;deploymentName&gt;
 code-push rollback MyApp Production
 </code></pre></div>
-<p>This has the effect of issuing another release with the same contents and metadata as the version prior to the latest one. Note that this means that issuing a second consecutive <code>rollback</code> command simply cancels out the first one.</p>
+<p>This has the effect of creating a new release for the deployment that includes the <strong>exact same code and metadata</strong> as the version prior to the latest one. For example, imagine that you released the following updates to your app:</p>
 
-<p>The release produced by a rollback will be annotated in the output of the <code>deployment history</code> command.</p>
+<table><thead>
+<tr>
+<th>Release</th>
+<th>Description</th>
+<th>Mandatory</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>v1</td>
+<td>Initial release!</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>v2</td>
+<td>Added new feature</td>
+<td>No</td>
+</tr>
+<tr>
+<td>v3</td>
+<td>Bug fixes</td>
+<td>Yes</td>
+</tr>
+</tbody></table>
+
+<p>If you ran the <code>rollback</code> command on that deployment, a new release (<code>v4</code>) would be created that included the contents of the <code>v2</code> release. </p>
+
+<table><thead>
+<tr>
+<th>Release</th>
+<th>Description</th>
+<th>Mandatory</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>v1</td>
+<td>Initial release!</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>v2</td>
+<td>Added new feature</td>
+<td>No</td>
+</tr>
+<tr>
+<td>v3</td>
+<td>Bug fixes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>v4 (Rollback from v3 to v2)</td>
+<td>Added new feature</td>
+<td>No</td>
+</tr>
+</tbody></table>
+
+<p>End-users that had already acquired <code>v3</code> would now be &ldquo;moved back&rdquo; to <code>v2</code> when the app performs an update check. Additionally, any users that were still running <code>v2</code>, and therefore, had never acquired <code>v3</code>, wouldn&rsquo;t receive an update since they are already running the latest release (this is why our update check uses the package hash in addition to the release label).</p>
+
+<p>If you would like to rollback a deployment to a release other than the previous (e.g. <code>v3</code> -&gt; <code>v2</code>), you can specify the optional <code>--targetRelease</code> parameter:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push rollback MyApp Production --targetRelease v34
+</code></pre></div>
+<p><em>NOTE: The release produced by a rollback will be annotated in the output of the <code>deployment history</code> command to help identify them more easily.</em></p>
 
 <h2>Viewing release history</h2>
 
 <p>You can view a history of the 50 most recent releases for a specific app deployment using the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment history &lt;appName&gt; &lt;deploymentName&gt;
 </code></pre></div>
+<p>The history will display all attributes about each release (e.g. label, mandatory) as well as indicate if any releases were made due to a promotion or a rollback operation.</p>
+
+<p><img src="https://cloud.githubusercontent.com/assets/696206/11605068/14e440d0-9aab-11e5-8837-69ab09bfb66c.PNG" alt="Deployment History"></p>
+
+<p><em>NOTE: The history command can also be run using the &ldquo;h&rdquo; alias</em># CodePush management CLI</p>
+
+<p>CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users&rsquo; devices. It works by acting as a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using the provided client SDKs for <a href="http://github.com/Microsoft/cordova-plugin-code-push">Cordova</a> and <a href="http://github.com/Microsoft/react-native-code-push">React Native</a>). This allows you to have a more deterministic and direct engagement model with your userbase, when addressing bugs and/or adding small features that don&rsquo;t require you to re-build a binary and re-distribute it through the respective app stores.</p>
+
+<p><img src="https://cloud.githubusercontent.com/assets/116461/12046296/624c5d66-ae6b-11e5-9e0f-6f2f43e46eed.png" alt="CodePush CLI"></p>
+
+<h2>Installation</h2>
+
+<ul>
+<li>Install <a href="https://nodejs.org/">Node.js</a></li>
+<li>Install the CodePush CLI: <code>npm install -g code-push-cli</code></li>
+</ul>
+
+<h2>Quick Start</h2>
+
+<ol>
+<li>Create a <a href="#account-creation">CodePush account</a> push using the CodePush CLI</li>
+<li>Register your <a href="#app-management">app</a> with the service, and optionally create any additional <a href="#deployment-management">deployments</a></li>
+<li>CodePush-ify your app and point it at the deployment you wish to use (<a href="http://github.com/Microsoft/cordova-plugin-code-push">Cordova</a> and <a href="http://github.com/Microsoft/react-native-code-push">React Native</a>)</li>
+<li><a href="#releasing-app-updates">Deploy</a> an update for your registered app</li>
+<li>Live long and prosper! (<a href="https://en.wikipedia.org/wiki/Vulcan_salute">details</a>)</li>
+</ol>
+
+<h2>Account creation</h2>
+
+<p>Before you can begin releasing app updates, you need to create a CodePush account. You can do this by simply running the following command once you&rsquo;ve installed the CLI:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push register
+</code></pre></div>
+<p>This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. Once authenticated, it will create a CodePush account &ldquo;linked&rdquo; to your GitHub/MSA identity, and generate an access token you can copy/paste into the CLI in order to login.</p>
+
+<p><em>Note: After registering, you are automatically logged-in with the CLI, so until you explicitly log out, you don&rsquo;t need to login again from the same machine.</em></p>
+
+<h2>Authentication</h2>
+
+<p>Every command within the CodePush CLI requires authentication, and therefore, before you can begin managing your account, you need to login using the Github or Microsoft account you used when registering. You can do this by running the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push login
+</code></pre></div>
+<p>This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. This will generate an access token that you need to copy/paste into the CLI (it will prompt you for it). You are now succesfully authenticated and can safely close your browser window.</p>
+
+<p>When you login from the CLI, your access token (kind of like a cookie) is persisted to disk so that you don&rsquo;t have to login everytime you attempt to access your account. In order to delete this file from your computer, simply run the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push logout
+</code></pre></div>
+<p>If you forget to logout from a machine you&rsquo;d prefer not to leave a running session on (e.g. your friend&rsquo;s laptop), you can use the following commands to list and remove any &ldquo;live&rdquo; access tokens.
+The list of access keys will display the name of the machine the token was created on, as well as the time the login occurred. This should make it easy to spot keys you don&rsquo;t want to keep around.</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push access-key ls
+code-push access-key rm &lt;accessKey&gt;
+</code></pre></div>
+<p>If you need additional keys, that can be used to authenticate against the CodePush service without needing to give access to your GitHub and/or Microsoft crendentials, you can run the following command to create one (along with a description of what it is for):</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push access-key add &quot;VSO Integration&quot;
+</code></pre></div>
+<p>After creating the new key, you can specify its value using the <code>--accessKey</code> flag of the <code>login</code> command, which allows you to perform the &ldquo;headless&rdquo; authentication, as opposed to launching a browser.</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push login --accessKey &lt;accessKey&gt;
+</code></pre></div>
+<p>If you want to log out of your current session, but still be able to reuse the same key for future logins, run the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push logout --local
+</code></pre></div>
+<h2>App management</h2>
+
+<p>Before you can deploy any updates, you need to register an app with the CodePush service using the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push app add &lt;appName&gt;
+</code></pre></div>
+<p>If your app targets both iOS and Android, we recommend creating separate apps with CodePush. One for each platform. This way, you can manage and release updates to them seperately, which in the long run, tends to make things simpler. The naming convention that most folks use is to suffix the app name with <code>-iOS</code> and <code>-Android</code>. For example:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push app add MyApp-Android
+code-push app add MyApp-iOS
+</code></pre></div>
+<p>All new apps automatically come with two deployments (<code>Staging</code> and <code>Production</code>) so that you can begin distributing updates to multiple channels without needing to do anything extra (see deployment instructions below). After you create an app, the CLI will output the deployment keys for the <code>Staging</code> and <code>Production</code> deployments, which you can begin using to configure your mobile clients via their respective SDKs (details for <a href="http://github.com/Microsoft/cordova-plugin-code-push">Cordova</a> and <a href="http://github.com/Microsoft/react-native-code-push">React Native</a>).</p>
+
+<p>If you decide that you don&rsquo;t like the name you gave to an app, you can rename it at any time using the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push app rename &lt;appName&gt; &lt;newAppName&gt;
+</code></pre></div>
+<p>The app&rsquo;s name is only meant to be recognizeable from the management side, and therefore, you can feel free to rename it as neccessary. It won&rsquo;t actually impact the running app, since update queries are made via deployment keys.</p>
+
+<p>If at some point you no longer need an app, you can remove it from the server using the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push app rm &lt;appName&gt;
+</code></pre></div>
+<p>Do this with caution since any apps that have been configured to use it will obviously stop receiving updates. </p>
+
+<p>Finally, if you want to list all apps that you&rsquo;ve registered with the CodePush server,
+you can run the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push app ls
+</code></pre></div>
+<h2>Deployment management</h2>
+
+<p>From the CodePush perspective, an app is simply a named grouping for one or more things called &ldquo;deployments&rdquo;. While the app represents a conceptual &ldquo;namespace&rdquo; or &ldquo;scope&rdquo; for a platform-specific version of an app (e.g. the iOS port of Foo app), it&rsquo;s deployments represent the actual target for releasing updates (for developers) and synchronizing updates (for end-users). Deployments allow you to have multiple &ldquo;environments&rdquo; for each app in-flight at any given time, and help model the reality that apps typically move from a dev&rsquo;s personal environment to a testing/QA/staging environment, before finally making their way into production.</p>
+
+<p><em>NOTE: As you&rsquo;ll see below, the <code>release</code>, <code>promote</code> and <code>rollback</code> commands require both an app name and a deployment name is order to work, because it is the combination of the two that uniquely identifies a point of distribution (e.g. I want to release an update of my iOS app to my beta testers).</em></p>
+
+<p>Whenever an app is registered with the CodePush service, it includes two deployments by default: <code>Staging</code> and <code>Production</code>. This allows you to immediately begin releasing updates to an internal environment, where you can thoroughly test each update before pushing them out to your end-users. This workflow is critical for ensuring your releases are ready for mass-consumption, and is a practice that has been established in the web for a long time.</p>
+
+<p>If having a staging and production version of your app is enough to meet your needs, then you don&rsquo;t need to do anything else. However, if you want an alpha, dev, etc. deployment, you can easily create them using the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment add &lt;appName&gt; &lt;deploymentName&gt;
+</code></pre></div>
+<p>Just like with apps, you can remove, rename and list deployments as well, using the following commands respectively:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploymentName&gt;
+code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
+code-push deployment ls &lt;appName&gt;
+</code></pre></div>
+<h2>Releasing app updates</h2>
+
+<p>Once your app has been configured to query for updates against the CodePush service&ndash;using your desired deployment&ndash;you can begin pushing updates to it using the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push release &lt;appName&gt; &lt;package&gt; &lt;appStoreVersion&gt;
+[--deploymentName &lt;deploymentName&gt;]
+[--description &lt;description&gt;]
+[--mandatory]
+</code></pre></div>
+<h3>Package parameter</h3>
+
+<p>This specifies the location of the code and assets you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the <code>/platforms/ios/www</code> folder for a Cordova app). You don&rsquo;t need to zip up multiple files or directories in order to deploy those changes, since the CLI will automatically zip them for you.</p>
+
+<p>It&rsquo;s important that the path you specify refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you should run before releasing, as well as the location you can subsequently point at using the <code>package</code> parameter:</p>
+
+<table><thead>
+<tr>
+<th>Platform</th>
+<th>Prepare command</th>
+<th>Package path (relative to project root)</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Cordova (Android)</td>
+<td><code>cordova prepare android</code></td>
+<td><code>./platforms/android/assets/www</code> directory</td>
+</tr>
+<tr>
+<td>Cordova (iOS)</td>
+<td><code>cordova prepare ios</code></td>
+<td><code>./platforms/ios/www</code> directory</td>
+</tr>
+<tr>
+<td>React Native (Android)</td>
+<td><code>react-native bundle --platform android --entry-file &lt;entryFile&gt; --bundle-output &lt;bundleOutput&gt; --dev false</code></td>
+<td>Value of the <code>--bundle-output</code> option</td>
+</tr>
+<tr>
+<td>React Native wo/assets (iOS)</td>
+<td><code>react-native bundle --platform ios --entry-file &lt;entryFile&gt; --bundle-output &lt;bundleOutput&gt; --dev false</code></td>
+<td>Value of the <code>--bundle-output</code> option</td>
+</tr>
+<tr>
+<td>React Native w/assets (iOS)</td>
+<td><code>react-native bundle --platform ios --entry-file &lt;entryFile&gt; --bundle-output &lt;releaseFolder&gt;/&lt;bundleOutput&gt; --assets-dest &lt;releaseFolder&gt; --dev false</code></td>
+<td>Value of the <code>--assets-dest</code> option, which should represent a newly created directory that includes your assets and JS bundle</td>
+</tr>
+</tbody></table>
+
+<p><em>NOTE: Our support for React Native on Android doesn&rsquo;t currently support distributing updates to assets. This will be coming soon!</em></p>
+
+<h3>App store version parameter</h3>
+
+<p>This specifies the semver compliant (e.g. <code>1.0.0</code> not <code>1.0</code>) store/binary version of the application you are releasing the update for. Only users running this <strong>exact version</strong> will receive the update. Users running an older and/or newer version of the app binary will not receive this update, for the following reasons:</p>
+
+<ol>
+<li><p>If a user is running an older binary version, it&rsquo;s possible that there are breaking changes in the CodePush update that wouldn&rsquo;t be compatible with what they&rsquo;re running.</p></li>
+<li><p>If a user is running a newer binary version, then it&rsquo;s presumed that what they are running is newer (and potentially imcompatible) with the CodePush update.  </p></li>
+</ol>
+
+<p>The following table outlines the value that CodePush expects you to provide for each respective app type:</p>
+
+<table><thead>
+<tr>
+<th>Platform</th>
+<th>Source of app store version</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Cordova</td>
+<td>The <code>&lt;widget version&gt;</code> attribute in the <code>config.xml</code> file</td>
+</tr>
+<tr>
+<td>React Native (Android)</td>
+<td>The <code>android.defaultConfig.versionName</code> property in your <code>build.gradle</code> file</td>
+</tr>
+<tr>
+<td>React Native (iOS)</td>
+<td>The <code>CFBundleShortVersionString</code> key in the <code>Info.plist</code> file</td>
+</tr>
+</tbody></table>
+
+<h3>Deployment name parameter</h3>
+
+<p>This specifies which deployment you want to release the update to. This defaults to <code>Staging</code>, but when you&rsquo;re ready to deploy to <code>Production</code>, or one of your own custom deployments, just explicitly set this argument.</p>
+
+<p><em>NOTE: The parameter can be set using either &ldquo;&ndash;deploymentName&rdquo; or &ldquo;-d&rdquo;.</em></p>
+
+<h3>Description parameter</h3>
+
+<p>This provides an optional &ldquo;change log&rdquo; for the deployment. The value is simply roundtripped to the client so that when the update is detected, your app can choose to display it to the end-user (e.g. via a &ldquo;What&rsquo;s new?&rdquo; dialog). This string accepts control characters such as <code>\n</code> and <code>\t</code> so that you can include whitespace formatting within your descriptions for improved readability.</p>
+
+<p><em>NOTE: This parameter can be set using either &ldquo;&ndash;description&rdquo; or &ldquo;-desc&rdquo;</em></p>
+
+<h3>Mandatory parameter</h3>
+
+<p>This specifies whether the update should be considered mandatory or not (e.g. it includes a critical security fix). This attribute is simply roundtripped to the client, who can then decide if and how they would like to enforce it.</p>
+
+<p><em>NOTE: This parameter is simply a &ldquo;flag&rdquo;, and therefore, it&rsquo;s absence indicates that the release is optional, and it&rsquo;s presence indicates that it&rsquo;s mandatory. You can provide a value to it (e.g. <code>--mandatory true</code>), however, simply specifying <code>--mandatory</code> is sufficient for marking a release as mandatory.</em></p>
+
+<p>The mandatory attribute is unique because the server will dynamically modify it as neccessary in order to ensure that the semantics of your releases are maintained for your end-users. For example, imagine that you released the following three updates to your app:</p>
+
+<table><thead>
+<tr>
+<th>Release</th>
+<th>Mandatory?</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>v1</td>
+<td>No</td>
+</tr>
+<tr>
+<td>v2</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>v3</td>
+<td>No</td>
+</tr>
+</tbody></table>
+
+<p>If an end-user is currently running <code>v1</code>, and they query the server for an update, it wil respond with <code>v3</code> (since that is the latest), but it will dynamically convert the release to mandatory, since a mandatory update was released in between. This behavior is important since the code contained in <code>v3</code> is incremental to that included in <code>v2</code>, and therefore, whatever made <code>v2</code> mandatory, continues to make <code>v3</code> mandatory for anyone that didn&rsquo;t already acquire <code>v2</code>.</p>
+
+<p>If an end-user is currently running <code>v2</code>, and they query the server for an update, it will respond with <code>v3</code>, but leave the release as optional. This is because they already received the mandatory update, and therefore, there isn&rsquo;t a need to modify the policy of <code>v3</code>. This behavior is why we say that the server will &ldquo;dynamically convert&rdquo; the mandatory flag, because as far as the release goes, it&rsquo;s mandatory attribute will always be stored using the value you specified when releasing it. It is only changed on-the-fly as neccesary when responding to an update check from an end-user.</p>
+
+<p>If you never release an update that is marked as mandatory, then the above behavior doesn&rsquo;t apply to you, since the server will never change an optional release to mandatory unless there were intermingled mandatory updates as illustrated above. Additionally, if a release is marked as mandatory, it will never be converted to optional, since that wouldn&rsquo;t make any sense. The server will only change an optional release to mandatory in order to respect the semantics described above.</p>
+
+<p><em>NOTE: This parameter can be set using either &ldquo;&ndash;mandatory&rdquo; or &ldquo;-m&rdquo;</em></p>
+
+<h2>Promoting updates across deployments</h2>
+
+<p>Once you&rsquo;ve tested an update against a specific deployment (e.g. <code>Staging</code>), and you want to promote it &ldquo;downstream&rdquo; (e.g. dev-&gt;staging, staging-&gt;production), you can simply use the following command to copy the release from one deployment to another:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push promote &lt;appName&gt; &lt;sourceDeploymentName&gt; &lt;destDeploymentName&gt;
+code-push promote MyApp Staging Production
+</code></pre></div>
+<p>The <code>promote</code> command wil create a new release for the destination deployment, which includes the <strong>exact code and metadata</strong> (description, mandatory and app store version) from the latest release of the source deployment. While you could use the <code>release</code> command to &ldquo;manually&rdquo; migrate an update from one environment to another, the <code>promote</code> command has the following benefits:</p>
+
+<ol>
+<li><p>It&rsquo;s quicker, since you don&rsquo;t need to re-assemble the release assets you want to publish or remember the description/app store version that are associated with the source deployment&rsquo;s release.</p></li>
+<li><p>It&rsquo;s less error-prone, since the promote operartion ensures that the exact thing that you already tested in the source deployment (e.g. <code>Staging</code>) will become active in the destination deployment (e.g. <code>Production</code>). </p></li>
+</ol>
+
+<p>We recommend that all users take advantage of the automatically created <code>Staging</code> and <code>Production</code> environments, and do all releases directly to <code>Staging</code>, and then perform a <code>promote</code> from <code>Staging</code> to <code>Production</code> after performing the appropriate testing.</p>
+
+<p><em>NOTE: The release produced by a promotion will be annotated in the output of the <code>deployment history</code> command to help identify them more easily.</em></p>
+
+<h2>Rolling back undesired updates</h2>
+
+<p>A deployment&rsquo;s release history is immutable, so you cannot delete or remove an update once it has been released. However, if you release an update that is broken or contains unintended features, it is easy to roll it back using the <code>rollback</code> command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push rollback &lt;appName&gt; &lt;deploymentName&gt;
+code-push rollback MyApp Production
+</code></pre></div>
+<p>This has the effect of creating a new release for the deployment that includes the <strong>exact same code and metadata</strong> as the version prior to the latest one. For example, imagine that you released the following updates to your app:</p>
+
+<table><thead>
+<tr>
+<th>Release</th>
+<th>Description</th>
+<th>Mandatory</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>v1</td>
+<td>Initial release!</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>v2</td>
+<td>Added new feature</td>
+<td>No</td>
+</tr>
+<tr>
+<td>v3</td>
+<td>Bug fixes</td>
+<td>Yes</td>
+</tr>
+</tbody></table>
+
+<p>If you ran the <code>rollback</code> command on that deployment, a new release (<code>v4</code>) would be created that included the contents of the <code>v2</code> release. </p>
+
+<table><thead>
+<tr>
+<th>Release</th>
+<th>Description</th>
+<th>Mandatory</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>v1</td>
+<td>Initial release!</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>v2</td>
+<td>Added new feature</td>
+<td>No</td>
+</tr>
+<tr>
+<td>v3</td>
+<td>Bug fixes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>v4 (Rollback from v3 to v2)</td>
+<td>Added new feature</td>
+<td>No</td>
+</tr>
+</tbody></table>
+
+<p>End-users that had already acquired <code>v3</code> would now be &ldquo;moved back&rdquo; to <code>v2</code> when the app performs an update check. Additionally, any users that were still running <code>v2</code>, and therefore, had never acquired <code>v3</code>, wouldn&rsquo;t receive an update since they are already running the latest release (this is why our update check uses the package hash in addition to the release label).</p>
+
+<p>If you would like to rollback a deployment to a release other than the previous (e.g. <code>v3</code> -&gt; <code>v2</code>), you can specify the optional <code>--targetRelease</code> parameter:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push rollback MyApp Production --targetRelease v34
+</code></pre></div>
+<p><em>NOTE: The release produced by a rollback will be annotated in the output of the <code>deployment history</code> command to help identify them more easily.</em></p>
+
+<h2>Viewing release history</h2>
+
+<p>You can view a history of the 50 most recent releases for a specific app deployment using the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment history &lt;appName&gt; &lt;deploymentName&gt;
+</code></pre></div>
+<p>The history will display all attributes about each release (e.g. label, mandatory) as well as indicate if any releases were made due to a promotion or a rollback operation.</p>
+
 <p><img src="https://cloud.githubusercontent.com/assets/696206/11605068/14e440d0-9aab-11e5-8837-69ab09bfb66c.PNG" alt="Deployment History"></p>
 
 <p><em>NOTE: The history command can also be run using the &ldquo;h&rdquo; alias</em></p>
