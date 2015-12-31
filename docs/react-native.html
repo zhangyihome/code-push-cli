@@ -802,10 +802,10 @@ codePush.sync({ updateDialog: true }, (status) =&gt; {
 
 <h5>InstallMode</h5>
 
-<p>This enum specified when you would like an installed update to actually be applied, and can be passed to either the <code>sync</code> or <code>LocalPackage.install</code> methods. It includes the following values:
-* <strong>CodePush.InstallMode.IMMEDIATE</strong> <em>(0)</em> - Indicates that you want to install the update and restart the app immediately. This value is appropriate for debugging scenarios as well as when displaying an update prompt to the user, since they would expect to see the changes immediately after accepting the installation.</p>
+<p>This enum specified when you would like an installed update to actually be applied, and can be passed to either the <code>sync</code> or <code>LocalPackage.install</code> methods. It includes the following values:</p>
 
 <ul>
+<li><p><strong>CodePush.InstallMode.IMMEDIATE</strong> <em>(0)</em> - Indicates that you want to install the update and restart the app immediately. This value is appropriate for debugging scenarios as well as when displaying an update prompt to the user, since they would expect to see the changes immediately after accepting the installation.</p></li>
 <li><p><strong>CodePush.InstallMode.ON_NEXT_RESTART</strong> <em>(1)</em> - Indicates that you want to install the update, but not forcibly restart the app. When the app is &ldquo;naturally&rdquo; restarted (due the OS or end user killing it), the update will be seamlessly picked up. This value is appropriate when performing silent updates, since it would likely be disruptive to the end user if the app suddenly restarted out of nowhere, since they wouldn&rsquo;t have realized an update was even downloaded. This is the default mode used for both the <code>sync</code> and <code>LocalPackage.install</code> methods.</p></li>
 <li><p><strong>CodePush.InstallMode.ON_NEXT_RESUME</strong> <em>(2)</em> - Indicates that you want to install the update, but don&rsquo;t want to restart the app until the next time the end user resumes it from the background. This way, you don&rsquo;t disrupt their current session, but you can get the update in front of them sooner then having to wait for the next natural restart. This value is appropriate for silent installs that can be applied on resume in a non-invasive way.</p></li>
 </ul>

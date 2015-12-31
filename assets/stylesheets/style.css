@@ -263,6 +263,9 @@ body {
   color: black;
   overflow-x: hidden; }
 
+strong {
+  font-family: Segoe UI Bold; }
+
 @media (max-width: 767px) {
   body {
     font-size: 7px; } }
