@@ -864,12 +864,14 @@ codePush.sync({ updateDialog: true }, (status) =&gt; {
 
 <ul>
 <li><p><strong>CodePush(String deploymentKey, Activity mainActivity)</strong> - Creates a new instance of the CodePush runtime, that will be used to query the service for updates via the provided deployment key. The <code>mainActivity</code> parameter should always be set to <code>this</code> when configuring your <code>ReactInstanceManager</code> inside the <code>MainActivity</code> class. This constructor puts the CodePush runtime into &ldquo;release mode&rdquo;, so if you want to enable debugging behavior, use the following constructor instead.</p></li>
-<li><p><strong>CodePush(String deploymentKey, Activity mainActivity, bool isDebugMode)</strong> - Equivalent to the previous constructor, but allows you to specify whether you want the CodePush runtime to be in debug mode or not. When using this constructor, the <code>isDebugMode</code> parameter should always be set to <code>BuildConfig.DEBUG</code> in order to stay synchronized with your build type. When putting CodePush into debug mode, the following behaviors are enabled:</p></li>
-</ul>
-<div class="highlight"><pre><code class="language-text" data-lang="text">1. Old CodePush updates aren&#39;t deleted from storage whenever a new binary is deployed to the emulator/device. This behavior enables you to deploy new binaries, without bumping the version during development, and without continuously getting the same update every time your app calls `sync`.
+<li><p><strong>CodePush(String deploymentKey, Activity mainActivity, bool isDebugMode)</strong> - Equivalent to the previous constructor, but allows you to specify whether you want the CodePush runtime to be in debug mode or not. When using this constructor, the <code>isDebugMode</code> parameter should always be set to <code>BuildConfig.DEBUG</code> in order to stay synchronized with your build type. When putting CodePush into debug mode, the following behaviors are enabled:</p>
 
-2. The local cache that the React Native runtime maintains in debug mode is deleted whenever a CodePush update is installed. This ensures that when the app is restarted after an update is applied, you will see the expected changes. As soon as [this PR](https://github.com/facebook/react-native/pull/4738) is merged, we won&#39;t need to do this anymore.
-</code></pre></div>
+<ol>
+<li>Old CodePush updates aren&rsquo;t deleted from storage whenever a new binary is deployed to the emulator/device. This behavior enables you to deploy new binaries, without bumping the version during development, and without continuously getting the same update every time your app calls <code>sync</code>.</li>
+<li>The local cache that the React Native runtime maintains in debug mode is deleted whenever a CodePush update is installed. This ensures that when the app is restarted after an update is applied, you will see the expected changes. As soon as <a href="https://github.com/facebook/react-native/pull/4738">this PR</a> is merged, we won&rsquo;t need to do this anymore.</li>
+</ol></li>
+</ul>
+
 <h5>Methods</h5>
 
 <ul>
