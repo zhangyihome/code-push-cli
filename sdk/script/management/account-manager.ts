@@ -107,24 +107,24 @@ export class AccountManager {
             this.attachCredentials(req, request);
 
             req.end((err: any, res: request.Response) => {
-                    if (err && err.status !== 401) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
+                if (err && err.status !== 401) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
 
-                    this._authedAgent = null;
+                this._authedAgent = null;
 
-                    if (res.ok) {
-                        resolve(null);
+                if (res.ok) {
+                    resolve(null);
+                } else {
+                    var body = tryJSON(res.text);
+                    if (body) {
+                        reject(<CodePushError>body);
                     } else {
-                        var body = tryJSON(res.text);
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
                     }
-                });
+                }
+            });
         });
     }
 
@@ -135,22 +135,22 @@ export class AccountManager {
             this.attachCredentials(req, requester);
 
             req.end((err: any, res: request.Response) => {
-                    if (err && err.status !== 401) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
+                if (err && err.status !== 401) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
 
-                    var status: number = res ? res.status : err.status;
+                var status: number = res ? res.status : err.status;
 
-                    var authenticated: boolean = status === 200;
+                var authenticated: boolean = status === 200;
 
-                    if (authenticated && this._saveAuthedAgent) {
-                        this._authedAgent = request.agent();
-                        this._authedAgent.saveCookies(res);
-                    }
+                if (authenticated && this._saveAuthedAgent) {
+                    this._authedAgent = request.agent();
+                    this._authedAgent.saveCookies(res);
+                }
 
-                    resolve(authenticated);
-                });
+                resolve(authenticated);
+            });
         });
     }
 
@@ -200,26 +200,26 @@ export class AccountManager {
             this.attachCredentials(req, requester);
 
             req.end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
 
-                    var body = tryJSON(res.text);
-                    if (res.ok) {
-                        if (body) {
-                            resolve(body.accessKey);
-                        } else {
-                            reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
-                        }
+                var body = tryJSON(res.text);
+                if (res.ok) {
+                    if (body) {
+                        resolve(body.accessKey);
                     } else {
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
+                        reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
                     }
-                });
+                } else {
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
         });
     }
 
@@ -231,26 +231,26 @@ export class AccountManager {
             this.attachCredentials(req, requester);
 
             req.end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
 
-                    var body = tryJSON(res.text);
-                    if (res.ok) {
-                        if (body) {
-                            resolve(body.accessKeys);
-                        } else {
-                            reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
-                        }
+                var body = tryJSON(res.text);
+                if (res.ok) {
+                    if (body) {
+                        resolve(body.accessKeys);
                     } else {
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
+                        reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
                     }
-                });
+                } else {
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
         });
     }
 
@@ -262,22 +262,22 @@ export class AccountManager {
             this.attachCredentials(req, requester);
 
             req.end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
 
-                    if (res.ok) {
-                        resolve(null);
+                if (res.ok) {
+                    resolve(null);
+                } else {
+                    var body = tryJSON(res.text);
+                    if (body) {
+                        reject(<CodePushError>body);
                     } else {
-                        var body = tryJSON(res.text);
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
                     }
-                });
+                }
+            });
         });
     }
 
@@ -290,28 +290,28 @@ export class AccountManager {
             this.attachCredentials(req, requester);
 
             req.end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
 
-                    var body = tryJSON(res.text);
+                var body = tryJSON(res.text);
 
-                    if (res.ok) {
-                        if (body) {
-                            this.account = <Account>body.account;
-                            resolve(this.account);
-                        } else {
-                            reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
-                        }
+                if (res.ok) {
+                    if (body) {
+                        this.account = <Account>body.account;
+                        resolve(this.account);
                     } else {
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
+                        reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
                     }
-                });
+                } else {
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
         });
     }
 
@@ -353,26 +353,26 @@ export class AccountManager {
             this.attachCredentials(req, requester);
 
             req.end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
 
-                    var body = tryJSON(res.text);
-                    if (res.ok) {
-                        if (body) {
-                            resolve(body.apps);
-                        } else {
-                            reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
-                        }
+                var body = tryJSON(res.text);
+                if (res.ok) {
+                    if (body) {
+                        resolve(body.apps);
                     } else {
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
+                        reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
                     }
-                });
+                } else {
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
         });
     }
 
@@ -384,26 +384,26 @@ export class AccountManager {
             this.attachCredentials(req, requester);
 
             req.end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
 
-                    var body = tryJSON(res.text);
-                    if (res.ok) {
-                        if (body) {
-                            resolve(body.app);
-                        } else {
-                            reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
-                        }
+                var body = tryJSON(res.text);
+                if (res.ok) {
+                    if (body) {
+                        resolve(body.app);
                     } else {
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
+                        reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
                     }
-                });
+                } else {
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
         });
     }
 
@@ -452,22 +452,22 @@ export class AccountManager {
             this.attachCredentials(req, requester);
 
             req.end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
 
-                    if (res.ok) {
-                        resolve(null);
+                if (res.ok) {
+                    resolve(null);
+                } else {
+                    var body = tryJSON(res.text);
+                    if (body) {
+                        reject(<CodePushError>body);
                     } else {
-                        var body = tryJSON(res.text);
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
                     }
-                });
+                }
+            });
         });
     }
 
@@ -543,26 +543,26 @@ export class AccountManager {
             this.attachCredentials(req, requester);
 
             req.end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
 
-                    var body = tryJSON(res.text);
-                    if (res.ok) {
-                        if (body) {
-                            resolve(body.deployments);
-                        } else {
-                            reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
-                        }
+                var body = tryJSON(res.text);
+                if (res.ok) {
+                    if (body) {
+                        resolve(body.deployments);
                     } else {
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
+                        reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
                     }
-                });
+                } else {
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
         });
     }
 
@@ -573,26 +573,26 @@ export class AccountManager {
             this.attachCredentials(req, requester);
 
             req.end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
 
-                    var body = tryJSON(res.text);
-                    if (res.ok) {
-                        if (body) {
-                            resolve(body.deployment);
-                        } else {
-                            reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
-                        }
+                var body = tryJSON(res.text);
+                if (res.ok) {
+                    if (body) {
+                        resolve(body.deployment);
                     } else {
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
+                        reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
                     }
-                });
+                } else {
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
         });
     }
 
@@ -632,22 +632,22 @@ export class AccountManager {
             this.attachCredentials(req, requester);
 
             req.end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
 
-                    if (res.ok) {
-                        resolve(null);
+                if (res.ok) {
+                    resolve(null);
+                } else {
+                    var body = tryJSON(res.text);
+                    if (body) {
+                        reject(<CodePushError>body);
                     } else {
-                        var body = tryJSON(res.text);
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
                     }
-                });
+                }
+            });
         });
     }
 
@@ -782,26 +782,26 @@ export class AccountManager {
             this.attachCredentials(req, requester);
 
             req.end((err: any, res: request.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
 
-                    var body = tryJSON(res.text);
-                    if (res.ok) {
-                        if (body) {
-                            resolve(body.package);
-                        } else {
-                            reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
-                        }
+                var body = tryJSON(res.text);
+                if (res.ok) {
+                    if (body) {
+                        resolve(body.package);
                     } else {
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
+                        reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
                     }
-                });
+                } else {
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
         });
     }
 
@@ -855,10 +855,6 @@ export class AccountManager {
             appVersion: appVersion,
             isMandatory: isMandatory
         };
-    }
-
-    private generateDeploymentKey(name: string, description?: string, isPrimary?: boolean, id?: string): DeploymentKey {
-        return <DeploymentKey>{ id: id, name: name, description: description, isPrimary: !!isPrimary };
     }
 
     private attachCredentials(request: request.Request<any>, requester: request.SuperAgent<any>): void {
