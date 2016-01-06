@@ -59,7 +59,9 @@ export class SdkStub {
 
     public getDeploymentKeys(appId: string, deploymentId: string): Promise<codePush.DeploymentKey[]> {
         return Q([<codePush.DeploymentKey>{
+            description: null,
             id: "5",
+            isPrimary: true,
             key: "6",
             name: "Primary"
         }]);
@@ -88,11 +90,13 @@ export class SdkStub {
     public getPackageHistory(appId: string, deploymentId: string): Promise<codePush.Package[]> {
         return Q([
             <codePush.Package>{
+                description: null,
                 appVersion: "1.0.0",
                 isMandatory: false,
                 packageHash: "463acc7d06adc9c46233481d87d9e8264b3e9ffe60fe98d721e6974209dc71a0",
                 blobUrl: "https://fakeblobstorage.net/storagev2/blobid1",
                 uploadTime: 1447113596270,
+                size: 1,
                 label: "v1"
             },
             <codePush.Package>{
@@ -102,6 +106,7 @@ export class SdkStub {
                 packageHash: "463acc7d06adc9c46233481d87d9e8264b3e9ffe60fe98d721e6974209dc71a0",
                 blobUrl: "https://fakeblobstorage.net/storagev2/blobid2",
                 uploadTime: 1447118476669,
+                size: 2,
                 label: "v2"
             }
         ]);
@@ -472,11 +477,13 @@ describe("CLI", () => {
                 var actual: string = log.args[0][0];
                 var expected: codePush.Package[] = [
                     <codePush.Package>{
+                        description: null,
                         appVersion: "1.0.0",
                         isMandatory: false,
                         packageHash: "463acc7d06adc9c46233481d87d9e8264b3e9ffe60fe98d721e6974209dc71a0",
                         blobUrl: "https://fakeblobstorage.net/storagev2/blobid1",
                         uploadTime: 1447113596270,
+                        size: 1,
                         label: "v1"
                     },
                     <codePush.Package>{
@@ -486,6 +493,7 @@ describe("CLI", () => {
                         packageHash: "463acc7d06adc9c46233481d87d9e8264b3e9ffe60fe98d721e6974209dc71a0",
                         blobUrl: "https://fakeblobstorage.net/storagev2/blobid2",
                         uploadTime: 1447118476669,
+                        size: 2,
                         label: "v2"
                     }
                 ];

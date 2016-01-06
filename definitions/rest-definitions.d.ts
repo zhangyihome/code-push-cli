@@ -1,69 +1,70 @@
 declare module "rest-definitions" {
     export interface AccessKey {
-        id: string;
+        /*generated*/ id?: string;
         name: string;
-        createdTime: number;
         createdBy: string;
+        createdTime: number;
         description?: string;
     }
 
     export interface PackageInfo {
         appVersion: string;
         description: string;
-        label: string;
-        packageHash: string;
         isMandatory: boolean;
+        /*generated*/ label?: string;
+        /*generated*/ packageHash: string;
     }
 
     export interface UpdateCheckResponse extends PackageInfo {
-        downloadURL: string;
-        isAvailable: boolean;
-        packageSize: number;
-        updateAppVersion?: boolean;
+        /*generated*/ downloadURL: string;
+        /*generated*/ isAvailable: boolean;
+        /*generated*/ packageSize: number;
+        /*generated*/ updateAppVersion?: boolean;
     }
 
     export interface UpdateCheckRequest {
-        deploymentKey: string;
         appVersion: string;
-        packageHash: string;
+        deploymentKey: string;
         isCompanion: boolean;
         label: string;
+        packageHash: string;
     }
 
     export interface Account {
-        id: string;
-        username: string;
-        name: string;
         email: string;
+        /*generated*/ id?: string;
+        name: string;
+        /*const*/ username: string;
     }
 
     export interface App {
-        id: string;
+        /*generated*/ id?: string;
         name: string;
     }
 
     export interface Deployment {
-        id: string;
+        /*generated*/ id?: string;
         name: string;
         package?: Package
     }
 
     export interface DeploymentKey {
-        id: string;
-        key: string;
-        name: string;
         description: string;
+        /*generated*/ id?: string;
         isPrimary: boolean;
+        /*generated*/ key: string;
+        name: string;
     }
 
     export interface Package extends PackageInfo {
-        size: number;
-        blobUrl: string;
-        diffBlobUrl?: string;
-        diffAgainstPackageHash?: string;
-        uploadTime: number;
-        /*generated*/ releaseMethod?: string;       // "Upload", "Promote" or "Rollback". Unknown if unspecified
+        /*generated*/ blobUrl: string;
+        /*generated*/ diffAgainstPackageHash?: string;
+        /*generated*/ diffBlobUrl?: string;
+        /*generated*/ diffSize?: number;
         /*generated*/ originalLabel?: string;       // Set on "Promote" and "Rollback"
         /*generated*/ originalDeployment?: string;  // Set on "Promote"
+        /*generated*/ releaseMethod?: string;       // "Upload", "Promote" or "Rollback". Unknown if unspecified
+        /*generated*/ size: number;
+        /*generated*/ uploadTime: number;
     }
 }
