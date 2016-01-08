@@ -39,9 +39,8 @@ interface ILoginInfo {
 }
 
 export class AccountManager {
-    private _authedAgent: request.SuperAgent<any>;
-    private _saveAuthedAgent: boolean = false;
     private _userAgent: string;
+    private _accessKey: string;
 
     public account: Account;
     public serverUrl: string = "http://localhost:3000";
@@ -51,60 +50,28 @@ export class AccountManager {
     }
 
     constructor(serverUrl: string, userAgent: string) {
-        // If window is not defined, it means we are in the node environment and not a browser.
-        this._saveAuthedAgent = (typeof window === "undefined");
-
         this._userAgent = userAgent;
         this.serverUrl = serverUrl;
     }
 
     public loginWithAccessToken(accessToken: string): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
+            // Attempt to parse login info for backwards compatibility
             var loginInfo: ILoginInfo = AccountManager.getLoginInfo(accessToken);
-
-            var req = request.post(this.serverUrl + "/auth/login/accessToken");
-            this.attachCredentials(req, request);
-            req = req.type("form");
-
             if (loginInfo && loginInfo.providerName && loginInfo.providerUniqueId) {
-                // Login the old way.
-                req = req.send({ identity: JSON.stringify({ providerName: loginInfo.providerName, providerUniqueId: loginInfo.providerUniqueId }) })
-                    .send({ token: loginInfo.accessKeyName });
+                this._accessKey = loginInfo.accessKeyName;
             } else {
-                // Note: We can't send an empty identity string, or PassportAuth will short circuit and fail.
-                req = req.send({ identity: "accessKey" })
-                    .send({ token: accessToken });
+                this._accessKey = accessToken;
             }
 
-            req.end((err: any, res: request.Response) => {
-                if (err) {
-                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                    return;
-                }
-
-                if (this._saveAuthedAgent) {
-                    this._authedAgent = request.agent();
-                    this._authedAgent.saveCookies(res);
-                }
-
-                if (res.ok) {
-                    resolve(null);
-                } else {
-                    var body = tryJSON(res.text);
-                    if (body) {
-                        reject(<CodePushError>body);
-                    } else {
-                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                    }
-                }
-            });
+            resolve(null);
         });
     }
 
     public logout(): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             var req = request.post(this.serverUrl + "/auth/logout");
-            this.attachCredentials(req, request);
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err && err.status !== 401) {
@@ -112,7 +79,7 @@ export class AccountManager {
                     return;
                 }
 
-                this._authedAgent = null;
+                this._accessKey = null;
 
                 if (res.ok) {
                     resolve(null);
@@ -130,9 +97,8 @@ export class AccountManager {
 
     public isAuthenticated(): Promise<boolean> {
         return Promise<boolean>((resolve, reject, notify) => {
-            var requester: request.SuperAgent<any> = this._authedAgent ? this._authedAgent : request;
-            var req = requester.get(this.serverUrl + "/authenticated");
-            this.attachCredentials(req, requester);
+            var req = request.get(this.serverUrl + "/authenticated");
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err && err.status !== 401) {
@@ -141,13 +107,7 @@ export class AccountManager {
                 }
 
                 var status: number = res ? res.status : err.status;
-
                 var authenticated: boolean = status === 200;
-
-                if (authenticated && this._saveAuthedAgent) {
-                    this._authedAgent = request.agent();
-                    this._authedAgent.saveCookies(res);
-                }
 
                 resolve(authenticated);
             });
@@ -158,10 +118,9 @@ export class AccountManager {
         return Promise<AccessKey>((resolve, reject, notify) => {
             return this.generateAccessKey().then((newAccessKey: string) => {
                 var accessKey: AccessKey = { id: null, name: newAccessKey, createdTime: new Date().getTime(), createdBy: machine, description: description };
-                var requester: request.SuperAgent<any> = this._authedAgent ? this._authedAgent : request;
-                var req = requester.post(this.serverUrl + "/accessKeys/");
+                var req = request.post(this.serverUrl + "/accessKeys/");
 
-                this.attachCredentials(req, requester);
+                this.attachCredentials(req);
 
                 req.set("Content-Type", "application/json;charset=UTF-8")
                     .send(JSON.stringify(accessKey))
@@ -194,10 +153,9 @@ export class AccountManager {
 
     public getAccessKey(accessKeyId: string): Promise<AccessKey> {
         return Promise<AccessKey>((resolve, reject, notify) => {
-            var requester: request.SuperAgent<any> = this._authedAgent ? this._authedAgent : request;
-            var req = requester.get(this.serverUrl + "/accessKeys/" + accessKeyId);
+            var req = request.get(this.serverUrl + "/accessKeys/" + accessKeyId);
 
-            this.attachCredentials(req, requester);
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err) {
@@ -225,10 +183,9 @@ export class AccountManager {
 
     public getAccessKeys(): Promise<AccessKey[]> {
         return Promise<AccessKey[]>((resolve, reject, notify) => {
-            var requester: request.SuperAgent<any> = this._authedAgent ? this._authedAgent : request;
-            var req = requester.get(this.serverUrl + "/accessKeys");
+            var req = request.get(this.serverUrl + "/accessKeys");
 
-            this.attachCredentials(req, requester);
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err) {
@@ -256,10 +213,9 @@ export class AccountManager {
 
     public removeAccessKey(accessKeyId: string): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var requester: request.SuperAgent<any> = this._authedAgent ? this._authedAgent : request;
-            var req = requester.del(this.serverUrl + "/accessKeys/" + accessKeyId);
+            var req = request.del(this.serverUrl + "/accessKeys/" + accessKeyId);
 
-            this.attachCredentials(req, requester);
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err) {
@@ -284,10 +240,8 @@ export class AccountManager {
     // Account
     public getAccountInfo(): Promise<Account> {
         return Promise<Account>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-
-            var req = requester.get(this.serverUrl + "/account");
-            this.attachCredentials(req, requester);
+            var req = request.get(this.serverUrl + "/account");
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err) {
@@ -317,10 +271,8 @@ export class AccountManager {
 
     public updateAccountInfo(accountInfoToChange: Account): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-
-            var req = requester.put(this.serverUrl + "/account");
-            this.attachCredentials(req, requester);
+            var req = request.put(this.serverUrl + "/account");
+            this.attachCredentials(req);
 
             req.set("Content-Type", "application/json;charset=UTF-8")
                 .send(JSON.stringify(accountInfoToChange))
@@ -347,10 +299,8 @@ export class AccountManager {
     // Apps
     public getApps(): Promise<App[]> {
         return Promise<App[]>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-
-            var req = requester.get(this.serverUrl + "/apps");
-            this.attachCredentials(req, requester);
+            var req = request.get(this.serverUrl + "/apps");
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err) {
@@ -378,10 +328,8 @@ export class AccountManager {
 
     public getApp(appId: string): Promise<App> {
         return Promise<App>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-
-            var req = requester.get(this.serverUrl + "/apps/" + appId);
-            this.attachCredentials(req, requester);
+            var req = request.get(this.serverUrl + "/apps/" + appId);
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err) {
@@ -410,10 +358,9 @@ export class AccountManager {
     public addApp(appName: string): Promise<App> {
         return Promise<App>((resolve, reject, notify) => {
             var app = <App>{ name: appName };
-            var requester = (this._authedAgent ? this._authedAgent : request);
 
-            var req = requester.post(this.serverUrl + "/apps/");
-            this.attachCredentials(req, requester);
+            var req = request.post(this.serverUrl + "/apps/");
+            this.attachCredentials(req);
 
             req.set("Content-Type", "application/json;charset=UTF-8")
                 .send(JSON.stringify(app))
@@ -446,10 +393,8 @@ export class AccountManager {
     public removeApp(app: App | string): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             var id: string = (typeof app === "string") ? app : app.id;
-            var requester = (this._authedAgent ? this._authedAgent : request);
-
-            var req = requester.del(this.serverUrl + "/apps/" + id);
-            this.attachCredentials(req, requester);
+            var req = request.del(this.serverUrl + "/apps/" + id);
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err) {
@@ -473,9 +418,8 @@ export class AccountManager {
 
     public updateApp(infoToChange: App): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.put(this.serverUrl + "/apps/" + infoToChange.id);
-            this.attachCredentials(req, requester);
+            var req = request.put(this.serverUrl + "/apps/" + infoToChange.id);
+            this.attachCredentials(req);
 
             req.set("Content-Type", "application/json;charset=UTF-8")
                 .send(JSON.stringify(infoToChange))
@@ -504,9 +448,8 @@ export class AccountManager {
         return Promise<Deployment>((resolve, reject, notify) => {
             var deployment = <Deployment>{ name: name };
 
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.post(this.serverUrl + "/apps/" + appId + "/deployments/");;
-            this.attachCredentials(req, requester);
+            var req = request.post(this.serverUrl + "/apps/" + appId + "/deployments/");;
+            this.attachCredentials(req);
 
             req.set("Content-Type", "application/json;charset=UTF-8")
                 .send(JSON.stringify(deployment))
@@ -538,9 +481,8 @@ export class AccountManager {
 
     public getDeployments(appId: string): Promise<Deployment[]> {
         return Promise<Deployment[]>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.get(this.serverUrl + "/apps/" + appId + "/deployments");
-            this.attachCredentials(req, requester);
+            var req = request.get(this.serverUrl + "/apps/" + appId + "/deployments");
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err) {
@@ -568,9 +510,8 @@ export class AccountManager {
 
     public getDeployment(appId: string, deploymentId: string) {
         return Promise<Deployment>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId);
-            this.attachCredentials(req, requester);
+            var req = request.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId);
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err) {
@@ -598,9 +539,8 @@ export class AccountManager {
 
     public updateDeployment(appId: string, infoToChange: Deployment): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.put(this.serverUrl + "/apps/" + appId + "/deployments/" + infoToChange.id);
-            this.attachCredentials(req, requester);
+            var req = request.put(this.serverUrl + "/apps/" + appId + "/deployments/" + infoToChange.id);
+            this.attachCredentials(req);
 
             req.set("Content-Type", "application/json;charset=UTF-8")
                 .send(JSON.stringify(infoToChange))
@@ -627,9 +567,8 @@ export class AccountManager {
     public removeDeployment(appId: string, deployment: Deployment | string): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             var id: string = (typeof deployment === "string") ? deployment : deployment.id;
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.del(this.serverUrl + "/apps/" + appId + "/deployments/" + id);
-            this.attachCredentials(req, requester);
+            var req = request.del(this.serverUrl + "/apps/" + appId + "/deployments/" + id);
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err) {
@@ -653,9 +592,8 @@ export class AccountManager {
 
     public getDeploymentKeys(appId: string, deploymentId: string): Promise<DeploymentKey[]> {
         return Promise<DeploymentKey[]>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/deploymentKeys")
-            this.attachCredentials(req, requester);
+            var req = request.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/deploymentKeys")
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err) {
@@ -684,9 +622,8 @@ export class AccountManager {
     public addPackage(appId: string, deploymentId: string, fileOrPath: File | string, description: string, label: string, appVersion: string, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             var packageInfo: PackageToUpload = this.generatePackageInfo(description, label, appVersion, isMandatory);
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.put(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/package");
-            this.attachCredentials(req, requester);
+            var req = request.put(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/package");
+            this.attachCredentials(req);
 
             var file: any;
             if (typeof fileOrPath === "string") {
@@ -725,9 +662,8 @@ export class AccountManager {
 
     public promotePackage(appId: string, sourceDeploymentId: string, destDeploymentId: string): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.post(this.serverUrl + "/apps/" + appId + "/deployments/" + sourceDeploymentId + "/promote/" + destDeploymentId);
-            this.attachCredentials(req, requester);
+            var req = request.post(this.serverUrl + "/apps/" + appId + "/deployments/" + sourceDeploymentId + "/promote/" + destDeploymentId);
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err) {
@@ -751,9 +687,8 @@ export class AccountManager {
 
     public rollbackPackage(appId: string, deploymentId: string, targetRelease?: string): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.post(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/rollback/" + (targetRelease || ""));
-            this.attachCredentials(req, requester);
+            var req = request.post(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/rollback/" + (targetRelease || ""));
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err) {
@@ -777,9 +712,8 @@ export class AccountManager {
 
     public getPackage(appId: string, deploymentId: string): Promise<Package> {
         return Promise<Package>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/package");
-            this.attachCredentials(req, requester);
+            var req = request.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/package");
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err) {
@@ -807,9 +741,8 @@ export class AccountManager {
 
     public getPackageHistory(appId: string, deploymentId: string): Promise<Package[]> {
         return Promise<Package[]>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/packageHistory");
-            this.attachCredentials(req, requester);
+            var req = request.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/packageHistory");
+            this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
                 if (err) {
@@ -857,17 +790,11 @@ export class AccountManager {
         };
     }
 
-    private attachCredentials(request: request.Request<any>, requester: request.SuperAgent<any>): void {
-        if (this._saveAuthedAgent) {
-            if (requester && requester.attachCookies) {
-                requester.attachCookies(request);
-            }
-        } else {
-            request.withCredentials();
-        }
+    private attachCredentials(request: request.Request<any>): void {
+        request.set("User-Agent", this._userAgent);
 
-        if (this._userAgent) {
-            request.set("User-Agent", this._userAgent);
+        if (this._accessKey) {
+            request.set("Authorization", "Bearer " + this._accessKey);
         }
     }
 
