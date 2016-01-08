@@ -513,9 +513,16 @@ function login(command: cli.ILoginCommand): Promise<void> {
     if (command.accessKey) {
         sdk = new AccountManager(command.serverUrl, userAgent);
         return sdk.loginWithAccessToken(command.accessKey)
-            .then((): void => {
-                // The access token is valid.
-                serializeConnectionInfo(command.serverUrl, command.accessKey);
+            .then((): Promise<boolean> => {
+                return sdk.isAuthenticated();
+            })
+            .then((isAuthenticated: boolean): void => {
+                if (isAuthenticated) {
+                    // The access token is valid.
+                    serializeConnectionInfo(command.serverUrl, command.accessKey);
+                } else {
+                    throw new Error("Invalid access token.");
+                }
             });
     } else {
         initiateExternalAuthenticationAsync(command.serverUrl, "login");
@@ -539,9 +546,15 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
             sdk = new AccountManager(serverUrl, userAgent);
 
             return sdk.loginWithAccessToken(accessToken)
-                .then((): void => {
-                    // The access token is valid.
-                    serializeConnectionInfo(serverUrl, accessToken);
+                .then((): Promise<boolean> => {
+                    return sdk.isAuthenticated();
+                })
+                .then((isAuthenticated: boolean): void => {
+                    if (isAuthenticated) {
+                        serializeConnectionInfo(serverUrl, accessToken);
+                    } else {
+                        throw new Error("Invalid access token.");
+                    }
                 });
         });
 }
