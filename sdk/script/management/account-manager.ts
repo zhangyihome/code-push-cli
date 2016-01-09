@@ -17,8 +17,8 @@ if (typeof window === "undefined") {
     }
 }
 
-import { AccessKey, Account, App, Deployment, DeploymentKey, Package } from "rest-definitions";
-export { AccessKey, Account, App, Deployment, DeploymentKey, Package };
+import { AccessKey, Account, App, Collaborator, Deployment, DeploymentKey, Package } from "rest-definitions";
+export { AccessKey, Account, App, Collaborator, Deployment, DeploymentKey, Package };
 
 export interface CodePushError {
     message?: string;
@@ -42,7 +42,6 @@ export class AccountManager {
     private _authedAgent: request.SuperAgent<any>;
     private _saveAuthedAgent: boolean = false;
     private _userAgent: string;
-
     public account: Account;
     public serverUrl: string = "http://localhost:3000";
 
@@ -500,8 +499,8 @@ export class AccountManager {
     }
 
     // Collaborators
-    public getCollaboratorsList(appId: string): Promise<App[]> {
-        return Promise<App[]>((resolve, reject, notify) => {
+    public getCollaboratorsList(appId: string): Promise<Collaborator[]> {
+        return Promise<Collaborator[]>((resolve, reject, notify) => {
             var requester = (this._authedAgent ? this._authedAgent : request);
 
             var req = requester.get(this.serverUrl + "/apps/" + appId + "/collaborators");

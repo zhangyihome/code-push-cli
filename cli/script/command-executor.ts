@@ -18,7 +18,7 @@ import * as yazl from "yazl";
 import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
-import { AccessKey, AccountManager, App, Deployment, DeploymentKey, Package } from "code-push";
+import { AccessKey, AccountManager, App, Deployment, Collaborator, DeploymentKey, Package } from "code-push";
 var packageJson = require("../package.json");
 import Promise = Q.Promise;
 var progress = require("progress");
@@ -655,15 +655,15 @@ function formatDate(unixOffset: number): string {
 function printAppList(format: string, apps: App[], deploymentLists: string[][]): void {
     if (format === "json") {
         var dataSource: any[] = apps.map((app: App, index: number) => {
-            return { "name": app.name, "deployments": deploymentLists[index] };
+            return { "name": app.name, "deployments": deploymentLists[index], "collaborators": app.collaborator };
         });
 
         printJson(dataSource);
     } else if (format === "table") {
-        var headers = ["Name", "Deployments"];
+        var headers = ["Name", "Deployments", "Collaborators"];
         printTable(headers, (dataSource: any[]): void => {
             apps.forEach((app: App, index: number): void => {
-                var row = [app.name, wordwrap(50)(deploymentLists[index].join(", "))];
+                var row = [app.name, wordwrap(50)(deploymentLists[index].join(", ")), wordwrap(50)(app.collaborator.join("\n"))];
                 dataSource.push(row);
             });
         });

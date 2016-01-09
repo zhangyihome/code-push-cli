@@ -40,6 +40,12 @@ declare module "rest-definitions" {
     export interface App {
         /*generated*/ id?: string;
         name: string;
+        /*generated*/ collaborator?: Collaborator[];
+    }
+
+    export interface Collaborator {
+        /*assigned*/ accountId?: string;
+        email: string;
     }
 
     export interface Deployment {
