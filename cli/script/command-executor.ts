@@ -47,17 +47,6 @@ interface IPackageFile {
 export var sdk: AccountManager;
 export var log = (message: string | Chalk.ChalkChain): void => console.log(message);
 
-export var loginWithAccessToken = (): Promise<void> => {
-    if (!connectionInfo) {
-        return Q.reject<void>(new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server."));
-    }
-
-    var accessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
-    sdk = new AccountManager(accessKey, userAgent, connectionInfo.serverUrl);
-
-    return Q(<void>null);
-}
-
 export var confirm = (): Promise<boolean> => {
     return Promise<boolean>((resolve, reject, notify): void => {
         prompt.message = "";
@@ -326,72 +315,81 @@ export function execute(command: cli.ICommand): Promise<void> {
 
     switch (command.type) {
         case cli.CommandType.login:
+        case cli.CommandType.register:
             if (connectionInfo) {
                 return Q.reject<void>(new Error("You are already logged in from this machine."));
             }
+            break;
 
+        default:
+            if (!connectionInfo) {
+                return Q.reject<void>(new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server."));
+            }
+
+            var accessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
+            sdk = new AccountManager(accessKey, userAgent, connectionInfo.serverUrl);
+            break;
+    }
+
+    switch (command.type) {
+        case cli.CommandType.login:
             return login(<cli.ILoginCommand>command);
+
+        case cli.CommandType.register:
+            return register(<cli.IRegisterCommand>command);
 
         case cli.CommandType.logout:
             return logout(<cli.ILogoutCommand>command);
 
-        case cli.CommandType.register:
-            return register(<cli.IRegisterCommand>command);
+        case cli.CommandType.accessKeyAdd:
+            return accessKeyAdd(<cli.IAccessKeyAddCommand>command);
+
+        case cli.CommandType.accessKeyList:
+            return accessKeyList(<cli.IAccessKeyListCommand>command);
+
+        case cli.CommandType.accessKeyRemove:
+            return accessKeyRemove(<cli.IAccessKeyRemoveCommand>command);
+
+        case cli.CommandType.appAdd:
+            return appAdd(<cli.IAppAddCommand>command);
+
+        case cli.CommandType.appList:
+            return appList(<cli.IAppListCommand>command);
+
+        case cli.CommandType.appRemove:
+            return appRemove(<cli.IAppRemoveCommand>command);
+
+        case cli.CommandType.appRename:
+            return appRename(<cli.IAppRenameCommand>command);
+
+        case cli.CommandType.deploymentAdd:
+            return deploymentAdd(<cli.IDeploymentAddCommand>command);
+
+        case cli.CommandType.deploymentList:
+            return deploymentList(<cli.IDeploymentListCommand>command);
+
+        case cli.CommandType.deploymentRemove:
+            return deploymentRemove(<cli.IDeploymentRemoveCommand>command);
+
+        case cli.CommandType.deploymentRename:
+            return deploymentRename(<cli.IDeploymentRenameCommand>command);
+
+        case cli.CommandType.deploymentHistory:
+            return deploymentHistory(<cli.IDeploymentHistoryCommand>command);
+
+        case cli.CommandType.promote:
+            return promote(<cli.IPromoteCommand>command);
+
+        case cli.CommandType.release:
+            return release(<cli.IReleaseCommand>command);
+
+        case cli.CommandType.rollback:
+            return rollback(<cli.IRollbackCommand>command);
+
+        default:
+            // We should never see this message as invalid commands should be caught by the argument parser.
+            log("Invalid command:  " + JSON.stringify(command));
     }
-
-    return loginWithAccessToken()
-        .then((): Promise<void> => {
-            switch (command.type) {
-                case cli.CommandType.accessKeyAdd:
-                    return accessKeyAdd(<cli.IAccessKeyAddCommand>command);
-
-                case cli.CommandType.accessKeyList:
-                    return accessKeyList(<cli.IAccessKeyListCommand>command);
-
-                case cli.CommandType.accessKeyRemove:
-                    return accessKeyRemove(<cli.IAccessKeyRemoveCommand>command);
-
-                case cli.CommandType.appAdd:
-                    return appAdd(<cli.IAppAddCommand>command);
-
-                case cli.CommandType.appList:
-                    return appList(<cli.IAppListCommand>command);
-
-                case cli.CommandType.appRemove:
-                    return appRemove(<cli.IAppRemoveCommand>command);
-
-                case cli.CommandType.appRename:
-                    return appRename(<cli.IAppRenameCommand>command);
-
-                case cli.CommandType.deploymentAdd:
-                    return deploymentAdd(<cli.IDeploymentAddCommand>command);
-
-                case cli.CommandType.deploymentList:
-                    return deploymentList(<cli.IDeploymentListCommand>command);
-
-                case cli.CommandType.deploymentRemove:
-                    return deploymentRemove(<cli.IDeploymentRemoveCommand>command);
-
-                case cli.CommandType.deploymentRename:
-                    return deploymentRename(<cli.IDeploymentRenameCommand>command);
-
-                case cli.CommandType.deploymentHistory:
-                    return deploymentHistory(<cli.IDeploymentHistoryCommand>command);
-
-                case cli.CommandType.promote:
-                    return promote(<cli.IPromoteCommand>command);
-
-                case cli.CommandType.release:
-                    return release(<cli.IReleaseCommand>command);
-
-                case cli.CommandType.rollback:
-                    return rollback(<cli.IRollbackCommand>command);
-
-                default:
-                    // We should never see this message as invalid commands should be caught by the argument parser.
-                    log("Invalid command:  " + JSON.stringify(command));
-            }
-        });
 }
 
 function generateRandomFilename(length: number): string {
@@ -554,9 +552,7 @@ function getAccessKeyFromConnectionInfo(connectionInfo: ILegacyLoginConnectionIn
 }
 
 function logout(command: cli.ILogoutCommand): Promise<void> {
-    if (!connectionInfo) return Q.reject<void>(new Error("You are not logged in."));
-
-    return loginWithAccessToken()
+    return Q(<void>null)
         .then((): Promise<void> => {
             if (!command.isLocal) {
                 var accessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);

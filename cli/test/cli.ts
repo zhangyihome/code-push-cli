@@ -145,7 +145,6 @@ describe("CLI", () => {
 
         sandbox.stub(cmdexec, "confirm", (): Promise<boolean> => Q(wasConfirmed));
         log = sandbox.stub(cmdexec, "log", (message: string): void => { });
-        sandbox.stub(cmdexec, "loginWithAccessToken", (): Promise<void> => Q(<void>null));
 
         cmdexec.sdk = <any>new SdkStub();
     });
