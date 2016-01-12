@@ -239,7 +239,7 @@ function listCollaborators(command: cli.ICollaboratorListCommand): Promise<void>
             throwForInvalidAppId(appId, command.appName);
 
             return sdk.getCollaboratorsList(appId)
-                .then((retrievedCollaborators: any[]): void => { //TODO: type - Collaborators[]
+                .then((retrievedCollaborators: Collaborator[]): void => { //TODO: type - Collaborators[]
                     printCollaboratorsList(command.format, retrievedCollaborators);
                 });
         });
@@ -255,7 +255,7 @@ function removeCollaborator(command: cli.ICollaboratorRemoveCommand): Promise<vo
                     if (wasConfirmed) {
                         return sdk.removeCollaborator(appId, command.email)
                             .then((): void => {
-                                log("Successfully removed the \"" + command.appName + "\" app.");
+                                log("Successfully removed collaborator with email" + command.email + "from the \"" + command.appName + "\" app.");
                             });
                     }
 
@@ -655,24 +655,24 @@ function formatDate(unixOffset: number): string {
 function printAppList(format: string, apps: App[], deploymentLists: string[][]): void {
     if (format === "json") {
         var dataSource: any[] = apps.map((app: App, index: number) => {
-            return { "name": app.name, "deployments": deploymentLists[index], "collaborators": app.collaborator };
+            return { "name": app.name, "deployments": deploymentLists[index] };
         });
 
         printJson(dataSource);
     } else if (format === "table") {
-        var headers = ["Name", "Deployments", "Collaborators"];
+        var headers = ["Name", "Deployments"];
         printTable(headers, (dataSource: any[]): void => {
             apps.forEach((app: App, index: number): void => {
-                var row = [app.name, wordwrap(50)(deploymentLists[index].join(", ")), wordwrap(50)(app.collaborator.join("\n"))];
+                var row = [app.name, wordwrap(50)(deploymentLists[index].join(", "))];
                 dataSource.push(row);
             });
         });
     }
 }
 
-function printCollaboratorsList(format: string, collaborators: any[]): void { // TODO: Type - Collaborators[]
+function printCollaboratorsList(format: string, collaborators: Collaborator[]): void {
     if (format === "json") {
-        var dataSource: any[] = collaborators.map((collaborator: any) => {
+        var dataSource: any[] = collaborators.map((collaborator: Collaborator) => {
             return { "email": collaborator.email };
         });
 
@@ -680,7 +680,7 @@ function printCollaboratorsList(format: string, collaborators: any[]): void { //
     } else if (format === "table") {
         var headers = ["Collaborators"];
         printTable(headers, (dataSource: any[]): void => {
-            collaborators.forEach((collaborator: any, index: number): void => {
+            collaborators.forEach((collaborator: Collaborator, index: number): void => {
                 var row = [collaborator.email];
                 dataSource.push(row);
             });

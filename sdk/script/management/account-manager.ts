@@ -515,7 +515,7 @@ export class AccountManager {
                 var body = tryJSON(res.text);
                 if (res.ok) {
                     if (body) {
-                        resolve(body.apps);
+                        resolve(body.collaborators);
                     } else {
                         reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
                     }
@@ -559,7 +559,6 @@ export class AccountManager {
     }
 
     public removeCollaborator(app: App | string, email: string): Promise<void> {
-        // TODO: sanitize email
         return Promise<void>((resolve, reject, notify) => {
             var id: string = (typeof app === "string") ? app : app.id;
             var requester = (this._authedAgent ? this._authedAgent : request);
