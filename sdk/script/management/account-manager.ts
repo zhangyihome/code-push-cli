@@ -5,6 +5,8 @@ import tryJSON = require("try-json");
 import Promise = Q.Promise;
 import request = require("superagent");
 
+var packageJson = require("../../package.json");
+
 declare var fs: any;
 
 if (typeof window === "undefined") {
@@ -35,11 +37,11 @@ interface PackageToUpload {
 export class AccountManager {
     private _accessKey: string;
     private _serverUrl: string;
-    private _userAgent: string; // TODO: auto-fill user agent if not specified?
+    private _userAgent: string;
 
-    constructor(accessKey: string, userAgent: string, serverUrl?: string) {
+    constructor(accessKey: string, userAgent?: string, serverUrl?: string) {
         this._accessKey = accessKey;
-        this._userAgent = userAgent;
+        this._userAgent = userAgent || (packageJson.name + "/" + packageJson.version);
         this._serverUrl = serverUrl || "https://codepush.azurewebsites.net";
     }
 
