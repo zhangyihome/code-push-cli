@@ -19,7 +19,8 @@
     promote,
     register,
     release,
-    rollback
+    rollback,
+    transfer
 }
 
 export interface ICommand {
@@ -129,4 +130,9 @@ export interface IRollbackCommand extends ICommand {
     appName: string;
     deploymentName: string;
     targetRelease: string;
+}
+
+export interface ITransferCommand extends ICommand {
+    appName: string;
+    email: string;
 }

@@ -205,6 +205,13 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
         addCommonConfiguration(yargs);
     })
+    .command("transfer", "Transfer the ownership of app from your account to another", (yargs: yargs.Argv) => {
+        yargs.usage(USAGE_PREFIX + " transfer <appName> <email>")
+            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly four non-option arguments.
+            .example("transfer MyApp foo@bar.com", "Transfer the ownership of app \"MyApp\" to an account with email \"foo@bar.com\"");
+
+        addCommonConfiguration(yargs);
+    })
     .command("collaborator", "View and manage collaborators for a given app", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         yargs.usage(USAGE_PREFIX + " collaborator <command>")
@@ -540,6 +547,17 @@ function createCommand(): cli.ICommand {
                     rollbackCommand.appName = arg1;
                     rollbackCommand.deploymentName = arg2;
                     rollbackCommand.targetRelease = argv["targetRelease"];
+                }
+                break;
+
+            case "promote":
+                if (arg1 && arg2) {
+                    cmd = { type: cli.CommandType.transfer };
+
+                    var appTransferCommand = <cli.ITransferCommand>cmd;
+
+                    appTransferCommand.appName = arg1;
+                    appTransferCommand.email = arg2;
                 }
                 break;
         }

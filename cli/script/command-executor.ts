@@ -468,6 +468,9 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.rollback:
                     return rollback(<cli.IRollbackCommand>command);
 
+                case cli.CommandType.transfer:
+                    return transfer(<cli.ITransferCommand>command);
+
                 default:
                     // We should never see this message as invalid commands should be caught by the argument parser.
                     log("Invalid command:  " + JSON.stringify(command));
@@ -932,6 +935,20 @@ function rollback(command: cli.IRollbackCommand): Promise<void> {
                 .then((): void => {
                     log("Successfully performed a rollback on the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
                 });
+        });
+}
+
+function transfer(command: cli.ITransferCommand): Promise<void> {
+    var appId: string;
+
+    return getAppId(command.appName)
+        .then((appIdResult: string): Promise<void> => {
+            throwForInvalidAppId(appIdResult, command.appName);
+            appId = appIdResult;
+            return sdk.transferApp(appId, command.email);
+        })
+        .then((): void => {
+            log("Successfully transferred the ownership of \"" + command.appName + "\" app to the account with email \"" + command.email + "\".");
         });
 }
 
