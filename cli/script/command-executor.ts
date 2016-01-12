@@ -49,7 +49,7 @@ export var log = (message: string | Chalk.ChalkChain): void => console.log(messa
 
 export var loginWithAccessToken = (): Promise<void> => {
     if (!connectionInfo) {
-        return Q.fcall(() => { throw new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server."); });
+        return Q.reject<void>(new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server."));
     }
 
     var accessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
@@ -104,7 +104,7 @@ function accessKeyList(command: cli.IAccessKeyListCommand): Promise<void> {
 function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
     var loggedInAccessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
     if (loggedInAccessKey && command.accessKeyName === loggedInAccessKey) {
-        return Q.reject<void>("Cannot remove the access key for the current session. Please run 'code-push logout' if you would like to remove this access key.");
+        return Q.reject<void>(new Error("Cannot remove the access key for the current session. Please run 'code-push logout' if you would like to remove this access key."));
     } else {
         return getAccessKeyId(command.accessKeyName)
             .then((accessKeyId: string): Promise<void> => {
@@ -321,17 +321,13 @@ function deserializeConnectionInfo(): ILegacyLoginConnectionInfo|ILoginConnectio
     return credentialsObject;
 }
 
-function notifyAlreadyLoggedIn(): Promise<void> {
-    return Q.fcall(() => { throw new Error("You are already logged in from this machine."); });
-}
-
 export function execute(command: cli.ICommand): Promise<void> {
     connectionInfo = deserializeConnectionInfo();
 
     switch (command.type) {
         case cli.CommandType.login:
             if (connectionInfo) {
-                return notifyAlreadyLoggedIn();
+                return Q.reject<void>(new Error("You are already logged in from this machine."));
             }
 
             return login(<cli.ILoginCommand>command);
@@ -558,7 +554,7 @@ function getAccessKeyFromConnectionInfo(connectionInfo: ILegacyLoginConnectionIn
 }
 
 function logout(command: cli.ILogoutCommand): Promise<void> {
-    if (!connectionInfo) return Q.reject<void>("You are not logged in.");
+    if (!connectionInfo) return Q.reject<void>(new Error("You are not logged in."));
 
     return loginWithAccessToken()
         .then((): Promise<void> => {
