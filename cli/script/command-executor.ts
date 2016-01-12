@@ -52,11 +52,10 @@ export var loginWithAccessToken = (): Promise<void> => {
         return Q.fcall(() => { throw new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server."); });
     }
 
-    sdk = new AccountManager(connectionInfo.serverUrl, userAgent);
-
     var accessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
+    sdk = new AccountManager(accessKey, userAgent, connectionInfo.serverUrl);
 
-    return sdk.loginWithAccessKey(accessKey);
+    return Q(<void>null);
 }
 
 export var confirm = (): Promise<boolean> => {
@@ -495,17 +494,14 @@ function initiateExternalAuthenticationAsync(serverUrl: string, action: string):
 function login(command: cli.ILoginCommand): Promise<void> {
     // Check if one of the flags were provided.
     if (command.accessKey) {
-        sdk = new AccountManager(command.serverUrl, userAgent);
-        return sdk.loginWithAccessKey(command.accessKey)
-            .then((): Promise<boolean> => {
-                return sdk.isAuthenticated();
-            })
+        sdk = new AccountManager(command.accessKey, userAgent, command.serverUrl);
+        return sdk.isAuthenticated()
             .then((isAuthenticated: boolean): void => {
                 if (isAuthenticated) {
                     // The access token is valid.
                     serializeConnectionInfo(command.serverUrl, command.accessKey);
                 } else {
-                    throw new Error("Invalid access token.");
+                    throw new Error("Invalid access key.");
                 }
             });
     } else {
@@ -527,13 +523,10 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
                 throw new Error("Invalid access token.");
             }
 
-            sdk = new AccountManager(serverUrl, userAgent);
             var accessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
+            sdk = new AccountManager(accessKey, userAgent, serverUrl);
 
-            return sdk.loginWithAccessKey(accessKey)
-                .then((): Promise<boolean> => {
-                    return sdk.isAuthenticated();
-                })
+            return sdk.isAuthenticated()
                 .then((isAuthenticated: boolean): void => {
                     if (isAuthenticated) {
                         serializeConnectionInfo(serverUrl, accessToken);
@@ -547,13 +540,13 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
 function getAccessKeyFromConnectionInfo(connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo): string {
     if (!connectionInfo) return null;
 
-    var standardLoginConnectionInfo: ILegacyLoginConnectionInfo = <ILegacyLoginConnectionInfo>connectionInfo;
-    var accessKeyLoginConnectionInfo: ILoginConnectionInfo = <ILoginConnectionInfo>connectionInfo;
+    var legacyLoginConnectionInfo: ILegacyLoginConnectionInfo = <ILegacyLoginConnectionInfo>connectionInfo;
+    var loginConnectionInfo: ILoginConnectionInfo = <ILoginConnectionInfo>connectionInfo;
 
-    if (standardLoginConnectionInfo.accessKeyName) {
-        return standardLoginConnectionInfo.accessKeyName;
+    if (legacyLoginConnectionInfo.accessKeyName) {
+        return legacyLoginConnectionInfo.accessKeyName;
     } else {
-        return accessKeyLoginConnectionInfo.accessKey;
+        return loginConnectionInfo.accessKey;
     }
 }
 

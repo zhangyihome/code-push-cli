@@ -32,33 +32,22 @@ interface PackageToUpload {
     isMandatory: boolean;
 }
 
-interface ILoginInfo {
-    accessKeyName: string;
-    providerName: string;
-    providerUniqueId: string;
-}
-
 export class AccountManager {
-    private _userAgent: string;
     private _accessKey: string;
+    private _userAgent: string; // TODO: auto-fill user agent if not specified?
 
+    // TODO: why are these public? should I expose accessKey?
     public account: Account;
-    public serverUrl: string = "http://localhost:3000";
+    public serverUrl: string;
 
     public get accountId(): string {
         return this.account.id;
     }
 
-    constructor(serverUrl: string, userAgent: string) {
+    constructor(accessKey: string, userAgent: string, serverUrl: string) {
+        this._accessKey = accessKey;
         this._userAgent = userAgent;
-        this.serverUrl = serverUrl;
-    }
-
-    public loginWithAccessKey(accessKey: string): Promise<void> {
-        return Promise<void>((resolve, reject, notify) => {
-            this._accessKey = accessKey;
-            resolve(null);
-        });
+        this.serverUrl = serverUrl || "https://codepush.azurewebsites.net";
     }
 
     public isAuthenticated(): Promise<boolean> {
@@ -734,15 +723,6 @@ export class AccountManager {
         });
     }
 
-    private static getLoginInfo(accessKey: string): ILoginInfo {
-        try {
-            var decoded: string = base64.decode(accessKey);
-            return tryJSON(decoded);
-        } catch (ex) {
-            return null;
-        }
-    }
-
     private getErrorMessage(error: Error, response: request.Response): string {
         return response && response.text ? response.text : error.message;
     }
@@ -758,10 +738,7 @@ export class AccountManager {
 
     private attachCredentials(request: request.Request<any>): void {
         request.set("User-Agent", this._userAgent);
-
-        if (this._accessKey) {
-            request.set("Authorization", "Bearer " + this._accessKey);
-        }
+        request.set("Authorization", "Bearer " + this._accessKey);
     }
 
     private generateAccessKey(): Promise<string> {

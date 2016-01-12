@@ -3,7 +3,7 @@
 import * as assert from "assert";
 import * as Q from "q";
 
-import {AccountManager} from "../script/management/account-manager";
+import { AccountManager } from "../script/management/account-manager";
 
 var request = require("superagent");
 
@@ -11,7 +11,7 @@ var manager: AccountManager;
 describe("Management SDK", () => {
 
     beforeEach(() => {
-        manager = new AccountManager(/*serverUrl=*/ "http://localhost", /*userAgent=*/ "unit-test/1.0.0");
+        manager = new AccountManager(/*accessKey=*/ "stub", /*userAgent=*/ "unit-test/1.0.0", /*serverUrl=*/ "http://localhost");
     });
 
     after(() => {
