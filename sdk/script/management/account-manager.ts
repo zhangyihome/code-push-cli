@@ -40,14 +40,18 @@ export class AccountManager {
     public account: Account;
     public serverUrl: string;
 
-    public get accountId(): string {
-        return this.account.id;
-    }
-
     constructor(accessKey: string, userAgent: string, serverUrl: string) {
         this._accessKey = accessKey;
         this._userAgent = userAgent;
         this.serverUrl = serverUrl || "https://codepush.azurewebsites.net";
+    }
+
+    public get accessKey(): string {
+        return this._accessKey;
+    }
+
+    public get accountId(): string {
+        return this.account.id;
     }
 
     public isAuthenticated(): Promise<boolean> {

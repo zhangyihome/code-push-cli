@@ -71,8 +71,6 @@ export var confirm = (): Promise<boolean> => {
     });
 }
 
-var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo;
-
 function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
     var hostname: string = os.hostname();
     return sdk.addAccessKey(hostname, command.description)
@@ -91,8 +89,7 @@ function accessKeyList(command: cli.IAccessKeyListCommand): Promise<void> {
 }
 
 function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
-    var loggedInAccessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
-    if (loggedInAccessKey && command.accessKeyName === loggedInAccessKey) {
+    if (command.accessKeyName === sdk.accessKey) {
         return Q.reject<void>(new Error("Cannot remove the access key for the current session. Please run 'code-push logout' if you would like to remove this access key."));
     } else {
         return getAccessKeyId(command.accessKeyName)
@@ -306,12 +303,12 @@ function deserializeConnectionInfo(): ILegacyLoginConnectionInfo|ILoginConnectio
         return;
     }
 
-    var credentialsObject: ILegacyLoginConnectionInfo|ILoginConnectionInfo = tryJSON(savedConnection);
-    return credentialsObject;
+    var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = tryJSON(savedConnection);
+    return connectionInfo;
 }
 
 export function execute(command: cli.ICommand): Promise<void> {
-    connectionInfo = deserializeConnectionInfo();
+    var connectionInfo = deserializeConnectionInfo();
 
     switch (command.type) {
         case cli.CommandType.login:
@@ -331,6 +328,7 @@ export function execute(command: cli.ICommand): Promise<void> {
             break;
     }
 
+    // TODO: thrown errors
     switch (command.type) {
         case cli.CommandType.login:
             return login(<cli.ILoginCommand>command);
@@ -555,10 +553,10 @@ function logout(command: cli.ILogoutCommand): Promise<void> {
     return Q(<void>null)
         .then((): Promise<void> => {
             if (!command.isLocal) {
-                var accessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
-                return sdk.removeAccessKey(accessKey)
+                return sdk.removeAccessKey(sdk.accessKey)
                     .then((): void => {
-                        log("Removed access key " + accessKey + ".");
+                        log("Removed access key " + sdk.accessKey + ".");
+                        sdk = null;
                     });
             }
         })
