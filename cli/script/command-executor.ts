@@ -519,7 +519,14 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
                 return;
             }
 
-            if (!accessToken) {
+            var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo;
+            try {
+                var decoded: string = base64.decode(accessToken);
+                connectionInfo = JSON.parse(decoded);
+            } catch (ex) {
+            }
+
+            if (!connectionInfo) {
                 throw new Error("Invalid access token.");
             }
 
