@@ -37,7 +37,6 @@ describe("Management SDK", () => {
             manager.getDeploymentKeys.bind(manager, "appId", "deploymentId"),
 
             manager.getPackage.bind(manager, ""),
-            manager.logout.bind(manager),
         ];
 
         var result = Q<void>(null);

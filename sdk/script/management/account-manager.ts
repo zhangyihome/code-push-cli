@@ -68,33 +68,6 @@ export class AccountManager {
         });
     }
 
-    public logout(): Promise<void> {
-        return Promise<void>((resolve, reject, notify) => {
-            var req = request.post(this.serverUrl + "/auth/logout");
-            this.attachCredentials(req);
-
-            req.end((err: any, res: request.Response) => {
-                if (err && err.status !== 401) {
-                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                    return;
-                }
-
-                this._accessKey = null;
-
-                if (res.ok) {
-                    resolve(null);
-                } else {
-                    var body = tryJSON(res.text);
-                    if (body) {
-                        reject(<CodePushError>body);
-                    } else {
-                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                    }
-                }
-            });
-        });
-    }
-
     public isAuthenticated(): Promise<boolean> {
         return Promise<boolean>((resolve, reject, notify) => {
             var req = request.get(this.serverUrl + "/authenticated");

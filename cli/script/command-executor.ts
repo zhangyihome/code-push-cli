@@ -115,13 +115,9 @@ function accessKeyList(command: cli.IAccessKeyListCommand): Promise<void> {
         });
 }
 
-function removeLocalAccessKey(): Promise<void> {
-    return Q.fcall(() => { throw new Error("Cannot remove the access key for the current session. Please run 'code-push logout' if you would like to remove this access key."); });
-}
-
 function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
     if (connectionInfo && (command.accessKeyName === (<IStandardLoginConnectionInfo>connectionInfo).accessKeyName || command.accessKeyName === (<IAccessKeyLoginConnectionInfo>connectionInfo).accessKey)) {
-        return removeLocalAccessKey();
+        return Q.reject<void>("Cannot remove the access key for the current session. Please run 'code-push logout' if you would like to remove this access key.");
     } else {
         return getAccessKeyId(command.accessKeyName)
             .then((accessKeyId: string): Promise<void> => {
@@ -586,7 +582,6 @@ function logout(command: cli.ILogoutCommand): Promise<void> {
         }
 
         return setupPromise
-            .then((): Promise<void> => sdk.logout(), (): Promise<void> => sdk.logout())
             .then((): void => deleteConnectionInfoCache(), (): void => deleteConnectionInfoCache());
     }
 
