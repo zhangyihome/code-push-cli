@@ -35,6 +35,8 @@ interface PackageToUpload {
 }
 
 export class AccountManager {
+    public static API_VERSION = "v2";
+
     private _accessKey: string;
     private _serverUrl: string;
     private _userAgent: string;
@@ -736,6 +738,7 @@ export class AccountManager {
 
     private attachCredentials(request: request.Request<any>): void {
         request.set("User-Agent", this._userAgent);
+        request.set("Accept", "application/vnd.code-push." + AccountManager.API_VERSION + "+json");
         request.set("Authorization", "Bearer " + this._accessKey);
     }
 
