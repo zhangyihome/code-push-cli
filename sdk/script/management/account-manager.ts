@@ -35,7 +35,7 @@ interface PackageToUpload {
 }
 
 export class AccountManager {
-    public static API_VERSION = "v2";
+    private static API_VERSION = "v2";
 
     private _accessKey: string;
     private _serverUrl: string;
