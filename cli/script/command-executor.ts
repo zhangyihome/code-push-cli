@@ -319,7 +319,7 @@ export function execute(command: cli.ICommand): Promise<void> {
                         throw new Error("You are already logged in from this machine.");
                     }
                     break;
-        
+
                 default:
                     if (!!sdk) break; // Used by unit tests to skip authentication
 
@@ -335,58 +335,58 @@ export function execute(command: cli.ICommand): Promise<void> {
             switch (command.type) {
                 case cli.CommandType.login:
                     return login(<cli.ILoginCommand>command);
-        
+
                 case cli.CommandType.register:
                     return register(<cli.IRegisterCommand>command);
-        
+
                 case cli.CommandType.logout:
                     return logout(<cli.ILogoutCommand>command);
-        
+
                 case cli.CommandType.accessKeyAdd:
                     return accessKeyAdd(<cli.IAccessKeyAddCommand>command);
-        
+
                 case cli.CommandType.accessKeyList:
                     return accessKeyList(<cli.IAccessKeyListCommand>command);
-        
+
                 case cli.CommandType.accessKeyRemove:
                     return accessKeyRemove(<cli.IAccessKeyRemoveCommand>command);
-        
+
                 case cli.CommandType.appAdd:
                     return appAdd(<cli.IAppAddCommand>command);
-        
+
                 case cli.CommandType.appList:
                     return appList(<cli.IAppListCommand>command);
-        
+
                 case cli.CommandType.appRemove:
                     return appRemove(<cli.IAppRemoveCommand>command);
-        
+
                 case cli.CommandType.appRename:
                     return appRename(<cli.IAppRenameCommand>command);
-        
+
                 case cli.CommandType.deploymentAdd:
                     return deploymentAdd(<cli.IDeploymentAddCommand>command);
-        
+
                 case cli.CommandType.deploymentList:
                     return deploymentList(<cli.IDeploymentListCommand>command);
-        
+
                 case cli.CommandType.deploymentRemove:
                     return deploymentRemove(<cli.IDeploymentRemoveCommand>command);
-        
+
                 case cli.CommandType.deploymentRename:
                     return deploymentRename(<cli.IDeploymentRenameCommand>command);
-        
+
                 case cli.CommandType.deploymentHistory:
                     return deploymentHistory(<cli.IDeploymentHistoryCommand>command);
-        
+
                 case cli.CommandType.promote:
                     return promote(<cli.IPromoteCommand>command);
-        
+
                 case cli.CommandType.release:
                     return release(<cli.IReleaseCommand>command);
-        
+
                 case cli.CommandType.rollback:
                     return rollback(<cli.IRollbackCommand>command);
-        
+
                 default:
                     // We should never see this message as invalid commands should be caught by the argument parser.
                     throw new Error("Invalid command:  " + JSON.stringify(command));
@@ -790,7 +790,7 @@ function release(command: cli.IReleaseCommand): Promise<void> {
                     }
 
                     var lastTotalProgress = 0;
-                    var progressBar = new progress("Upload progress:[:bar] :percent :etas", { 
+                    var progressBar = new progress("Upload progress:[:bar] :percent :etas", {
                         complete: "=",
                         incomplete: " ",
                         width: 50,
