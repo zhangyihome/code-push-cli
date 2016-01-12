@@ -34,29 +34,22 @@ interface PackageToUpload {
 
 export class AccountManager {
     private _accessKey: string;
+    private _serverUrl: string;
     private _userAgent: string; // TODO: auto-fill user agent if not specified?
 
-    // TODO: why are these public? should I expose accessKey?
-    public account: Account;
-    public serverUrl: string;
-
-    constructor(accessKey: string, userAgent: string, serverUrl: string) {
+    constructor(accessKey: string, userAgent: string, serverUrl?: string) {
         this._accessKey = accessKey;
         this._userAgent = userAgent;
-        this.serverUrl = serverUrl || "https://codepush.azurewebsites.net";
+        this._serverUrl = serverUrl || "https://codepush.azurewebsites.net";
     }
 
     public get accessKey(): string {
         return this._accessKey;
     }
 
-    public get accountId(): string {
-        return this.account.id;
-    }
-
     public isAuthenticated(): Promise<boolean> {
         return Promise<boolean>((resolve, reject, notify) => {
-            var req = request.get(this.serverUrl + "/authenticated");
+            var req = request.get(this._serverUrl + "/authenticated");
             this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
@@ -77,7 +70,7 @@ export class AccountManager {
         return Promise<AccessKey>((resolve, reject, notify) => {
             return this.generateAccessKey().then((newAccessKey: string) => {
                 var accessKey: AccessKey = { id: null, name: newAccessKey, createdTime: new Date().getTime(), createdBy: machine, description: description };
-                var req = request.post(this.serverUrl + "/accessKeys/");
+                var req = request.post(this._serverUrl + "/accessKeys/");
 
                 this.attachCredentials(req);
 
@@ -112,7 +105,7 @@ export class AccountManager {
 
     public getAccessKey(accessKeyId: string): Promise<AccessKey> {
         return Promise<AccessKey>((resolve, reject, notify) => {
-            var req = request.get(this.serverUrl + "/accessKeys/" + accessKeyId);
+            var req = request.get(this._serverUrl + "/accessKeys/" + accessKeyId);
 
             this.attachCredentials(req);
 
@@ -142,7 +135,7 @@ export class AccountManager {
 
     public getAccessKeys(): Promise<AccessKey[]> {
         return Promise<AccessKey[]>((resolve, reject, notify) => {
-            var req = request.get(this.serverUrl + "/accessKeys");
+            var req = request.get(this._serverUrl + "/accessKeys");
 
             this.attachCredentials(req);
 
@@ -172,7 +165,7 @@ export class AccountManager {
 
     public removeAccessKey(accessKeyId: string): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var req = request.del(this.serverUrl + "/accessKeys/" + accessKeyId);
+            var req = request.del(this._serverUrl + "/accessKeys/" + accessKeyId);
 
             this.attachCredentials(req);
 
@@ -199,7 +192,7 @@ export class AccountManager {
     // Account
     public getAccountInfo(): Promise<Account> {
         return Promise<Account>((resolve, reject, notify) => {
-            var req = request.get(this.serverUrl + "/account");
+            var req = request.get(this._serverUrl + "/account");
             this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
@@ -212,8 +205,7 @@ export class AccountManager {
 
                 if (res.ok) {
                     if (body) {
-                        this.account = <Account>body.account;
-                        resolve(this.account);
+                        resolve(body.account);
                     } else {
                         reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
                     }
@@ -230,7 +222,7 @@ export class AccountManager {
 
     public updateAccountInfo(accountInfoToChange: Account): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var req = request.put(this.serverUrl + "/account");
+            var req = request.put(this._serverUrl + "/account");
             this.attachCredentials(req);
 
             req.set("Content-Type", "application/json;charset=UTF-8")
@@ -258,7 +250,7 @@ export class AccountManager {
     // Apps
     public getApps(): Promise<App[]> {
         return Promise<App[]>((resolve, reject, notify) => {
-            var req = request.get(this.serverUrl + "/apps");
+            var req = request.get(this._serverUrl + "/apps");
             this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
@@ -287,7 +279,7 @@ export class AccountManager {
 
     public getApp(appId: string): Promise<App> {
         return Promise<App>((resolve, reject, notify) => {
-            var req = request.get(this.serverUrl + "/apps/" + appId);
+            var req = request.get(this._serverUrl + "/apps/" + appId);
             this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
@@ -318,7 +310,7 @@ export class AccountManager {
         return Promise<App>((resolve, reject, notify) => {
             var app = <App>{ name: appName };
 
-            var req = request.post(this.serverUrl + "/apps/");
+            var req = request.post(this._serverUrl + "/apps/");
             this.attachCredentials(req);
 
             req.set("Content-Type", "application/json;charset=UTF-8")
@@ -352,7 +344,7 @@ export class AccountManager {
     public removeApp(app: App | string): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             var id: string = (typeof app === "string") ? app : app.id;
-            var req = request.del(this.serverUrl + "/apps/" + id);
+            var req = request.del(this._serverUrl + "/apps/" + id);
             this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
@@ -377,7 +369,7 @@ export class AccountManager {
 
     public updateApp(infoToChange: App): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var req = request.put(this.serverUrl + "/apps/" + infoToChange.id);
+            var req = request.put(this._serverUrl + "/apps/" + infoToChange.id);
             this.attachCredentials(req);
 
             req.set("Content-Type", "application/json;charset=UTF-8")
@@ -407,7 +399,7 @@ export class AccountManager {
         return Promise<Deployment>((resolve, reject, notify) => {
             var deployment = <Deployment>{ name: name };
 
-            var req = request.post(this.serverUrl + "/apps/" + appId + "/deployments/");;
+            var req = request.post(this._serverUrl + "/apps/" + appId + "/deployments/");;
             this.attachCredentials(req);
 
             req.set("Content-Type", "application/json;charset=UTF-8")
@@ -440,7 +432,7 @@ export class AccountManager {
 
     public getDeployments(appId: string): Promise<Deployment[]> {
         return Promise<Deployment[]>((resolve, reject, notify) => {
-            var req = request.get(this.serverUrl + "/apps/" + appId + "/deployments");
+            var req = request.get(this._serverUrl + "/apps/" + appId + "/deployments");
             this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
@@ -469,7 +461,7 @@ export class AccountManager {
 
     public getDeployment(appId: string, deploymentId: string) {
         return Promise<Deployment>((resolve, reject, notify) => {
-            var req = request.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId);
+            var req = request.get(this._serverUrl + "/apps/" + appId + "/deployments/" + deploymentId);
             this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
@@ -498,7 +490,7 @@ export class AccountManager {
 
     public updateDeployment(appId: string, infoToChange: Deployment): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var req = request.put(this.serverUrl + "/apps/" + appId + "/deployments/" + infoToChange.id);
+            var req = request.put(this._serverUrl + "/apps/" + appId + "/deployments/" + infoToChange.id);
             this.attachCredentials(req);
 
             req.set("Content-Type", "application/json;charset=UTF-8")
@@ -526,7 +518,7 @@ export class AccountManager {
     public removeDeployment(appId: string, deployment: Deployment | string): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             var id: string = (typeof deployment === "string") ? deployment : deployment.id;
-            var req = request.del(this.serverUrl + "/apps/" + appId + "/deployments/" + id);
+            var req = request.del(this._serverUrl + "/apps/" + appId + "/deployments/" + id);
             this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
@@ -551,7 +543,7 @@ export class AccountManager {
 
     public getDeploymentKeys(appId: string, deploymentId: string): Promise<DeploymentKey[]> {
         return Promise<DeploymentKey[]>((resolve, reject, notify) => {
-            var req = request.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/deploymentKeys")
+            var req = request.get(this._serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/deploymentKeys")
             this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
@@ -581,7 +573,7 @@ export class AccountManager {
     public addPackage(appId: string, deploymentId: string, fileOrPath: File | string, description: string, label: string, appVersion: string, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             var packageInfo: PackageToUpload = this.generatePackageInfo(description, label, appVersion, isMandatory);
-            var req = request.put(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/package");
+            var req = request.put(this._serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/package");
             this.attachCredentials(req);
 
             var file: any;
@@ -621,7 +613,7 @@ export class AccountManager {
 
     public promotePackage(appId: string, sourceDeploymentId: string, destDeploymentId: string): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var req = request.post(this.serverUrl + "/apps/" + appId + "/deployments/" + sourceDeploymentId + "/promote/" + destDeploymentId);
+            var req = request.post(this._serverUrl + "/apps/" + appId + "/deployments/" + sourceDeploymentId + "/promote/" + destDeploymentId);
             this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
@@ -646,7 +638,7 @@ export class AccountManager {
 
     public rollbackPackage(appId: string, deploymentId: string, targetRelease?: string): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var req = request.post(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/rollback/" + (targetRelease || ""));
+            var req = request.post(this._serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/rollback/" + (targetRelease || ""));
             this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
@@ -671,7 +663,7 @@ export class AccountManager {
 
     public getPackage(appId: string, deploymentId: string): Promise<Package> {
         return Promise<Package>((resolve, reject, notify) => {
-            var req = request.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/package");
+            var req = request.get(this._serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/package");
             this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
@@ -700,7 +692,7 @@ export class AccountManager {
 
     public getPackageHistory(appId: string, deploymentId: string): Promise<Package[]> {
         return Promise<Package[]>((resolve, reject, notify) => {
-            var req = request.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/packageHistory");
+            var req = request.get(this._serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/packageHistory");
             this.attachCredentials(req);
 
             req.end((err: any, res: request.Response) => {
@@ -746,12 +738,12 @@ export class AccountManager {
     }
 
     private generateAccessKey(): Promise<string> {
-        return this.getAccountInfo().then(() => {
+        return this.getAccountInfo().then((account: Account) => {
             var accessKey = crypto.randomBytes(21)
                 .toString("base64")
                 .replace(/\+/g, "_")  // URL-friendly characters
                 .replace(/\//g, "-")
-                .concat(this.accountId);
+                .concat(account.id);
 
             return accessKey;
         })
