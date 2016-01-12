@@ -54,16 +54,9 @@ export class AccountManager {
         this.serverUrl = serverUrl;
     }
 
-    public loginWithAccessToken(accessToken: string): Promise<void> {
+    public loginWithAccessKey(accessKey: string): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            // Attempt to parse login info for backwards compatibility
-            var loginInfo: ILoginInfo = AccountManager.getLoginInfo(accessToken);
-            if (loginInfo && loginInfo.providerName && loginInfo.providerUniqueId) {
-                this._accessKey = loginInfo.accessKeyName;
-            } else {
-                this._accessKey = accessToken;
-            }
-
+            this._accessKey = accessKey;
             resolve(null);
         });
     }

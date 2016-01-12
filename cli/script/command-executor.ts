@@ -26,14 +26,14 @@ var progress = require("progress");
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var userAgent: string = packageJson.name + "/" + packageJson.version;
 
-interface IStandardLoginConnectionInfo {
+interface ILegacyLoginConnectionInfo {
     accessKeyName: string;
     providerName: string;
     providerUniqueId: string;
     serverUrl: string;
 }
 
-interface IAccessKeyLoginConnectionInfo {
+interface ILoginConnectionInfo {
     accessKey: string;
     serverUrl: string;
 }
@@ -54,22 +54,9 @@ export var loginWithAccessToken = (): Promise<void> => {
 
     sdk = new AccountManager(connectionInfo.serverUrl, userAgent);
 
-    var accessToken: string;
+    var accessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
 
-    var standardLoginConnectionInfo: IStandardLoginConnectionInfo = <IStandardLoginConnectionInfo>connectionInfo;
-    var accessKeyLoginConnectionInfo: IAccessKeyLoginConnectionInfo = <IAccessKeyLoginConnectionInfo>connectionInfo;
-
-    if (standardLoginConnectionInfo.providerName) {
-        accessToken = base64.encode(JSON.stringify({
-            accessKeyName: standardLoginConnectionInfo.accessKeyName,
-            providerName: standardLoginConnectionInfo.providerName,
-            providerUniqueId: standardLoginConnectionInfo.providerUniqueId
-        }));
-    } else {
-        accessToken = accessKeyLoginConnectionInfo.accessKey;
-    }
-
-    return sdk.loginWithAccessToken(accessToken);
+    return sdk.loginWithAccessKey(accessKey);
 }
 
 export var confirm = (): Promise<boolean> => {
@@ -96,7 +83,7 @@ export var confirm = (): Promise<boolean> => {
     });
 }
 
-var connectionInfo: IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo;
+var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo;
 
 function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
     var hostname: string = os.hostname();
@@ -116,7 +103,8 @@ function accessKeyList(command: cli.IAccessKeyListCommand): Promise<void> {
 }
 
 function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
-    if (connectionInfo && (command.accessKeyName === (<IStandardLoginConnectionInfo>connectionInfo).accessKeyName || command.accessKeyName === (<IAccessKeyLoginConnectionInfo>connectionInfo).accessKey)) {
+    var loggedInAccessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
+    if (loggedInAccessKey && command.accessKeyName === loggedInAccessKey) {
         return Q.reject<void>("Cannot remove the access key for the current session. Please run 'code-push logout' if you would like to remove this access key.");
     } else {
         return getAccessKeyId(command.accessKeyName)
@@ -321,7 +309,7 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
         });
 }
 
-function deserializeConnectionInfo(): IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo {
+function deserializeConnectionInfo(): ILegacyLoginConnectionInfo|ILoginConnectionInfo {
     var savedConnection: string;
 
     try {
@@ -330,7 +318,7 @@ function deserializeConnectionInfo(): IStandardLoginConnectionInfo|IAccessKeyLog
         return;
     }
 
-    var credentialsObject: IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo = tryJSON(savedConnection);
+    var credentialsObject: ILegacyLoginConnectionInfo|ILoginConnectionInfo = tryJSON(savedConnection);
     return credentialsObject;
 }
 
@@ -508,7 +496,7 @@ function login(command: cli.ILoginCommand): Promise<void> {
     // Check if one of the flags were provided.
     if (command.accessKey) {
         sdk = new AccountManager(command.serverUrl, userAgent);
-        return sdk.loginWithAccessToken(command.accessKey)
+        return sdk.loginWithAccessKey(command.accessKey)
             .then((): Promise<boolean> => {
                 return sdk.isAuthenticated();
             })
@@ -540,8 +528,9 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
             }
 
             sdk = new AccountManager(serverUrl, userAgent);
+            var accessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
 
-            return sdk.loginWithAccessToken(accessToken)
+            return sdk.loginWithAccessKey(accessKey)
                 .then((): Promise<boolean> => {
                     return sdk.isAuthenticated();
                 })
@@ -555,37 +544,33 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
         });
 }
 
-function logout(command: cli.ILogoutCommand): Promise<void> {
-    if (connectionInfo) {
-        var setupPromise: Promise<void> = loginWithAccessToken();
-        if (!command.isLocal) {
-            var accessKeyName: string;
-            setupPromise = setupPromise
-                .then((): Promise<string> => {
-                    var standardLoginConnectionInfo: IStandardLoginConnectionInfo = <IStandardLoginConnectionInfo>connectionInfo;
-                    var accessKeyLoginConnectionInfo: IAccessKeyLoginConnectionInfo = <IAccessKeyLoginConnectionInfo>connectionInfo;
+function getAccessKeyFromConnectionInfo(connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo): string {
+    if (!connectionInfo) return null;
 
-                    if (standardLoginConnectionInfo.accessKeyName) {
-                        accessKeyName = standardLoginConnectionInfo.accessKeyName;
-                        return getAccessKeyId(standardLoginConnectionInfo.accessKeyName);
-                    } else {
-                        accessKeyName = accessKeyLoginConnectionInfo.accessKey;
-                        return getAccessKeyId(accessKeyLoginConnectionInfo.accessKey);
-                    }
-                })
-                .then((accessKeyId: string): Promise<void> => {
-                    return sdk.removeAccessKey(accessKeyId);
-                })
-                .then((): void => {
-                    log("Removed access key " + accessKeyName + ".");
-                });
-        }
+    var standardLoginConnectionInfo: ILegacyLoginConnectionInfo = <ILegacyLoginConnectionInfo>connectionInfo;
+    var accessKeyLoginConnectionInfo: ILoginConnectionInfo = <ILoginConnectionInfo>connectionInfo;
 
-        return setupPromise
-            .then((): void => deleteConnectionInfoCache(), (): void => deleteConnectionInfoCache());
+    if (standardLoginConnectionInfo.accessKeyName) {
+        return standardLoginConnectionInfo.accessKeyName;
+    } else {
+        return accessKeyLoginConnectionInfo.accessKey;
     }
+}
 
-    return Q.fcall(() => { throw new Error("You are not logged in."); });
+function logout(command: cli.ILogoutCommand): Promise<void> {
+    if (!connectionInfo) return Q.reject<void>("You are not logged in.");
+
+    return loginWithAccessToken()
+        .then((): Promise<void> => {
+            if (!command.isLocal) {
+                var accessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
+                return sdk.removeAccessKey(accessKey)
+                    .then((): void => {
+                        log("Removed access key " + accessKey + ".");
+                    });
+            }
+        })
+        .then((): void => deleteConnectionInfoCache(), (): void => deleteConnectionInfoCache());
 }
 
 function formatDate(unixOffset: number): string {
@@ -890,7 +875,7 @@ function requestAccessToken(): Promise<string> {
 function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
     // The access token should have been validated already (i.e.:  logging in).
     var json: string = tryBase64Decode(accessToken);
-    var standardLoginConnectionInfo: IStandardLoginConnectionInfo = tryJSON(json);
+    var standardLoginConnectionInfo: ILegacyLoginConnectionInfo = tryJSON(json);
 
     if (standardLoginConnectionInfo) {
         // This is a normal login.
@@ -899,7 +884,7 @@ function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
         fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
     } else {
         // This login uses an access token
-        var accessKeyLoginConnectionInfo: IAccessKeyLoginConnectionInfo = { serverUrl: serverUrl, accessKey: accessToken };
+        var accessKeyLoginConnectionInfo: ILoginConnectionInfo = { serverUrl: serverUrl, accessKey: accessToken };
         json = JSON.stringify(accessKeyLoginConnectionInfo);
         fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
     }
