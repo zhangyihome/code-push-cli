@@ -321,15 +321,17 @@ export function execute(command: cli.ICommand): Promise<void> {
                     break;
         
                 default:
+                    if (!!sdk) break; // Used by unit tests to skip authentication
+
                     if (!connectionInfo) {
                         throw new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server.");
                     }
-        
+
                     var accessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
                     sdk = new AccountManager(accessKey, userAgent, connectionInfo.serverUrl);
                     break;
             }
-        
+
             switch (command.type) {
                 case cli.CommandType.login:
                     return login(<cli.ILoginCommand>command);
