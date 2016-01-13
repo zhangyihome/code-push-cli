@@ -9,7 +9,7 @@ declare module "rest-definitions" {
 
     export interface DeploymentStatusReport {
         appVersion: string;
-        clientUniqueID: string;
+        clientUniqueId: string;
         deploymentKey: string; 
         label?: string;
         status?: string

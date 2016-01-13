@@ -47,7 +47,7 @@ export interface Callback<T> { (error: Error, parameter: T): void; }
 
 export interface Configuration {
     appVersion: string;
-    clientUniqueID: string;
+    clientUniqueId: string;
     deploymentKey: string;
     serverUrl: string;
     ignoreAppVersion?: boolean
@@ -60,7 +60,7 @@ export class AcquisitionStatus {
 
 export class AcquisitionManager {
     private _appVersion: string;
-    private _clientUniqueID: string;
+    private _clientUniqueId: string;
     private _deploymentKey: string;
     private _httpRequester: Http.Requester;
     private _ignoreAppVersion: boolean;
@@ -75,7 +75,7 @@ export class AcquisitionManager {
         }
 
         this._appVersion = configuration.appVersion;
-        this._clientUniqueID = configuration.clientUniqueID;
+        this._clientUniqueId = configuration.clientUniqueId;
         this._deploymentKey = configuration.deploymentKey;
         this._ignoreAppVersion = configuration.ignoreAppVersion;
     }
@@ -149,7 +149,7 @@ export class AcquisitionManager {
         var url: string = this._serverUrl + "reportStatus/deploy";
         var body: DeploymentStatusReport = {
             appVersion: this._appVersion,
-            clientUniqueID: this._clientUniqueID,
+            clientUniqueId: this._clientUniqueId,
             deploymentKey: this._deploymentKey
         };
         

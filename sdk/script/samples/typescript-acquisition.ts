@@ -8,7 +8,7 @@ class MyApp {
     private _acquisition: Acquisition.NativeSample;
 
     constructor() {
-         this._acquisition = new Acquisition.NativeImplementation({ appVersion: "1.0.0", clientUniqueID: "203ff986-f335-4e94-8e79-ee404231218d", deploymentKey: "fa3s34a5s6d7f8we9a9r", serverUrl: MyApp.ServerUrl });
+         this._acquisition = new Acquisition.NativeImplementation({ appVersion: "1.0.0", clientUniqueId: "203ff986-f335-4e94-8e79-ee404231218d", deploymentKey: "fa3s34a5s6d7f8we9a9r", serverUrl: MyApp.ServerUrl });
     }
 
     public onAppStartup(): void {

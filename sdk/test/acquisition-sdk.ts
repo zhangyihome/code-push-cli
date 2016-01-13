@@ -12,7 +12,7 @@ var latestPackage: rest.UpdateCheckResponse = clone(mockApi.latestPackage);
 
 var configuration: acquisitionSdk.Configuration = {
     appVersion: "1.5.0",
-    clientUniqueID: "My iPhone",
+    clientUniqueId: "My iPhone",
     deploymentKey: mockApi.validDeploymentKey,
     serverUrl: mockApi.serverUrl,
 }
