@@ -1,6 +1,6 @@
 /// <reference path="../definitions/harness.d.ts" />
 
-import { UpdateCheckResponse, UpdateCheckRequest } from "rest-definitions";
+import { UpdateCheckResponse, UpdateCheckRequest, DeploymentStatusReport } from "rest-definitions";
 
 export module Http {
     export const enum Verb {
@@ -51,14 +51,6 @@ export interface Configuration {
     deploymentKey: string;
     serverUrl: string;
     ignoreAppVersion?: boolean
-}
-
-interface DeploymentStatusReport {
-    appVersion: string;
-    clientUniqueID: string;
-    deploymentKey: string; 
-    label?: string;
-    status?: string
 }
 
 export class AcquisitionStatus {
@@ -148,7 +140,12 @@ export class AcquisitionManager {
         });
     }
 
-    public reportStatus(package?: Package, status?: string, callback?: Callback<void>): void {
+    // Deprecated.
+    public reportStatus(status: string, message?: string, callback?: Callback<void>): void {
+        callback(/*error*/ null, /*not used*/ null);
+    }
+    
+    public reportStatusDeploy(package?: Package, status?: string, callback?: Callback<void>): void {
         var url: string = this._serverUrl + "reportStatus/deploy";
         var body: DeploymentStatusReport = {
             appVersion: this._appVersion,
@@ -171,7 +168,7 @@ export class AcquisitionManager {
                         if (!status) {
                             callback(new Error("Missing status argument."), /*not used*/ null);
                         } else {
-                            callback(new Error("Unrecognized status" + status + "."), /*not used*/ null);
+                            callback(new Error("Unrecognized status \"" + status + "\"."), /*not used*/ null);
                         }
                     }
                     return;
