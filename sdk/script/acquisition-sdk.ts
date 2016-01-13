@@ -177,7 +177,7 @@ export class AcquisitionManager {
                     return;
             }
         }
-        
+
         this._httpRequester.request(Http.Verb.POST, url, JSON.stringify(body), (error: Error, response: Http.Response): void => {
             if (callback) {
                 if (error) {
