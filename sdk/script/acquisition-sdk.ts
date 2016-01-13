@@ -139,11 +139,6 @@ export class AcquisitionManager {
             callback(/*error=*/ null, remotePackage);
         });
     }
-
-    // Deprecated.
-    public reportStatus(status: string, message?: string, callback?: Callback<void>): void {
-        callback(/*error*/ null, /*not used*/ null);
-    }
     
     public reportStatusDeploy(package?: Package, status?: string, callback?: Callback<void>): void {
         var url: string = this._serverUrl + "reportStatus/deploy";
