@@ -501,7 +501,7 @@ export class AccountManager {
     public transferApp(appId: string, email: string): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.post(this.serverUrl + "/apps/" + appId + "/transfer/" + email);
+            var req = requester.put(this.serverUrl + "/apps/" + appId + "/transfer/" + email);
             this.attachCredentials(req, requester);
 
             req.end((err: any, res: request.Response) => {

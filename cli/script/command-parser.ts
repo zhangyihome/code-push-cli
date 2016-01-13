@@ -550,7 +550,7 @@ function createCommand(): cli.ICommand {
                 }
                 break;
 
-            case "promote":
+            case "transfer":
                 if (arg1 && arg2) {
                     cmd = { type: cli.CommandType.transfer };
 

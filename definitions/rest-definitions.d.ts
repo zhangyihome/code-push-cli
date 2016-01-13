@@ -46,6 +46,7 @@ declare module "rest-definitions" {
     export interface Collaborator {
         /*assigned*/ accountId?: string;
         email: string;
+        permission: string;
     }
 
     export interface Deployment {

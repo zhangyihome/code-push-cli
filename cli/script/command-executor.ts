@@ -155,14 +155,26 @@ function appAdd(command: cli.IAppAddCommand): Promise<void> {
         });
 }
 
+function getOwner(app: App): string {
+    for(var i = 0; i < app.collaborator.length; i++) {
+        if (app.collaborator[i].permission === "Owner") {
+            return app.collaborator[i].email;
+        }
+    }
+
+    return "";
+}
+
 function appList(command: cli.IAppListCommand): Promise<void> {
     throwForInvalidOutputFormat(command.format);
     var apps: App[];
-
+    var owners: string[] = [];
     return sdk.getApps()
         .then((retrievedApps: App[]): Promise<string[][]> => {
             apps = retrievedApps;
             var deploymentListPromises: Promise<string[]>[] = apps.map((app: App) => {
+                owners.push(getOwner(app));
+
                 return sdk.getDeployments(app.id)
                     .then((deployments: Deployment[]) => {
                         var deploymentList: string[] = deployments
@@ -176,7 +188,7 @@ function appList(command: cli.IAppListCommand): Promise<void> {
             return Q.all(deploymentListPromises);
         })
         .then((deploymentLists: string[][]): void => {
-            printAppList(command.format, apps, deploymentLists);
+            printAppList(command.format, apps, deploymentLists, owners);
         });
 }
 
@@ -655,18 +667,18 @@ function formatDate(unixOffset: number): string {
     }
 }
 
-function printAppList(format: string, apps: App[], deploymentLists: string[][]): void {
+function printAppList(format: string, apps: App[], deploymentLists: string[][], owners: string[]): void {
     if (format === "json") {
         var dataSource: any[] = apps.map((app: App, index: number) => {
-            return { "name": app.name, "deployments": deploymentLists[index] };
+            return { "name": app.name, "deployments": deploymentLists[index], "owner": owners[index] };
         });
 
         printJson(dataSource);
     } else if (format === "table") {
-        var headers = ["Name", "Deployments"];
+        var headers = ["Name", "Deployments", "Owner"];
         printTable(headers, (dataSource: any[]): void => {
             apps.forEach((app: App, index: number): void => {
-                var row = [app.name, wordwrap(50)(deploymentLists[index].join(", "))];
+                var row = [app.name, wordwrap(50)(deploymentLists[index].join(", ")), owners[index]];
                 dataSource.push(row);
             });
         });
