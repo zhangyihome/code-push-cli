@@ -22,6 +22,7 @@ import { AccessKey, AccountManager, App, Deployment, Collaborator, DeploymentKey
 var packageJson = require("../package.json");
 import Promise = Q.Promise;
 var progress = require("progress");
+var emailValidator = require("email-validator");
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var userAgent: string = packageJson.name + "/" + packageJson.version;
@@ -210,6 +211,27 @@ function appRemove(command: cli.IAppRemoveCommand): Promise<void> {
                 });
         });
 }
+function appTransfer(command: cli.ITransferCommand): Promise<void> {
+    throwForInvalidEmail(command.email);
+
+    return getAppId(command.appName)
+        .then((appId: string): Promise<void> => {
+            throwForInvalidAppId(appId, command.appName);
+
+            return confirm()
+                .then((wasConfirmed: boolean): Promise<void> => {
+                    if (wasConfirmed) {
+                        return sdk.transferApp(appId, command.email)
+                            .then((): void => {
+                                log("Successfully transferred the ownership of \"" + command.appName + "\" app to the account with email \"" + command.email + "\".");
+                            });
+                    }
+
+                    log("App transfer cancelled.");
+                });
+        });
+}
+
 
 function appRename(command: cli.IAppRenameCommand): Promise<void> {
     return getApp(command.currentAppName)
@@ -226,6 +248,8 @@ function appRename(command: cli.IAppRenameCommand): Promise<void> {
 }
 
 function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
+    throwForInvalidEmail(command.email);
+
     return getAppId(command.appName)
         .then((appId: string): Promise<void> => {
             throwForInvalidAppId(appId, command.appName);
@@ -258,6 +282,8 @@ function listCollaborators(command: cli.ICollaboratorListCommand): Promise<void>
 }
 
 function removeCollaborator(command: cli.ICollaboratorRemoveCommand): Promise<void> {
+    throwForInvalidEmail(command.email);
+
     return getAppId(command.appName)
         .then((appId: string): Promise<void> => {
             throwForInvalidAppId(appId, command.appName);
@@ -481,7 +507,7 @@ export function execute(command: cli.ICommand): Promise<void> {
                     return rollback(<cli.IRollbackCommand>command);
 
                 case cli.CommandType.transfer:
-                    return transfer(<cli.ITransferCommand>command);
+                    return appTransfer(<cli.ITransferCommand>command);
 
                 default:
                     // We should never see this message as invalid commands should be caught by the argument parser.
@@ -950,20 +976,6 @@ function rollback(command: cli.IRollbackCommand): Promise<void> {
         });
 }
 
-function transfer(command: cli.ITransferCommand): Promise<void> {
-    var appId: string;
-
-    return getAppId(command.appName)
-        .then((appIdResult: string): Promise<void> => {
-            throwForInvalidAppId(appIdResult, command.appName);
-            appId = appIdResult;
-            return sdk.transferApp(appId, command.email);
-        })
-        .then((): void => {
-            log("Successfully transferred the ownership of \"" + command.appName + "\" app to the account with email \"" + command.email + "\".");
-        });
-}
-
 function requestAccessToken(): Promise<string> {
     return Promise<string>((resolve, reject, notify): void => {
         prompt.message = "";
@@ -1037,6 +1049,12 @@ function throwForInvalidApp(app: App, appName: string): void {
 function throwForInvalidAppId(appId: string, appName: string): void {
     if (!appId) {
         throw new Error("App \"" + appName + "\" does not exist.");
+    }
+}
+
+function throwForInvalidEmail(email: string): void {
+    if (!emailValidator.validate(email)) {
+        throw new Error("Invalid email id \"" + email + "\"");
     }
 }
 

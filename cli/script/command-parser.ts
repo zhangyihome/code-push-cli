@@ -183,6 +183,13 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             })
             .command("list", "List the apps associated with your account", (yargs: yargs.Argv) => appList("list", yargs))
             .command("ls", "List the apps associated with your account", (yargs: yargs.Argv) => appList("ls", yargs))
+            .command("transfer", "Transfer the ownership of the app from your account to another", (yargs: yargs.Argv) => {
+                yargs.usage(USAGE_PREFIX + " app transfer <appName> <email>")
+                    .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
+                    .example("app transfer MyApp foo@bar.com", "Transfer the ownership of app \"MyApp\" to an account with email \"foo@bar.com\"");
+
+                addCommonConfiguration(yargs);
+            })
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
         addCommonConfiguration(yargs);
@@ -202,13 +209,6 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName>")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
             .example("promote MyApp Staging Production", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\"");
-
-        addCommonConfiguration(yargs);
-    })
-    .command("transfer", "Transfer the ownership of app from your account to another", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " transfer <appName> <email>")
-            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly four non-option arguments.
-            .example("transfer MyApp foo@bar.com", "Transfer the ownership of app \"MyApp\" to an account with email \"foo@bar.com\"");
 
         addCommonConfiguration(yargs);
     })
@@ -386,6 +386,17 @@ function createCommand(): cli.ICommand {
                             appRenameCommand.newAppName = arg3;
                         }
                         break;
+
+                    case "transfer":
+                        if (arg2 && arg3) {
+                            cmd = { type: cli.CommandType.transfer };
+
+                            var appTransferCommand = <cli.ITransferCommand>cmd;
+
+                            appTransferCommand.appName = arg2;
+                            appTransferCommand.email = arg3;
+                        }
+                        break;
                 }
                 break;
 
@@ -547,17 +558,6 @@ function createCommand(): cli.ICommand {
                     rollbackCommand.appName = arg1;
                     rollbackCommand.deploymentName = arg2;
                     rollbackCommand.targetRelease = argv["targetRelease"];
-                }
-                break;
-
-            case "transfer":
-                if (arg1 && arg2) {
-                    cmd = { type: cli.CommandType.transfer };
-
-                    var appTransferCommand = <cli.ITransferCommand>cmd;
-
-                    appTransferCommand.appName = arg1;
-                    appTransferCommand.email = arg2;
                 }
                 break;
         }
