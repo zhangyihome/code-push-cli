@@ -157,9 +157,11 @@ function appAdd(command: cli.IAppAddCommand): Promise<void> {
 }
 
 function getOwner(app: App): string {
-    for(var i = 0; i < app.collaborator.length; i++) {
-        if (app.collaborator[i].permission === "Owner") {
-            return app.collaborator[i].email;
+    if (app && app.collaborator) {
+        for(var i = 0; i < app.collaborator.length; i++) {
+            if (app.collaborator[i].permission === "Owner") {
+                return app.collaborator[i].email;
+            }
         }
     }
 
