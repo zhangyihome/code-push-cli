@@ -219,7 +219,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .command("add", "Add a new collaborator to the given app", (yargs: yargs.Argv): void => {
                 isValidCommand = true;
                 yargs.usage(USAGE_PREFIX + " collaborator add <appName> <email>")
-                    .demand(/*count*/ 4, /*max*/ 4)  // Require exactly three non-option arguments.
+                    .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
                     .example("collaborator add MyApp foo@bar.com", "Adds foo@bar.com as a collaborator to app \"MyApp\"");
 
                 addCommonConfiguration(yargs);

@@ -156,11 +156,11 @@ function appAdd(command: cli.IAppAddCommand): Promise<void> {
         });
 }
 
-function getOwner(app: App): string {
-    if (app && app.collaborator) {
-        for(var i = 0; i < app.collaborator.length; i++) {
-            if (app.collaborator[i].permission === "Owner") {
-                return app.collaborator[i].email;
+function getOwnerEmail(collaboratorList: Collaborator[]): string {
+    if (collaboratorList) {
+        for(var i = 0; i < collaboratorList.length; i++) {
+            if (collaboratorList[i].permission === "Owner") {
+                return collaboratorList[i].email;
             }
         }
     }
@@ -176,7 +176,7 @@ function appList(command: cli.IAppListCommand): Promise<void> {
         .then((retrievedApps: App[]): Promise<string[][]> => {
             apps = retrievedApps;
             var deploymentListPromises: Promise<string[]>[] = apps.map((app: App) => {
-                owners.push(getOwner(app));
+                owners.push(getOwnerEmail(app.collaborator));
 
                 return sdk.getDeployments(app.id)
                     .then((deployments: Deployment[]) => {
@@ -213,6 +213,7 @@ function appRemove(command: cli.IAppRemoveCommand): Promise<void> {
                 });
         });
 }
+
 function appTransfer(command: cli.ITransferCommand): Promise<void> {
     throwForInvalidEmail(command.email);
 
@@ -277,7 +278,7 @@ function listCollaborators(command: cli.ICollaboratorListCommand): Promise<void>
             throwForInvalidAppId(appId, command.appName);
 
             return sdk.getCollaboratorsList(appId)
-                .then((retrievedCollaborators: Collaborator[]): void => { //TODO: type - Collaborators[]
+                .then((retrievedCollaborators: Collaborator[]): void => {
                     printCollaboratorsList(command.format, retrievedCollaborators);
                 });
         });

@@ -557,7 +557,6 @@ export class AccountManager {
     }
 
     public addCollaborator(appId: string, email: string): Promise<void> {
-        // TODO: sanitize email
         return Promise<void>((resolve, reject, notify) => {
             var requester = (this._authedAgent ? this._authedAgent : request);
 
