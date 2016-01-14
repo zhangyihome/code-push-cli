@@ -1,6 +1,6 @@
 /// <reference path="../definitions/harness.d.ts" />
 
-import { UpdateCheckResponse, UpdateCheckRequest } from "rest-definitions";
+import { UpdateCheckResponse, UpdateCheckRequest, DeploymentStatusReport } from "rest-definitions";
 
 export module Http {
     export const enum Verb {
@@ -46,8 +46,10 @@ export interface LocalPackage extends Package {
 export interface Callback<T> { (error: Error, parameter: T): void; }
 
 export interface Configuration {
-    serverUrl: string;
+    appVersion: string;
+    clientUniqueId: string;
     deploymentKey: string;
+    serverUrl: string;
     ignoreAppVersion?: boolean
 }
 
@@ -57,6 +59,8 @@ export class AcquisitionStatus {
 }
 
 export class AcquisitionManager {
+    private _appVersion: string;
+    private _clientUniqueId: string;
     private _deploymentKey: string;
     private _httpRequester: Http.Requester;
     private _ignoreAppVersion: boolean;
@@ -70,6 +74,8 @@ export class AcquisitionManager {
             this._serverUrl += "/";
         }
 
+        this._appVersion = configuration.appVersion;
+        this._clientUniqueId = configuration.clientUniqueId;
         this._deploymentKey = configuration.deploymentKey;
         this._ignoreAppVersion = configuration.ignoreAppVersion;
     }
@@ -133,26 +139,38 @@ export class AcquisitionManager {
             callback(/*error=*/ null, remotePackage);
         });
     }
+    
+    public reportStatusDeploy(package?: Package, status?: string, callback?: Callback<void>): void {
+        var url: string = this._serverUrl + "reportStatus/deploy";
+        var body: DeploymentStatusReport = {
+            appVersion: this._appVersion,
+            clientUniqueId: this._clientUniqueId,
+            deploymentKey: this._deploymentKey
+        };
+        
+        if (package) {
+            body.label = package.label;
+            body.appVersion = package.appVersion;
+            
+            switch (status) {
+                case AcquisitionStatus.DeploymentSucceeded:
+                case AcquisitionStatus.DeploymentFailed:
+                    body.status = status;
+                    break;
 
-    public reportStatus(status: string, message?: string, callback?: Callback<void>): void {
-        var url: string = this._serverUrl + "reportStatus";
-        var body: string;
-
-        switch (status) {
-            case AcquisitionStatus.DeploymentSucceeded:
-            case AcquisitionStatus.DeploymentFailed:
-                url += "/deploy";
-                body = JSON.stringify({ deploymentKey: this._deploymentKey, status: status, message: message });
-                break;
-
-            default:
-                if (callback) {
-                    callback(new Error("Unrecognized status."), /*not used*/ null);
-                }
-                return;
+                default:
+                    if (callback) {
+                        if (!status) {
+                            callback(new Error("Missing status argument."), /*not used*/ null);
+                        } else {
+                            callback(new Error("Unrecognized status \"" + status + "\"."), /*not used*/ null);
+                        }
+                    }
+                    return;
+            }
         }
 
-        this._httpRequester.request(Http.Verb.POST, url, body, (error: Error, response: Http.Response): void => {
+        this._httpRequester.request(Http.Verb.POST, url, JSON.stringify(body), (error: Error, response: Http.Response): void => {
             if (callback) {
                 if (error) {
                     callback(error, /*not used*/ null);

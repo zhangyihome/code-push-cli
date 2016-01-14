@@ -11,8 +11,10 @@ import * as rest from "rest-definitions";
 var latestPackage: rest.UpdateCheckResponse = clone(mockApi.latestPackage);
 
 var configuration: acquisitionSdk.Configuration = {
-    serverUrl: mockApi.serverUrl,
+    appVersion: "1.5.0",
+    clientUniqueId: "My iPhone",
     deploymentKey: mockApi.validDeploymentKey,
+    serverUrl: mockApi.serverUrl,
 }
 
 var templateCurrentPackage: acquisitionSdk.Package = {
@@ -197,10 +199,10 @@ describe("Acquisition SDK", () => {
         done();
     });
 
-    it("reportStatus(...) signals completion", (done: MochaDone): void => {
+    it("reportStatusDeploy(...) signals completion", (done: MochaDone): void => {
         var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
 
-        acquisition.reportStatus(acquisitionSdk.AcquisitionStatus.DeploymentFailed, "message", ((error: Error, parameter: void): void => {
+        acquisition.reportStatusDeploy(templateCurrentPackage, acquisitionSdk.AcquisitionStatus.DeploymentFailed, ((error: Error, parameter: void): void => {
             if (error) {
                 throw error;
             }
