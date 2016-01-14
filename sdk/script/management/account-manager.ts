@@ -743,14 +743,15 @@ export class AccountManager {
     }
 
     private generateAccessKey(): Promise<string> {
-        return this.getAccountInfo().then((account: Account) => {
-            var accessKey = crypto.randomBytes(21)
-                .toString("base64")
-                .replace(/\+/g, "_")  // URL-friendly characters
-                .replace(/\//g, "-")
-                .concat(account.id);
+        return this.getAccountInfo()
+            .then((account: Account) => {
+                var accessKey = crypto.randomBytes(21)
+                    .toString("base64")
+                    .replace(/\+/g, "_")  // URL-friendly characters
+                    .replace(/\//g, "-")
+                    .concat(account.id);
 
-            return accessKey;
-        })
+                return accessKey;
+            });
     }
 }

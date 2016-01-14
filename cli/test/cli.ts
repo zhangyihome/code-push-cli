@@ -202,7 +202,7 @@ describe("CLI", () => {
     it("accessKeyRemove removes access key", (done: MochaDone): void => {
         var command: cli.IAccessKeyRemoveCommand = {
             type: cli.CommandType.accessKeyRemove,
-            accessKeyName: "8"
+            accessKey: "8"
         };
 
         var removeAccessKey: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeAccessKey");
@@ -221,7 +221,7 @@ describe("CLI", () => {
     it("accessKeyRemove does not remove access key if cancelled", (done: MochaDone): void => {
         var command: cli.IAccessKeyRemoveCommand = {
             type: cli.CommandType.accessKeyRemove,
-            accessKeyName: "8"
+            accessKey: "8"
         };
 
         var removeAccessKey: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeAccessKey");

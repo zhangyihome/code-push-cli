@@ -297,7 +297,7 @@ function createCommand(): cli.ICommand {
                         if (arg2) {
                             cmd = { type: cli.CommandType.accessKeyRemove };
 
-                            (<cli.IAccessKeyRemoveCommand>cmd).accessKeyName = arg2;
+                            (<cli.IAccessKeyRemoveCommand>cmd).accessKey = arg2;
                         }
                         break;
                 }

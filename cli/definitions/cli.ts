@@ -32,7 +32,7 @@ export interface IAccessKeyListCommand extends ICommand {
 }
 
 export interface IAccessKeyRemoveCommand extends ICommand {
-    accessKeyName: string;
+    accessKey: string;
 }
 
 export interface IAppAddCommand extends ICommand {

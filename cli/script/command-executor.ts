@@ -89,19 +89,19 @@ function accessKeyList(command: cli.IAccessKeyListCommand): Promise<void> {
 }
 
 function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
-    if (command.accessKeyName === sdk.accessKey) {
+    if (command.accessKey === sdk.accessKey) {
         throw new Error("Cannot remove the access key for the current session. Please run 'code-push logout' if you would like to remove this access key.");
     } else {
-        return getAccessKeyId(command.accessKeyName)
+        return getAccessKeyId(command.accessKey)
             .then((accessKeyId: string): Promise<void> => {
-                throwForInvalidAccessKeyId(accessKeyId, command.accessKeyName);
+                throwForInvalidAccessKeyId(accessKeyId, command.accessKey);
 
                 return confirm()
                     .then((wasConfirmed: boolean): Promise<void> => {
                         if (wasConfirmed) {
                             return sdk.removeAccessKey(accessKeyId)
                                 .then((): void => {
-                                    log("Successfully removed the \"" + command.accessKeyName + "\" access key.");
+                                    log("Successfully removed the \"" + command.accessKey + "\" access key.");
                                 });
                         }
 
@@ -308,7 +308,7 @@ function deserializeConnectionInfo(): ILegacyLoginConnectionInfo|ILoginConnectio
 }
 
 export function execute(command: cli.ICommand): Promise<void> {
-    var connectionInfo = deserializeConnectionInfo();
+    var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = deserializeConnectionInfo();
 
     return Q(<void>null)
         .then(() => {
@@ -333,15 +333,6 @@ export function execute(command: cli.ICommand): Promise<void> {
             }
 
             switch (command.type) {
-                case cli.CommandType.login:
-                    return login(<cli.ILoginCommand>command);
-
-                case cli.CommandType.register:
-                    return register(<cli.IRegisterCommand>command);
-
-                case cli.CommandType.logout:
-                    return logout(<cli.ILogoutCommand>command);
-
                 case cli.CommandType.accessKeyAdd:
                     return accessKeyAdd(<cli.IAccessKeyAddCommand>command);
 
@@ -378,8 +369,17 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.deploymentHistory:
                     return deploymentHistory(<cli.IDeploymentHistoryCommand>command);
 
+                case cli.CommandType.login:
+                    return login(<cli.ILoginCommand>command);
+
+                case cli.CommandType.logout:
+                    return logout(<cli.ILogoutCommand>command);
+
                 case cli.CommandType.promote:
                     return promote(<cli.IPromoteCommand>command);
+
+                case cli.CommandType.register:
+                    return register(<cli.IRegisterCommand>command);
 
                 case cli.CommandType.release:
                     return release(<cli.IReleaseCommand>command);
@@ -494,7 +494,6 @@ function login(command: cli.ILoginCommand): Promise<void> {
         return sdk.isAuthenticated()
             .then((isAuthenticated: boolean): void => {
                 if (isAuthenticated) {
-                    // The access token is valid.
                     serializeConnectionInfo(command.serverUrl, command.accessKey);
                 } else {
                     throw new Error("Invalid access key.");
@@ -515,13 +514,8 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
                 return;
             }
 
-            var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo;
-            try {
-                var decoded: string = base64.decode(accessToken);
-                connectionInfo = JSON.parse(decoded);
-            } catch (ex) {
-            }
-
+            var decoded: string = tryBase64Decode(accessToken);
+            var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = tryJSON(decoded);
             if (!connectionInfo) {
                 throw new Error("Invalid access token.");
             }
@@ -866,22 +860,21 @@ function requestAccessToken(): Promise<string> {
     });
 }
 
-function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
+function serializeConnectionInfo(serverUrl: string, accessTokenOrKey: string): void {
     // The access token should have been validated already (i.e.:  logging in).
-    var json: string = tryBase64Decode(accessToken);
-    var standardLoginConnectionInfo: ILegacyLoginConnectionInfo = tryJSON(json);
+    var json: string = tryBase64Decode(accessTokenOrKey);
+    var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = tryJSON(json);
 
-    if (standardLoginConnectionInfo) {
-        // This is a normal login.
-        standardLoginConnectionInfo.serverUrl = serverUrl;
-        json = JSON.stringify(standardLoginConnectionInfo);
-        fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
+    if (connectionInfo) {
+        // This is a legacy login format
+        connectionInfo.serverUrl = serverUrl;
     } else {
-        // This login uses an access token
-        var accessKeyLoginConnectionInfo: ILoginConnectionInfo = { serverUrl: serverUrl, accessKey: accessToken };
-        json = JSON.stringify(accessKeyLoginConnectionInfo);
-        fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
+        // This login uses an access key
+        connectionInfo = <ILoginConnectionInfo>{ serverUrl: serverUrl, accessKey: accessTokenOrKey };
     }
+
+    json = JSON.stringify(connectionInfo);
+    fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
 
     log("\r\nSuccessfully logged-in. Your session token was written to " + chalk.cyan(configFilePath) + ". You can run the " + chalk.cyan("code-push logout") + " command at any time to delete this file and terminate your session.\r\n");
 }
@@ -898,7 +891,6 @@ function throwForMissingCredentials(accessKeyName: string, providerName: string,
     if (!accessKeyName) throw new Error("Access key is missing.");
     if (!providerName) throw new Error("Provider name is missing.");
     if (!providerUniqueId) throw new Error("Provider unique ID is missing.");
-
 }
 
 function throwForInvalidAccessKeyId(accessKeyId: string, accessKeyName: string): void {
