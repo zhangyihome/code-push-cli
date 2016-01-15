@@ -556,10 +556,9 @@ describe("CLI", () => {
             .done((): void => {
                 throw "Error Expected";
             }, (error: any): void => {
-                if (error) {
-                    assert.equal(error.message, RELEASE_FAILED_ERROR_MESSAGE);
-                    done();
-                }
+                assert (!!error);
+                assert.equal(error.message, RELEASE_FAILED_ERROR_MESSAGE);
+                done();
             });
     }
 });
