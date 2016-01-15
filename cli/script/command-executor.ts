@@ -743,7 +743,7 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
 
 function release(command: cli.IReleaseCommand): Promise<void> {
     if (isBinaryOrZip(command.package)) {
-        throw new Error("It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platoforms/ios/www) or file (e.g. main.jsbundle).");
+        throw new Error("It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).");
     } else if (semver.valid(command.appStoreVersion) === null) {
         throw new Error("Please use a semver compliant app store version, for example \"1.0.3\".");
     }
