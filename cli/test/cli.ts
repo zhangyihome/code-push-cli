@@ -139,7 +139,7 @@ describe("CLI", () => {
     var log: Sinon.SinonStub;
     var sandbox: Sinon.SinonSandbox;
     var wasConfirmed = true;
-    var releaseErrorMessage: string;
+    const RELEASE_FAILED_ERROR_MESSAGE: string = "It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).";
 
     beforeEach((): void => {
         wasConfirmed = true;
@@ -150,7 +150,6 @@ describe("CLI", () => {
         log = sandbox.stub(cmdexec, "log", (message: string): void => { });
         sandbox.stub(cmdexec, "loginWithAccessToken", (): Promise<void> => Q(<void>null));
 
-        releaseErrorMessage = "It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).";
         cmdexec.sdk = <any>new SdkStub();
     });
 
@@ -517,14 +516,7 @@ describe("CLI", () => {
 
         var release: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "release");
 
-        cmdexec.execute(command)
-            .done((): void => {
-            }, (error: any): void => {
-                if (error) {
-                    assert.equal(error.message, releaseErrorMessage);
-                    done();
-                }
-            });
+        releaseHelperFunction(command, done);
     });
 
     it("release doesn't allow releasing .ipa file", (done: MochaDone): void => {
@@ -540,14 +532,7 @@ describe("CLI", () => {
 
         var release: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "release");
 
-        cmdexec.execute(command)
-            .done((): void => {
-            }, (error: any): void => {
-                if (error) {
-                    assert.equal(error.message, releaseErrorMessage);
-                    done();
-                }
-            });
+        releaseHelperFunction(command, done);
     });
 
     it("release doesn't allow releasing .apk file", (done: MochaDone): void => {
@@ -563,13 +548,18 @@ describe("CLI", () => {
 
         var release: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "release");
 
+        releaseHelperFunction(command, done);
+    });
+
+    function releaseHelperFunction(command: cli.IReleaseCommand, done: MochaDone): void {
         cmdexec.execute(command)
             .done((): void => {
+                throw "Error Expected";
             }, (error: any): void => {
                 if (error) {
-                    assert.equal(error.message, releaseErrorMessage);
+                    assert.equal(error.message, RELEASE_FAILED_ERROR_MESSAGE);
                     done();
                 }
             });
-    });
+    }
 });
