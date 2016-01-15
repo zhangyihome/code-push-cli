@@ -110,6 +110,10 @@ export class SdkStub {
         ]);
     }
 
+    public release(appId: string, deploymentId: string): Promise<string> {
+        return Q("Successfully released");
+    }
+
     public removeAccessKey(accessKeyId: string): Promise<void> {
         return Q(<void>null);
     }
@@ -495,6 +499,75 @@ describe("CLI", () => {
 
                 assertJsonDescribesObject(actual, expected);
                 done();
+            });
+    });
+
+    it("release doesn't allow releasing .zip file", (done: MochaDone): void => {
+        var command: cli.IReleaseCommand = {
+            type: cli.CommandType.release,
+            appName: "a",
+            deploymentName: "Staging",
+            description: "test releasing zip file",
+            mandatory: false,
+            appStoreVersion: "1.0.0",
+            package: "/fake/path/test/file.zip"
+        };
+
+        var release: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "release");
+
+        cmdexec.execute(command)
+            .done((): void => {
+            }, (error: any): void => {
+                if (error) {
+                    assert.equal(error.message, "It is unnecessary to package releases in a .zip or binary file. Please specify the path of the desired directory or file directly.");
+                    done();
+                }
+            });
+    });
+
+    it("release doesn't allow releasing .ipa file", (done: MochaDone): void => {
+        var command: cli.IReleaseCommand = {
+            type: cli.CommandType.release,
+            appName: "a",
+            deploymentName: "Staging",
+            description: "test releasing zip file",
+            mandatory: false,
+            appStoreVersion: "1.0.0",
+            package: "/fake/path/test/file.ipa"
+        };
+
+        var release: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "release");
+
+        cmdexec.execute(command)
+            .done((): void => {
+            }, (error: any): void => {
+                if (error) {
+                    assert.equal(error.message, "It is unnecessary to package releases in a .zip or binary file. Please specify the path of the desired directory or file directly.");
+                    done();
+                }
+            });
+    });
+
+    it("release doesn't allow releasing .apk file", (done: MochaDone): void => {
+        var command: cli.IReleaseCommand = {
+            type: cli.CommandType.release,
+            appName: "a",
+            deploymentName: "Staging",
+            description: "test releasing zip file",
+            mandatory: false,
+            appStoreVersion: "1.0.0",
+            package: "/fake/path/test/file.apk"
+        };
+
+        var release: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "release");
+
+        cmdexec.execute(command)
+            .done((): void => {
+            }, (error: any): void => {
+                if (error) {
+                    assert.equal(error.message, "It is unnecessary to package releases in a .zip or binary file. Please specify the path of the desired directory or file directly.");
+                    done();
+                }
             });
     });
 });
