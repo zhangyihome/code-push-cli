@@ -139,6 +139,7 @@ describe("CLI", () => {
     var log: Sinon.SinonStub;
     var sandbox: Sinon.SinonSandbox;
     var wasConfirmed = true;
+    var releaseErrorMessage: string;
 
     beforeEach((): void => {
         wasConfirmed = true;
@@ -149,6 +150,7 @@ describe("CLI", () => {
         log = sandbox.stub(cmdexec, "log", (message: string): void => { });
         sandbox.stub(cmdexec, "loginWithAccessToken", (): Promise<void> => Q(<void>null));
 
+        releaseErrorMessage = "It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platoforms/ios/www) or file (e.g. main.jsbundle).";
         cmdexec.sdk = <any>new SdkStub();
     });
 
@@ -519,7 +521,7 @@ describe("CLI", () => {
             .done((): void => {
             }, (error: any): void => {
                 if (error) {
-                    assert.equal(error.message, "It is unnecessary to package releases in a .zip or binary file. Please specify the path of the desired directory or file directly.");
+                    assert.equal(error.message, releaseErrorMessage);
                     done();
                 }
             });
@@ -542,7 +544,7 @@ describe("CLI", () => {
             .done((): void => {
             }, (error: any): void => {
                 if (error) {
-                    assert.equal(error.message, "It is unnecessary to package releases in a .zip or binary file. Please specify the path of the desired directory or file directly.");
+                    assert.equal(error.message, releaseErrorMessage);
                     done();
                 }
             });
@@ -565,7 +567,7 @@ describe("CLI", () => {
             .done((): void => {
             }, (error: any): void => {
                 if (error) {
-                    assert.equal(error.message, "It is unnecessary to package releases in a .zip or binary file. Please specify the path of the desired directory or file directly.");
+                    assert.equal(error.message, releaseErrorMessage);
                     done();
                 }
             });
