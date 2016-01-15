@@ -532,7 +532,7 @@ describe("CLI", () => {
             type: cli.CommandType.release,
             appName: "a",
             deploymentName: "Staging",
-            description: "test releasing zip file",
+            description: "test releasing ipa file",
             mandatory: false,
             appStoreVersion: "1.0.0",
             package: "/fake/path/test/file.ipa"
@@ -555,7 +555,7 @@ describe("CLI", () => {
             type: cli.CommandType.release,
             appName: "a",
             deploymentName: "Staging",
-            description: "test releasing zip file",
+            description: "test releasing apk file",
             mandatory: false,
             appStoreVersion: "1.0.0",
             package: "/fake/path/test/file.apk"

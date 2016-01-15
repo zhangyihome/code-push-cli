@@ -910,8 +910,8 @@ function tryBase64Decode(encoded: string): string {
 
 function isBinaryOrZip(path: string): boolean {
     return path.search(/\.zip$/i) !== -1
-            || path.search(/\.apk$/i) !== -1
-            || path.search(/\.ipa$/i) !== -1;
+    || path.search(/\.apk$/i) !== -1
+    || path.search(/\.ipa$/i) !== -1;
 }
 
 function throwForMissingCredentials(accessKeyName: string, providerName: string, providerUniqueId: string): void {
