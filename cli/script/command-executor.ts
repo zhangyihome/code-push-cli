@@ -741,8 +741,8 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
 }
 
 function release(command: cli.IReleaseCommand): Promise<void> {
-    if (command.package.search(/\.zip$/i) !== -1) {
-        throw new Error("It is unnecessary to package releases in a .zip file. Please specify the path of the desired directory or file directly.");
+    if (isBinaryOrZip(command.package)) {
+        throw new Error("It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).");
     } else if (semver.valid(command.appStoreVersion) === null) {
         throw new Error("Please use a semver compliant app store version, for example \"1.0.3\".");
     }
@@ -905,6 +905,12 @@ function tryBase64Decode(encoded: string): string {
     } catch (ex) {
         return null;
     }
+}
+
+function isBinaryOrZip(path: string): boolean {
+    return path.search(/\.zip$/i) !== -1
+        || path.search(/\.apk$/i) !== -1
+        || path.search(/\.ipa$/i) !== -1;
 }
 
 function throwForMissingCredentials(accessKeyName: string, providerName: string, providerUniqueId: string): void {
