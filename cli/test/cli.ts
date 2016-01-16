@@ -514,8 +514,6 @@ describe("CLI", () => {
             package: "/fake/path/test/file.zip"
         };
 
-        var release: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "release");
-
         releaseHelperFunction(command, done);
     });
 
@@ -529,8 +527,6 @@ describe("CLI", () => {
             appStoreVersion: "1.0.0",
             package: "/fake/path/test/file.ipa"
         };
-
-        var release: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "release");
 
         releaseHelperFunction(command, done);
     });
@@ -546,12 +542,11 @@ describe("CLI", () => {
             package: "/fake/path/test/file.apk"
         };
 
-        var release: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "release");
-
         releaseHelperFunction(command, done);
     });
 
     function releaseHelperFunction(command: cli.IReleaseCommand, done: MochaDone): void {
+        var release: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "release");
         cmdexec.execute(command)
             .done((): void => {
                 throw "Error Expected";
