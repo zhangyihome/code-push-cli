@@ -190,6 +190,7 @@ export class AcquisitionManager {
     public reportStatusDownload(package: Package, callback?: Callback<void>): void {
         var url: string = this._serverUrl + "reportStatus/download";
         var body: DownloadReport = {
+            clientUniqueId: this._clientUniqueId,
             deploymentKey: this._deploymentKey,
             label: package.label
         };

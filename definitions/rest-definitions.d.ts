@@ -16,6 +16,7 @@ declare module "rest-definitions" {
     }
 
     export interface DownloadReport {
+        clientUniqueId: string;
         deploymentKey: string; 
         label: string;
     }
