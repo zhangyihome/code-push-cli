@@ -21,6 +21,7 @@ export var latestPackage = <rest.UpdateCheckResponse>{
 
 export var serverUrl = "http://myurl.com";
 var reportStatusDeployUrl = serverUrl + "/reportStatus/deploy";
+var reportStatusDownloadUrl = serverUrl + "/reportStatus/download";
 var updateCheckUrl = serverUrl + "/updateCheck?";
 
 export class HttpRequester implements acquisitionSdk.Http.Requester {
@@ -33,6 +34,8 @@ export class HttpRequester implements acquisitionSdk.Http.Requester {
             var params = querystring.parse(url.substring(updateCheckUrl.length));
             Server.onUpdateCheck(params, callback);
         } else if (verb === acquisitionSdk.Http.Verb.POST && url === reportStatusDeployUrl) {
+            Server.onReportStatus(callback);
+        } else if (verb === acquisitionSdk.Http.Verb.POST && url === reportStatusDownloadUrl) {
             Server.onReportStatus(callback);
         } else {
             throw new Error("Unexpected call");
