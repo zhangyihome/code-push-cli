@@ -11,12 +11,19 @@
     deploymentRemove,
     deploymentRename,
     deploymentHistory,
+    deploymentMetrics,
     login,
     logout,
     promote,
     register,
     release,
     rollback
+}
+
+export interface DeploymentMetric {
+    active: number;
+    failed: number;
+    installed: number;
 }
 
 export interface ICommand {
@@ -74,6 +81,12 @@ export interface IDeploymentRenameCommand extends ICommand {
 }
 
 export interface IDeploymentHistoryCommand extends ICommand {
+    appName: string;
+    deploymentName: string;
+    format: string;
+}
+
+export interface IDeploymentMetricsCommand extends ICommand {
     appName: string;
     deploymentName: string;
     format: string;

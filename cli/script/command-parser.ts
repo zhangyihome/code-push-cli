@@ -124,6 +124,17 @@ function deploymentHistory(commandName: string, yargs: yargs.Argv): void {
     addCommonConfiguration(yargs);
 }
 
+function deploymentMetrics(commandName: string, yargs: yargs.Argv): void {
+    isValidCommand = true;
+    yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> <deploymentName> [--format <format>]")
+        .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
+        .example("deployment " + commandName + " MyApp MyDeployment", "Shows the acquisition metrics for deployment \"MyDeployment\" from app \"MyApp\" in tabular format")
+        .example("deployment " + commandName + " MyApp MyDeployment --format json", "Shows the acquisition metrics for deployment \"MyDeployment\" from app \"MyApp\" in JSON format")
+        .option("format", { default: "table", demand: false, description: "The output format (\"json\" or \"table\")", type: "string" });
+
+    addCommonConfiguration(yargs);
+}
+
 var argv = yargs.usage(USAGE_PREFIX + " <command>")
     .demand(/*count*/ 1, /*max*/ 1)  // Require exactly one non-option argument.
     .command("access-key", "View and delete active user sessions", (yargs: yargs.Argv) => {
@@ -220,6 +231,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .command("ls", "List the deployments associated with an app", (yargs: yargs.Argv) => deploymentList("ls", yargs))
             .command("history", "Show the release history of a specific deployment", (yargs: yargs.Argv) => deploymentHistory("history", yargs))
             .command("h", "Show the release history of a specific deployment", (yargs: yargs.Argv) => deploymentHistory("h", yargs))
+            .command("metrics", "Show the acquisition metrics of a specific deployment", (yargs: yargs.Argv) => deploymentMetrics("metrics", yargs))
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
         addCommonConfiguration(yargs);
@@ -401,6 +413,18 @@ function createCommand(): cli.ICommand {
                             deploymentHistoryCommand.appName = arg2;
                             deploymentHistoryCommand.deploymentName = arg3;
                             deploymentHistoryCommand.format = argv["format"];
+                        }
+                        break;
+
+                    case "metrics":
+                        if (arg2 && arg3) {
+                            cmd = { type: cli.CommandType.deploymentMetrics };
+
+                            var deploymentMetricsCommand = <cli.IDeploymentMetricsCommand>cmd;
+
+                            deploymentMetricsCommand.appName = arg2;
+                            deploymentMetricsCommand.deploymentName = arg3;
+                            deploymentMetricsCommand.format = argv["format"];
                         }
                         break;
                 }

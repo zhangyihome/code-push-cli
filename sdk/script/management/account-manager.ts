@@ -596,6 +596,36 @@ export class AccountManager {
         });
     }
 
+    public getDeploymentMetrics(appId: string, deploymentId: string) {
+        return Promise<any>((resolve, reject, notify) => {
+            var requester = (this._authedAgent ? this._authedAgent : request);
+            var req = requester.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/metrics");
+            this.attachCredentials(req, requester);
+
+            req.end((err: any, res: request.Response) => {
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
+
+                var body = tryJSON(res.text);
+                if (res.ok) {
+                    if (body) {
+                        resolve(body.metrics);
+                    } else {
+                        reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
+                    }
+                } else {
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
+        });
+    }
+
     public updateDeployment(appId: string, infoToChange: Deployment): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             var requester = (this._authedAgent ? this._authedAgent : request);

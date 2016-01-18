@@ -18,6 +18,7 @@ import * as yazl from "yazl";
 import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
+import { AcquisitionStatus } from "code-push/script/acquisition-sdk";
 import { AccessKey, AccountManager, App, Deployment, DeploymentKey, Package } from "code-push";
 var packageJson = require("../package.json");
 import Promise = Q.Promise;
@@ -325,6 +326,27 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
         });
 }
 
+function deploymentMetrics(command: cli.IDeploymentMetricsCommand): Promise<void> {
+    throwForInvalidOutputFormat(command.format);
+    var storedAppId: string;
+
+    return getAppId(command.appName)
+        .then((appId: string): Promise<string> => {
+            throwForInvalidAppId(appId, command.appName);
+            storedAppId = appId;
+
+            return getDeploymentId(appId, command.deploymentName);
+        })
+        .then((deploymentId: string): Promise<Package[]> => {
+            throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
+
+            return sdk.getDeploymentMetrics(storedAppId, deploymentId);
+        })
+        .then((metrics: any): void => {
+            printDeploymentMetrics(command, metrics);
+        });
+}
+
 function deserializeConnectionInfo(): IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo {
     var savedConnection: string;
 
@@ -398,6 +420,9 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.deploymentHistory:
                     return deploymentHistory(<cli.IDeploymentHistoryCommand>command);
+                    
+                case cli.CommandType.deploymentMetrics:
+                    return deploymentMetrics(<cli.IDeploymentMetricsCommand>command);
 
                 case cli.CommandType.promote:
                     return promote(<cli.IPromoteCommand>command);
@@ -658,6 +683,54 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
                     packageObject.appVersion,
                     packageObject.isMandatory ? "Yes" : "No",
                     packageObject.description ? wordwrap(30)(packageObject.description) : ""
+                ]);
+            });
+        });
+    }
+}
+
+function printDeploymentMetrics(command: cli.IDeploymentMetricsCommand, metrics: any): void {
+    var labelToMetricsMap: { [label: string] : cli.DeploymentMetric } = {};
+    var totalActive: number = 0;
+    
+    Object.keys(metrics).forEach((metricKey: string) => {
+        var parsedKey: string[] = metricKey.split(":");
+        var label: string = parsedKey[0];
+        var metricType: string = parsedKey[1];
+        labelToMetricsMap[label] = labelToMetricsMap[label] || {
+            installed: 0,
+            failed: 0,
+            active: 0
+        };
+        
+        switch (metricType) {
+            case "Active":
+                totalActive += metrics[metricKey];
+                labelToMetricsMap[label].active += metrics[metricKey];
+                break;
+            case AcquisitionStatus.DeploymentSucceeded:
+                labelToMetricsMap[label].installed += metrics[metricKey];
+                break;
+            case AcquisitionStatus.DeploymentFailed:
+                labelToMetricsMap[label].failed += metrics[metricKey];
+                break;
+        }
+    });
+    
+    if (command.format === "json") {
+        printJson(labelToMetricsMap);
+    } else if (command.format === "table") {
+        printTable(["Label", "Active", "Installed", "Failed"], (dataSource: any[]) => {
+            Object.keys(labelToMetricsMap).forEach((label: string) => {
+                var percent: number = totalActive
+                    ? labelToMetricsMap[label].active / totalActive * 100
+                    : 0.0;
+                var percentString = percent === 100.0 ? "100" : percent.toPrecision(2);
+                dataSource.push([
+                    label,
+                    labelToMetricsMap[label].active + " (" + percentString + "%)",
+                    labelToMetricsMap[label].installed,
+                    labelToMetricsMap[label].failed ? chalk.red("" + labelToMetricsMap[label].failed) : labelToMetricsMap[label].failed
                 ]);
             });
         });
