@@ -1,6 +1,6 @@
 /// <reference path="../definitions/harness.d.ts" />
 
-import { UpdateCheckResponse, UpdateCheckRequest, DeploymentStatusReport } from "rest-definitions";
+import { UpdateCheckResponse, UpdateCheckRequest, DeploymentStatusReport, DownloadReport } from "rest-definitions";
 
 export module Http {
     export const enum Verb {
@@ -170,6 +170,30 @@ export class AcquisitionManager {
             }
         }
 
+        this._httpRequester.request(Http.Verb.POST, url, JSON.stringify(body), (error: Error, response: Http.Response): void => {
+            if (callback) {
+                if (error) {
+                    callback(error, /*not used*/ null);
+                    return;
+                }
+
+                if (response.statusCode !== 200) {
+                    callback(new Error(response.statusCode + ": " + response.body), /*not used*/ null);
+                    return;
+                }
+
+                callback(/*error*/ null, /*not used*/ null);
+            }
+        });
+    }
+    
+    public reportStatusDownload(package: Package, callback?: Callback<void>): void {
+        var url: string = this._serverUrl + "reportStatus/download";
+        var body: DownloadReport = {
+            deploymentKey: this._deploymentKey,
+            label: package.label
+        };
+        
         this._httpRequester.request(Http.Verb.POST, url, JSON.stringify(body), (error: Error, response: Http.Response): void => {
             if (callback) {
                 if (error) {
