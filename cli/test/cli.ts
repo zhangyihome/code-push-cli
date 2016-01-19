@@ -406,7 +406,7 @@ describe("CLI", () => {
                             isMandatory: true,
                             size: 10,
                             blobUrl: "http://mno.pqr",
-                            uploadTime: +1000,
+                            uploadTime: 1000,
                             metrics: {
                                 active: 123,
                                 downloaded: 321,
