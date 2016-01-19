@@ -3,7 +3,7 @@
 import * as assert from "assert";
 import * as Q from "q";
 
-import { AccountManager } from "../script/management/account-manager";
+import { AccountManager } from "../script/account-manager";
 
 var request = require("superagent");
 
