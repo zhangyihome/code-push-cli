@@ -212,6 +212,20 @@ describe("Acquisition SDK", () => {
             done();
         }));
     });
+    
+    it("reportStatusDownload(...) signals completion", (done: MochaDone): void => {
+        var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
+
+        acquisition.reportStatusDownload(templateCurrentPackage, ((error: Error, parameter: void): void => {
+            if (error) {
+                throw error;
+            }
+
+            assert.equal(parameter, /*expected*/ null);
+
+            done();
+        }));
+    });
 });
 
 function clone<T>(initialObject: T): T {
