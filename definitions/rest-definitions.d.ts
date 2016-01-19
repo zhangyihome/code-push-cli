@@ -69,6 +69,10 @@ declare module "rest-definitions" {
         /*generated*/ key: string;
         name: string;
     }
+    
+    export interface DeploymentMetrics {
+        [labelStatus: string]: number;
+    }
 
     export interface Package extends PackageInfo {
         /*generated*/ blobUrl: string;

@@ -82,7 +82,7 @@ export class SdkStub {
                 isMandatory: true,
                 size: 10,
                 blobUrl: "http://mno.pqr",
-                uploadTime: +1000
+                uploadTime: 1000
             }
         }]);
     }

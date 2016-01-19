@@ -19,7 +19,7 @@ import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
 import { AcquisitionStatus } from "code-push/script/acquisition-sdk";
-import { AccessKey, AccountManager, App, Deployment, DeploymentKey, Package } from "code-push";
+import { AccessKey, AccountManager, App, Deployment, DeploymentKey, DeploymentMetrics, Package } from "code-push";
 var packageJson = require("../package.json");
 import Promise = Q.Promise;
 var progress = require("progress");
@@ -278,7 +278,7 @@ export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: b
                         var metricsPromises: Promise<void>[] = deployments.map((deployment: Deployment) => {
                             if (deployment.package) {
                                 return sdk.getDeploymentMetrics(theAppId, deployment.id)
-                                    .then((metrics: any): void => {
+                                    .then((metrics: DeploymentMetrics): void => {
                                         (<PackageWithMetrics>(deployment.package)).metrics = {
                                             active: metrics[getLabelMetricKey(deployment.package.label, ACTIVE_METRICS_KEY)] || 0,
                                             downloaded: metrics[getLabelMetricKey(deployment.package.label, DOWNLOADED_METRICS_KEY)] || 0,
@@ -363,7 +363,7 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
         })
         .then((packageHistory: Package[]): Promise<void> => {
             return sdk.getDeploymentMetrics(storedAppId, storedDeploymentId)
-                .then((metrics: any): void => {
+                .then((metrics: DeploymentMetrics): void => {
                     packageHistory.forEach((packageObject: Package) => {
                         (<PackageWithMetrics>packageObject).metrics = {
                             active: metrics[getLabelMetricKey(packageObject.label, ACTIVE_METRICS_KEY)] || 0,
@@ -388,12 +388,12 @@ function deploymentMetrics(command: cli.IDeploymentMetricsCommand): Promise<void
 
             return getDeploymentId(appId, command.deploymentName);
         })
-        .then((deploymentId: string): Promise<Package[]> => {
+        .then((deploymentId: string): Promise<DeploymentMetrics> => {
             throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
 
             return sdk.getDeploymentMetrics(storedAppId, deploymentId);
         })
-        .then((metrics: any): void => {
+        .then((metrics: DeploymentMetrics): void => {
             printDeploymentMetrics(command, metrics);
         });
 }
@@ -460,20 +460,20 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.deploymentAdd:
                     return deploymentAdd(<cli.IDeploymentAddCommand>command);
 
+                case cli.CommandType.deploymentHistory:
+                    return deploymentHistory(<cli.IDeploymentHistoryCommand>command);
+
                 case cli.CommandType.deploymentList:
                     return deploymentList(<cli.IDeploymentListCommand>command);
 
+                case cli.CommandType.deploymentMetrics:
+                    return deploymentMetrics(<cli.IDeploymentMetricsCommand>command);
+                    
                 case cli.CommandType.deploymentRemove:
                     return deploymentRemove(<cli.IDeploymentRemoveCommand>command);
 
                 case cli.CommandType.deploymentRename:
                     return deploymentRename(<cli.IDeploymentRenameCommand>command);
-
-                case cli.CommandType.deploymentHistory:
-                    return deploymentHistory(<cli.IDeploymentHistoryCommand>command);
-                    
-                case cli.CommandType.deploymentMetrics:
-                    return deploymentMetrics(<cli.IDeploymentMetricsCommand>command);
 
                 case cli.CommandType.promote:
                     return promote(<cli.IPromoteCommand>command);
@@ -574,7 +574,7 @@ function getDeploymentId(appId: string, deploymentName: string): Promise<string>
         });
 }
 
-function getLabelMetricKey(label: string, metricType: string) {
+function getLabelMetricKey(label: string, metricType: string): string {
     return label + ":" + metricType;
 }
 
@@ -706,7 +706,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
                 var row = [deployment.name, deploymentKeys[index]];
                 if (showPackage) {
                     row.push(getPackageString(deployment.package));
-                    row.push(getPackageMetricsString(<PackageWithMetrics>(deployment.package)))
+                    row.push(getPackageMetricsString(<PackageWithMetrics>(deployment.package)));
                 }
                 dataSource.push(row);
             });
@@ -714,7 +714,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
     }
 }
 
-function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageHistory: PackageWithMetrics[], metrics: any): void {
+function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageHistory: PackageWithMetrics[], metrics: DeploymentMetrics): void {
     if (command.format === "json") {
         printJson(packageHistory);
     } else if (command.format === "table") {
@@ -747,17 +747,17 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
     }
 }
 
-function printDeploymentMetrics(command: cli.IDeploymentMetricsCommand, metrics: any): void {
+function printDeploymentMetrics(command: cli.IDeploymentMetricsCommand, metrics: DeploymentMetrics): void {
     var labelToMetricsMap: { [label: string] : DeploymentMetric } = {};
     var totalActive: number = 0;
-    var versionRegex = /v(\d+)/;
+    var labelRegex = /^v\d+$/;
     
     Object.keys(metrics).forEach((metricKey: string) => {
         var parsedKey: string[] = metricKey.split(":");
         var label: string = parsedKey[0];
         var metricType: string = parsedKey[1];
         if (!labelToMetricsMap[label]) {
-            labelToMetricsMap[label] = versionRegex.test(label) 
+            labelToMetricsMap[label] = labelRegex.test(label) 
                 ? {
                     active: 0,
                     downloaded: 0,
@@ -791,7 +791,7 @@ function printDeploymentMetrics(command: cli.IDeploymentMetricsCommand, metrics:
     } else if (command.format === "table") {
         printTable(["Label", "Active", "Downloaded", "Installed", "Failed"], (dataSource: any[]) => {
             Object.keys(labelToMetricsMap).forEach((label: string) => {
-                var isCodePushLabel: boolean = versionRegex.test(label);
+                var isLabel: boolean = labelRegex.test(label);
                 var percent: number = totalActive
                     ? labelToMetricsMap[label].active / totalActive * 100
                     : 0.0;
@@ -799,9 +799,9 @@ function printDeploymentMetrics(command: cli.IDeploymentMetricsCommand, metrics:
                 dataSource.push([
                     label,
                     labelToMetricsMap[label].active + " (" + percentString + "%)",
-                    isCodePushLabel ? labelToMetricsMap[label].downloaded : "",
-                    isCodePushLabel ? labelToMetricsMap[label].installed : "",
-                    isCodePushLabel ? labelToMetricsMap[label].failed : ""
+                    isLabel ? labelToMetricsMap[label].downloaded : "",
+                    isLabel ? labelToMetricsMap[label].installed : "",
+                    isLabel ? labelToMetricsMap[label].failed : ""
                 ]);
             });
         });

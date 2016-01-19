@@ -17,8 +17,8 @@ if (typeof window === "undefined") {
     }
 }
 
-import { AccessKey, Account, App, Deployment, DeploymentKey, Package } from "rest-definitions";
-export { AccessKey, Account, App, Deployment, DeploymentKey, Package };
+import { AccessKey, Account, App, Deployment, DeploymentKey, DeploymentMetrics, Package } from "rest-definitions";
+export { AccessKey, Account, App, Deployment, DeploymentKey, DeploymentMetrics, Package };
 
 export interface CodePushError {
     message?: string;
@@ -566,7 +566,7 @@ export class AccountManager {
         });
     }
 
-    public getDeployment(appId: string, deploymentId: string) {
+    public getDeployment(appId: string, deploymentId: string): Promise<Deployment> {
         return Promise<Deployment>((resolve, reject, notify) => {
             var requester = (this._authedAgent ? this._authedAgent : request);
             var req = requester.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId);
@@ -596,8 +596,8 @@ export class AccountManager {
         });
     }
 
-    public getDeploymentMetrics(appId: string, deploymentId: string) {
-        return Promise<any>((resolve, reject, notify) => {
+    public getDeploymentMetrics(appId: string, deploymentId: string): Promise<DeploymentMetrics> {
+        return Promise<DeploymentMetrics>((resolve, reject, notify) => {
             var requester = (this._authedAgent ? this._authedAgent : request);
             var req = requester.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/metrics");
             this.attachCredentials(req, requester);
