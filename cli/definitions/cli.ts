@@ -20,12 +20,6 @@
     rollback
 }
 
-export interface DeploymentMetric {
-    active: number;
-    failed: number;
-    installed: number;
-}
-
 export interface ICommand {
     type: CommandType;
 }

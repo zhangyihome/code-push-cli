@@ -77,7 +77,7 @@ export class SdkStub {
             package: {
                 appVersion: "1.0.0",
                 description: "fgh",
-                label: "ghi",
+                label: "v2",
                 packageHash: "jkl",
                 isMandatory: true,
                 size: 10,
@@ -110,6 +110,20 @@ export class SdkStub {
                 label: "v2"
             }
         ]);
+    }
+    
+    public getDeploymentMetrics(appId: string, deploymentId: string): Promise<any> {
+        return Q({
+            "1.0.0:Active": 123,
+            "v1:Downloaded": 456,
+            "v1:Active": 789,
+            "v1:DeploymentSucceeded": 987,
+            "v1:DeploymentFailed": 654,
+            "v2:Downloaded": 321,
+            "v2:Active": 123,
+            "v2:DeploymentSucceeded": 456,
+            "v2:DeploymentFailed": 789,
+        });
     }
 
     public release(appId: string, deploymentId: string): Promise<string> {
@@ -387,12 +401,18 @@ describe("CLI", () => {
                         package: {
                             appVersion: "1.0.0",
                             description: "fgh",
-                            label: "ghi",
+                            label: "v2",
                             packageHash: "jkl",
                             isMandatory: true,
                             size: 10,
                             blobUrl: "http://mno.pqr",
-                            uploadTime: +1000
+                            uploadTime: +1000,
+                            metrics: {
+                                active: 123,
+                                downloaded: 321,
+                                failed: 789,
+                                installed: 456
+                            }
                         }
                     }
                 ];
@@ -481,7 +501,7 @@ describe("CLI", () => {
 
                 var actual: string = log.args[0][0];
                 var expected: codePush.Package[] = [
-                    <codePush.Package>{
+                    <cmdexec.PackageWithMetrics>{
                         description: null,
                         appVersion: "1.0.0",
                         isMandatory: false,
@@ -489,9 +509,15 @@ describe("CLI", () => {
                         blobUrl: "https://fakeblobstorage.net/storagev2/blobid1",
                         uploadTime: 1447113596270,
                         size: 1,
-                        label: "v1"
+                        label: "v1",
+                        metrics: {
+                            active: 789,
+                            downloaded: 456,
+                            failed: 654,
+                            installed: 987
+                        }
                     },
-                    <codePush.Package>{
+                    <cmdexec.PackageWithMetrics>{
                         description: "New update - this update does a whole bunch of things, including testing linewrapping",
                         appVersion: "1.0.1",
                         isMandatory: false,
@@ -499,7 +525,13 @@ describe("CLI", () => {
                         blobUrl: "https://fakeblobstorage.net/storagev2/blobid2",
                         uploadTime: 1447118476669,
                         size: 2,
-                        label: "v2"
+                        label: "v2",
+                        metrics: {
+                            active: 123,
+                            downloaded: 321,
+                            failed: 789,
+                            installed: 456
+                        }
                     }
                 ];
 
@@ -508,6 +540,46 @@ describe("CLI", () => {
             });
     });
 
+    it("deploymentMetrics lists metrics for deployment", (done: MochaDone): void => {
+        var command: cli.IDeploymentMetricsCommand = {
+            type: cli.CommandType.deploymentMetrics,
+            appName: "a",
+            deploymentName: "Staging",
+            format: "json"
+        };
+
+        var getDeploymentMetrics: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getDeploymentMetrics");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(getDeploymentMetrics);
+                sinon.assert.calledOnce(log);
+                assert.equal(log.args[0].length, 1);
+
+                var actual: string = log.args[0][0];
+                var expected: any = {
+                    "1.0.0": {
+                        active: 123
+                    },
+                    "v1": {
+                        active: 789,
+                        downloaded: 456,
+                        failed: 654,
+                        installed: 987
+                    },
+                    "v2": {
+                        active: 123,
+                        downloaded: 321,
+                        failed: 789,
+                        installed: 456
+                    }
+                };
+
+                assertJsonDescribesObject(actual, expected);
+                done();
+            });
+    });
+    
     it("release doesn't allow releasing .zip file", (done: MochaDone): void => {
         var command: cli.IReleaseCommand = {
             type: cli.CommandType.release,
