@@ -58,10 +58,16 @@ export interface IDeploymentAddCommand extends ICommand {
     deploymentName: string;
 }
 
+export interface IDeploymentHistoryCommand extends ICommand {
+    appName: string;
+    deploymentName: string;
+    format: string;
+}
+
 export interface IDeploymentListCommand extends ICommand {
     appName: string;
     format: string;
-    showDeploymentKeys: boolean;
+    displayKeys: boolean;
 }
 
 export interface IDeploymentRemoveCommand extends ICommand {
@@ -73,18 +79,6 @@ export interface IDeploymentRenameCommand extends ICommand {
     appName: string;
     currentDeploymentName: string;
     newDeploymentName: string;
-}
-
-export interface IDeploymentHistoryCommand extends ICommand {
-    appName: string;
-    deploymentName: string;
-    format: string;
-}
-
-export interface IDeploymentMetricsCommand extends ICommand {
-    appName: string;
-    deploymentName: string;
-    format: string;
 }
 
 export interface ILoginCommand extends ICommand {

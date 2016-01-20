@@ -388,7 +388,7 @@ describe("CLI", () => {
             type: cli.CommandType.deploymentList,
             appName: "a",
             format: "json",
-            showDeploymentKeys: true
+            displayKeys: true
         };
 
         cmdexec.execute(command)
@@ -544,46 +544,6 @@ describe("CLI", () => {
                         }
                     }
                 ];
-
-                assertJsonDescribesObject(actual, expected);
-                done();
-            });
-    });
-
-    it("deploymentMetrics lists metrics for deployment", (done: MochaDone): void => {
-        var command: cli.IDeploymentMetricsCommand = {
-            type: cli.CommandType.deploymentMetrics,
-            appName: "a",
-            deploymentName: "Staging",
-            format: "json"
-        };
-
-        var getDeploymentMetrics: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getDeploymentMetrics");
-
-        cmdexec.execute(command)
-            .done((): void => {
-                sinon.assert.calledOnce(getDeploymentMetrics);
-                sinon.assert.calledOnce(log);
-                assert.equal(log.args[0].length, 1);
-
-                var actual: string = log.args[0][0];
-                var expected: any = {
-                    "1.0.0": {
-                        active: 123
-                    },
-                    "v1": {
-                        active: 789,
-                        downloaded: 456,
-                        failed: 654,
-                        installed: 987
-                    },
-                    "v2": {
-                        active: 123,
-                        downloaded: 321,
-                        failed: 789,
-                        installed: 456
-                    }
-                };
 
                 assertJsonDescribesObject(actual, expected);
                 done();

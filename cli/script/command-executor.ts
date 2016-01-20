@@ -161,7 +161,7 @@ function appAdd(command: cli.IAppAddCommand): Promise<void> {
                 type: cli.CommandType.deploymentList,
                 appName: app.name,
                 format: "table",
-                showDeploymentKeys: true
+                displayKeys: true
             };
             return deploymentList(deploymentListCommand, /*showPackage=*/ false);
         });
@@ -263,7 +263,7 @@ export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: b
         })
         .then((retrievedDeployments: Deployment[]): Promise<void> => {
             deployments = retrievedDeployments;
-            if (command.showDeploymentKeys) {  
+            if (command.displayKeys) {  
                 var deploymentKeyPromises: Promise<string>[] = deployments.map((deployment: Deployment) => {
                     return sdk.getDeploymentKeys(theAppId, deployment.id)
                         .then((deploymentKeys: DeploymentKey[]): string => {
@@ -394,27 +394,6 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
         });
 }
 
-function deploymentMetrics(command: cli.IDeploymentMetricsCommand): Promise<void> {
-    throwForInvalidOutputFormat(command.format);
-    var storedAppId: string;
-
-    return getAppId(command.appName)
-        .then((appId: string): Promise<string> => {
-            throwForInvalidAppId(appId, command.appName);
-            storedAppId = appId;
-
-            return getDeploymentId(appId, command.deploymentName);
-        })
-        .then((deploymentId: string): Promise<DeploymentMetrics> => {
-            throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
-
-            return sdk.getDeploymentMetrics(storedAppId, deploymentId);
-        })
-        .then((metrics: DeploymentMetrics): void => {
-            printDeploymentMetrics(command, metrics);
-        });
-}
-
 function deserializeConnectionInfo(): IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo {
     var savedConnection: string;
 
@@ -482,10 +461,7 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.deploymentList:
                     return deploymentList(<cli.IDeploymentListCommand>command);
-
-                case cli.CommandType.deploymentMetrics:
-                    return deploymentMetrics(<cli.IDeploymentMetricsCommand>command);
-                    
+ 
                 case cli.CommandType.deploymentRemove:
                     return deploymentRemove(<cli.IDeploymentRemoveCommand>command);
 
@@ -715,7 +691,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
     if (command.format === "json") {
         var dataSource: any[] = deployments.map((deployment: Deployment, index: number) => {
             var deploymentJson: any = { "name": deployment.name, "package": deployment.package };
-            if (command.showDeploymentKeys) {
+            if (command.displayKeys) {
                 deploymentJson.deploymentKey = deploymentKeys[index];
             }
             
@@ -724,7 +700,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
         printJson(dataSource);
     } else if (command.format === "table") {
         var headers = ["Name"];
-        if (command.showDeploymentKeys) {
+        if (command.displayKeys) {
             headers.push("Deployment Key");
         }
         
@@ -736,7 +712,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
         printTable(headers, (dataSource: any[]): void => {
             deployments.forEach((deployment: Deployment, index: number): void => {
                 var row = [deployment.name];
-                if (command.showDeploymentKeys) {
+                if (command.displayKeys) {
                     row.push(deploymentKeys[index]);
                 }
                 
@@ -784,36 +760,6 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
     }
 }
 
-function printDeploymentMetrics(command: cli.IDeploymentMetricsCommand, metrics: DeploymentMetrics): void {
-    var labelRegex = /^v\d+$/;
-    var totalActive: number = 0;
-    Object.keys(metrics).forEach((label: string) => {
-        totalActive += metrics[label].active;
-    });
-    
-    if (command.format === "json") {
-        printJson(metrics);
-    } else if (command.format === "table") {
-        printTable(["Label", "Type", "Active", "Downloaded", "Installed", "Failed"], (dataSource: any[]) => {
-            Object.keys(metrics).forEach((appVersionOrPackageLabel: string) => {
-                var isLabel: boolean = labelRegex.test(appVersionOrPackageLabel);
-                var percent: number = totalActive
-                    ? metrics[appVersionOrPackageLabel].active / totalActive * 100
-                    : 0.0;
-                var percentString = percent === 100.0 ? "100" : percent.toPrecision(2) + "%";
-                dataSource.push([
-                    appVersionOrPackageLabel,
-                    isLabel ? "CodePush" : "Binary",
-                    percentString + " (" + metrics[appVersionOrPackageLabel].active + ")",
-                    isLabel ? metrics[appVersionOrPackageLabel].downloaded : "",
-                    isLabel ? metrics[appVersionOrPackageLabel].installed : "",
-                    isLabel ? metrics[appVersionOrPackageLabel].failed : ""
-                ]);
-            });
-        });
-    }
-}
-
 function getPackageString(packageObject: Package): string {
     if (!packageObject) {
         return "";
@@ -833,17 +779,15 @@ function getPackageMetricsString(packageObject: PackageWithMetrics): string {
     
     var percentString: string = packageObject.metrics.activePercent === 100.0 ? "100" : packageObject.metrics.activePercent.toPrecision(2) + "%";
     var numPending: number = packageObject.metrics.downloaded - packageObject.metrics.installed - packageObject.metrics.failed;
-    var returnString: string = chalk.green("Active: ") + percentString + " (" + packageObject.metrics.active + ")";
-    if (packageObject.metrics.installed || numPending) {
-        returnString += "\n" + chalk.green("Installs: ") + ("" + packageObject.metrics.installed);
-    }
-    ;
+    var returnString: string = chalk.green("Active: ") + percentString + " (" + packageObject.metrics.active + ")\n" +
+        chalk.green("Installs: ") + ("" + packageObject.metrics.installed);
+        
     if (numPending) {
         returnString += " (" + numPending + " pending)";
     }    
     
     if (packageObject.metrics.failed) {
-        returnString += "\n" + chalk.green("Failures: ") + chalk.red(packageObject.metrics.failed + "");
+        returnString += "\n" + chalk.green("Rollbacks: ") + chalk.red(packageObject.metrics.failed + "");
     }
     
     return returnString;
