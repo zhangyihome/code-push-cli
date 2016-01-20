@@ -47,12 +47,12 @@ interface IPackageFile {
     path: string;
 }
 
-export interface UpdateMetricsWithActivePercentage extends UpdateMetrics {
-    activePercent: number;
+export interface UpdateMetricsWithTotalActive extends UpdateMetrics {
+    totalActive: number;
 }
 
 export interface PackageWithMetrics {
-    metrics?: UpdateMetricsWithActivePercentage;
+    metrics?: UpdateMetricsWithTotalActive;
 }
 
 export var sdk: AccountManager;
@@ -285,15 +285,12 @@ export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: b
                             .then((metrics: DeploymentMetrics): void => {
                                 if (metrics[deployment.package.label]) {
                                     var totalActive: number = getTotalActiveFromDeploymentMetrics(metrics);
-                                    var activePercent: number = totalActive
-                                        ? metrics[deployment.package.label].active / totalActive * 100
-                                        : 0.0;
                                     (<PackageWithMetrics>(deployment.package)).metrics = {
                                         active: metrics[deployment.package.label].active,
-                                        activePercent: activePercent,
                                         downloaded: metrics[deployment.package.label].downloaded,
                                         failed: metrics[deployment.package.label].failed,
-                                        installed: metrics[deployment.package.label].installed
+                                        installed: metrics[deployment.package.label].installed,
+                                        totalActive: totalActive
                                     };
                                 }
                             });
@@ -377,15 +374,12 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
                     var totalActive: number = getTotalActiveFromDeploymentMetrics(metrics);
                     packageHistory.forEach((packageObject: Package) => {
                         if (metrics[packageObject.label]) {
-                            var activePercent: number = totalActive
-                                ? metrics[packageObject.label].active / totalActive * 100
-                                : 0.0;
                             (<PackageWithMetrics>packageObject).metrics = {
                                 active: metrics[packageObject.label].active,
-                                activePercent: activePercent,
                                 downloaded: metrics[packageObject.label].downloaded,
                                 failed: metrics[packageObject.label].failed,
-                                installed: metrics[packageObject.label].installed
+                                installed: metrics[packageObject.label].installed,
+                                totalActive: totalActive
                             };
                         }
                     });
@@ -695,6 +689,13 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
                 deploymentJson.deploymentKey = deploymentKeys[index];
             }
             
+            if (deployment.package) {
+                var packageWithMetrics = <PackageWithMetrics>(deployment.package);
+                if (packageWithMetrics.metrics) {
+                    delete packageWithMetrics.metrics.totalActive;
+                }
+            }
+            
             return deploymentJson;
         });
         printJson(dataSource);
@@ -729,6 +730,12 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
 
 function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageHistory: PackageWithMetrics[]): void {
     if (command.format === "json") {
+        packageHistory.forEach((packageObject: PackageWithMetrics) => {
+            if (packageObject.metrics) {
+                delete packageObject.metrics.totalActive;
+            }
+        });
+        
         printJson(packageHistory);
     } else if (command.format === "table") {
         printTable(["Label", "Release Time", "App Version", "Mandatory", "Description", "Metrics"], (dataSource: any[]) => {
@@ -776,10 +783,13 @@ function getPackageMetricsString(packageObject: PackageWithMetrics): string {
     if (!packageObject || !packageObject.metrics) {
         return "";
     }
-    
-    var percentString: string = packageObject.metrics.activePercent === 100.0 ? "100" : packageObject.metrics.activePercent.toPrecision(2) + "%";
+
+    var activePercent: number = packageObject.metrics.totalActive
+        ? packageObject.metrics.active / packageObject.metrics.totalActive * 100
+        : 0.0;
+    var percentString: string = activePercent === 100.0 ? "100" : activePercent.toPrecision(2) + "%";
     var numPending: number = packageObject.metrics.downloaded - packageObject.metrics.installed - packageObject.metrics.failed;
-    var returnString: string = chalk.green("Active: ") + percentString + " (" + packageObject.metrics.active + ")\n" +
+    var returnString: string = chalk.green("Active: ") + percentString + " (" + packageObject.metrics.active + " of " + packageObject.metrics.totalActive + ")\n" +
         chalk.green("Installs: ") + ("" + packageObject.metrics.installed);
         
     if (numPending) {

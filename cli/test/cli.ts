@@ -415,7 +415,6 @@ describe("CLI", () => {
                             uploadTime: 1000,
                             metrics: {
                                 active: 123,
-                                activePercent: 123 / (123 + 789 + 123) * 100,
                                 downloaded: 321,
                                 failed: 789,
                                 installed: 456
@@ -520,7 +519,6 @@ describe("CLI", () => {
                         label: "v1",
                         metrics: {
                             active: 789,
-                            activePercent: 789 / (123 + 789 + 123) * 100,
                             downloaded: 456,
                             failed: 654,
                             installed: 987
@@ -537,7 +535,6 @@ describe("CLI", () => {
                         label: "v2",
                         metrics: {
                             active: 123,
-                            activePercent: 123 / (123 + 789 + 123) * 100,
                             downloaded: 321,
                             failed: 789,
                             installed: 456
