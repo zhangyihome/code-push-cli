@@ -114,15 +114,21 @@ export class SdkStub {
     
     public getDeploymentMetrics(appId: string, deploymentId: string): Promise<any> {
         return Q({
-            "1.0.0:Active": 123,
-            "v1:Downloaded": 456,
-            "v1:Active": 789,
-            "v1:DeploymentSucceeded": 987,
-            "v1:DeploymentFailed": 654,
-            "v2:Downloaded": 321,
-            "v2:Active": 123,
-            "v2:DeploymentSucceeded": 456,
-            "v2:DeploymentFailed": 789,
+            "1.0.0": {
+                active: 123
+            },
+            "v1": {
+                active: 789,
+                downloaded: 456,
+                failed: 654,
+                installed: 987
+            },
+            "v2": {
+                active: 123,
+                downloaded: 321,
+                failed: 789,
+                installed: 456
+            }
         });
     }
 
@@ -381,7 +387,8 @@ describe("CLI", () => {
         var command: cli.IDeploymentListCommand = {
             type: cli.CommandType.deploymentList,
             appName: "a",
-            format: "json"
+            format: "json",
+            showDeploymentKeys: true
         };
 
         cmdexec.execute(command)
@@ -397,7 +404,6 @@ describe("CLI", () => {
                     },
                     {
                         name: "Staging",
-                        deploymentKey: "6",
                         package: {
                             appVersion: "1.0.0",
                             description: "fgh",
@@ -409,11 +415,13 @@ describe("CLI", () => {
                             uploadTime: 1000,
                             metrics: {
                                 active: 123,
+                                activePercent: 123 / (123 + 789 + 123) * 100,
                                 downloaded: 321,
                                 failed: 789,
                                 installed: 456
                             }
-                        }
+                        },
+                        deploymentKey: "6"
                     }
                 ];
 
@@ -501,7 +509,7 @@ describe("CLI", () => {
 
                 var actual: string = log.args[0][0];
                 var expected: codePush.Package[] = [
-                    <cmdexec.PackageWithMetrics>{
+                    {
                         description: null,
                         appVersion: "1.0.0",
                         isMandatory: false,
@@ -512,12 +520,13 @@ describe("CLI", () => {
                         label: "v1",
                         metrics: {
                             active: 789,
+                            activePercent: 789 / (123 + 789 + 123) * 100,
                             downloaded: 456,
                             failed: 654,
                             installed: 987
                         }
                     },
-                    <cmdexec.PackageWithMetrics>{
+                    {
                         description: "New update - this update does a whole bunch of things, including testing linewrapping",
                         appVersion: "1.0.1",
                         isMandatory: false,
@@ -528,6 +537,7 @@ describe("CLI", () => {
                         label: "v2",
                         metrics: {
                             active: 123,
+                            activePercent: 123 / (123 + 789 + 123) * 100,
                             downloaded: 321,
                             failed: 789,
                             installed: 456

@@ -61,6 +61,7 @@ export interface IDeploymentAddCommand extends ICommand {
 export interface IDeploymentListCommand extends ICommand {
     appName: string;
     format: string;
+    showDeploymentKeys: boolean;
 }
 
 export interface IDeploymentRemoveCommand extends ICommand {

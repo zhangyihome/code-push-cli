@@ -17,8 +17,10 @@ if (typeof window === "undefined") {
     }
 }
 
-import { AccessKey, Account, App, Deployment, DeploymentKey, DeploymentMetrics, Package } from "rest-definitions";
+// Aliasing UpdateMetrics as IUpdateMetrics to deal with TypeScript issue that removes unused imports.
+import { AccessKey, Account, App, Deployment, DeploymentKey, DeploymentMetrics, Package, UpdateMetrics as IUpdateMetrics } from "rest-definitions";
 export { AccessKey, Account, App, Deployment, DeploymentKey, DeploymentMetrics, Package };
+export type UpdateMetrics = IUpdateMetrics;
 
 export interface CodePushError {
     message?: string;
