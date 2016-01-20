@@ -34,8 +34,6 @@ describe("Management SDK", () => {
             manager.updateDeployment.bind(manager, "appId", { id: "deploymentToChange" }),
             manager.removeDeployment.bind(manager, "appId", { id: "deploymentToChange" }),
 
-            manager.getDeploymentKeys.bind(manager, "appId", "deploymentId"),
-
             manager.getPackage.bind(manager, ""),
         ];
 
@@ -135,19 +133,10 @@ describe("Management SDK", () => {
     });
 
     it("addDeployment handles success response", (done: MochaDone) => {
-        mockReturn("", 200, { location: "/deploymentId" });
+        mockReturn(JSON.stringify({ deployment: { name: "name", key: "key" } }), 201, { location: "/deploymentId" });
 
         manager.addDeployment("appId", "name").done((obj: any) => {
             assert.ok(obj);
-            done();
-        }, rejectHandler);
-    });
-
-    it("addDeployment handles missing location header", (done: MochaDone) => {
-        mockReturn("", 200, {});
-
-        manager.addDeployment("appId", "name").done((obj: any) => {
-            assert.ok(!obj);
             done();
         }, rejectHandler);
     });
@@ -184,15 +173,6 @@ describe("Management SDK", () => {
 
         manager.removeDeployment("appId", "deploymentId").done((obj: any) => {
             assert.ok(!obj);
-            done();
-        }, rejectHandler);
-    });
-
-    it("getDeploymentKeys handles JSON response", (done: MochaDone) => {
-        mockReturn(JSON.stringify({ deploymentKeys: [] }), 200, {});
-
-        manager.getDeploymentKeys("appId", "deploymentId").done((obj: any) => {
-            assert.ok(obj);
             done();
         }, rejectHandler);
     });

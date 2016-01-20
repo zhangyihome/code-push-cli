@@ -10,14 +10,14 @@ declare module "rest-definitions" {
     export interface DeploymentStatusReport {
         appVersion: string;
         clientUniqueId: string;
-        deploymentKey: string; 
+        deploymentKey: string;
         label?: string;
         status?: string
     }
 
     export interface DownloadReport {
         clientUniqueId: string;
-        deploymentKey: string; 
+        deploymentKey: string;
         label: string;
     }
 
@@ -59,15 +59,8 @@ declare module "rest-definitions" {
     export interface Deployment {
         /*generated*/ id?: string;
         name: string;
+        /*generated*/ key?: string;
         package?: Package
-    }
-
-    export interface DeploymentKey {
-        description: string;
-        /*generated*/ id?: string;
-        isPrimary: boolean;
-        /*generated*/ key: string;
-        name: string;
     }
 
     export interface Package extends PackageInfo {

@@ -18,7 +18,7 @@ import * as yazl from "yazl";
 import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
-import { AccessKey, AccountManager, App, Deployment, DeploymentKey, Package } from "code-push";
+import { AccessKey, AccountManager, App, Deployment, Package } from "code-push";
 var packageJson = require("../package.json");
 import Promise = Q.Promise;
 var progress = require("progress");
@@ -197,10 +197,8 @@ function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
             throwForInvalidAppId(appId, command.appName);
 
             return sdk.addDeployment(appId, command.deploymentName)
-                .then((deployment: Deployment): Promise<DeploymentKey[]> => {
-                    return sdk.getDeploymentKeys(appId, deployment.id);
-                }).then((deploymentKeys: DeploymentKey[]) => {
-                    log("Successfully added the \"" + command.deploymentName + "\" deployment with key \"" + deploymentKeys[0].key + "\" to the \"" + command.appName + "\" app.");
+                .then((deployment: Deployment): void => {
+                    log("Successfully added the \"" + command.deploymentName + "\" deployment with key \"" + deployment.key + "\" to the \"" + command.appName + "\" app.");
                 });
         })
 }
@@ -216,17 +214,8 @@ export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: b
 
             return sdk.getDeployments(appId);
         })
-        .then((deployments: Deployment[]): Promise<void> => {
-            var deploymentKeyPromises: Promise<string>[] = deployments.map((deployment: Deployment) => {
-                return sdk.getDeploymentKeys(theAppId, deployment.id)
-                    .then((deploymentKeys: DeploymentKey[]): string => {
-                        return deploymentKeys[0].key;
-                    });
-            });
-            return Q.all(deploymentKeyPromises)
-                .then((deploymentKeyList: string[]) => {
-                    printDeploymentList(command, deployments, deploymentKeyList, showPackage);
-                });
+        .then((deployments: Deployment[]): void => {
+            printDeploymentList(command, deployments, showPackage);
         });
 }
 
@@ -590,20 +579,18 @@ function printAppList(format: string, apps: App[], deploymentLists: string[][]):
     }
 }
 
-function printDeploymentList(command: cli.IDeploymentListCommand, deployments: Deployment[], deploymentKeys: Array<string>, showPackage: boolean = true): void {
+function printDeploymentList(command: cli.IDeploymentListCommand, deployments: Deployment[], showPackage: boolean = true): void {
     if (command.format === "json") {
-        var dataSource: any[] = deployments.map((deployment: Deployment, index: number) => {
-            return { "name": deployment.name, "deploymentKey": deploymentKeys[index], "package": deployment.package };
-        });
-        printJson(dataSource);
+        deployments.forEach((deployment: Deployment) => delete deployment.id);  // Temporary until ID's are removed from the REST API
+        printJson(deployments);
     } else if (command.format === "table") {
         var headers = ["Name", "Deployment Key"];
         if (showPackage) {
             headers.push("Package Metadata");
         }
         printTable(headers, (dataSource: any[]): void => {
-            deployments.forEach((deployment: Deployment, index: number): void => {
-                var row = [deployment.name, deploymentKeys[index]];
+            deployments.forEach((deployment: Deployment): void => {
+                var row = [deployment.name, deployment.key];
                 if (showPackage) {
                     row.push(getPackageString(deployment.package));
                 }
