@@ -145,7 +145,6 @@ describe("CLI", () => {
 
         sandbox.stub(cmdexec, "confirm", (): Promise<boolean> => Q(wasConfirmed));
         log = sandbox.stub(cmdexec, "log", (message: string): void => { });
-        sandbox.stub(cmdexec, "loginWithAccessToken", (): Promise<void> => Q(<void>null));
 
         cmdexec.sdk = <any>new SdkStub();
     });
@@ -203,7 +202,7 @@ describe("CLI", () => {
     it("accessKeyRemove removes access key", (done: MochaDone): void => {
         var command: cli.IAccessKeyRemoveCommand = {
             type: cli.CommandType.accessKeyRemove,
-            accessKeyName: "8"
+            accessKey: "8"
         };
 
         var removeAccessKey: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeAccessKey");
@@ -222,7 +221,7 @@ describe("CLI", () => {
     it("accessKeyRemove does not remove access key if cancelled", (done: MochaDone): void => {
         var command: cli.IAccessKeyRemoveCommand = {
             type: cli.CommandType.accessKeyRemove,
-            accessKeyName: "8"
+            accessKey: "8"
         };
 
         var removeAccessKey: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeAccessKey");

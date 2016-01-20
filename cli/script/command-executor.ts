@@ -26,14 +26,14 @@ var progress = require("progress");
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var userAgent: string = packageJson.name + "/" + packageJson.version;
 
-interface IStandardLoginConnectionInfo {
+interface ILegacyLoginConnectionInfo {
     accessKeyName: string;
     providerName: string;
     providerUniqueId: string;
     serverUrl: string;
 }
 
-interface IAccessKeyLoginConnectionInfo {
+interface ILoginConnectionInfo {
     accessKey: string;
     serverUrl: string;
 }
@@ -46,31 +46,6 @@ interface IPackageFile {
 // Exported variables for unit testing.
 export var sdk: AccountManager;
 export var log = (message: string | Chalk.ChalkChain): void => console.log(message);
-
-export var loginWithAccessToken = (): Promise<void> => {
-    if (!connectionInfo) {
-        return Q.fcall(() => { throw new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server."); });
-    }
-
-    sdk = new AccountManager(connectionInfo.serverUrl, userAgent);
-
-    var accessToken: string;
-
-    var standardLoginConnectionInfo: IStandardLoginConnectionInfo = <IStandardLoginConnectionInfo>connectionInfo;
-    var accessKeyLoginConnectionInfo: IAccessKeyLoginConnectionInfo = <IAccessKeyLoginConnectionInfo>connectionInfo;
-
-    if (standardLoginConnectionInfo.providerName) {
-        accessToken = base64.encode(JSON.stringify({
-            accessKeyName: standardLoginConnectionInfo.accessKeyName,
-            providerName: standardLoginConnectionInfo.providerName,
-            providerUniqueId: standardLoginConnectionInfo.providerUniqueId
-        }));
-    } else {
-        accessToken = accessKeyLoginConnectionInfo.accessKey;
-    }
-
-    return sdk.loginWithAccessToken(accessToken);
-}
 
 export var confirm = (): Promise<boolean> => {
     return Promise<boolean>((resolve, reject, notify): void => {
@@ -96,8 +71,6 @@ export var confirm = (): Promise<boolean> => {
     });
 }
 
-var connectionInfo: IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo;
-
 function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
     var hostname: string = os.hostname();
     return sdk.addAccessKey(hostname, command.description)
@@ -115,24 +88,20 @@ function accessKeyList(command: cli.IAccessKeyListCommand): Promise<void> {
         });
 }
 
-function removeLocalAccessKey(): Promise<void> {
-    return Q.fcall(() => { throw new Error("Cannot remove the access key for the current session. Please run 'code-push logout' if you would like to remove this access key."); });
-}
-
 function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
-    if (connectionInfo && (command.accessKeyName === (<IStandardLoginConnectionInfo>connectionInfo).accessKeyName || command.accessKeyName === (<IAccessKeyLoginConnectionInfo>connectionInfo).accessKey)) {
-        return removeLocalAccessKey();
+    if (command.accessKey === sdk.accessKey) {
+        throw new Error("Cannot remove the access key for the current session. Please run 'code-push logout' if you would like to remove this access key.");
     } else {
-        return getAccessKeyId(command.accessKeyName)
+        return getAccessKeyId(command.accessKey)
             .then((accessKeyId: string): Promise<void> => {
-                throwForInvalidAccessKeyId(accessKeyId, command.accessKeyName);
+                throwForInvalidAccessKeyId(accessKeyId, command.accessKey);
 
                 return confirm()
                     .then((wasConfirmed: boolean): Promise<void> => {
                         if (wasConfirmed) {
                             return sdk.removeAccessKey(accessKeyId)
                                 .then((): void => {
-                                    log("Successfully removed the \"" + command.accessKeyName + "\" access key.");
+                                    log("Successfully removed the \"" + command.accessKey + "\" access key.");
                                 });
                         }
 
@@ -325,7 +294,7 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
         });
 }
 
-function deserializeConnectionInfo(): IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo {
+function deserializeConnectionInfo(): ILegacyLoginConnectionInfo|ILoginConnectionInfo {
     var savedConnection: string;
 
     try {
@@ -334,34 +303,35 @@ function deserializeConnectionInfo(): IStandardLoginConnectionInfo|IAccessKeyLog
         return;
     }
 
-    var credentialsObject: IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo = tryJSON(savedConnection);
-    return credentialsObject;
-}
-
-function notifyAlreadyLoggedIn(): Promise<void> {
-    return Q.fcall(() => { throw new Error("You are already logged in from this machine."); });
+    var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = tryJSON(savedConnection);
+    return connectionInfo;
 }
 
 export function execute(command: cli.ICommand): Promise<void> {
-    connectionInfo = deserializeConnectionInfo();
+    var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = deserializeConnectionInfo();
 
-    switch (command.type) {
-        case cli.CommandType.login:
-            if (connectionInfo) {
-                return notifyAlreadyLoggedIn();
+    return Q(<void>null)
+        .then(() => {
+            switch (command.type) {
+                case cli.CommandType.login:
+                case cli.CommandType.register:
+                    if (connectionInfo) {
+                        throw new Error("You are already logged in from this machine.");
+                    }
+                    break;
+
+                default:
+                    if (!!sdk) break; // Used by unit tests to skip authentication
+
+                    if (!connectionInfo) {
+                        throw new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server.");
+                    }
+
+                    var accessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
+                    sdk = new AccountManager(accessKey, userAgent, connectionInfo.serverUrl);
+                    break;
             }
 
-            return login(<cli.ILoginCommand>command);
-
-        case cli.CommandType.logout:
-            return logout(<cli.ILogoutCommand>command);
-
-        case cli.CommandType.register:
-            return register(<cli.IRegisterCommand>command);
-    }
-
-    return loginWithAccessToken()
-        .then((): Promise<void> => {
             switch (command.type) {
                 case cli.CommandType.accessKeyAdd:
                     return accessKeyAdd(<cli.IAccessKeyAddCommand>command);
@@ -399,8 +369,17 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.deploymentHistory:
                     return deploymentHistory(<cli.IDeploymentHistoryCommand>command);
 
+                case cli.CommandType.login:
+                    return login(<cli.ILoginCommand>command);
+
+                case cli.CommandType.logout:
+                    return logout(<cli.ILogoutCommand>command);
+
                 case cli.CommandType.promote:
                     return promote(<cli.IPromoteCommand>command);
+
+                case cli.CommandType.register:
+                    return register(<cli.IRegisterCommand>command);
 
                 case cli.CommandType.release:
                     return release(<cli.IReleaseCommand>command);
@@ -410,7 +389,7 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 default:
                     // We should never see this message as invalid commands should be caught by the argument parser.
-                    log("Invalid command:  " + JSON.stringify(command));
+                    throw new Error("Invalid command:  " + JSON.stringify(command));
             }
         });
 }
@@ -511,11 +490,14 @@ function initiateExternalAuthenticationAsync(serverUrl: string, action: string):
 function login(command: cli.ILoginCommand): Promise<void> {
     // Check if one of the flags were provided.
     if (command.accessKey) {
-        sdk = new AccountManager(command.serverUrl, userAgent);
-        return sdk.loginWithAccessToken(command.accessKey)
-            .then((): void => {
-                // The access token is valid.
-                serializeConnectionInfo(command.serverUrl, command.accessKey);
+        sdk = new AccountManager(command.accessKey, userAgent, command.serverUrl);
+        return sdk.isAuthenticated()
+            .then((isAuthenticated: boolean): void => {
+                if (isAuthenticated) {
+                    serializeConnectionInfo(command.serverUrl, command.accessKey);
+                } else {
+                    throw new Error("Invalid access key.");
+                }
             });
     } else {
         initiateExternalAuthenticationAsync(command.serverUrl, "login");
@@ -532,52 +514,51 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
                 return;
             }
 
-            if (!accessToken) {
+            var decoded: string = tryBase64Decode(accessToken);
+            var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = tryJSON(decoded);
+            if (!connectionInfo) {
                 throw new Error("Invalid access token.");
             }
 
-            sdk = new AccountManager(serverUrl, userAgent);
+            var accessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
+            sdk = new AccountManager(accessKey, userAgent, serverUrl);
 
-            return sdk.loginWithAccessToken(accessToken)
-                .then((): void => {
-                    // The access token is valid.
-                    serializeConnectionInfo(serverUrl, accessToken);
+            return sdk.isAuthenticated()
+                .then((isAuthenticated: boolean): void => {
+                    if (isAuthenticated) {
+                        serializeConnectionInfo(serverUrl, accessToken);
+                    } else {
+                        throw new Error("Invalid access token.");
+                    }
                 });
         });
 }
 
-function logout(command: cli.ILogoutCommand): Promise<void> {
-    if (connectionInfo) {
-        var setupPromise: Promise<void> = loginWithAccessToken();
-        if (!command.isLocal) {
-            var accessKeyName: string;
-            setupPromise = setupPromise
-                .then((): Promise<string> => {
-                    var standardLoginConnectionInfo: IStandardLoginConnectionInfo = <IStandardLoginConnectionInfo>connectionInfo;
-                    var accessKeyLoginConnectionInfo: IAccessKeyLoginConnectionInfo = <IAccessKeyLoginConnectionInfo>connectionInfo;
+function getAccessKeyFromConnectionInfo(connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo): string {
+    if (!connectionInfo) return null;
 
-                    if (standardLoginConnectionInfo.accessKeyName) {
-                        accessKeyName = standardLoginConnectionInfo.accessKeyName;
-                        return getAccessKeyId(standardLoginConnectionInfo.accessKeyName);
-                    } else {
-                        accessKeyName = accessKeyLoginConnectionInfo.accessKey;
-                        return getAccessKeyId(accessKeyLoginConnectionInfo.accessKey);
-                    }
-                })
-                .then((accessKeyId: string): Promise<void> => {
-                    return sdk.removeAccessKey(accessKeyId);
-                })
-                .then((): void => {
-                    log("Removed access key " + accessKeyName + ".");
-                });
-        }
+    var legacyLoginConnectionInfo: ILegacyLoginConnectionInfo = <ILegacyLoginConnectionInfo>connectionInfo;
+    var loginConnectionInfo: ILoginConnectionInfo = <ILoginConnectionInfo>connectionInfo;
 
-        return setupPromise
-            .then((): Promise<void> => sdk.logout(), (): Promise<void> => sdk.logout())
-            .then((): void => deleteConnectionInfoCache(), (): void => deleteConnectionInfoCache());
+    if (legacyLoginConnectionInfo.accessKeyName) {
+        return legacyLoginConnectionInfo.accessKeyName;
+    } else {
+        return loginConnectionInfo.accessKey;
     }
+}
 
-    return Q.fcall(() => { throw new Error("You are not logged in."); });
+function logout(command: cli.ILogoutCommand): Promise<void> {
+    return Q(<void>null)
+        .then((): Promise<void> => {
+            if (!command.isLocal) {
+                return sdk.removeAccessKey(sdk.accessKey)
+                    .then((): void => {
+                        log("Removed access key " + sdk.accessKey + ".");
+                        sdk = null;
+                    });
+            }
+        })
+        .then((): void => deleteConnectionInfoCache(), (): void => deleteConnectionInfoCache());
 }
 
 function formatDate(unixOffset: number): string {
@@ -803,7 +784,7 @@ function release(command: cli.IReleaseCommand): Promise<void> {
                     }
 
                     var lastTotalProgress = 0;
-                    var progressBar = new progress("Upload progress:[:bar] :percent :etas", { 
+                    var progressBar = new progress("Upload progress:[:bar] :percent :etas", {
                         complete: "=",
                         incomplete: " ",
                         width: 50,
@@ -879,22 +860,21 @@ function requestAccessToken(): Promise<string> {
     });
 }
 
-function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
+function serializeConnectionInfo(serverUrl: string, accessTokenOrKey: string): void {
     // The access token should have been validated already (i.e.:  logging in).
-    var json: string = tryBase64Decode(accessToken);
-    var standardLoginConnectionInfo: IStandardLoginConnectionInfo = tryJSON(json);
+    var json: string = tryBase64Decode(accessTokenOrKey);
+    var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = tryJSON(json);
 
-    if (standardLoginConnectionInfo) {
-        // This is a normal login.
-        standardLoginConnectionInfo.serverUrl = serverUrl;
-        json = JSON.stringify(standardLoginConnectionInfo);
-        fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
+    if (connectionInfo) {
+        // This is a legacy login format
+        connectionInfo.serverUrl = serverUrl;
     } else {
-        // This login uses an access token
-        var accessKeyLoginConnectionInfo: IAccessKeyLoginConnectionInfo = { serverUrl: serverUrl, accessKey: accessToken };
-        json = JSON.stringify(accessKeyLoginConnectionInfo);
-        fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
+        // This login uses an access key
+        connectionInfo = <ILoginConnectionInfo>{ serverUrl: serverUrl, accessKey: accessTokenOrKey };
     }
+
+    json = JSON.stringify(connectionInfo);
+    fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
 
     log("\r\nSuccessfully logged-in. Your session token was written to " + chalk.cyan(configFilePath) + ". You can run the " + chalk.cyan("code-push logout") + " command at any time to delete this file and terminate your session.\r\n");
 }
@@ -911,7 +891,6 @@ function throwForMissingCredentials(accessKeyName: string, providerName: string,
     if (!accessKeyName) throw new Error("Access key is missing.");
     if (!providerName) throw new Error("Provider name is missing.");
     if (!providerUniqueId) throw new Error("Provider unique ID is missing.");
-
 }
 
 function throwForInvalidAccessKeyId(accessKeyId: string, accessKeyName: string): void {
