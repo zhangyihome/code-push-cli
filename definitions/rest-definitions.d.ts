@@ -7,6 +7,20 @@ declare module "rest-definitions" {
         description?: string;
     }
 
+    export interface DeploymentStatusReport {
+        appVersion: string;
+        clientUniqueId: string;
+        deploymentKey: string; 
+        label?: string;
+        status?: string
+    }
+
+    export interface DownloadReport {
+        clientUniqueId: string;
+        deploymentKey: string; 
+        label: string;
+    }
+
     export interface PackageInfo {
         appVersion: string;
         description: string;

@@ -112,6 +112,10 @@ export class SdkStub {
         ]);
     }
 
+    public release(appId: string, deploymentId: string): Promise<string> {
+        return Q("Successfully released");
+    }
+
     public removeAccessKey(accessKeyId: string): Promise<void> {
         return Q(<void>null);
     }
@@ -137,6 +141,7 @@ describe("CLI", () => {
     var log: Sinon.SinonStub;
     var sandbox: Sinon.SinonSandbox;
     var wasConfirmed = true;
+    const RELEASE_FAILED_ERROR_MESSAGE: string = "It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).";
 
     beforeEach((): void => {
         wasConfirmed = true;
@@ -501,4 +506,58 @@ describe("CLI", () => {
                 done();
             });
     });
+
+    it("release doesn't allow releasing .zip file", (done: MochaDone): void => {
+        var command: cli.IReleaseCommand = {
+            type: cli.CommandType.release,
+            appName: "a",
+            deploymentName: "Staging",
+            description: "test releasing zip file",
+            mandatory: false,
+            appStoreVersion: "1.0.0",
+            package: "/fake/path/test/file.zip"
+        };
+
+        releaseHelperFunction(command, done);
+    });
+
+    it("release doesn't allow releasing .ipa file", (done: MochaDone): void => {
+        var command: cli.IReleaseCommand = {
+            type: cli.CommandType.release,
+            appName: "a",
+            deploymentName: "Staging",
+            description: "test releasing ipa file",
+            mandatory: false,
+            appStoreVersion: "1.0.0",
+            package: "/fake/path/test/file.ipa"
+        };
+
+        releaseHelperFunction(command, done);
+    });
+
+    it("release doesn't allow releasing .apk file", (done: MochaDone): void => {
+        var command: cli.IReleaseCommand = {
+            type: cli.CommandType.release,
+            appName: "a",
+            deploymentName: "Staging",
+            description: "test releasing apk file",
+            mandatory: false,
+            appStoreVersion: "1.0.0",
+            package: "/fake/path/test/file.apk"
+        };
+
+        releaseHelperFunction(command, done);
+    });
+
+    function releaseHelperFunction(command: cli.IReleaseCommand, done: MochaDone): void {
+        var release: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "release");
+        cmdexec.execute(command)
+            .done((): void => {
+                throw "Error Expected";
+            }, (error: any): void => {
+                assert (!!error);
+                assert.equal(error.message, RELEASE_FAILED_ERROR_MESSAGE);
+                done();
+            });
+    }
 });
