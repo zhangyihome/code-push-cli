@@ -77,12 +77,12 @@ export class SdkStub {
             package: {
                 appVersion: "1.0.0",
                 description: "fgh",
-                label: "ghi",
+                label: "v2",
                 packageHash: "jkl",
                 isMandatory: true,
                 size: 10,
                 blobUrl: "http://mno.pqr",
-                uploadTime: +1000
+                uploadTime: 1000
             }
         }]);
     }
@@ -110,6 +110,26 @@ export class SdkStub {
                 label: "v2"
             }
         ]);
+    }
+    
+    public getDeploymentMetrics(appId: string, deploymentId: string): Promise<any> {
+        return Q({
+            "1.0.0": {
+                active: 123
+            },
+            "v1": {
+                active: 789,
+                downloaded: 456,
+                failed: 654,
+                installed: 987
+            },
+            "v2": {
+                active: 123,
+                downloaded: 321,
+                failed: 789,
+                installed: 456
+            }
+        });
     }
 
     public release(appId: string, deploymentId: string): Promise<string> {
@@ -367,7 +387,8 @@ describe("CLI", () => {
         var command: cli.IDeploymentListCommand = {
             type: cli.CommandType.deploymentList,
             appName: "a",
-            format: "json"
+            format: "json",
+            displayKeys: true
         };
 
         cmdexec.execute(command)
@@ -383,17 +404,23 @@ describe("CLI", () => {
                     },
                     {
                         name: "Staging",
-                        deploymentKey: "6",
                         package: {
                             appVersion: "1.0.0",
                             description: "fgh",
-                            label: "ghi",
+                            label: "v2",
                             packageHash: "jkl",
                             isMandatory: true,
                             size: 10,
                             blobUrl: "http://mno.pqr",
-                            uploadTime: +1000
-                        }
+                            uploadTime: 1000,
+                            metrics: {
+                                active: 123,
+                                downloaded: 321,
+                                failed: 789,
+                                installed: 456
+                            }
+                        },
+                        deploymentKey: "6"
                     }
                 ];
 
@@ -481,7 +508,7 @@ describe("CLI", () => {
 
                 var actual: string = log.args[0][0];
                 var expected: codePush.Package[] = [
-                    <codePush.Package>{
+                    {
                         description: null,
                         appVersion: "1.0.0",
                         isMandatory: false,
@@ -489,9 +516,15 @@ describe("CLI", () => {
                         blobUrl: "https://fakeblobstorage.net/storagev2/blobid1",
                         uploadTime: 1447113596270,
                         size: 1,
-                        label: "v1"
+                        label: "v1",
+                        metrics: {
+                            active: 789,
+                            downloaded: 456,
+                            failed: 654,
+                            installed: 987
+                        }
                     },
-                    <codePush.Package>{
+                    {
                         description: "New update - this update does a whole bunch of things, including testing linewrapping",
                         appVersion: "1.0.1",
                         isMandatory: false,
@@ -499,7 +532,13 @@ describe("CLI", () => {
                         blobUrl: "https://fakeblobstorage.net/storagev2/blobid2",
                         uploadTime: 1447118476669,
                         size: 2,
-                        label: "v2"
+                        label: "v2",
+                        metrics: {
+                            active: 123,
+                            downloaded: 321,
+                            failed: 789,
+                            installed: 456
+                        }
                     }
                 ];
 
@@ -507,7 +546,7 @@ describe("CLI", () => {
                 done();
             });
     });
-
+    
     it("release doesn't allow releasing .zip file", (done: MochaDone): void => {
         var command: cli.IReleaseCommand = {
             type: cli.CommandType.release,

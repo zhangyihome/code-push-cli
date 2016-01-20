@@ -96,11 +96,12 @@ function appRemove(commandName: string, yargs: yargs.Argv): void {
 
 function deploymentList(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
-    yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> [--format <format>]")
+    yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> [--format <format>] [--displayKeys]")
         .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
         .example("deployment " + commandName + " MyApp", "Lists deployments for app \"MyApp\" in tabular format")
         .example("deployment " + commandName + " MyApp --format json", "Lists deployments for app \"MyApp\" in JSON format")
-        .option("format", { default: "table", demand: false, description: "The output format (\"json\" or \"table\")", type: "string" });
+        .option("format", { default: "table", demand: false, description: "The output format (\"json\" or \"table\")", type: "string" })
+        .option("displayKeys", { alias: "k", default: false, demand: false, description: "Whether to display the deployment keys", type: "boolean" });
     addCommonConfiguration(yargs);
 }
 
@@ -364,6 +365,7 @@ function createCommand(): cli.ICommand {
 
                             deploymentListCommand.appName = arg2;
                             deploymentListCommand.format = argv["format"];
+                            deploymentListCommand.displayKeys = argv["displayKeys"];
                         }
                         break;
 
