@@ -15,6 +15,12 @@ declare module "rest-definitions" {
         status?: string
     }
 
+    export interface DownloadReport {
+        clientUniqueId: string;
+        deploymentKey: string; 
+        label: string;
+    }
+
     export interface PackageInfo {
         appVersion: string;
         description: string;
