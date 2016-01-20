@@ -190,7 +190,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " rollback <appName> <deploymentName> [--targetRelease <releaseLabel>]")
             .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
             .example("rollback MyApp Production", "Perform a rollback on the \"Production\" deployment of \"MyApp\"")
-            .example("rollback MyApp Production --targetRelease v4", "Perform a rollback on the \"Production\" deployment of \"MyApp\" to the v4 release.")
+            .example("rollback MyApp Production --targetRelease v4", "Perform a rollback on the \"Production\" deployment of \"MyApp\" to the v4 release")
             .option("targetRelease", { alias: "r", default: null, demand: false, description: "The label of the release to be rolled back to (e.g. v4)", type: "string" });
 
         addCommonConfiguration(yargs);
@@ -242,8 +242,8 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         isValidCommand = true;
         yargs.usage(USAGE_PREFIX + " logout [--local]")
             .demand(/*count*/ 1, /*max*/ 1)  // Require exactly one non-option argument.
-            .example("logout", "Log out and also remove the access key used for the current session.")
-            .example("logout --local", "Log out but allow the use of the same access key for future logins.")
+            .example("logout", "Log out and also remove the access key used for the current session")
+            .example("logout --local", "Log out but allow the use of the same access key for future logins")
             .option("local", { demand: false, description: "Whether to delete the current session's access key on the server", type: "boolean" });
         addCommonConfiguration(yargs);
     })
