@@ -789,15 +789,15 @@ function getPackageMetricsString(packageObject: PackageWithMetrics): string {
         : 0.0;
     var percentString: string = activePercent === 100.0 ? "100" : activePercent.toPrecision(2) + "%";
     var numPending: number = packageObject.metrics.downloaded - packageObject.metrics.installed - packageObject.metrics.failed;
-    var returnString: string = chalk.green("Active: ") + percentString + " (" + packageObject.metrics.active + " of " + packageObject.metrics.totalActive + ")\n" +
-        chalk.green("Installs: ") + ("" + packageObject.metrics.installed);
+    var returnString: string = chalk.green("Active: ") + percentString + " (" + packageObject.metrics.active.toLocaleString() + " of " + packageObject.metrics.totalActive.toLocaleString() + ")\n" +
+        chalk.green("Installs: ") + packageObject.metrics.installed.toLocaleString();
         
     if (numPending) {
-        returnString += " (" + numPending + " pending)";
+        returnString += " (" + numPending.toLocaleString() + " pending)";
     }    
     
     if (packageObject.metrics.failed) {
-        returnString += "\n" + chalk.green("Rollbacks: ") + chalk.red(packageObject.metrics.failed + "");
+        returnString += "\n" + chalk.green("Rollbacks: ") + chalk.red(packageObject.metrics.failed.toLocaleString() + "");
     }
     
     return returnString;
