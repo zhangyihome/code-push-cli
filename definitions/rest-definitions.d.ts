@@ -55,6 +55,7 @@ declare module "rest-definitions" {
         /*generated*/ id?: string;
         name: string;
         /*generated*/ collaborator?: Collaborator[];
+        /*generated*/ isOwner?: boolean;
     }
 
     export interface Collaborator {

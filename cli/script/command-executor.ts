@@ -568,20 +568,21 @@ function getApp(appName: string): Promise<App> {
 
     return sdk.getApps()
         .then((apps: App[]): App => {
+            var foundApp = false;
             for (var i = 0; i < apps.length; ++i) {
                 var app: App = apps[i];
 
                 if (app.name === appNameValue) {
                     if (ownerEmailValue) {
                         var appOwner: string = getOwnerEmail(app.collaborator);
-                        if (appOwner === ownerEmailValue) {
-                            return app;
-                        } else {
-                            continue;
-                        }
+                        foundApp = appOwner === ownerEmailValue; 
                     } else {
-                        return app;
+                        foundApp = app.isOwner;
                     }
+                }
+
+                if (foundApp) {
+                    return app;
                 }
             }
         });
