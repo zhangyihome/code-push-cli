@@ -12,7 +12,6 @@ import * as Q from "q";
 import * as recursiveFs from "recursive-fs";
 import * as semver from "semver";
 import slash = require("slash");
-import tryJSON = require("try-json");
 var Table = require("cli-table");
 import * as yazl from "yazl";
 import wordwrap = require("wordwrap");
@@ -389,16 +388,12 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
 }
 
 function deserializeConnectionInfo(): IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo {
-    var savedConnection: string;
-
     try {
-        savedConnection = fs.readFileSync(configFilePath, { encoding: "utf8" });
+        var savedConnection: string = fs.readFileSync(configFilePath, { encoding: "utf8" });
+        return JSON.parse(savedConnection);
     } catch (ex) {
         return;
     }
-
-    var credentialsObject: IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo = tryJSON(savedConnection);
-    return credentialsObject;
 }
 
 function notifyAlreadyLoggedIn(): Promise<void> {
@@ -1009,7 +1004,14 @@ function requestAccessToken(): Promise<string> {
 function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
     // The access token should have been validated already (i.e.:  logging in).
     var json: string = tryBase64Decode(accessToken);
-    var standardLoginConnectionInfo: IStandardLoginConnectionInfo = tryJSON(json);
+    var standardLoginConnectionInfo: IStandardLoginConnectionInfo;
+    
+    try {
+        standardLoginConnectionInfo = JSON.parse(json);
+    } catch (ex) {
+        // If the JSON parsing threw an exception, then it is
+        // an access key and not a user session object.
+    }
 
     if (standardLoginConnectionInfo) {
         // This is a normal login.
