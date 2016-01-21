@@ -701,8 +701,8 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
         }
         
         if (showPackage) {
-            headers.push("Package Metadata");
-            headers.push("Metrics");
+            headers.push("Update Metadata");
+            headers.push("Install Metrics");
         }
         
         printTable(headers, (dataSource: any[]): void => {
@@ -733,7 +733,7 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
         
         printJson(packageHistory);
     } else if (command.format === "table") {
-        printTable(["Label", "Release Time", "App Version", "Mandatory", "Description", "Metrics"], (dataSource: any[]) => {
+        printTable(["Label", "Release Time", "App Version", "Mandatory", "Description", "Install Metrics"], (dataSource: any[]) => {
             packageHistory.forEach((packageObject: Package) => {
                 var releaseTime: string = formatDate(packageObject.uploadTime);
                 var releaseSource: string;
@@ -787,7 +787,7 @@ function getPackageMetricsString(packageObject: PackageWithMetrics): string {
     var returnString: string = chalk.green("Active: ") + percentString + " (" + packageObject.metrics.active.toLocaleString() + " of " + packageObject.metrics.totalActive.toLocaleString() + ")\n" +
         chalk.green("Installs: ") + packageObject.metrics.installed.toLocaleString();
         
-    if (numPending) {
+    if (numPending > 0) {
         returnString += " (" + numPending.toLocaleString() + " pending)";
     }    
     
