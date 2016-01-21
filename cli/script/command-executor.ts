@@ -555,13 +555,33 @@ function getAccessKeyId(accessKeyName: string): Promise<string> {
 }
 
 function getApp(appName: string): Promise<App> {
+    var ownerEmailValue: string;
+    var appNameValue: string = appName;
+    var delimiterIndex: number = appName.indexOf("/");
+
+    if (delimiterIndex !== -1) {
+        ownerEmailValue = appName.substring(0, delimiterIndex);
+        appNameValue = appName.substring(delimiterIndex + 1);
+
+        throwForInvalidEmail(ownerEmailValue);
+    }
+
     return sdk.getApps()
         .then((apps: App[]): App => {
             for (var i = 0; i < apps.length; ++i) {
                 var app: App = apps[i];
 
-                if (app.name === appName) {
-                    return app;
+                if (app.name === appNameValue) {
+                    if (ownerEmailValue) {
+                        var appOwner: string = getOwnerEmail(app.collaborator);
+                        if (appOwner === ownerEmailValue) {
+                            return app;
+                        } else {
+                            continue;
+                        }
+                    } else {
+                        return app;
+                    }
                 }
             }
         });
@@ -795,7 +815,8 @@ function getPackageString(packageObject: Package): string {
     return chalk.green("Label: ") + packageObject.label + "\n" +
         chalk.green("App Version: ") + packageObject.appVersion + "\n" +
         chalk.green("Mandatory: ") + (packageObject.isMandatory ? "Yes" : "No") + "\n" +
-        chalk.green("Release Time: ") + formatDate(packageObject.uploadTime) +
+        chalk.green("Release Time: ") + formatDate(packageObject.uploadTime) + "\n" +
+        chalk.green("Released by: ") + (packageObject.releasedBy ? packageObject.releasedBy : "") +
         (packageObject.description ? wordwrap(70)("\n" + chalk.green("Description: ") + packageObject.description): "");
 }
 

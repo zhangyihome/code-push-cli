@@ -84,6 +84,7 @@ declare module "rest-definitions" {
         /*generated*/ diffSize?: number;
         /*generated*/ originalLabel?: string;       // Set on "Promote" and "Rollback"
         /*generated*/ originalDeployment?: string;  // Set on "Promote"
+        /*generated*/ releasedBy?: string;          // Set by commitPackage
         /*generated*/ releaseMethod?: string;       // "Upload", "Promote" or "Rollback". Unknown if unspecified
         /*generated*/ size: number;
         /*generated*/ uploadTime: number;
