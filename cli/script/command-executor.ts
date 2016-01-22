@@ -776,7 +776,7 @@ function getPackageString(packageObject: Package): string {
 
 function getPackageMetricsString(packageObject: PackageWithMetrics): string {
     if (!packageObject || !packageObject.metrics) {
-        return "";
+        return "" + chalk.magenta("No installs recorded");
     }
 
     var activePercent: number = packageObject.metrics.totalActive
