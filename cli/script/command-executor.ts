@@ -780,9 +780,10 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
     if (command.format === "json") {
         printJson(packageHistory);
     } else if (command.format === "table") {
-        printTable(["Label", "Release Time", "App Version", "Mandatory", "Description"], (dataSource: any[]) => {
+        printTable(["Label", "Release Time", "App Version", "Mandatory", "Released By", "Description"], (dataSource: any[]) => {
             packageHistory.forEach((packageObject: Package) => {
                 var releaseTime: string = formatDate(packageObject.uploadTime);
+                var releasedBy: string = packageObject.releasedBy ? packageObject.releasedBy : "";
                 var releaseSource: string;
                 if (packageObject.releaseMethod === "Promote") {
                     releaseSource = `Promoted ${ packageObject.originalLabel } from "${ packageObject.originalDeployment }"`;
@@ -801,6 +802,7 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
                     releaseTime,
                     packageObject.appVersion,
                     packageObject.isMandatory ? "Yes" : "No",
+                    releasedBy,
                     packageObject.description ? wordwrap(30)(packageObject.description) : ""
                 ]);
             });
