@@ -790,6 +790,7 @@ function getPackageMetricsString(packageObject: PackageWithMetrics): string {
     } else {
         percentString = activePercent.toPrecision(2) + "%";
     }
+    
     var numPending: number = packageObject.metrics.downloaded - packageObject.metrics.installed - packageObject.metrics.failed;
     var returnString: string = chalk.green("Active: ") + percentString + " (" + packageObject.metrics.active.toLocaleString() + " of " + packageObject.metrics.totalActive.toLocaleString() + ")\n" +
         chalk.green("Total: ") + packageObject.metrics.installed.toLocaleString();
