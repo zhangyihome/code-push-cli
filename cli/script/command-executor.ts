@@ -776,13 +776,21 @@ function getPackageString(packageObject: Package): string {
 
 function getPackageMetricsString(packageObject: PackageWithMetrics): string {
     if (!packageObject || !packageObject.metrics) {
-        return "";
+        return "" + chalk.magenta("No installs recorded");
     }
 
     var activePercent: number = packageObject.metrics.totalActive
         ? packageObject.metrics.active / packageObject.metrics.totalActive * 100
         : 0.0;
-    var percentString: string = (activePercent === 100.0 ? "100" : activePercent.toPrecision(2)) + "%";
+    var percentString: string; 
+    if (activePercent === 100.0) {
+        percentString = "100%";
+    } else if (activePercent === 0.0) {
+        percentString = "0%";
+    } else {
+        percentString = activePercent.toPrecision(2) + "%";
+    }
+    
     var numPending: number = packageObject.metrics.downloaded - packageObject.metrics.installed - packageObject.metrics.failed;
     var returnString: string = chalk.green("Active: ") + percentString + " (" + packageObject.metrics.active.toLocaleString() + " of " + packageObject.metrics.totalActive.toLocaleString() + ")\n" +
         chalk.green("Total: ") + packageObject.metrics.installed.toLocaleString();
