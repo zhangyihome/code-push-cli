@@ -268,11 +268,11 @@ strong {
 
 @media (max-width: 767px) {
   body {
-    font-size: 7px; } }
+    font-size: 8px; } }
 
 @media (min-width: 768px) {
   body {
-    font-size: 8px; } }
+    font-size: 8.5px; } }
 
 @media (min-width: 992px) {
   body {
@@ -409,12 +409,12 @@ img {
   #footer strong {
     color: inherit; }
   #footer p {
-    font-size: 1.4rem; }
+    font-size: 1.4em; }
   #footer h3 {
     margin-top: 10px; }
   #footer .nav > li > a {
     padding-left: 0;
-    font-size: 1.6rem; }
+    font-size: 1.6em; }
   #footer .early-adopters p {
     padding-top: 14px; }
 
@@ -442,7 +442,7 @@ img {
 
 @media (max-width: 991px) {
   #footer {
-    font-size: 10px; }
+    font-size: 1.2em; }
   .ms-logo-footer {
     padding-top: 4px; } }
 
@@ -534,7 +534,8 @@ button.btn-invert:hover {
 .top_section {
   text-align: center;
   font-size: 1em;
-  padding-bottom: 45px; }
+  padding-top: 1em;
+  padding-bottom: 5em; }
   .top_section .row:first-child {
     position: relative; }
 
@@ -566,20 +567,20 @@ button.btn-invert:hover {
 .hero pre {
   background-color: #E5E5E5;
   border-color: #E5E5E5;
-  padding: 1rem;
+  padding: 1em;
   font-weight: 600;
-  font-size: 1.6rem;
-  width: 25rem;
+  font-size: 1.6em;
+  width: 25em;
   margin-top: -5.2em;
   text-align: center; }
 
-@media (min-width: 10rem) {
+@media (min-width: 10em) {
   .hero_logo_container {
     font-size: .8em; }
     .hero_logo_container .logo_text {
       margin-left: 0; }
   .hero pre {
-    margin-top: -5rem; } }
+    margin-top: -5em; } }
 
 @media (min-width: 768px) {
   /* Center the navs when not collapsed */
@@ -649,9 +650,9 @@ button.btn-invert:hover {
   padding: 4em 0; }
   .next-steps-container .row > div .content {
     padding-top: 10px;
-    padding-left: 25px;
-    font-size: 1.6rem;
-    line-height: 1.6em; }
+    padding-left: 25px; }
+    .next-steps-container .row > div .content li {
+      font-size: 1.6em; }
   .next-steps-container .row > div .next-step-link {
     font-size: 2.2em;
     font-family: "Comfortaa-Regular";
@@ -664,7 +665,7 @@ button.btn-invert:hover {
     padding-left: 60px;
     border-left: 1px solid #1274a9; }
   .next-steps-container p {
-    font-size: 1.6rem; }
+    font-size: 1.6em; }
 
 .beta-container {
   background: url("../images/betaBg.png") no-repeat center;
@@ -690,10 +691,10 @@ button.btn-invert:hover {
       border-radius: 8px;
       resize: none;
       padding: 15px;
-      font-size: 1.6rem; }
+      font-size: 1.6em; }
   .beta-container .checkbox {
     color: #FFFFFF;
-    font-size: 1.6rem;
+    font-size: 1.6em;
     width: 100%; }
     .beta-container .checkbox label {
       margin-left: 10px; }
@@ -786,19 +787,19 @@ button.btn-invert:hover {
 .how_it_works {
   margin-top: 4em; }
   .how_it_works small {
-    font-size: 1.3rem; }
+    font-size: 1.3em; }
   .how_it_works ol {
     -moz-padding-start: 1.4em;
     -webkit-padding-start: 1.4em;
     -khtml-padding-start: 1.4em;
     -o-padding-start: 1.4em;
     padding-left: 1.4em;
-    font-size: 1.6rem;
+    font-size: 1.6em;
     line-height: 1.8em; }
     .how_it_works ol li {
       margin-bottom: 10px; }
   .how_it_works p {
-    font-size: 1.6rem;
+    font-size: 1.6em;
     line-height: 1.8em; }
   .how_it_works .img {
     max-width: 375px; }
@@ -826,7 +827,7 @@ button.btn-invert:hover {
   left: -60px; }
 
 .getting_started p {
-  font-size: 1.6rem;
+  font-size: 1.6em;
   line-height: 1.8em; }
 
 @media (min-width: 992px) {
@@ -842,21 +843,24 @@ button.btn-invert:hover {
     left: -60px; } }
 
 .number_circle {
-  width: 50px;
-  height: 50px;
-  padding: 8px;
-  font-size: 24px;
+  width: 2.0em;
+  height: 2.0em;
+  padding: 0.5em;
+  font-size: 1em;
   color: #ffffff;
   vertical-align: middle;
   white-space: nowrap;
   text-align: center;
   background-color: #7BCD33;
   border-radius: 50%;
-  margin-top: -9px; }
+  margin-top: -0.5em; }
 
 @media (min-width: 992px) {
   .number_circle {
     margin-left: 15px;
+    width: 2.4em;
+    height: 2.4em;
+    font-size: 2.4em;
     position: absolute;
     left: 0; }
   .getting-started-text {
@@ -891,7 +895,7 @@ button.btn-invert:hover {
   border-radius: 0;
   background-color: #E5E5E5; }
   .well_text ul {
-    font-size: 1.6rem; }
+    font-size: 1.6em; }
   .well_text p {
     line-height: 1.4em; }
 
@@ -907,17 +911,17 @@ button.btn-invert:hover {
 #signupWaiting {
   display: none;
   color: #56ACE2;
-  font-size: 2rem; }
+  font-size: 2em; }
 
 #signupSuccess {
   display: none;
   color: #7BCD33;
-  font-size: 2rem; }
+  font-size: 2em; }
 
 #signupError {
   display: none;
   color: #F005BD;
-  font-size: 2rem; }
+  font-size: 2em; }
 
 #authModal iframe {
   width: 700px;
@@ -974,28 +978,24 @@ nav.xs-toc {
 .doc-header {
   padding-left: 10px; }
   .doc-header .doc-title {
-    font-size: 4rem; }
+    font-size: 4em; }
   .doc-header .edit-page-link {
     font-size: 12px; }
 
 .doc-content {
-  font-size: 1.6rem;
   padding-left: 10px;
   padding-bottom: 20px; }
-  .doc-content p, .doc-content span {
-    font-size: 1.6rem; }
+  .doc-content p, .doc-content span, .doc-content code {
+    font-size: 1.6em; }
+  .doc-content ul li, .doc-content ol li {
+    font-size: 1.6em; }
+    .doc-content ul li li, .doc-content ol li li {
+      font-size: 1.0em; }
+    .doc-content ul li p, .doc-content ol li p {
+      font-size: 1.0em; }
   .doc-content h1 {
     color: #7BCD33;
-    font-size: 3.2rem;
-    margin-bottom: 2rem; }
-  .doc-content h2 {
-    font-size: 2.4rem; }
-  .doc-content h3 {
-    font-size: 2rem; }
-  .doc-content h4 {
-    font-size: 1.8rem; }
-  .doc-content h5 {
-    font-size: 1.8rem; }
+    margin-bottom: 2em; }
   .doc-content h2, .doc-content p, .doc-content li {
     line-height: 1.8em; }
   .doc-content img {
@@ -1005,11 +1005,11 @@ nav.xs-toc {
 p code, li code, td code {
   background-color: transparent;
   color: #657b83;
-  font-size: 1em; }
+  font-size: 1em !important; }
 
 pre {
   margin-top: 0;
-  margin-bottom: 1rem;
+  margin-bottom: 1em;
   display: block;
   padding: 0px;
   font-size: 1em;
@@ -1032,12 +1032,13 @@ pre {
     font-size: 14px; }
 
 table {
-  margin-bottom: 1rem;
+  margin-bottom: 1em;
   width: 100%; }
 
 td, th {
-  padding: 0.25rem 0.5rem;
-  border: 2px solid #000; }
+  padding: 0.25em 0.5em;
+  border: 2px solid #000;
+  font-size: 1.3em; }
 
 th {
   text-align: left;
@@ -1046,7 +1047,7 @@ th {
 
 .site-toc-title {
   font-weight: 300;
-  font-size: 2.2rem;
+  font-size: 2.2em;
   text-transform: uppercase; }
 
 /* outer ToC for the site */
@@ -1058,7 +1059,7 @@ th {
 
 .site-toc > li {
   list-style: none;
-  font-size: 1.8rem;
+  font-size: 1.8em;
   font-weight: 300;
   padding: 0.5em 0em; }
 
@@ -1079,10 +1080,9 @@ th {
   border-left: 0.5em solid #4CC2E4; }
 
 .hljs {
-  background: #f5fafd;
-  font-size: 1.6rem; }
+  background: #f5fafd; }
   .hljs span {
-    font-size: 1.6rem !important; }
+    font-size: 1.0em !important; }
 
 .hljs-keyword {
   color: #6fb92d; }
@@ -1094,41 +1094,46 @@ th {
     position: fixed; }
 
 .faq hr {
-  margin-top: 3rem;
-  padding-bottom: 1rem; }
+  margin-top: 3em;
+  padding-bottom: 1em; }
 
 .faq .main_content {
   padding-top: 0px;
-  padding-bottom: 3rem; }
+  padding-bottom: 3em; }
 
 .faq {
-  margin-top: 4rem; }
+  margin-top: 4em; }
 
 .faq a.anchor {
-  padding-left: 1rem;
+  padding-left: 1em;
   opacity: 0.5; }
 
 .faq h1 {
   text-align: center; }
 
 .faq p {
-  font-size: 1.6rem; }
+  font-size: 1.6em; }
 
 .post {
   margin-bottom: 6em; }
-  .post p, .post span, .post li {
-    font-size: 1.6rem; }
+  .post p, .post span, .post code {
+    font-size: 1.6em; }
+  .post ul li {
+    font-size: 1.6em; }
   .post .author {
-    padding-left: 4px;
-    font-size: 1.6rem; }
+    padding-left: 4px; }
   .post .post-header {
     text-align: center;
     margin-bottom: 3.5em; }
     .post .post-header span {
       color: #989898; }
 
-.blog p, .blog span, .blog li {
-  font-size: 1.6rem; }
+.blog p, .blog span {
+  font-size: 1.6em; }
+
+.blog .title {
+  font-size: 2.4em;
+  padding-bottom: 0.3em; }
 
 .blog .blogHeader {
   position: relative;
@@ -1172,25 +1177,23 @@ li:first-child header .adorner {
     overflow: hidden;
     white-space: nowrap; }
   .blog .blog-list .posts header .author {
-    padding-left: 6px;
-    font-size: 1.9rem; }
+    padding-left: 6px; }
   .blog .blog-list .posts header div:nth-of-type(2) {
     color: #b58733;
-    font-size: 2.4rem;
     top: -4px;
     position: relative; }
     .blog .blog-list .posts header div:nth-of-type(2) span {
-      font-size: 1.8rem;
       color: #999;
       position: relative;
-      top: -6px; }
+      top: -6px;
+      font-size: 1.8em; }
     .blog .blog-list .posts header div:nth-of-type(2) .date {
       color: #2f2f2f; }
 
 .blog .blog-list .posts section {
   padding-bottom: 60px; }
   .blog .blog-list .posts section a {
-    font-size: 1.6rem; }
+    font-size: 1.6em; }
 
 .blog .social-container {
   max-width: 360px;
@@ -1277,8 +1280,6 @@ li:first-child header .adorner {
 .blog div.post {
   padding: 12px 15px 0 15px;
   margin-top: -8px; }
-  .blog div.post .title {
-    font-size: 30pt; }
   .blog div.post .author {
     padding-left: 6px;
     font-size: 12pt; }
@@ -1301,8 +1302,7 @@ li:first-child header .adorner {
   padding: 10px 0; }
 
 .blog section.nextprev-posts div .title {
-  color: #3992ab;
-  font-size: 14pt; }
+  color: #3992ab; }
 
 .blog section.nextprev-posts div span {
   font-size: 9pt;
@@ -1316,8 +1316,7 @@ li:first-child header .adorner {
   position: fixed;
   top: 37%; }
   .blog section.nextprev-controls div .title {
-    color: white;
-    font-size: 12pt; }
+    color: white; }
   .blog section.nextprev-controls div span {
     font-size: 9pt;
     color: #999;

@@ -61,7 +61,7 @@ nav.xs-toc {
     padding-left: 10px;
 
     .doc-title {
-        font-size: 4rem;
+        font-size: 4em;
     }
 
     .edit-page-link {
@@ -70,34 +70,28 @@ nav.xs-toc {
 }
 
 .doc-content {
-    font-size: 1.6rem;
     padding-left: 10px;
     padding-bottom: 20px;
 
-    p, span {
-        font-size: 1.6rem;
+    p, span, code {
+        font-size: 1.6em;
     }
-
+    
+    ul, ol {
+        li {
+            font-size: 1.6em;
+            li {
+                font-size: 1.0em;
+            }
+            p {
+                font-size: 1.0em;
+            }
+        }
+    }
+    
     h1 {
         color: $docs-accent-textcolor;
-        font-size: 3.2rem;
-        margin-bottom: 2rem;
-    }
-
-    h2 {
-        font-size: 2.4rem;
-    }
-
-    h3 {
-        font-size: 2rem;
-    }
-
-    h4 {
-        font-size: 1.8rem;
-    }
-
-    h5 {
-        font-size: 1.8rem;
+        margin-bottom: 2em;
     }
 
     h2, p, li {
@@ -114,13 +108,13 @@ p, li, td {
     code {
         background-color: transparent;
         color: #657b83;
-        font-size: 1em;
+        font-size: 1em !important;
     }
 }
 
 pre {
     margin-top: 0;
-    margin-bottom: 1rem;
+    margin-bottom: 1em;
     display: block;
     padding: 0px;
     font-size: 1em;
@@ -148,13 +142,14 @@ pre {
 }
 
 table {
-    margin-bottom: 1rem;
+    margin-bottom: 1em;
     width: 100%;
 }
 
 td, th {
-    padding: .25rem .5rem;
+    padding: .25em .5em;
     border: 2px solid #000;
+    font-size: 1.3em;
 }
 
 th {
@@ -165,7 +160,7 @@ th {
 
 .site-toc-title {
     font-weight: 300;
-    font-size: 2.2rem;
+    font-size: 2.2em;
     text-transform: uppercase;
 }
 
@@ -180,7 +175,7 @@ th {
 
 .site-toc > li {
     list-style: none;
-    font-size: 1.8rem;
+    font-size: 1.8em;
     font-weight: 300;
     padding: 0.5em 0em;
 }
@@ -207,9 +202,8 @@ th {
 
 .hljs {
     background: lighten($brand-light-blue, 36.5%);
-    font-size: 1.6rem;
     span {
-        font-size: 1.6rem !important;
+        font-size: 1.0em !important;
     }
 }
 

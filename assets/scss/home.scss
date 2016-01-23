@@ -51,7 +51,8 @@
         position: relative;
     }
 
-    padding-bottom: 45px;
+    padding-top: 1em;
+    padding-bottom: 5em;
 }
 
 .hero_logo_container {
@@ -98,15 +99,15 @@
 .hero pre {
     background-color: $brand-light-gray;
     border-color: $brand-light-gray;
-    padding: 1rem;
+    padding: 1em;
     font-weight: 600;
-    font-size: 1.6rem;
-    width: 25rem;
+    font-size: 1.6em;
+    width: 25em;
     margin-top: -5.2em;
     text-align: center;
 }
 
-@media (min-width: 10rem) {
+@media (min-width: 10em) {
     .hero_logo_container {
         font-size: .8em;
 
@@ -116,7 +117,7 @@
     }
 
     .hero pre {
-        margin-top: -5rem;
+        margin-top: -5em;
     }
 }
 
@@ -211,8 +212,9 @@
         .content {
             padding-top: 10px;
             padding-left: 25px;
-            font-size: 1.6rem;
-            line-height: 1.6em;
+            li {
+                font-size: 1.6em;
+            }
         }
 
         .next-step-link {
@@ -236,7 +238,7 @@
     }
     
     p {
-        font-size: 1.6rem;
+        font-size: 1.6em;
     }
 }
 
@@ -275,13 +277,13 @@
             border-radius: 8px;
             resize: none;
             padding: 15px;
-            font-size: 1.6rem;
+            font-size: 1.6em;
         }
     }
 
     .checkbox {
         color: $brand-white;
-        font-size: 1.6rem;
+        font-size: 1.6em;
         width: 100%;
 
         label {
@@ -412,7 +414,7 @@
     margin-top: 4em;
     
     small {
-        font-size: 1.3rem;
+        font-size: 1.3em;
     }
     
     ol {
@@ -421,7 +423,7 @@
         -khtml-padding-start: 1.4em;
         -o-padding-start: 1.4em;
         padding-left: 1.4em;
-        font-size: 1.6rem;
+        font-size: 1.6em;
         line-height: 1.8em;
 
         li {
@@ -430,7 +432,7 @@
     }
     
     p {
-        font-size: 1.6rem;
+        font-size: 1.6em;
         line-height: 1.8em;
     }
     
@@ -469,7 +471,7 @@
     }
 
     p {
-        font-size: 1.6rem;
+        font-size: 1.6em;
         line-height: 1.8em;
     }
 }
@@ -495,24 +497,26 @@
 }
 
 .number_circle {
-    width: 50px;
-    height: 50px;
-    padding: 8px;
-    font-size: 24px;
+    width: 2.0em;
+    height: 2.0em;
+    padding: 0.5em;
+    font-size: 1em;
     color: #ffffff;
     vertical-align: middle;
     white-space: nowrap;
     text-align: center;
     background-color: $brand-accent-color;
     border-radius: 50%;
-    margin-top: -9px;
+    margin-top: -0.5em;
 }
 
 @media (min-width: $screen-md) {
     //Let's us put a numbered circle as aligned to h2 on medium-large devices
     .number_circle {
         margin-left: 15px;
-
+        width: 2.4em;
+        height: 2.4em;
+        font-size: 2.4em;
         // To make it look like Bootstrap's column padding default is padding it
         position: absolute;
         left: 0;
@@ -568,7 +572,7 @@
     border-radius:0;
     background-color: $brand-light-gray;
     ul {
-        font-size: 1.6rem;
+        font-size: 1.6em;
     }
     p {
         line-height: 1.4em;
@@ -592,19 +596,19 @@
 #signupWaiting {
     display: none;
     color: $brand-light-blue;
-    font-size: 2rem;
+    font-size: 2em;
 }
 
 #signupSuccess {
     display: none;
     color: $brand-accent-color;
-    font-size: 2rem;
+    font-size: 2em;
 }
 
 #signupError {
     display: none;
     color: $brand-hot-pink;
-    font-size: 2rem;
+    font-size: 2em;
 }
 
 #authModal iframe {

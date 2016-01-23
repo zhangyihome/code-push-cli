@@ -66,15 +66,19 @@ body {
     overflow-x: hidden;
 }
 
+strong {
+    font-family: Segoe UI Bold;
+}
+
 @media (max-width: $screen-xs-max) {
     body {
-        font-size: 7px;
+        font-size: 8px;
     }
 }
 
 @media (min-width: $screen-sm-min) {
     body {
-        font-size: 8px;
+        font-size: 8.5px;
     }
 }
 
@@ -251,7 +255,7 @@ img {
     }
 
     p {
-        font-size: 1.4rem;
+        font-size: 1.4em;
     }
     
     h3 {
@@ -260,7 +264,7 @@ img {
 
     .nav > li > a {
         padding-left: 0;
-        font-size: 1.6rem;
+        font-size: 1.6em;
     }
 
     .early-adopters {
@@ -305,7 +309,7 @@ img {
 
 @media (max-width: $screen-sm-max) {
     #footer {
-        font-size: 10px;
+        font-size: 1.2em;
     }
 
     .ms-logo-footer {

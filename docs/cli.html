@@ -330,7 +330,7 @@
                     <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/CLI.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
                 </header>  
                 <article class="doc-content">               
-                    <p><img src="https://cloud.githubusercontent.com/assets/116461/12046296/624c5d66-ae6b-11e5-9e0f-6f2f43e46eed.png" alt="CodePush CLI"></p>
+                    <p><img src="https://cloud.githubusercontent.com/assets/116461/12527087/6efba342-c12a-11e5-944d-88b4b6a5a438.png" alt="CodePush CLI"></p>
 
 <h2>Installation</h2>
 
@@ -418,11 +418,28 @@ you can run the following command:</p>
 <p>If having a staging and production version of your app is enough to meet your needs, then you don&rsquo;t need to do anything else. However, if you want an alpha, dev, etc. deployment, you can easily create them using the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment add &lt;appName&gt; &lt;deploymentName&gt;
 </code></pre></div>
-<p>Just like with apps, you can remove, rename and list deployments as well, using the following commands respectively:</p>
+<p>Just like with apps, you can remove and rename deployments as well, using the following commands respectively:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploymentName&gt;
 code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
-code-push deployment ls &lt;appName&gt;
 </code></pre></div>
+<p>If at any time you&rsquo;d like to view the list of deployments that a specific app includes, you can simply run the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment ls &lt;appName&gt; [--displayKeys]
+</code></pre></div>
+<p>This will display not only the list of deployments, but also the update metadata (e.g. mandatory, description) and installation metrics for their latest release:</p>
+
+<p><img src="https://cloud.githubusercontent.com/assets/116461/12526883/7730991c-c127-11e5-9196-98e9ceec758f.png" alt="Deployment lis"></p>
+
+<p>The install metrics have the following meaning:</p>
+
+<ul>
+<li><p><strong>Active</strong> - The number of successful installs that are currently running this release. This number will increase and decrease as end-users upgrade to and away from this release, respectively.</p></li>
+<li><p><strong>Total</strong> - The total number of successful installations that this update has received overall. This number only ever increases as new users/devices install it, and therefore, this is always a superset of the active count.</p></li>
+<li><p><strong>Pending</strong> - The number of times this release has been downloaded, but not yet installed. This would only apply to updates that aren&rsquo;t installed immediately, and helps provide the broader picture of release adoption for apps that rely on app resume and restart to apply an update.</p></li>
+<li><p><strong>Rollbacks</strong> - The number of times that this release has been automatically rolled back on the client. Ideally this number should be zero, and in that case, this metric isn&rsquo;t even shown. However, if you released an update that includes a crash as part of the installation process, the CodePush plugin will roll the end-user back to the previous release, and report that issue back to the server. This allows your end-users to remain unblocked in the event of broken releases, and by being able to see this telemtry in the CLI, you can identify erroneous releases and respond to them by <a href="#rolling-back-undesired-updates">rolling it back</a> on the server.</p></li>
+</ul>
+
+<p>When the metrics cell reports <code>No installs recorded</code>, that indicates that the server hasn&rsquo;t seen any activity for this release. This could either be because it precluded the plugin versions that included telemtry support, or no end-users have synchronized with the CodePush server yet. As soon as an install happens, you will begin to see metrics populate in the CLI for the release.</p>
+
 <h2>Releasing app updates</h2>
 
 <p>Once your app has been configured to query for updates against the CodePush service&ndash;using your desired deployment&ndash;you can begin pushing updates to it using the following command:</p>
@@ -648,7 +665,9 @@ code-push rollback MyApp Production
 
 <p><img src="https://cloud.githubusercontent.com/assets/696206/11605068/14e440d0-9aab-11e5-8837-69ab09bfb66c.PNG" alt="Deployment History"></p>
 
-<p><em>NOTE: The history command can also be run using the &ldquo;h&rdquo; alias</em># CodePush management CLI</p>
+<p>Additionally, the history displays the install metrics for each release. You can view the details about how to interpret the metric data in the documentation for the <code>deployment ls</code> command above.</p>
+
+<p><em>NOTE: The history command can also be run using the &ldquo;h&rdquo; alias</em></p>
   
                 </article>
             </div>  

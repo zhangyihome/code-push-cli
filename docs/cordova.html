@@ -379,28 +379,25 @@
 <ul>
 <li>Add the plugin to your application.</li>
 <li>Create one deployment per target platform using the <a href="https://github.com/Microsoft/code-push/tree/master/cli">CodePush CLI</a></li>
-<li>Add the deployment keys to your <code>config.xml</code>
-<code>xml
-&lt;platform name=&quot;android&quot;&gt;
+<li><p>Add the deployment keys to your <code>config.xml</code></p>
+<div class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;platform name=&quot;android&quot;&gt;
     &lt;preference name=&quot;CodePushDeploymentKey&quot; value=&quot;YOUR-ANDROID-DEPLOYMENT-KEY&quot; /&gt;
 &lt;/platform&gt;
 &lt;platform name=&quot;ios&quot;&gt;
     &lt;preference name=&quot;CodePushDeploymentKey&quot; value=&quot;YOUR-IOS-DEPLOYMENT-KEY&quot; /&gt;
 &lt;/platform&gt;
-</code></li>
-<li>Allow access to the CodePush server:
+</code></pre></div></li>
+<li><p>Allow access to the CodePush server:</p>
 
 <ul>
-<li>In <code>config.xml</code>, add 
-<code>xml
-&lt;access origin=&quot;https://codepush.azurewebsites.net/ &quot; /&gt;
-</code></li>
-<li>In your html pages where the plugin is used, add the server URL to your existing Content Security Policy (CSP) header:
-<code>xml
-&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src https://codepush.azurewebsites.net/ &#39;self&#39; ... &quot;&gt;
-</code></li>
+<li><p>In <code>config.xml</code>, add </p>
+<div class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;access origin=&quot;https://codepush.azurewebsites.net/&quot; /&gt;
+</code></pre></div></li>
+<li><p>In your html pages where the plugin is used, add the server URL to your existing Content Security Policy (CSP) header:</p>
+<div class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src https://codepush.azurewebsites.net/ &#39;self&#39; data: gap: https://ssl.gstatic.com &#39;unsafe-eval&#39;; style-src &#39;self&#39; &#39;unsafe-inline&#39;; media-src *&quot;&gt;
+</code></pre></div></li>
 </ul></li>
-<li>You are now ready to use the plugin in the application code. See the <a href="/samples">sample applications</a> for a examples and the methods description for more details.</li>
+<li><p>You are now ready to use the plugin in the application code. See the <a href="/samples">sample applications</a> for examples and the API documentation for more details.</p></li>
 </ul>
 
 <h2>Create an application update package</h2>
@@ -408,25 +405,22 @@
 <p>You can create an update by simply zipping and deploying your platform&rsquo;s www folder. The <a href="https://github.com/Microsoft/code-push/tree/master/cli">CodePush CLI</a> has a <code>deploy</code> command for this.</p>
 
 <ol>
-<li>Prepare your application</li>
-</ol>
-<div class="highlight"><pre><code class="language-text" data-lang="text">  cordova prepare
+<li><p>Prepare your application</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">cordova prepare
 </code></pre></div>
-<p>We are not deploying binaries in updates, so <code>prepare</code> is enough for this step. The <code>cordova build</code> command works as well for this step, since it calls <code>cordova prepare</code> behind the scenes.</p>
-
-<ol>
-<li>Deploy update using the <a href="https://github.com/Microsoft/code-push/tree/master/cli">CodePush CLI</a></li>
+<p>We are not deploying binaries in updates, so <code>prepare</code> is enough for this step. The <code>cordova build</code> command works as well for this step, since it calls <code>cordova prepare</code> behind the scenes.</p></li>
+<li><p>Deploy update using the <a href="https://github.com/Microsoft/code-push/tree/master/cli">CodePush CLI</a></p></li>
 </ol>
+
+<p>In this step, we will use the <a href="https://github.com/Microsoft/code-push/tree/master/cli">CodePush CLI</a> to zip the platform specific <code>www</code> folder and to upload it to the service. Once the zip reaches the server, a diff against the previous released update is generated such that users upgrading from the previous version will only receive the changed files. Users upgrading from older versions will receive all the files in the <code>www</code> folder.</p>
 
 <ul>
-<li>For Android:
-<code>
-code-push release &lt;appName&gt; path_to_your_app/platforms/android/assets/www &lt;appStoreVersion&gt; --deploymentName &lt;AndroidDeploymentName&gt;
-</code></li>
-<li>For iOS:
-<code>
-code-push release &lt;appName&gt; path_to_your_app/platforms/ios/www &lt;appStoreVersion&gt; --deploymentName &lt;iOSDeploymentName&gt;
-</code></li>
+<li><p>For Android:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push release &lt;appName&gt; path_to_your_app/platforms/android/assets/www &lt;appStoreVersion&gt; --deploymentName &lt;AndroidDeploymentName&gt;
+</code></pre></div></li>
+<li><p>For iOS:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push release &lt;appName&gt; path_to_your_app/platforms/ios/www &lt;appStoreVersion&gt; --deploymentName &lt;iOSDeploymentName&gt;
+</code></pre></div></li>
 </ul>
 
 <p>The service should now return an update when calling <code>codePush.checkForUpdate</code>.</p>
@@ -445,7 +439,7 @@ code-push release &lt;appName&gt; path_to_your_app/platforms/ios/www &lt;appStor
 <li><strong>isMandatory</strong>: Flag indicating if the update is mandatory. (Boolean)</li>
 <li><strong>packageHash</strong>: The hash value of the package. (String)</li>
 <li><strong>packageSize</strong>: The size of the package, in bytes. (Number)</li>
-<li><strong>failedInstall</strong>: Boolean flag indicating if this update package was previously attempted and the update failed. (Boolean). If using the rollback feature, this field can protect against going into an infinite bad update/revert loop. For an example on how to use the rollbackTimeout parameter to protect against a bad update, see the <a href="#codepushnotifyapplicationready">notifyApplicationReady() documentation</a>.</li>
+<li><strong>failedInstall</strong>: Boolean flag indicating if this update package was previously attempted and the update failed. (Boolean). For an example on how to protect against a bad update, see the <a href="#codepushnotifyapplicationready">notifyApplicationReady() documentation</a>.</li>
 <li><strong>localPath</strong>: The current, local path of the package. (String)</li>
 <li><strong>isFirstRun</strong>: Flag indicating if the current application run is the first one after the package was applied. (Boolean)</li>
 </ul>
@@ -455,9 +449,8 @@ code-push release &lt;appName&gt; path_to_your_app/platforms/ios/www &lt;appStor
 <ul>
 <li><strong>install(installSuccess, installError, installOptions)</strong>: Installs this package to the application.
 The install behavior is dependent on the provided <code>installOptions</code>. By default, the update package is silently installed and the application is reloaded with the new content on the next application start.
-If the installOptions.rollbackTimeout parameter is provided, the application will wait for a <code>codePush.notifyApplicationReady()</code> for the given number of milliseconds.
-If <code>codePush.notifyApplicationReady()</code> is called before the time period specified by <code>rollbackTimeout</code>, the install operation is considered a success.
-Otherwise, the install operation will be marked as failed, and the application is reverted to its previous version.</li>
+On the first run after the update, the application will wait for a <code>codePush.notifyApplicationReady()</code> call. Once this call is made, the install operation is considered a success.
+Otherwise, the install operation will be marked as failed, and the application is reverted to its previous version on the next run.</li>
 </ul>
 
 <h3>InstallOptions</h3>
@@ -465,16 +458,14 @@ Otherwise, the install operation will be marked as failed, and the application i
 <p>Interface defining several options for customizing install operation behavior.</p>
 
 <ul>
-<li><strong>rollbackTimeout</strong>: Optional time interval, in milliseconds, to wait for a <a href="#codepushnotifyapplicationready">notifyApplicationReady()</a> call before marking the install as failed and reverting to the previous version. By default, the rollback functionality is disabled - the parameter defaults to 0. (number)</li>
-<li><strong>installMode</strong>: Used to specity the <a href="#installmode">InstallMode</a> used for the install operation. This is optional and defaults to InstallMode.ON_NEXT_RESTART.</li>
-</ul>
+<li><p><strong>installMode</strong>: Used to specity the <a href="#installmode">InstallMode</a> used for the install operation. This is optional and defaults to InstallMode.ON_NEXT_RESTART.</p>
 
-<p>#### Example
-    &ldquo;`javascript
-    var onError = function (error) {
-        console.log(&quot;An error occurred. &rdquo; + error);
-    };</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">var onInstallSuccess = function () {
+<h4>Example</h4>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var onError = function (error) {
+    console.log(&quot;An error occurred. &quot; + error);
+};
+
+var onInstallSuccess = function () {
     console.log(&quot;Install succeeded.&quot;);
 };
 
@@ -492,9 +483,10 @@ var onUpdateCheck = function (remotePackage) {
 };
 
 window.codePush.checkForUpdate(onUpdateCheck, onError);
-```
-</code></pre></div>
-<p>For an example on how to use the rollbackTimeout parameter to protect against a bad update, see the <a href="#codepushnotifyapplicationready">notifyApplicationReady() documentation</a>.</p>
+</code></pre></div></li>
+</ul>
+
+<p>For an example on how to protect against a bad update, see the <a href="#codepushnotifyapplicationready">notifyApplicationReady() documentation</a>.</p>
 
 <h2>RemotePackage</h2>
 
@@ -532,56 +524,63 @@ The optional <code>downloadProgress</code> callback is invoked several times dur
 <li><strong>receivedBytes</strong>: The number of bytes already downloaded. (Number)</li>
 </ul>
 
-<p>### Example
-  &ldquo;`javascript
-    var onError = function (error) {
-            console.log(&quot;An error occurred. &rdquo; + error);
-        };</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">    var onPackageDownloaded = function (localPackage) {
-        console.log(&quot;Package downloaded at: &quot; + localPackage.localPath);
-        // you can now update your application to the downloaded version by calling localPackage.install()
-    };
+<h3>Example</h3>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var onError = function (error) {
+    console.log(&quot;An error occurred. &quot; + error);
+};
 
-    var onProgress = function (downloadProgress) {
-        console.log(&quot;Downloading &quot; + downloadProgress.receivedBytes + &quot; of &quot; + downloadProgress.totalBytes + &quot; bytes.&quot;);
-    };
+var onPackageDownloaded = function (localPackage) {
+    console.log(&quot;Package downloaded at: &quot; + localPackage.localPath);
+    // you can now update your application to the downloaded version by calling localPackage.install()
+};
 
-    var onUpdateCheck = function (remotePackage) {
-        if (!remotePackage) {
-            console.log(&quot;The application is up to date.&quot;);
-        } else {
-            console.log(&quot;A CodePush update is available. Package hash: &quot; + remotePackage.packageHash);
-            remotePackage.download(onPackageDownloaded, onError, onProgress);
-        }
-    };
+var onProgress = function (downloadProgress) {
+    console.log(&quot;Downloading &quot; + downloadProgress.receivedBytes + &quot; of &quot; + downloadProgress.totalBytes + &quot; bytes.&quot;);
+};
 
-    window.codePush.checkForUpdate(onUpdateCheck, onError);
-</code></pre></div><div class="highlight"><pre><code class="language-text" data-lang="text">- __abortDownload(abortSuccess, abortError)__: Aborts the current download session, if any.
+var onUpdateCheck = function (remotePackage) {
+    if (!remotePackage) {
+        console.log(&quot;The application is up to date.&quot;);
+    } else {
+        console.log(&quot;A CodePush update is available. Package hash: &quot; + remotePackage.packageHash);
+        remotePackage.download(onPackageDownloaded, onError, onProgress);
+    }
+};
 
-## SyncStatus
-Defines the possible statuses of the [sync](#codepushsync) operation. There are two categories of statuses: intermediate and result (final). The intermediate statuses represent progress statuses of the sync operation, and are not final. The result statuses represent final statuses of the sync operation. Every sync operation ends with only one result status, but can have zero or more intermediate statuses.
-### Properties
-- __UP_TO_DATE__: Result status - the application is up to date. (number)
-- __UPDATE_INSTALLED__: Result status - an update is available, it has been downloaded, unzipped and copied to the deployment folder. After the completion of the callback invoked with SyncStatus.UPDATE_INSTALLED, the application will be reloaded with the updated code and resources. (number)
-- __UPDATE_IGNORED__: Result status - an optional update is available, but the user declined to install it. The update was not downloaded. (number)
-- __ERROR__: Result status - an error happened during the sync operation. This might be an error while communicating with the server, downloading or unziping the update. The console logs should contain more information about what happened. No update has been applied in this case. (number)
-- __CHECKING_FOR_UPDATE__: Intermediate status - the plugin is about to check for updates.
-- __AWAITING_USER_ACTION__: Intermediate status - a user dialog is about to be displayed. This status will be reported only if user interaction is enabled.
-- __DOWNLOADING_PACKAGE__: Intermediate status - the update package is about to be downloaded.
-- __INSTALLING_UPDATE__: Intermediate status - the update package is about to be installed.
-
-## codePush.checkForUpdate
-Queries the CodePush server for updates.
-```javascript
-codePush.checkForUpdate(onUpdateCheck, onError, deploymentKey);
+window.codePush.checkForUpdate(onUpdateCheck, onError);
 </code></pre></div>
 <ul>
-<li><strong>onUpdateCheck</strong> Callback invoked in case of a successful response from the server.
-                     The callback takes one <code>RemotePackage</code> parameter. A non-null package is a valid update.
-                     A null package means the application is up to date for the current native application version.</li>
-<li><strong>onError</strong> Optional callback invoked in case of an error. The callback takes one error parameter, containing the details of the error.</li>
-<li><strong>deploymentKey</strong> Optional deployment key that overrides the config.xml setting.</li>
+<li><strong>abortDownload(abortSuccess, abortError)</strong>: Aborts the current download session, if any.</li>
 </ul>
+
+<h2>SyncStatus</h2>
+
+<p>Defines the possible statuses of the <a href="#codepushsync">sync</a> operation. There are two categories of statuses: intermediate and result (final). The intermediate statuses represent progress statuses of the sync operation, and are not final. The result statuses represent final statuses of the sync operation. Every sync operation ends with only one result status, but can have zero or more intermediate statuses.</p>
+
+<h3>Properties</h3>
+
+<ul>
+<li><strong>UP_TO_DATE</strong>: Result status - the application is up to date. (number)</li>
+<li><strong>UPDATE_INSTALLED</strong>: Result status - an update is available, it has been downloaded, unzipped and copied to the deployment folder. After the completion of the callback invoked with SyncStatus.UPDATE_INSTALLED, the application will be reloaded with the updated code and resources. (number)</li>
+<li><strong>UPDATE_IGNORED</strong>: Result status - an optional update is available, but the user declined to install it. The update was not downloaded. (number)</li>
+<li><strong>ERROR</strong>: Result status - an error happened during the sync operation. This might be an error while communicating with the server, downloading or unziping the update. The console logs should contain more information about what happened. No update has been applied in this case. (number)</li>
+<li><strong>CHECKING_FOR_UPDATE</strong>: Intermediate status - the plugin is about to check for updates.</li>
+<li><strong>AWAITING_USER_ACTION</strong>: Intermediate status - a user dialog is about to be displayed. This status will be reported only if user interaction is enabled.</li>
+<li><strong>DOWNLOADING_PACKAGE</strong>: Intermediate status - the update package is about to be downloaded.</li>
+<li><strong>INSTALLING_UPDATE</strong>: Intermediate status - the update package is about to be installed.</li>
+</ul>
+
+<h2>codePush.checkForUpdate</h2>
+
+<p>Queries the CodePush server for updates.
+<code>javascript
+codePush.checkForUpdate(onUpdateCheck, onError, deploymentKey);
+</code>
+- <strong>onUpdateCheck</strong> Callback invoked in case of a successful response from the server.
+                         The callback takes one <code>RemotePackage</code> parameter. A non-null package is a valid update.
+                         A null package means the application is up to date for the current native application version.
+- <strong>onError</strong> Optional callback invoked in case of an error. The callback takes one error parameter, containing the details of the error.
+- <strong>deploymentKey</strong> Optional deployment key that overrides the config.xml setting.</p>
 
 <h3>Example</h3>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var onError = function (error) {
@@ -623,11 +622,14 @@ window.codePush.getCurrentPackage(onPackageSuccess, onError);
 <h2>codePush.notifyApplicationReady</h2>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.notifyApplicationReady(notifySucceeded, notifyFailed);
 </code></pre></div>
-<p>Notifies the plugin that the update operation succeeded.
-Calling this function is required if a installOptions.rollbackTimeout parameter is passed to your <code>LocalPackage.install</code> call.
-If automatic rollback was not used, calling this function is not required and will result in a noop.
-- <strong>notifySucceeded</strong>: Optional callback invoked if the plugin was successfully notified.
-- <strong>notifyFailed</strong>: Optional callback invoked in case of an error during notifying the plugin.</p>
+<p>Notifies the plugin that the update operation succeeded and that the application is ready.
+Calling this function is required on the first run after an update. On every subsequent application run, calling this function is a noop.
+If using the sync API, calling this function is not required since sync calls it internally. </p>
+
+<ul>
+<li><strong>notifySucceeded</strong>: Optional callback invoked if the plugin was successfully notified.</li>
+<li><strong>notifyFailed</strong>: Optional callback invoked in case of an error during notifying the plugin.</li>
+</ul>
 
 <h3>Example</h3>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">// App version 1 (current version)
@@ -641,8 +643,7 @@ var onInstallSuccess = function () {
 };
 
 var onPackageDownloaded = function (localPackage) {
-    // set the rollbackTimeout to 10s
-    localPackage.install(onInstallSuccess, onError, { rollbackTimeout: 10000 });
+    localPackage.install(onInstallSuccess, onError);
 };
 
 var onUpdateCheck = function (remotePackage) {
@@ -697,10 +698,9 @@ The algorithm of this method is the following:
 
 <h3>SyncOptions</h3>
 
-<p>Interface defining several options for customizing the <a href="#codepushsync">sync</a> operation behavior. Options span from disabling the user interaction or modifying it to enabling rollback in case of a bad update.</p>
+<p>Interface defining several options for customizing the <a href="#codepushsync">sync</a> operation behavior.</p>
 
 <ul>
-<li><strong>rollbackTimeout</strong>: Optional time interval, in milliseconds, to wait for a <a href="#codepushnotifyapplicationready">notifyApplicationReady()</a> call before marking the install as failed and reverting to the previous version. Sync calls <a href="#codepushnotifyapplicationready">notifyApplicationReady()</a> internally, so if you use sync() in your updated version of the application, there is no need to call <a href="#codepushnotifyapplicationready">notifyApplicationReady()</a> again. By default, the rollback functionality is disabled - the parameter defaults to 0. (number)</li>
 <li><strong>installMode</strong>: Used to specity the <a href="#installmode">InstallMode</a> used for the install operation. This is optional and defaults to InstallMode.ON_NEXT_RESTART.</li>
 <li><strong>ignoreFailedUpdates</strong>: Optional boolean flag. If set, updates available on the server for which and update was attempted and rolled back will be ignored. Defaults to true. (boolean)</li>
 <li><strong>updateDialog</strong>: Option used to enable, disable or customize the user interaction during sync. If set to false, user interaction will be disabled. If set to true, the user will be alerted or asked to confirm new updates, based on whether the update is mandatory. To customize the user dialog, this option can be set to a custom UpdateDialogOptions instance.</li>
@@ -803,6 +803,61 @@ window.codePush.sync(
     function (downloadProgress) {
         console.log(&quot;Downloading &quot; + downloadProgress.receivedBytes + &quot; of &quot; + downloadProgress.totalBytes + &quot; bytes.&quot;);
     });
+
+
+//------------------------------------------------
+
+// Using custom sync options - custom update dialog
+
+var updateDialogOptions = {
+    updateTitle: &quot;Update&quot;,
+    mandatoryUpdateMessage: &quot;You will be updated to the latest version of the app.&quot;,
+    mandatoryContinueButtonLabel: &quot;Continue&quot;,
+    optionalUpdateMessage: &quot;Update available. Install?&quot;,
+    optionalIgnoreButtonLabel: &quot;No&quot;,
+    optionalInstallButtonLabel: &quot;Yes&quot;,
+};
+
+var syncOptions = {
+    installMode: InstallMode.ON_NEXT_RESTART,
+    updateDialog: updateDialogOptions
+};
+
+var syncStatusCallback = function (syncStatus) {
+    switch (syncStatus) {
+        // Result (final) statuses
+        case SyncStatus.UPDATE_INSTALLED:
+            app.displayMessage(&quot;The update was installed successfully. For InstallMode.ON_NEXT_RESTART, the changes will be visible after application restart. &quot;);
+            break;
+        case SyncStatus.UP_TO_DATE:
+            app.displayMessage(&quot;The application is up to date.&quot;);
+            break;
+        case SyncStatus.UPDATE_IGNORED:
+            app.displayMessage(&quot;The user decided not to install the optional update.&quot;);
+            break;
+        case SyncStatus.ERROR:
+            app.displayMessage(&quot;An error occured while checking for updates&quot;);
+            break;
+
+        // Intermediate (non final) statuses
+        case SyncStatus.CHECKING_FOR_UPDATE:
+            console.log(&quot;Checking for update.&quot;);
+            break;
+        case SyncStatus.AWAITING_USER_ACTION:
+            console.log(&quot;Alerting user.&quot;);
+            break;
+        case SyncStatus.DOWNLOADING_PACKAGE:
+            console.log(&quot;Downloading package.&quot;);
+            break;
+        case SyncStatus.INSTALLING_UPDATE:
+            console.log(&quot;Installing update&quot;);
+            break;
+    }
+};
+
+/* Invoke sync with custom messages in the update dialog.
+   For customizing the sync behavior, see SyncOptions in the CodePush documentation. */
+window.codePush.sync(syncStatusCallback, syncOptions);
 
 </code></pre></div>
 <h2>InstallMode</h2>
