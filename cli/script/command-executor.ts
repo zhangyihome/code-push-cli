@@ -182,12 +182,10 @@ function getOwnerEmail(collaboratorList: Collaborator[]): string {
 function appList(command: cli.IAppListCommand): Promise<void> {
     throwForInvalidOutputFormat(command.format);
     var apps: App[];
-    var owners: string[] = [];
     return sdk.getApps()
         .then((retrievedApps: App[]): Promise<string[][]> => {
             apps = retrievedApps;
             var deploymentListPromises: Promise<string[]>[] = apps.map((app: App) => {
-                owners.push(getOwnerEmail(app.collaborator));
 
                 return sdk.getDeployments(app.id)
                     .then((deployments: Deployment[]) => {
@@ -202,7 +200,7 @@ function appList(command: cli.IAppListCommand): Promise<void> {
             return Q.all(deploymentListPromises);
         })
         .then((deploymentLists: string[][]): void => {
-            printAppList(command.format, apps, deploymentLists, owners);
+            printAppList(command.format, apps, deploymentLists);
         });
 }
 
@@ -620,6 +618,8 @@ function getApp(appName: string): Promise<App> {
     return sdk.getApps()
         .then((apps: App[]): App => {
             var foundApp = false;
+            var possibleApp: App;
+
             for (var i = 0; i < apps.length; ++i) {
                 var app: App = apps[i];
 
@@ -627,6 +627,11 @@ function getApp(appName: string): Promise<App> {
                     if (ownerEmailValue) {
                         var appOwner: string = getOwnerEmail(app.collaborator);
                         foundApp = appOwner === ownerEmailValue; 
+                    } else if (!app.isOwner){
+                        // found an app name matching give value but is not the owner of the app
+                        // its possible there is another app with same name of which this user 
+                        // is the owner, so keep this pointer for future use.
+                        possibleApp = app;
                     } else {
                         foundApp = app.isOwner;
                     }
@@ -635,6 +640,10 @@ function getApp(appName: string): Promise<App> {
                 if (foundApp) {
                     return app;
                 }
+            }
+
+            if (possibleApp) {
+                return possibleApp;
             }
         });
 }
@@ -777,18 +786,23 @@ function formatDate(unixOffset: number): string {
     }
 }
 
-function printAppList(format: string, apps: App[], deploymentLists: string[][], owners: string[]): void {
+function getDisplayName(app: App): string {
+    return app.isOwner ? app.name : getOwnerEmail(app.collaborator) + "/" + app.name;
+}
+
+function printAppList(format: string, apps: App[], deploymentLists: string[][]): void {
     if (format === "json") {
         var dataSource: any[] = apps.map((app: App, index: number) => {
-            return { "name": app.name, "deployments": deploymentLists[index], "owner": owners[index] };
+
+            return { "name": getDisplayName(app), "deployments": deploymentLists[index] };
         });
 
         printJson(dataSource);
     } else if (format === "table") {
-        var headers = ["Name", "Deployments", "Owner"];
+        var headers = ["Name", "Deployments"];
         printTable(headers, (dataSource: any[]): void => {
             apps.forEach((app: App, index: number): void => {
-                var row = [app.name, wordwrap(50)(deploymentLists[index].join(", ")), owners[index]];
+                var row = [getDisplayName(app), wordwrap(50)(deploymentLists[index].join(", "))];
                 dataSource.push(row);
             });
         });
