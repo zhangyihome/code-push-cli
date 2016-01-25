@@ -820,35 +820,36 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
             if (command.displayKeys) {
                 deploymentJson.deploymentKey = deploymentKeys[index];
             }
-            
+
             if (deployment.package) {
                 var packageWithMetrics = <PackageWithMetrics>(deployment.package);
                 if (packageWithMetrics.metrics) {
                     delete packageWithMetrics.metrics.totalActive;
                 }
             }
-            
+
             return deploymentJson;
         });
+
         printJson(dataSource);
     } else if (command.format === "table") {
         var headers = ["Name"];
         if (command.displayKeys) {
             headers.push("Deployment Key");
         }
-        
+
         if (showPackage) {
             headers.push("Update Metadata");
             headers.push("Install Metrics");
         }
-        
+
         printTable(headers, (dataSource: any[]): void => {
             deployments.forEach((deployment: Deployment, index: number): void => {
                 var row = [deployment.name];
                 if (command.displayKeys) {
                     row.push(deploymentKeys[index]);
                 }
-                
+
                 if (showPackage) {
                     row.push(getPackageString(deployment.package));
                     row.push(getPackageMetricsString(<PackageWithMetrics>(deployment.package)));
@@ -867,10 +868,17 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
                 delete packageObject.metrics.totalActive;
             }
         });
-        
+
         printJson(packageHistory);
     } else if (command.format === "table") {
-        printTable(["Label", "Release Time", "App Version", "Mandatory", "Released By", "Description", "Install Metrics"], (dataSource: any[]) => {
+        var headers = ["Label", "Release Time", "App Version", "Mandatory"];
+        if (command.displayReleasedBy) {
+            headers.push("Released by");
+        }
+
+        headers.push(...["Description", "Install Metrics"]);
+
+        printTable(headers, (dataSource: any[]) => {
             packageHistory.forEach((packageObject: Package) => {
                 var releaseTime: string = formatDate(packageObject.uploadTime);
                 var releasedBy: string = packageObject.releasedBy ? packageObject.releasedBy : "";
@@ -887,15 +895,17 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
                     releaseTime += "\n" + chalk.magenta(`(${releaseSource})`).toString();
                 }
 
-                dataSource.push([
-                    packageObject.label,
-                    releaseTime,
-                    packageObject.appVersion,
-                    packageObject.isMandatory ? "Yes" : "No",
-                    releasedBy,
+                var row = [packageObject.label, releaseTime, packageObject.appVersion, packageObject.isMandatory ? "Yes" : "No"];
+                if (command.displayReleasedBy) {
+                    row.push(releasedBy);
+                }
+
+                row.push(...[
                     packageObject.description ? wordwrap(30)(packageObject.description) : "",
                     getPackageMetricsString(packageObject)
                 ]);
+
+                dataSource.push(row);
             });
         });
     }

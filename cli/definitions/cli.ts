@@ -81,6 +81,7 @@ export interface IDeploymentHistoryCommand extends ICommand {
     appName: string;
     deploymentName: string;
     format: string;
+    displayReleasedBy: boolean;
 }
 
 export interface IDeploymentListCommand extends ICommand {
