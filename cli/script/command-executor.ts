@@ -269,16 +269,8 @@ function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
             throwForInvalidAppId(appId, command.appName);
 
             return sdk.addCollaborator(appId, command.email)
-                .then((): Promise<void> => {
+                .then((): void => {
                     log("Successfully added the \"" + command.email + "\" app as a collaborator to \"" + command.appName +"\".");
-                    var collaboratorListCommand: cli.IDeploymentListCommand = {
-                        type: cli.CommandType.collaboratorList,
-                        appName: command.appName,
-                        displayKeys: false,
-                        format: "table"
-                    };
-
-                    return listCollaborators(collaboratorListCommand);
                 });
         });
 }
@@ -312,7 +304,7 @@ function removeCollaborator(command: cli.ICollaboratorRemoveCommand): Promise<vo
                             });
                     }
 
-                    log("App removal cancelled.");
+                    log("App collaborator removal cancelled.");
                 });
         });
 }
@@ -811,7 +803,7 @@ function printCollaboratorsList(format: string, collaborators: Collaborator[]): 
 
         printJson(dataSource);
     } else if (format === "table") {
-        var headers = ["Collaborators"];
+        var headers = ["E-mail address"];
         printTable(headers, (dataSource: any[]): void => {
             collaborators.forEach((collaborator: Collaborator, index: number): void => {
                 var row = [collaborator.email];
