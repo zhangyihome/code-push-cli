@@ -10,10 +10,11 @@
     collaboratorList,
     collaboratorRemove,
     deploymentAdd,
+    deploymentHistory,
     deploymentList,
+    deploymentMetrics,
     deploymentRemove,
     deploymentRename,
-    deploymentHistory,
     login,
     logout,
     promote,
@@ -76,9 +77,16 @@ export interface IDeploymentAddCommand extends ICommand {
     deploymentName: string;
 }
 
+export interface IDeploymentHistoryCommand extends ICommand {
+    appName: string;
+    deploymentName: string;
+    format: string;
+}
+
 export interface IDeploymentListCommand extends ICommand {
     appName: string;
     format: string;
+    displayKeys: boolean;
 }
 
 export interface IDeploymentRemoveCommand extends ICommand {
@@ -90,12 +98,6 @@ export interface IDeploymentRenameCommand extends ICommand {
     appName: string;
     currentDeploymentName: string;
     newDeploymentName: string;
-}
-
-export interface IDeploymentHistoryCommand extends ICommand {
-    appName: string;
-    deploymentName: string;
-    format: string;
 }
 
 export interface ILoginCommand extends ICommand {

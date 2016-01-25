@@ -2,7 +2,7 @@
 
 CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users' devices. It works by acting as a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using the provided client SDKs for [Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push)). This allows you to have a more deterministic and direct engagement model with your userbase, when addressing bugs and/or adding small features that don't require you to re-build a binary and re-distribute it through the respective app stores.
 
-![CodePush CLI](https://cloud.githubusercontent.com/assets/116461/12046296/624c5d66-ae6b-11e5-9e0f-6f2f43e46eed.png)
+![CodePush CLI](https://cloud.githubusercontent.com/assets/116461/12527087/6efba342-c12a-11e5-944d-88b4b6a5a438.png)
 
 ## Installation
 
@@ -125,13 +125,34 @@ If having a staging and production version of your app is enough to meet your ne
 code-push deployment add <appName> <deploymentName>
 ```
 
-Just like with apps, you can remove, rename and list deployments as well, using the following commands respectively:
+Just like with apps, you can remove and rename deployments as well, using the following commands respectively:
 
 ```
 code-push deployment rename <appName> <deploymentName> <newDeploymentName>
 code-push deployment rm <appName> <deploymentName>
-code-push deployment ls <appName>
 ```
+
+If at any time you'd like to view the list of deployments that a specific app includes, you can simply run the following command:
+
+```
+code-push deployment ls <appName> [--displayKeys]
+```
+
+This will display not only the list of deployments, but also the update metadata (e.g. mandatory, description) and installation metrics for their latest release:
+
+![Deployment lis](https://cloud.githubusercontent.com/assets/116461/12526883/7730991c-c127-11e5-9196-98e9ceec758f.png)
+
+The install metrics have the following meaning:
+
+* **Active** - The number of successful installs that are currently running this release. This number will increase and decrease as end-users upgrade to and away from this release, respectively.
+
+* **Total** - The total number of successful installations that this update has received overall. This number only ever increases as new users/devices install it, and therefore, this is always a superset of the active count.
+
+* **Pending** - The number of times this release has been downloaded, but not yet installed. This would only apply to updates that aren't installed immediately, and helps provide the broader picture of release adoption for apps that rely on app resume and restart to apply an update.
+
+* **Rollbacks** - The number of times that this release has been automatically rolled back on the client. Ideally this number should be zero, and in that case, this metric isn't even shown. However, if you released an update that includes a crash as part of the installation process, the CodePush plugin will roll the end-user back to the previous release, and report that issue back to the server. This allows your end-users to remain unblocked in the event of broken releases, and by being able to see this telemtry in the CLI, you can identify erroneous releases and respond to them by [rolling it back](#rolling-back-undesired-updates) on the server.
+
+When the metrics cell reports `No installs recorded`, that indicates that the server hasn't seen any activity for this release. This could either be because it precluded the plugin versions that included telemtry support, or no end-users have synchronized with the CodePush server yet. As soon as an install happens, you will begin to see metrics populate in the CLI for the release.
 
 ## Releasing app updates
 
@@ -276,5 +297,7 @@ code-push deployment history <appName> <deploymentName>
 The history will display all attributes about each release (e.g. label, mandatory) as well as indicate if any releases were made due to a promotion or a rollback operation.
 
 ![Deployment History](https://cloud.githubusercontent.com/assets/696206/11605068/14e440d0-9aab-11e5-8837-69ab09bfb66c.PNG)
+
+Additionally, the history displays the install metrics for each release. You can view the details about how to interpret the metric data in the documentation for the `deployment ls` command above.
 
 *NOTE: The history command can also be run using the "h" alias*

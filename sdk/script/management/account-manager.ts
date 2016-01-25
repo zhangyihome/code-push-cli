@@ -17,8 +17,10 @@ if (typeof window === "undefined") {
     }
 }
 
-import { AccessKey, Account, App, Collaborator, Deployment, DeploymentKey, Package } from "rest-definitions";
-export { AccessKey, Account, App, Collaborator, Deployment, DeploymentKey, Package };
+// Aliasing UpdateMetrics as IUpdateMetrics to deal with TypeScript issue that removes unused imports.
+import { AccessKey, Account, App, Collaborator, Deployment, DeploymentKey, DeploymentMetrics, Package, UpdateMetrics as IUpdateMetrics } from "rest-definitions";
+export { AccessKey, Account, App, Collaborator, Deployment, DeploymentKey, DeploymentMetrics, Package };
+export type UpdateMetrics = IUpdateMetrics;
 
 export interface CodePushError {
     message?: string;
@@ -678,7 +680,7 @@ export class AccountManager {
         });
     }
 
-    public getDeployment(appId: string, deploymentId: string) {
+    public getDeployment(appId: string, deploymentId: string): Promise<Deployment> {
         return Promise<Deployment>((resolve, reject, notify) => {
             var requester = (this._authedAgent ? this._authedAgent : request);
             var req = requester.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId);
@@ -694,6 +696,36 @@ export class AccountManager {
                 if (res.ok) {
                     if (body) {
                         resolve(body.deployment);
+                    } else {
+                        reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
+                    }
+                } else {
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
+        });
+    }
+
+    public getDeploymentMetrics(appId: string, deploymentId: string): Promise<DeploymentMetrics> {
+        return Promise<DeploymentMetrics>((resolve, reject, notify) => {
+            var requester = (this._authedAgent ? this._authedAgent : request);
+            var req = requester.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/metrics");
+            this.attachCredentials(req, requester);
+
+            req.end((err: any, res: request.Response) => {
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
+
+                var body = tryJSON(res.text);
+                if (res.ok) {
+                    if (body) {
+                        resolve(body.metrics);
                     } else {
                         reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
                     }

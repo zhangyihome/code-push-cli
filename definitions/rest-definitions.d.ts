@@ -6,6 +6,10 @@ declare module "rest-definitions" {
         createdTime: number;
         description?: string;
     }
+    
+    export interface DeploymentMetrics {
+        [packageLabelOrAppVersion: string]: UpdateMetrics
+    }
 
     export interface DeploymentStatusReport {
         appVersion: string;
@@ -14,10 +18,10 @@ declare module "rest-definitions" {
         label?: string;
         status?: string
     }
-
+    
     export interface DownloadReport {
         clientUniqueId: string;
-        deploymentKey: string; 
+        deploymentKey: string;
         label: string;
     }
 
@@ -42,6 +46,13 @@ declare module "rest-definitions" {
         isCompanion: boolean;
         label: string;
         packageHash: string;
+    }
+    
+    export interface UpdateMetrics {
+        active: number;
+        downloaded?: number;
+        failed?: number;
+        installed?: number;
     }
 
     export interface Account {

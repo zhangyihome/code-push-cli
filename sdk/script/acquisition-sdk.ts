@@ -140,7 +140,7 @@ export class AcquisitionManager {
         });
     }
     
-    public reportStatusDeploy(package?: Package, status?: string, callback?: Callback<void>): void {
+    public reportStatusDeploy(deployedPackage?: Package, status?: string, callback?: Callback<void>): void {
         var url: string = this._serverUrl + "reportStatus/deploy";
         var body: DeploymentStatusReport = {
             appVersion: this._appVersion,
@@ -148,9 +148,9 @@ export class AcquisitionManager {
             deploymentKey: this._deploymentKey
         };
         
-        if (package) {
-            body.label = package.label;
-            body.appVersion = package.appVersion;
+        if (deployedPackage) {
+            body.label = deployedPackage.label;
+            body.appVersion = deployedPackage.appVersion;
             
             switch (status) {
                 case AcquisitionStatus.DeploymentSucceeded:
@@ -187,12 +187,12 @@ export class AcquisitionManager {
         });
     }
     
-    public reportStatusDownload(package: Package, callback?: Callback<void>): void {
+    public reportStatusDownload(downloadedPackage: Package, callback?: Callback<void>): void {
         var url: string = this._serverUrl + "reportStatus/download";
         var body: DownloadReport = {
             clientUniqueId: this._clientUniqueId,
             deploymentKey: this._deploymentKey,
-            label: package.label
+            label: downloadedPackage.label
         };
         
         this._httpRequester.request(Http.Verb.POST, url, JSON.stringify(body), (error: Error, response: Http.Response): void => {
