@@ -391,7 +391,7 @@ function createCommand(): cli.ICommand {
 
                     case "transfer":
                         if (arg2 && arg3) {
-                            cmd = { type: cli.CommandType.transfer };
+                            cmd = { type: cli.CommandType.appTransfer };
 
                             var appTransferCommand = <cli.ITransferCommand>cmd;
 

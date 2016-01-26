@@ -534,6 +534,9 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.appRename:
                     return appRename(<cli.IAppRenameCommand>command);
 
+                case cli.CommandType.appTransfer:
+                    return appTransfer(<cli.ITransferCommand>command);
+
                 case cli.CommandType.deploymentAdd:
                     return deploymentAdd(<cli.IDeploymentAddCommand>command);
 
@@ -557,9 +560,6 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.rollback:
                     return rollback(<cli.IRollbackCommand>command);
-
-                case cli.CommandType.transfer:
-                    return appTransfer(<cli.ITransferCommand>command);
 
                 default:
                     // We should never see this message as invalid commands should be caught by the argument parser.
@@ -1242,7 +1242,7 @@ function throwForInvalidAppId(appId: string, appName: string): void {
 
 function throwForInvalidEmail(email: string): void {
     if (!emailValidator.validate(email)) {
-        throw new Error("Invalid email id \"" + email + "\"");
+        throw new Error("\"" + email + "\" is an invalid e-mail address.");
     }
 }
 

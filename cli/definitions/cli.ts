@@ -6,6 +6,7 @@
     appList,
     appRemove,
     appRename,
+    appTransfer,
     collaboratorAdd,
     collaboratorList,
     collaboratorRemove,
@@ -20,8 +21,7 @@
     promote,
     register,
     release,
-    rollback,
-    transfer
+    rollback
 }
 
 export interface ICommand {
