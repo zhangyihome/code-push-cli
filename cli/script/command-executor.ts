@@ -12,19 +12,22 @@ import * as Q from "q";
 import * as recursiveFs from "recursive-fs";
 import * as semver from "semver";
 import slash = require("slash");
-import tryJSON = require("try-json");
 var Table = require("cli-table");
 import * as yazl from "yazl";
 import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
-import { AccessKey, AccountManager, App, Deployment, Package } from "code-push";
+import { AcquisitionStatus } from "code-push/script/acquisition-sdk";
+import { AccessKey, AccountManager, App, Deployment, DeploymentMetrics, Package, UpdateMetrics } from "code-push";
 var packageJson = require("../package.json");
 import Promise = Q.Promise;
 var progress = require("progress");
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var userAgent: string = packageJson.name + "/" + packageJson.version;
+
+const ACTIVE_METRICS_KEY: string = "Active";
+const DOWNLOADED_METRICS_KEY: string = "Downloaded";
 
 interface ILegacyLoginConnectionInfo {
     accessKeyName: string;
@@ -43,7 +46,14 @@ interface IPackageFile {
     path: string;
 }
 
-// Exported variables for unit testing.
+export interface UpdateMetricsWithTotalActive extends UpdateMetrics {
+    totalActive: number;
+}
+
+export interface PackageWithMetrics {
+    metrics?: UpdateMetricsWithTotalActive;
+}
+
 export var sdk: AccountManager;
 export var log = (message: string | Chalk.ChalkChain): void => console.log(message);
 
@@ -118,7 +128,8 @@ function appAdd(command: cli.IAppAddCommand): Promise<void> {
             var deploymentListCommand: cli.IDeploymentListCommand = {
                 type: cli.CommandType.deploymentList,
                 appName: app.name,
-                format: "table"
+                format: "table",
+                displayKeys: true
             };
             return deploymentList(deploymentListCommand, /*showPackage=*/ false);
         });
@@ -206,6 +217,7 @@ function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
 export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: boolean = true): Promise<void> => {
     throwForInvalidOutputFormat(command.format);
     var theAppId: string;
+    var deployments: Deployment[];
 
     return getAppId(command.appName)
         .then((appId: string): Promise<Deployment[]> => {
@@ -214,7 +226,33 @@ export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: b
 
             return sdk.getDeployments(appId);
         })
-        .then((deployments: Deployment[]): void => {
+        .then((retrievedDeployments: Deployment[]) => {
+            deployments = retrievedDeployments;
+            if (showPackage) {
+                var metricsPromises: Promise<void>[] = deployments.map((deployment: Deployment) => {
+                    if (deployment.package) {
+                        return sdk.getDeploymentMetrics(theAppId, deployment.id)
+                            .then((metrics: DeploymentMetrics): void => {
+                                if (metrics[deployment.package.label]) {
+                                    var totalActive: number = getTotalActiveFromDeploymentMetrics(metrics);
+                                    (<PackageWithMetrics>(deployment.package)).metrics = {
+                                        active: metrics[deployment.package.label].active,
+                                        downloaded: metrics[deployment.package.label].downloaded,
+                                        failed: metrics[deployment.package.label].failed,
+                                        installed: metrics[deployment.package.label].installed,
+                                        totalActive: totalActive
+                                    };
+                                }
+                            });
+                    } else {
+                        return Q(<void>null);
+                    }
+                });
+
+                return Q.all(metricsPromises);
+            }
+        })
+        .then(() => {
             printDeploymentList(command, deployments, showPackage);
         });
 }
@@ -265,6 +303,7 @@ function deploymentRename(command: cli.IDeploymentRenameCommand): Promise<void> 
 function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void> {
     throwForInvalidOutputFormat(command.format);
     var storedAppId: string;
+    var storedDeploymentId: string;
 
     return getAppId(command.appName)
         .then((appId: string): Promise<string> => {
@@ -275,25 +314,37 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
         })
         .then((deploymentId: string): Promise<Package[]> => {
             throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
+            storedDeploymentId = deploymentId;
 
             return sdk.getPackageHistory(storedAppId, deploymentId);
         })
-        .then((packageHistory: Package[]): void => {
-            printDeploymentHistory(command, packageHistory);
+        .then((packageHistory: Package[]): Promise<void> => {
+            return sdk.getDeploymentMetrics(storedAppId, storedDeploymentId)
+                .then((metrics: DeploymentMetrics): void => {
+                    var totalActive: number = getTotalActiveFromDeploymentMetrics(metrics);
+                    packageHistory.forEach((packageObject: Package) => {
+                        if (metrics[packageObject.label]) {
+                            (<PackageWithMetrics>packageObject).metrics = {
+                                active: metrics[packageObject.label].active,
+                                downloaded: metrics[packageObject.label].downloaded,
+                                failed: metrics[packageObject.label].failed,
+                                installed: metrics[packageObject.label].installed,
+                                totalActive: totalActive
+                            };
+                        }
+                    });
+                    printDeploymentHistory(command, <PackageWithMetrics[]>packageHistory);
+                });
         });
 }
 
 function deserializeConnectionInfo(): ILegacyLoginConnectionInfo|ILoginConnectionInfo {
-    var savedConnection: string;
-
     try {
-        savedConnection = fs.readFileSync(configFilePath, { encoding: "utf8" });
+        var savedConnection: string = fs.readFileSync(configFilePath, { encoding: "utf8" });
+        return JSON.parse(savedConnection);
     } catch (ex) {
         return;
     }
-
-    var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = tryJSON(savedConnection);
-    return connectionInfo;
 }
 
 export function execute(command: cli.ICommand): Promise<void> {
@@ -346,6 +397,9 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.deploymentAdd:
                     return deploymentAdd(<cli.IDeploymentAddCommand>command);
 
+                case cli.CommandType.deploymentHistory:
+                    return deploymentHistory(<cli.IDeploymentHistoryCommand>command);
+
                 case cli.CommandType.deploymentList:
                     return deploymentList(<cli.IDeploymentListCommand>command);
 
@@ -354,9 +408,6 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.deploymentRename:
                     return deploymentRename(<cli.IDeploymentRenameCommand>command);
-
-                case cli.CommandType.deploymentHistory:
-                    return deploymentHistory(<cli.IDeploymentHistoryCommand>command);
 
                 case cli.CommandType.login:
                     return login(<cli.ILoginCommand>command);
@@ -466,6 +517,15 @@ function getDeploymentId(appId: string, deploymentName: string): Promise<string>
         });
 }
 
+function getTotalActiveFromDeploymentMetrics(metrics: DeploymentMetrics): number {
+    var totalActive = 0;
+    Object.keys(metrics).forEach((label: string) => {
+        totalActive += metrics[label].active;
+    });
+
+    return totalActive;
+}
+
 function initiateExternalAuthenticationAsync(serverUrl: string, action: string): void {
     var message: string = `A browser is being launched to authenticate your account. Follow the instructions ` +
                           `it displays to complete your ${action === "register" ? "registration" : "login"}.\r\n`;
@@ -503,9 +563,10 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
                 return;
             }
 
-            var decoded: string = tryBase64Decode(accessToken);
-            var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = tryJSON(decoded);
-            if (!connectionInfo) {
+            try {
+                var decoded: string = base64.decode(accessToken);
+                var connectionInfo: ILegacyLoginConnectionInfo = JSON.parse(decoded);
+            } catch (error) {
                 throw new Error("Invalid access token.");
             }
 
@@ -515,7 +576,7 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
             return sdk.isAuthenticated()
                 .then((isAuthenticated: boolean): void => {
                     if (isAuthenticated) {
-                        serializeConnectionInfo(serverUrl, accessToken);
+                        serializeConnectionInfo(serverUrl, accessKey);
                     } else {
                         throw new Error("Invalid access token.");
                     }
@@ -584,27 +645,39 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
         deployments.forEach((deployment: Deployment) => delete deployment.id);  // Temporary until ID's are removed from the REST API
         printJson(deployments);
     } else if (command.format === "table") {
-        var headers = ["Name", "Deployment Key"];
-        if (showPackage) {
-            headers.push("Package Metadata");
+        var headers = ["Name"];
+        if (command.displayKeys) {
+            headers.push("Deployment Key");
         }
+
+        if (showPackage) {
+            headers.push("Update Metadata");
+            headers.push("Install Metrics");
+        }
+
         printTable(headers, (dataSource: any[]): void => {
             deployments.forEach((deployment: Deployment): void => {
-                var row = [deployment.name, deployment.key];
+                var row = [deployment.name];
+                if (command.displayKeys) {
+                    row.push(deployment.key);
+                }
+
                 if (showPackage) {
                     row.push(getPackageString(deployment.package));
+                    row.push(getPackageMetricsString(<PackageWithMetrics>(deployment.package)));
                 }
+
                 dataSource.push(row);
             });
         });
     }
 }
 
-function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageHistory: Package[]): void {
+function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageHistory: PackageWithMetrics[]): void {
     if (command.format === "json") {
         printJson(packageHistory);
     } else if (command.format === "table") {
-        printTable(["Label", "Release Time", "App Version", "Mandatory", "Description"], (dataSource: any[]) => {
+        printTable(["Label", "Release Time", "App Version", "Mandatory", "Description", "Install Metrics"], (dataSource: any[]) => {
             packageHistory.forEach((packageObject: Package) => {
                 var releaseTime: string = formatDate(packageObject.uploadTime);
                 var releaseSource: string;
@@ -625,7 +698,8 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
                     releaseTime,
                     packageObject.appVersion,
                     packageObject.isMandatory ? "Yes" : "No",
-                    packageObject.description ? wordwrap(30)(packageObject.description) : ""
+                    packageObject.description ? wordwrap(30)(packageObject.description) : "",
+                    getPackageMetricsString(packageObject)
                 ]);
             });
         });
@@ -642,6 +716,38 @@ function getPackageString(packageObject: Package): string {
         chalk.green("Mandatory: ") + (packageObject.isMandatory ? "Yes" : "No") + "\n" +
         chalk.green("Release Time: ") + formatDate(packageObject.uploadTime) +
         (packageObject.description ? wordwrap(70)("\n" + chalk.green("Description: ") + packageObject.description): "");
+}
+
+function getPackageMetricsString(packageObject: PackageWithMetrics): string {
+    if (!packageObject || !packageObject.metrics) {
+        return "" + chalk.magenta("No installs recorded");
+    }
+
+    var activePercent: number = packageObject.metrics.totalActive
+        ? packageObject.metrics.active / packageObject.metrics.totalActive * 100
+        : 0.0;
+    var percentString: string;
+    if (activePercent === 100.0) {
+        percentString = "100%";
+    } else if (activePercent === 0.0) {
+        percentString = "0%";
+    } else {
+        percentString = activePercent.toPrecision(2) + "%";
+    }
+
+    var numPending: number = packageObject.metrics.downloaded - packageObject.metrics.installed - packageObject.metrics.failed;
+    var returnString: string = chalk.green("Active: ") + percentString + " (" + packageObject.metrics.active.toLocaleString() + " of " + packageObject.metrics.totalActive.toLocaleString() + ")\n" +
+        chalk.green("Total: ") + packageObject.metrics.installed.toLocaleString();
+
+    if (numPending > 0) {
+        returnString += " (" + numPending.toLocaleString() + " pending)";
+    }
+
+    if (packageObject.metrics.failed) {
+        returnString += "\n" + chalk.green("Rollbacks: ") + chalk.red(packageObject.metrics.failed.toLocaleString() + "");
+    }
+
+    return returnString;
 }
 
 function printJson(object: any): void {
@@ -847,31 +953,12 @@ function requestAccessToken(): Promise<string> {
     });
 }
 
-function serializeConnectionInfo(serverUrl: string, accessTokenOrKey: string): void {
-    // The access token should have been validated already (i.e.:  logging in).
-    var json: string = tryBase64Decode(accessTokenOrKey);
-    var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = tryJSON(json);
-
-    if (connectionInfo) {
-        // This is a legacy login format
-        connectionInfo.serverUrl = serverUrl;
-    } else {
-        // This login uses an access key
-        connectionInfo = <ILoginConnectionInfo>{ serverUrl: serverUrl, accessKey: accessTokenOrKey };
-    }
-
-    json = JSON.stringify(connectionInfo);
+function serializeConnectionInfo(serverUrl: string, accessKey: string): void {
+    var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = <ILoginConnectionInfo>{ serverUrl: serverUrl, accessKey: accessKey };
+    var json: string = JSON.stringify(connectionInfo);
     fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
 
     log("\r\nSuccessfully logged-in. Your session token was written to " + chalk.cyan(configFilePath) + ". You can run the " + chalk.cyan("code-push logout") + " command at any time to delete this file and terminate your session.\r\n");
-}
-
-function tryBase64Decode(encoded: string): string {
-    try {
-        return base64.decode(encoded);
-    } catch (ex) {
-        return null;
-    }
 }
 
 function isBinaryOrZip(path: string): boolean {
