@@ -18,7 +18,7 @@ import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
 import { AcquisitionStatus } from "code-push/script/acquisition-sdk";
-import { AccessKey, AccountManager, App, Deployment, DeploymentKey, DeploymentMetrics, Package, UpdateMetrics } from "code-push";
+import { AccessKey, AccountManager, App, Deployment, DeploymentMetrics, Package, UpdateMetrics } from "code-push";
 var packageJson = require("../package.json");
 import Promise = Q.Promise;
 var progress = require("progress");
@@ -208,10 +208,8 @@ function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
             throwForInvalidAppId(appId, command.appName);
 
             return sdk.addDeployment(appId, command.deploymentName)
-                .then((deployment: Deployment): Promise<DeploymentKey[]> => {
-                    return sdk.getDeploymentKeys(appId, deployment.id);
-                }).then((deploymentKeys: DeploymentKey[]) => {
-                    log("Successfully added the \"" + command.deploymentName + "\" deployment with key \"" + deploymentKeys[0].key + "\" to the \"" + command.appName + "\" app.");
+                .then((deployment: Deployment): void => {
+                    log("Successfully added the \"" + command.deploymentName + "\" deployment with key \"" + deployment.key + "\" to the \"" + command.appName + "\" app.");
                 });
         })
 }
@@ -219,7 +217,6 @@ function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
 export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: boolean = true): Promise<void> => {
     throwForInvalidOutputFormat(command.format);
     var theAppId: string;
-    var deploymentKeyList: string[];
     var deployments: Deployment[];
 
     return getAppId(command.appName)
@@ -229,23 +226,8 @@ export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: b
 
             return sdk.getDeployments(appId);
         })
-        .then((retrievedDeployments: Deployment[]): Promise<void> => {
+        .then((retrievedDeployments: Deployment[]) => {
             deployments = retrievedDeployments;
-            if (command.displayKeys) {
-                var deploymentKeyPromises: Promise<string>[] = deployments.map((deployment: Deployment) => {
-                    return sdk.getDeploymentKeys(theAppId, deployment.id)
-                        .then((deploymentKeys: DeploymentKey[]): string => {
-                            return deploymentKeys[0].key;
-                        });
-                });
-
-                return Q.all(deploymentKeyPromises)
-                    .then((retrievedDeploymentKeyList: string[]) => {
-                        deploymentKeyList = retrievedDeploymentKeyList;
-                    });
-            }
-        })
-        .then(() => {
             if (showPackage) {
                 var metricsPromises: Promise<void>[] = deployments.map((deployment: Deployment) => {
                     if (deployment.package) {
@@ -271,7 +253,7 @@ export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: b
             }
         })
         .then(() => {
-            printDeploymentList(command, deployments, deploymentKeyList, showPackage);
+            printDeploymentList(command, deployments, showPackage);
         });
 }
 
@@ -581,9 +563,10 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
                 return;
             }
 
-            var decoded: string = tryBase64Decode(accessToken);
-            var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = tryJSON(decoded);
-            if (!connectionInfo) {
+            try {
+                var decoded: string = base64.decode(accessToken);
+                var connectionInfo: ILegacyLoginConnectionInfo = JSON.parse(decoded);
+            } catch (error) {
                 throw new Error("Invalid access token.");
             }
 
@@ -593,7 +576,7 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
             return sdk.isAuthenticated()
                 .then((isAuthenticated: boolean): void => {
                     if (isAuthenticated) {
-                        serializeConnectionInfo(serverUrl, accessToken);
+                        serializeConnectionInfo(serverUrl, accessKey);
                     } else {
                         throw new Error("Invalid access token.");
                     }
@@ -657,24 +640,10 @@ function printAppList(format: string, apps: App[], deploymentLists: string[][]):
     }
 }
 
-function printDeploymentList(command: cli.IDeploymentListCommand, deployments: Deployment[], deploymentKeys: Array<string>, showPackage: boolean = true): void {
+function printDeploymentList(command: cli.IDeploymentListCommand, deployments: Deployment[], showPackage: boolean = true): void {
     if (command.format === "json") {
-        var dataSource: any[] = deployments.map((deployment: Deployment, index: number) => {
-            var deploymentJson: any = { "name": deployment.name, "package": deployment.package };
-            if (command.displayKeys) {
-                deploymentJson.deploymentKey = deploymentKeys[index];
-            }
-
-            if (deployment.package) {
-                var packageWithMetrics = <PackageWithMetrics>(deployment.package);
-                if (packageWithMetrics.metrics) {
-                    delete packageWithMetrics.metrics.totalActive;
-                }
-            }
-
-            return deploymentJson;
-        });
-        printJson(dataSource);
+        deployments.forEach((deployment: Deployment) => delete deployment.id);  // Temporary until ID's are removed from the REST API
+        printJson(deployments);
     } else if (command.format === "table") {
         var headers = ["Name"];
         if (command.displayKeys) {
@@ -687,10 +656,10 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
         }
 
         printTable(headers, (dataSource: any[]): void => {
-            deployments.forEach((deployment: Deployment, index: number): void => {
+            deployments.forEach((deployment: Deployment): void => {
                 var row = [deployment.name];
                 if (command.displayKeys) {
-                    row.push(deploymentKeys[index]);
+                    row.push(deployment.key);
                 }
 
                 if (showPackage) {
@@ -706,12 +675,6 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
 
 function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageHistory: PackageWithMetrics[]): void {
     if (command.format === "json") {
-        packageHistory.forEach((packageObject: PackageWithMetrics) => {
-            if (packageObject.metrics) {
-                delete packageObject.metrics.totalActive;
-            }
-        });
-
         printJson(packageHistory);
     } else if (command.format === "table") {
         printTable(["Label", "Release Time", "App Version", "Mandatory", "Description", "Install Metrics"], (dataSource: any[]) => {
@@ -990,32 +953,12 @@ function requestAccessToken(): Promise<string> {
     });
 }
 
-function serializeConnectionInfo(serverUrl: string, accessTokenOrKey: string): void {
-    // The access token should have been validated already (i.e.:  logging in).
-    var json: string = tryBase64Decode(accessTokenOrKey);
-    var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo;
-
-    try {
-        connectionInfo = JSON.parse(json);
-        connectionInfo.serverUrl = serverUrl;
-    } catch (ex) {
-        // If the JSON parsing threw an exception, then it is
-        // an access key and not a user session object.
-        connectionInfo = <ILoginConnectionInfo>{ serverUrl: serverUrl, accessKey: accessTokenOrKey };
-    }
-
-    json = JSON.stringify(connectionInfo);
+function serializeConnectionInfo(serverUrl: string, accessKey: string): void {
+    var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = <ILoginConnectionInfo>{ serverUrl: serverUrl, accessKey: accessKey };
+    var json: string = JSON.stringify(connectionInfo);
     fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
 
     log("\r\nSuccessfully logged-in. Your session token was written to " + chalk.cyan(configFilePath) + ". You can run the " + chalk.cyan("code-push logout") + " command at any time to delete this file and terminate your session.\r\n");
-}
-
-function tryBase64Decode(encoded: string): string {
-    try {
-        return base64.decode(encoded);
-    } catch (ex) {
-        return null;
-    }
 }
 
 function isBinaryOrZip(path: string): boolean {

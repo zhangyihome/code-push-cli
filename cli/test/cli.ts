@@ -33,7 +33,8 @@ export class SdkStub {
     public addDeployment(appId: string, name: string): Promise<codePush.Deployment> {
         return Q(<codePush.Deployment>{
             id: "deploymentId",
-            name: name
+            name: name,
+            key: "6"
         });
     }
 
@@ -57,23 +58,15 @@ export class SdkStub {
         }]);
     }
 
-    public getDeploymentKeys(appId: string, deploymentId: string): Promise<codePush.DeploymentKey[]> {
-        return Q([<codePush.DeploymentKey>{
-            description: null,
-            id: "5",
-            isPrimary: true,
-            key: "6",
-            name: "Primary"
-        }]);
-    }
-
     public getDeployments(appId: string): Promise<codePush.Deployment[]> {
         return Q([<codePush.Deployment>{
             id: "3",
-            name: "Production"
+            name: "Production",
+            key: "6"
         }, <codePush.Deployment>{
             id: "4",
             name: "Staging",
+            key: "6",
             package: {
                 appVersion: "1.0.0",
                 description: "fgh",
@@ -111,7 +104,7 @@ export class SdkStub {
             }
         ]);
     }
-    
+
     public getDeploymentMetrics(appId: string, deploymentId: string): Promise<any> {
         return Q({
             "1.0.0": {
@@ -370,12 +363,10 @@ describe("CLI", () => {
         };
 
         var addDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "addDeployment");
-        var getDeploymentKeys: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getDeploymentKeys");
 
         cmdexec.execute(command)
             .done((): void => {
                 sinon.assert.calledOnce(addDeployment);
-                sinon.assert.calledOnce(getDeploymentKeys);
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Successfully added the \"b\" deployment with key \"6\" to the \"a\" app.");
                 done();
@@ -399,10 +390,11 @@ describe("CLI", () => {
                 var expected = [
                     {
                         name: "Production",
-                        deploymentKey: "6"
+                        key: "6"
                     },
                     {
                         name: "Staging",
+                        key: "6",
                         package: {
                             appVersion: "1.0.0",
                             description: "fgh",
@@ -416,10 +408,10 @@ describe("CLI", () => {
                                 active: 123,
                                 downloaded: 321,
                                 failed: 789,
-                                installed: 456
+                                installed: 456,
+                                totalActive: 1035
                             }
-                        },
-                        deploymentKey: "6"
+                        }
                     }
                 ];
 
@@ -520,7 +512,8 @@ describe("CLI", () => {
                             active: 789,
                             downloaded: 456,
                             failed: 654,
-                            installed: 987
+                            installed: 987,
+                            totalActive: 1035
                         }
                     },
                     {
@@ -536,7 +529,8 @@ describe("CLI", () => {
                             active: 123,
                             downloaded: 321,
                             failed: 789,
-                            installed: 456
+                            installed: 456,
+                            totalActive: 1035
                         }
                     }
                 ];
@@ -545,7 +539,7 @@ describe("CLI", () => {
                 done();
             });
     });
-    
+
     it("release doesn't allow releasing .zip file", (done: MochaDone): void => {
         var command: cli.IReleaseCommand = {
             type: cli.CommandType.release,

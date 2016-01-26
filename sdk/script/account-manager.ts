@@ -20,8 +20,8 @@ if (typeof window === "undefined") {
 }
 
 // Aliasing UpdateMetrics as IUpdateMetrics to deal with TypeScript issue that removes unused imports.
-import { AccessKey, Account, App, Deployment, DeploymentKey, DeploymentMetrics, Package, UpdateMetrics as IUpdateMetrics } from "rest-definitions";
-export { AccessKey, Account, App, Deployment, DeploymentKey, DeploymentMetrics, Package };
+import { AccessKey, Account, App, Deployment, DeploymentMetrics, Package, UpdateMetrics as IUpdateMetrics } from "rest-definitions";
+export { AccessKey, Account, App, Deployment, DeploymentMetrics, Package };
 export type UpdateMetrics = IUpdateMetrics;
 
 export interface CodePushError {
@@ -416,16 +416,14 @@ export class AccountManager {
                         return;
                     }
 
+                    var body = tryJSON(res.text);
                     if (res.ok) {
-                        var location = res.header["location"];
-                        if (location && location.lastIndexOf("/") !== -1) {
-                            deployment.id = location.substr(location.lastIndexOf("/") + 1);
-                            resolve(deployment);
+                        if (body) {
+                            resolve(body.deployment);
                         } else {
-                            resolve(null);
+                            reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
                         }
                     } else {
-                        var body = tryJSON(res.text);
                         if (body) {
                             reject(<CodePushError>body);
                         } else {
@@ -496,11 +494,10 @@ export class AccountManager {
 
     public getDeploymentMetrics(appId: string, deploymentId: string): Promise<DeploymentMetrics> {
         return Promise<DeploymentMetrics>((resolve, reject, notify) => {
-            var requester = (this._authedAgent ? this._authedAgent : request);
-            var req = requester.get(this.serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/metrics");
-            this.attachCredentials(req, requester);
+            var request: superagent.Request<any> = superagent.get(this._serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/metrics");
+            this.attachCredentials(request);
 
-            req.end((err: any, res: request.Response) => {
+            request.end((err: any, res: superagent.Response) => {
                 if (err) {
                     reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
                     return;
@@ -567,35 +564,6 @@ export class AccountManager {
                     resolve(null);
                 } else {
                     var body = tryJSON(res.text);
-                    if (body) {
-                        reject(<CodePushError>body);
-                    } else {
-                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                    }
-                }
-            });
-        });
-    }
-
-    public getDeploymentKeys(appId: string, deploymentId: string): Promise<DeploymentKey[]> {
-        return Promise<DeploymentKey[]>((resolve, reject, notify) => {
-            var request: superagent.Request<any> = superagent.get(this._serverUrl + "/apps/" + appId + "/deployments/" + deploymentId + "/deploymentKeys")
-            this.attachCredentials(request);
-
-            request.end((err: any, res: superagent.Response) => {
-                if (err) {
-                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                    return;
-                }
-
-                var body = tryJSON(res.text);
-                if (res.ok) {
-                    if (body) {
-                        resolve(body.deploymentKeys);
-                    } else {
-                        reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
-                    }
-                } else {
                     if (body) {
                         reject(<CodePushError>body);
                     } else {
