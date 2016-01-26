@@ -57,6 +57,11 @@ export interface IAppRenameCommand extends ICommand {
     newAppName: string;
 }
 
+export interface IAppTransferCommand extends ICommand {
+    appName: string;
+    email: string;
+}
+
 export interface ICollaboratorAddCommand extends ICommand {
     appName: string;
     email: string;
@@ -133,9 +138,4 @@ export interface IRollbackCommand extends ICommand {
     appName: string;
     deploymentName: string;
     targetRelease: string;
-}
-
-export interface ITransferCommand extends ICommand {
-    appName: string;
-    email: string;
 }

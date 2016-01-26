@@ -393,7 +393,7 @@ function createCommand(): cli.ICommand {
                         if (arg2 && arg3) {
                             cmd = { type: cli.CommandType.appTransfer };
 
-                            var appTransferCommand = <cli.ITransferCommand>cmd;
+                            var appTransferCommand = <cli.IAppTransferCommand>cmd;
 
                             appTransferCommand.appName = arg2;
                             appTransferCommand.email = arg3;

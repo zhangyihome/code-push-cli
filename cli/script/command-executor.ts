@@ -223,7 +223,7 @@ function appRemove(command: cli.IAppRemoveCommand): Promise<void> {
         });
 }
 
-function appTransfer(command: cli.ITransferCommand): Promise<void> {
+function appTransfer(command: cli.IAppTransferCommand): Promise<void> {
     throwForInvalidEmail(command.email);
 
     return getAppId(command.appName)
@@ -268,7 +268,7 @@ function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
 
             return sdk.addCollaborator(appId, command.email)
                 .then((): void => {
-                    log("Successfully added the \"" + command.email + "\" app as a collaborator to \"" + command.appName +"\".");
+                    log("Successfully added the \"" + command.email + "\" as a collaborator to \"" + command.appName +"\" app.");
                 });
         });
 }
@@ -535,7 +535,7 @@ export function execute(command: cli.ICommand): Promise<void> {
                     return appRename(<cli.IAppRenameCommand>command);
 
                 case cli.CommandType.appTransfer:
-                    return appTransfer(<cli.ITransferCommand>command);
+                    return appTransfer(<cli.IAppTransferCommand>command);
 
                 case cli.CommandType.deploymentAdd:
                     return deploymentAdd(<cli.IDeploymentAddCommand>command);
@@ -786,7 +786,7 @@ function formatDate(unixOffset: number): string {
     }
 }
 
-function getDisplayAppName(app: App): string {
+function getAppDisplayName(app: App): string {
     return app.isOwner ? app.name : getOwnerEmail(app.collaborator) + "/" + app.name;
 }
 
@@ -794,7 +794,7 @@ function printAppList(format: string, apps: App[], deploymentLists: string[][]):
     if (format === "json") {
         var dataSource: any[] = apps.map((app: App, index: number) => {
 
-            return { "name": getDisplayAppName(app), "deployments": deploymentLists[index] };
+            return { "name": getAppDisplayName(app), "deployments": deploymentLists[index] };
         });
 
         printJson(dataSource);
@@ -802,21 +802,21 @@ function printAppList(format: string, apps: App[], deploymentLists: string[][]):
         var headers = ["Name", "Deployments"];
         printTable(headers, (dataSource: any[]): void => {
             apps.forEach((app: App, index: number): void => {
-                var row = [getDisplayAppName(app), wordwrap(50)(deploymentLists[index].join(", "))];
+                var row = [getAppDisplayName(app), wordwrap(50)(deploymentLists[index].join(", "))];
                 dataSource.push(row);
             });
         });
     }
 }
 
-function getDisplayCollaboratorString(collaborator: Collaborator): string {
+function getCollaboratorDisplayName(collaborator: Collaborator): string {
     return (collaborator.permission === "Owner") ? collaborator.email + chalk.magenta(" (Owner)") : collaborator.email;
 }
 
 function printCollaboratorsList(format: string, collaborators: Collaborator[]): void {
     if (format === "json") {
         var dataSource: any[] = collaborators.map((collaborator: Collaborator) => {
-            return { "email": getDisplayCollaboratorString(collaborator) };
+            return { "email": getCollaboratorDisplayName(collaborator) };
         });
 
         printJson(dataSource);
@@ -824,7 +824,7 @@ function printCollaboratorsList(format: string, collaborators: Collaborator[]): 
         var headers = ["E-mail Address"];
         printTable(headers, (dataSource: any[]): void => {
             collaborators.forEach((collaborator: Collaborator, index: number): void => {
-                var row = [getDisplayCollaboratorString(collaborator)];
+                var row = [getCollaboratorDisplayName(collaborator)];
                 dataSource.push(row);
             });
         });
