@@ -786,7 +786,7 @@ function formatDate(unixOffset: number): string {
     }
 }
 
-function getDisplayName(app: App): string {
+function getDisplayAppName(app: App): string {
     return app.isOwner ? app.name : getOwnerEmail(app.collaborator) + "/" + app.name;
 }
 
@@ -794,7 +794,7 @@ function printAppList(format: string, apps: App[], deploymentLists: string[][]):
     if (format === "json") {
         var dataSource: any[] = apps.map((app: App, index: number) => {
 
-            return { "name": getDisplayName(app), "deployments": deploymentLists[index] };
+            return { "name": getDisplayAppName(app), "deployments": deploymentLists[index] };
         });
 
         printJson(dataSource);
@@ -802,17 +802,21 @@ function printAppList(format: string, apps: App[], deploymentLists: string[][]):
         var headers = ["Name", "Deployments"];
         printTable(headers, (dataSource: any[]): void => {
             apps.forEach((app: App, index: number): void => {
-                var row = [getDisplayName(app), wordwrap(50)(deploymentLists[index].join(", "))];
+                var row = [getDisplayAppName(app), wordwrap(50)(deploymentLists[index].join(", "))];
                 dataSource.push(row);
             });
         });
     }
 }
 
+function getDisplayCollaboratorString(collaborator: Collaborator): string {
+    return (collaborator.permission === "Owner") ? collaborator.email + chalk.magenta(" (owner)") : collaborator.email;
+}
+
 function printCollaboratorsList(format: string, collaborators: Collaborator[]): void {
     if (format === "json") {
         var dataSource: any[] = collaborators.map((collaborator: Collaborator) => {
-            return { "email": collaborator.email };
+            return { "email": getDisplayCollaboratorString(collaborator) };
         });
 
         printJson(dataSource);
@@ -820,7 +824,7 @@ function printCollaboratorsList(format: string, collaborators: Collaborator[]): 
         var headers = ["E-mail address"];
         printTable(headers, (dataSource: any[]): void => {
             collaborators.forEach((collaborator: Collaborator, index: number): void => {
-                var row = [collaborator.email];
+                var row = [getDisplayCollaboratorString(collaborator)];
                 dataSource.push(row);
             });
         });
