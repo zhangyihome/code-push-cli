@@ -890,7 +890,7 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
             headers.push("Released by");
         }
 
-        headers.push(...["Description", "Install Metrics"]);
+        headers.push("Description", "Install Metrics");
 
         printTable(headers, (dataSource: any[]) => {
             packageHistory.forEach((packageObject: Package) => {
@@ -914,10 +914,7 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
                     row.push(releasedBy);
                 }
 
-                row.push(...[
-                    packageObject.description ? wordwrap(30)(packageObject.description) : "",
-                    getPackageMetricsString(packageObject)
-                ]);
+                row.push(packageObject.description ? wordwrap(30)(packageObject.description) : "", getPackageMetricsString(packageObject));
 
                 dataSource.push(row);
             });
