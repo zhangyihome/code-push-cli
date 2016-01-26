@@ -810,7 +810,7 @@ function printAppList(format: string, apps: App[], deploymentLists: string[][]):
 }
 
 function getDisplayCollaboratorString(collaborator: Collaborator): string {
-    return (collaborator.permission === "Owner") ? collaborator.email + chalk.magenta(" (owner)") : collaborator.email;
+    return (collaborator.permission === "Owner") ? collaborator.email + chalk.magenta(" (Owner)") : collaborator.email;
 }
 
 function printCollaboratorsList(format: string, collaborators: Collaborator[]): void {
@@ -821,7 +821,7 @@ function printCollaboratorsList(format: string, collaborators: Collaborator[]): 
 
         printJson(dataSource);
     } else if (format === "table") {
-        var headers = ["E-mail address"];
+        var headers = ["E-mail Address"];
         printTable(headers, (dataSource: any[]): void => {
             collaborators.forEach((collaborator: Collaborator, index: number): void => {
                 var row = [getDisplayCollaboratorString(collaborator)];
@@ -891,7 +891,7 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
     } else if (command.format === "table") {
         var headers = ["Label", "Release Time", "App Version", "Mandatory"];
         if (command.displayReleasedBy) {
-            headers.push("Released by");
+            headers.push("Released By");
         }
 
         headers.push("Description", "Install Metrics");
@@ -935,7 +935,7 @@ function getPackageString(packageObject: Package): string {
         chalk.green("App Version: ") + packageObject.appVersion + "\n" +
         chalk.green("Mandatory: ") + (packageObject.isMandatory ? "Yes" : "No") + "\n" +
         chalk.green("Release Time: ") + formatDate(packageObject.uploadTime) + "\n" +
-        chalk.green("Released by: ") + (packageObject.releasedBy ? packageObject.releasedBy : "") +
+        chalk.green("Released By: ") + (packageObject.releasedBy ? packageObject.releasedBy : "") +
         (packageObject.description ? wordwrap(70)("\n" + chalk.green("Description: ") + packageObject.description): "");
 }
 
