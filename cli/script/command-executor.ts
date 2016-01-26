@@ -625,7 +625,7 @@ function getApp(appName: string): Promise<App> {
 
                 if (app.name === appNameValue) {
                     if (ownerEmailValue) {
-                        var appOwner: string = getOwnerEmail(app.collaborator);
+                        var appOwner: string = getOwnerEmail(app.collaborators);
                         foundApp = appOwner === ownerEmailValue; 
                     } else if (!app.isOwner){
                         // found an app name matching give value but is not the owner of the app
@@ -787,7 +787,7 @@ function formatDate(unixOffset: number): string {
 }
 
 function getAppDisplayName(app: App): string {
-    return app.isOwner ? app.name : getOwnerEmail(app.collaborator) + "/" + app.name;
+    return app.isOwner ? app.name : getOwnerEmail(app.collaborators) + "/" + app.name;
 }
 
 function printAppList(format: string, apps: App[], deploymentLists: string[][]): void {
