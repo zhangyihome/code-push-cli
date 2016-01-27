@@ -13,10 +13,12 @@ declare module "rest-definitions" {
 
     export interface DeploymentStatusReport {
         appVersion: string;
-        clientUniqueId: string;
-        deploymentKey: string; 
+        clientUniqueId?: string;
+        deploymentKey: string;
+        fromDeploymentKey?: string;
+        fromLabelOrAppVersion?: string;
         label?: string;
-        status?: string
+        status?: string;
     }
     
     export interface DownloadReport {
