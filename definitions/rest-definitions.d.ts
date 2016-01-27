@@ -15,8 +15,8 @@ declare module "rest-definitions" {
         appVersion: string;
         clientUniqueId?: string;
         deploymentKey: string;
-        fromDeploymentKey?: string;
-        fromLabelOrAppVersion?: string;
+        previousDeploymentKey?: string;
+        previousLabelOrAppVersion?: string;
         label?: string;
         status?: string;
     }

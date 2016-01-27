@@ -140,7 +140,7 @@ export class AcquisitionManager {
         });
     }
     
-    public reportStatusDeploy(deployedPackage?: Package, status?: string, fromLabelOrAppVersion?: string, fromDeploymentKey?: string, callback?: Callback<void>): void {
+    public reportStatusDeploy(deployedPackage?: Package, status?: string, previousLabelOrAppVersion?: string, previousDeploymentKey?: string, callback?: Callback<void>): void {
         var url: string = this._serverUrl + "reportStatus/deploy";
         var body: DeploymentStatusReport = {
             appVersion: this._appVersion,
@@ -173,12 +173,12 @@ export class AcquisitionManager {
             }
         }
         
-        if (fromLabelOrAppVersion) {
-            body.fromLabelOrAppVersion = fromLabelOrAppVersion;
+        if (previousLabelOrAppVersion) {
+            body.previousLabelOrAppVersion = previousLabelOrAppVersion;
         }
         
-        if (fromDeploymentKey) {
-            body.fromDeploymentKey = fromDeploymentKey;
+        if (previousDeploymentKey) {
+            body.previousDeploymentKey = previousDeploymentKey;
         }
         
         callback = typeof arguments[arguments.length - 1] === "function" && arguments[arguments.length - 1];
