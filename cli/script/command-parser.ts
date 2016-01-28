@@ -185,7 +185,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             })
             .command("list", "List the apps associated with your account", (yargs: yargs.Argv) => appList("list", yargs))
             .command("ls", "List the apps associated with your account", (yargs: yargs.Argv) => appList("ls", yargs))
-            .command("transfer", "Transfer the ownership of the app from your account to another", (yargs: yargs.Argv) => {
+            .command("transfer", "Transfer the ownership of an app to another account", (yargs: yargs.Argv) => {
                 yargs.usage(USAGE_PREFIX + " app transfer <appName> <email>")
                     .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
                     .example("app transfer MyApp foo@bar.com", "Transfer the ownership of app \"MyApp\" to an account with email \"foo@bar.com\"");

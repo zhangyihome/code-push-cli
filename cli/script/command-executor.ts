@@ -223,28 +223,6 @@ function appRemove(command: cli.IAppRemoveCommand): Promise<void> {
         });
 }
 
-function appTransfer(command: cli.IAppTransferCommand): Promise<void> {
-    throwForInvalidEmail(command.email);
-
-    return getAppId(command.appName)
-        .then((appId: string): Promise<void> => {
-            throwForInvalidAppId(appId, command.appName);
-
-            return confirm()
-                .then((wasConfirmed: boolean): Promise<void> => {
-                    if (wasConfirmed) {
-                        return sdk.transferApp(appId, command.email)
-                            .then((): void => {
-                                log("Successfully transferred the ownership of \"" + command.appName + "\" app to the account with email \"" + command.email + "\".");
-                            });
-                    }
-
-                    log("App transfer cancelled.");
-                });
-        });
-}
-
-
 function appRename(command: cli.IAppRenameCommand): Promise<void> {
     return getApp(command.currentAppName)
         .then((app: App): Promise<void> => {
@@ -259,6 +237,27 @@ function appRename(command: cli.IAppRenameCommand): Promise<void> {
         });
 }
 
+function appTransfer(command: cli.IAppTransferCommand): Promise<void> {
+    throwForInvalidEmail(command.email);
+
+    return getAppId(command.appName)
+        .then((appId: string): Promise<void> => {
+            throwForInvalidAppId(appId, command.appName);
+
+            return confirm()
+                .then((wasConfirmed: boolean): Promise<void> => {
+                    if (wasConfirmed) {
+                        return sdk.transferApp(appId, command.email)
+                            .then((): void => {
+                                log("Successfully transferred the ownership of \"" + command.appName + "\" to the account with email \"" + command.email + "\".");
+                            });
+                    }
+
+                    log("App transfer cancelled.");
+                });
+        });
+}
+
 function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
     throwForInvalidEmail(command.email);
 
@@ -268,7 +267,7 @@ function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
 
             return sdk.addCollaborator(appId, command.email)
                 .then((): void => {
-                    log("Successfully added the \"" + command.email + "\" as a collaborator to \"" + command.appName +"\" app.");
+                    log("Successfully added \"" + command.email + "\" as a collaborator to \"" + command.appName +"\".");
                 });
         });
 }
@@ -298,7 +297,7 @@ function removeCollaborator(command: cli.ICollaboratorRemoveCommand): Promise<vo
                     if (wasConfirmed) {
                         return sdk.removeCollaborator(appId, command.email)
                             .then((): void => {
-                                log("Successfully removed collaborator with email" + command.email + "from the \"" + command.appName + "\" app.");
+                                log("Successfully removed " + command.email + "as a collaborator from \"" + command.appName + "\".");
                             });
                     }
 
@@ -815,9 +814,7 @@ function getCollaboratorDisplayName(collaborator: Collaborator): string {
 
 function printCollaboratorsList(format: string, collaborators: Collaborator[]): void {
     if (format === "json") {
-        var dataSource: any[] = collaborators.map((collaborator: Collaborator) => {
-            return { "email": getCollaboratorDisplayName(collaborator) };
-        });
+        var dataSource = { "collaborators" : collaborators };
 
         printJson(dataSource);
     } else if (format === "table") {
