@@ -17,10 +17,11 @@ if (typeof window === "undefined") {
     }
 }
 
-// Aliasing UpdateMetrics as IUpdateMetrics to deal with TypeScript issue that removes unused imports.
-import { AccessKey, Account, App, Collaborator, Deployment, DeploymentKey, DeploymentMetrics, Package, UpdateMetrics as IUpdateMetrics } from "rest-definitions";
-export { AccessKey, Account, App, Collaborator, Deployment, DeploymentKey, DeploymentMetrics, Package };
+// Aliasing UpdateMetrics as IUpdateMetrics & CollaboratorProperties as ICollaboratorProperties to deal with TypeScript issue that removes unused imports.
+import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties as ICollaboratorProperties, Deployment, DeploymentKey, DeploymentMetrics, Package, UpdateMetrics as IUpdateMetrics } from "rest-definitions";
+export { AccessKey, Account, App, CollaboratorMap, Deployment, DeploymentKey, DeploymentMetrics, Package };
 export type UpdateMetrics = IUpdateMetrics;
+export type CollaboratorProperties = ICollaboratorProperties;
 
 export interface CodePushError {
     message?: string;
@@ -527,8 +528,8 @@ export class AccountManager {
     }
 
     // Collaborators
-    public getCollaboratorsList(appId: string): Promise<Collaborator[]> {
-        return Promise<Collaborator[]>((resolve, reject, notify) => {
+    public getCollaboratorsList(appId: string): Promise<CollaboratorMap> {
+        return Promise<CollaboratorMap>((resolve, reject, notify) => {
             var requester = (this._authedAgent ? this._authedAgent : request);
 
             var req = requester.get(this.serverUrl + "/apps/" + appId + "/collaborators");

@@ -62,17 +62,20 @@ declare module "rest-definitions" {
         /*const*/ username: string;
     }
 
+    export interface CollaboratorProperties {
+        /*generated*/ accountId?: string;
+        permission: string;
+    }
+
+    export interface CollaboratorMap {
+        [email: string]: CollaboratorProperties;
+    }
+
     export interface App {
         /*generated*/ id?: string;
         name: string;
-        /*generated*/ collaborators?: Collaborator[];
+        /*generated*/ collaborators?: CollaboratorMap;
         /*generated*/ isOwner?: boolean;
-    }
-
-    export interface Collaborator {
-        /*assigned*/ accountId?: string;
-        email: string;
-        permission: string;
     }
 
     export interface Deployment {

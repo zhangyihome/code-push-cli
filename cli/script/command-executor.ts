@@ -18,7 +18,7 @@ import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
 import { AcquisitionStatus } from "code-push/script/acquisition-sdk";
-import { AccessKey, AccountManager, App, Deployment, Collaborator, DeploymentKey, DeploymentMetrics, Package, UpdateMetrics } from "code-push";
+import { AccessKey, AccountManager, App, Deployment, CollaboratorMap, CollaboratorProperties, DeploymentKey, DeploymentMetrics, Package, UpdateMetrics } from "code-push";
 var packageJson = require("../package.json");
 import Promise = Q.Promise;
 var progress = require("progress");
@@ -167,11 +167,11 @@ function appAdd(command: cli.IAppAddCommand): Promise<void> {
         });
 }
 
-function getOwnerEmail(collaboratorList: Collaborator[]): string {
-    if (collaboratorList) {
-        for(var i = 0; i < collaboratorList.length; i++) {
-            if (collaboratorList[i].permission === "Owner") {
-                return collaboratorList[i].email;
+function getOwnerEmail(map: CollaboratorMap): string {
+    if (map) {
+        for(var key in Object.keys(map)) {
+            if ((<CollaboratorProperties>map[key]).permission === "Owner") {
+                return key;
             }
         }
     }
@@ -279,7 +279,7 @@ function listCollaborators(command: cli.ICollaboratorListCommand): Promise<void>
             throwForInvalidAppId(appId, command.appName);
 
             return sdk.getCollaboratorsList(appId)
-                .then((retrievedCollaborators: Collaborator[]): void => {
+                .then((retrievedCollaborators: CollaboratorMap): void => {
                     printCollaboratorsList(command.format, retrievedCollaborators);
                 });
         });
@@ -625,9 +625,9 @@ function getApp(appName: string): Promise<App> {
                 if (app.name === appNameValue) {
                     if (ownerEmailValue) {
                         var appOwner: string = getOwnerEmail(app.collaborators);
-                        foundApp = appOwner === ownerEmailValue; 
+                        foundApp = appOwner && appOwner === ownerEmailValue; 
                     } else if (!app.isOwner){
-                        // found an app name matching give value but is not the owner of the app
+                        // found an app name matching given value but is not the owner of the app
                         // its possible there is another app with same name of which this user 
                         // is the owner, so keep this pointer for future use.
                         possibleApp = app;
@@ -808,11 +808,11 @@ function printAppList(format: string, apps: App[], deploymentLists: string[][]):
     }
 }
 
-function getCollaboratorDisplayName(collaborator: Collaborator): string {
-    return (collaborator.permission === "Owner") ? collaborator.email + chalk.magenta(" (Owner)") : collaborator.email;
+function getCollaboratorDisplayName(email: string, collaboratorProperties: CollaboratorProperties): string {
+    return (collaboratorProperties.permission === "Owner") ? email + chalk.magenta(" (Owner)") : email;
 }
 
-function printCollaboratorsList(format: string, collaborators: Collaborator[]): void {
+function printCollaboratorsList(format: string, collaborators: CollaboratorMap): void {
     if (format === "json") {
         var dataSource = { "collaborators" : collaborators };
 
@@ -820,8 +820,8 @@ function printCollaboratorsList(format: string, collaborators: Collaborator[]): 
     } else if (format === "table") {
         var headers = ["E-mail Address"];
         printTable(headers, (dataSource: any[]): void => {
-            collaborators.forEach((collaborator: Collaborator, index: number): void => {
-                var row = [getCollaboratorDisplayName(collaborator)];
+            Object.keys(collaborators).forEach((email: string): void => {
+                var row = [getCollaboratorDisplayName(email, collaborators[email])];
                 dataSource.push(row);
             });
         });
