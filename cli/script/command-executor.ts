@@ -168,15 +168,16 @@ function appAdd(command: cli.IAppAddCommand): Promise<void> {
 }
 
 function getOwnerEmail(map: CollaboratorMap): string {
+    var ownerEmail: string = "";
     if (map) {
-        for(var key in Object.keys(map)) {
-            if ((<CollaboratorProperties>map[key]).permission === "Owner") {
-                return key;
+        Object.keys(map).forEach((email: string) => {
+            if ((<CollaboratorProperties>map[email]).permission === "Owner") {
+                ownerEmail = email;
             }
-        }
+        });
     }
 
-    return "";
+    return ownerEmail;
 }
 
 function appList(command: cli.IAppListCommand): Promise<void> {
