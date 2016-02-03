@@ -159,29 +159,28 @@ When the metrics cell reports `No installs recorded`, that indicates that the se
 Once your app has been configured to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
 
 ```
-code-push release <appName> <package> <appStoreVersion>
+code-push release <appName> <updateContents> <targetBinaryVersion>
 [--deploymentName <deploymentName>]
 [--description <description>]
 [--mandatory]
 ```
 
-### Package parameter
+### Update contents parameter
 
 This specifies the location of the code and assets you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the `/platforms/ios/www` folder for a Cordova app). You don't need to zip up multiple files or directories in order to deploy those changes, since the CLI will automatically zip them for you.
 
-It's important that the path you specify refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you should run before releasing, as well as the location you can subsequently point at using the `package` parameter:
+It's important that the path you specify refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you should run before releasing, as well as the location you can subsequently point at using the `updateContents` parameter:
 
-| Platform                     | Prepare command                                                                                                                                        | Package path (relative to project root)                                                                     |
-|------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|
-| Cordova (Android)            | `cordova prepare android`                                                                                                                              | `./platforms/android/assets/www` directory 																 |
-| Cordova (iOS)                | `cordova prepare ios`                                                                                                                                  | `./platforms/ios/www ` directory          																	 |
-| React Native (Android)       | `react-native bundle --platform android --entry-file <entryFile> --bundle-output <bundleOutput> --dev false`                                           | Value of the `--bundle-output` option      																 |
-| React Native wo/assets (iOS) | `react-native bundle --platform ios --entry-file <entryFile> --bundle-output <bundleOutput> --dev false`                                               | Value of the `--bundle-output` option                                                                       |
-| React Native w/assets (iOS)  | `react-native bundle --platform ios --entry-file <entryFile> --bundle-output <releaseFolder>/<bundleOutput> --assets-dest <releaseFolder> --dev false` | Value of the `--assets-dest` option, which should represent a newly created directory that includes your assets and JS bundle |
+| Platform                         | Prepare command                                                                                                                                            | Package path (relative to project root)                                                                     |
+|----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|
+| Cordova (Android)                | `cordova prepare android`                                                                                                                                  | `./platforms/android/assets/www` directory 																 |
+| Cordova (iOS)                    | `cordova prepare ios`                                                                                                                                      | `./platforms/ios/www ` directory          															|
+| React Native wo/assets (Android) | `react-native bundle --platform android --entry-file <entryFile> --bundle-output <bundleOutput> --dev false`                                               | Value of the `--bundle-output` option      																 |
+| React Native w/assets (Android)  | `react-native bundle --platform android --entry-file <entryFile> --bundle-output <releaseFolder>/<bundleOutput> --assets-dest <releaseFolder> --dev false` | Value of the `--assets-dest` option, which should represent a newly created directory that includes your assets and JS bundle |
+| React Native wo/assets (iOS)     | `react-native bundle --platform ios --entry-file <entryFile> --bundle-output <bundleOutput> --dev false`                                                   | Value of the `--bundle-output` option                                                                 |
+| React Native w/assets (iOS)      | `react-native bundle --platform ios --entry-file <entryFile> --bundle-output <releaseFolder>/<bundleOutput> --assets-dest <releaseFolder> --dev false` | Value of the `--assets-dest` option, which should represent a newly created directory that includes your assets and JS bundle |
 
-*NOTE: Our support for React Native on Android doesn't currently support distributing updates to assets. This will be coming soon!*
- 
-### App store version parameter
+### Target binary version parameter
 
 This specifies the semver compliant (e.g. `1.0.0` not `1.0`) store/binary version of the application you are releasing the update for. Only users running this **exact version** will receive the update. Users running an older and/or newer version of the app binary will not receive this update, for the following reasons:
 
