@@ -140,13 +140,16 @@ export class AcquisitionManager {
         });
     }
     
-    public reportStatusDeploy(deployedPackage?: Package, status?: string, callback?: Callback<void>): void {
+    public reportStatusDeploy(deployedPackage?: Package, status?: string, previousLabelOrAppVersion?: string, previousDeploymentKey?: string, callback?: Callback<void>): void {
         var url: string = this._serverUrl + "reportStatus/deploy";
         var body: DeploymentStatusReport = {
             appVersion: this._appVersion,
-            clientUniqueId: this._clientUniqueId,
             deploymentKey: this._deploymentKey
         };
+        
+        if (this._clientUniqueId) {
+            body.clientUniqueId = this._clientUniqueId;
+        }
         
         if (deployedPackage) {
             body.label = deployedPackage.label;
@@ -169,7 +172,17 @@ export class AcquisitionManager {
                     return;
             }
         }
-
+        
+        if (previousLabelOrAppVersion) {
+            body.previousLabelOrAppVersion = previousLabelOrAppVersion;
+        }
+        
+        if (previousDeploymentKey) {
+            body.previousDeploymentKey = previousDeploymentKey;
+        }
+        
+        callback = typeof arguments[arguments.length - 1] === "function" && arguments[arguments.length - 1];
+        
         this._httpRequester.request(Http.Verb.POST, url, JSON.stringify(body), (error: Error, response: Http.Response): void => {
             if (callback) {
                 if (error) {

@@ -1,6 +1,6 @@
 {
   "name": "code-push",
-  "version": "1.5.1-beta",
+  "version": "1.5.2-beta",
   "description": "Management SDK for the CodePush service",
   "main": "script/index.js",
   "scripts": {
@@ -15,9 +15,8 @@
   "homepage": "https://microsoft.github.io/code-push",
   "dependencies": {
     "base-64": "^0.1.0",
-    "fs": "0.0.2",
     "node-uuid": "^1.4.3",
     "q": "^1.4.1",
-    "superagent": "git://github.com/visionmedia/superagent.git#45a1290b2fe5a56a1d77ca74e0b236178d58d848"
+    "superagent": "^1.7.2"
   }
 }

@@ -202,7 +202,7 @@ describe("Acquisition SDK", () => {
     it("reportStatusDeploy(...) signals completion", (done: MochaDone): void => {
         var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
 
-        acquisition.reportStatusDeploy(templateCurrentPackage, acquisitionSdk.AcquisitionStatus.DeploymentFailed, ((error: Error, parameter: void): void => {
+        acquisition.reportStatusDeploy(templateCurrentPackage, acquisitionSdk.AcquisitionStatus.DeploymentFailed, "1.5.0", mockApi.validDeploymentKey, ((error: Error, parameter: void): void => {
             if (error) {
                 throw error;
             }
