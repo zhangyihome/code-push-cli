@@ -59,7 +59,7 @@ export class AccountManager {
 
     public isAuthenticated(): Promise<boolean> {
         return Promise<boolean>((resolve, reject, notify) => {
-            var request: superagent.Request<any> = superagent.get(this._serverUrl + `/authenticated`);
+            var request: superagent.Request<any> = superagent.get(`${this._serverUrl}/authenticated`);
             this.attachCredentials(request);
 
             request.end((err: any, res: superagent.Response) => {
@@ -82,7 +82,7 @@ export class AccountManager {
                 var accessKey: AccessKey = { id: null, name: newAccessKey, createdTime: new Date().getTime(), createdBy: machine, description: description };
                 return this.post(`/accessKeys/`, JSON.stringify(accessKey), /*expectResponseBody=*/ false)
                     .then((res: JsonResponse) => {
-                        var location = res.header[`location`];
+                        var location: string = res.header[`location`];
                         if (location && location.lastIndexOf(`/`) !== -1) {
                             accessKey.id = location.substr(location.lastIndexOf(`/`) + 1);
                             return accessKey;
@@ -131,7 +131,7 @@ export class AccountManager {
     }
 
     public addApp(appName: string): Promise<App> {
-        var app = <App>{ name: appName };
+        var app: App = { name: appName };
         return this.post(`/apps/`, JSON.stringify(app), /*expectResponseBody=*/ false)
             .then((res: JsonResponse) => {
                 var location = res.header[`location`];
@@ -145,7 +145,7 @@ export class AccountManager {
     }
 
     public removeApp(app: App | string): Promise<void> {
-        var id: string = (typeof app === `string`) ? (<string><any>app) : (<App><any>app).id;
+        var id: string = (typeof app === `string`) ? (<string>app) : (<App>app).id;
         return this.del(`/apps/${id}`)
             .then(() => null);
     }
@@ -183,7 +183,7 @@ export class AccountManager {
     }
 
     public removeDeployment(appId: string, deployment: Deployment | string): Promise<void> {
-        var id: string = (typeof deployment === `string`) ? (<string><any>deployment) : (<Deployment><any>deployment).id;
+        var id: string = (typeof deployment === `string`) ? (<string>deployment) : (<Deployment>deployment).id;
         return this.del(`/apps/${appId}/deployments/${id}`)
             .then(() => null);
     }
