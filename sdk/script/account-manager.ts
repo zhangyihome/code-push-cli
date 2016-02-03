@@ -1,7 +1,6 @@
 import * as base64 from "base-64";
 import Q = require("q");
 import crypto = require("crypto");
-import tryJSON = require("try-json");
 import Promise = Q.Promise;
 import superagent = require("superagent");
 
@@ -219,7 +218,11 @@ export class AccountManager {
                     if (res.ok) {
                         resolve(<void>null);
                     } else {
-                        var body = tryJSON(res.text);
+                        try {
+                            var body = JSON.parse(res.text);
+                        } catch (err) {
+                        }
+
                         if (body) {
                             reject(<CodePushError>body);
                         } else {
@@ -285,7 +288,11 @@ export class AccountManager {
                     return;
                 }
 
-                var body = tryJSON(res.text);
+                try {
+                    var body = JSON.parse(res.text);
+                } catch (err) {
+                }
+
                 if (res.ok) {
                     if (expectResponseBody && !body) {
                         reject(<CodePushError>{ message: `Could not parse response: ${res.text}`, statusCode: res.status });
