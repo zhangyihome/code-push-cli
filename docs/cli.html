@@ -443,16 +443,16 @@ code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 <h2>Releasing app updates</h2>
 
 <p>Once your app has been configured to query for updates against the CodePush service&ndash;using your desired deployment&ndash;you can begin pushing updates to it using the following command:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push release &lt;appName&gt; &lt;package&gt; &lt;appStoreVersion&gt;
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push release &lt;appName&gt; &lt;updateContents&gt; &lt;targetBinaryVersion&gt;
 [--deploymentName &lt;deploymentName&gt;]
 [--description &lt;description&gt;]
 [--mandatory]
 </code></pre></div>
-<h3>Package parameter</h3>
+<h3>Update contents parameter</h3>
 
 <p>This specifies the location of the code and assets you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the <code>/platforms/ios/www</code> folder for a Cordova app). You don&rsquo;t need to zip up multiple files or directories in order to deploy those changes, since the CLI will automatically zip them for you.</p>
 
-<p>It&rsquo;s important that the path you specify refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you should run before releasing, as well as the location you can subsequently point at using the <code>package</code> parameter:</p>
+<p>It&rsquo;s important that the path you specify refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you should run before releasing, as well as the location you can subsequently point at using the <code>updateContents</code> parameter:</p>
 
 <table><thead>
 <tr>
@@ -472,9 +472,14 @@ code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 <td><code>./platforms/ios/www</code> directory</td>
 </tr>
 <tr>
-<td>React Native (Android)</td>
+<td>React Native wo/assets (Android)</td>
 <td><code>react-native bundle --platform android --entry-file &lt;entryFile&gt; --bundle-output &lt;bundleOutput&gt; --dev false</code></td>
 <td>Value of the <code>--bundle-output</code> option</td>
+</tr>
+<tr>
+<td>React Native w/assets (Android)</td>
+<td><code>react-native bundle --platform android --entry-file &lt;entryFile&gt; --bundle-output &lt;releaseFolder&gt;/&lt;bundleOutput&gt; --assets-dest &lt;releaseFolder&gt; --dev false</code></td>
+<td>Value of the <code>--assets-dest</code> option, which should represent a newly created directory that includes your assets and JS bundle</td>
 </tr>
 <tr>
 <td>React Native wo/assets (iOS)</td>
@@ -488,9 +493,7 @@ code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 </tr>
 </tbody></table>
 
-<p><em>NOTE: Our support for React Native on Android doesn&rsquo;t currently support distributing updates to assets. This will be coming soon!</em></p>
-
-<h3>App store version parameter</h3>
+<h3>Target binary version parameter</h3>
 
 <p>This specifies the semver compliant (e.g. <code>1.0.0</code> not <code>1.0</code>) store/binary version of the application you are releasing the update for. Only users running this <strong>exact version</strong> will receive the update. Users running an older and/or newer version of the app binary will not receive this update, for the following reasons:</p>
 

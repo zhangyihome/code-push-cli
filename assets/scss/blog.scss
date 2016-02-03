@@ -1,13 +1,18 @@
 .post {
 	margin-bottom: 6em;
 	
-    p, span, li {
-        font-size: 1.6rem;
+    p, span, code {
+        font-size: 1.6em
     }
-	
+    
+    ul {
+        li {
+            font-size: 1.6em;
+        }
+    }
+    
 	.author{
 		padding-left: 4px;
-		font-size: 1.6rem;				
 	}
 	
 	.post-header{
@@ -21,10 +26,16 @@
 }
 
 .blog{
-    p, span, li {
-        font-size: 1.6rem;
+    
+    p, span {
+        font-size: 1.6em;
     }
-
+    
+    .title {
+        font-size: 2.4em;
+        padding-bottom: 0.3em;
+    }
+    
 	.blogHeader{	
 		position: relative;
 		padding:0 15px 25px 15px;
@@ -85,20 +96,18 @@
 					white-space: nowrap;
 				}
 				.author{
-					padding-left: 6px;
-					font-size: 1.9rem;				
+					padding-left: 6px;			
 				}					
 				div:nth-of-type(2){
 					color: #b58733;
-					font-size: 2.4rem;
 					top:-4px;
 					position: relative;
 					
 					span {
-					    font-size: 1.8rem;
 						color: #999;
 						position: relative;
 						top:-6px;
+                        font-size: 1.8em;
 					}
 					
 					.date{
@@ -110,7 +119,7 @@
 				padding-bottom: 60px;
 				
 				a{
-					font-size: 1.6rem;
+					font-size: 1.6em;
 				}					
 			}
 			
@@ -239,11 +248,7 @@
 	div.post{
 		padding:12px 15px 0 15px;
 		margin-top:-8px;
-		
-		.title{
-			font-size: 30pt;
-		}
-
+        
 		.author{
 			padding-left: 6px;
 			font-size: 12pt;						
@@ -282,7 +287,6 @@
 			}					
 			.title{
 				color: #3992ab;
-				font-size: 14pt;
 			}				
 			span{
 				font-size: 9pt;
@@ -301,8 +305,7 @@
 			position: fixed;
 			top:37%;	
 			.title{
-				color: white;
-				font-size: 12pt;								
+				color: white;					
 			}
 			span{
 				font-size: 9pt;
