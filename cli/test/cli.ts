@@ -13,9 +13,14 @@ function assertJsonDescribesObject(json: string, object: Object): void {
 }
 
 export class SdkStub {
+    public getAccountInfo(): Promise<codePush.Account> {
+        return Q(<codePush.Account>{
+            email: "a@a.com"
+        });
+    }
+
     public addAccessKey(machine: string, description?: string): Promise<codePush.AccessKey> {
         return Q(<codePush.AccessKey>{
-            id: "accessKeyId",
             name: "key123",
             createdTime: new Date().getTime(),
             createdBy: os.hostname(),
@@ -25,7 +30,6 @@ export class SdkStub {
 
     public addApp(name: string): Promise<codePush.App> {
         return Q(<codePush.App>{
-            id: "appId",
             name: name
         });
     }
@@ -36,7 +40,6 @@ export class SdkStub {
 
     public addDeployment(appId: string, name: string): Promise<codePush.Deployment> {
         return Q(<codePush.Deployment>{
-            id: "deploymentId",
             name: name,
             key: "6"
         });
@@ -44,7 +47,6 @@ export class SdkStub {
 
     public getAccessKeys(): Promise<codePush.AccessKey[]> {
         return Q([<codePush.AccessKey>{
-            id: "7",
             name: "8",
             createdTime: 0,
             createdBy: os.hostname(),
@@ -54,11 +56,9 @@ export class SdkStub {
 
     public getApps(): Promise<codePush.App[]> {
         return Q([<codePush.App>{
-            id: "1",
             name: "a",
             collaborators: { "a@a.com": { permission: "Owner", isCurrentAccount: true } }
         }, <codePush.App>{
-            id: "2",
             name: "b",
             collaborators: { "a@a.com": { permission: "Owner", isCurrentAccount: true } }
         }]);
@@ -66,11 +66,9 @@ export class SdkStub {
 
     public getDeployments(appId: string): Promise<codePush.Deployment[]> {
         return Q([<codePush.Deployment>{
-            id: "3",
             name: "Production",
             key: "6"
         }, <codePush.Deployment>{
-            id: "4",
             name: "Staging",
             key: "6",
             package: {
@@ -231,7 +229,6 @@ describe("CLI", () => {
                 var actual: string = log.args[0][0];
                 var expected = [
                     {
-                        id: "7",
                         name: "8",
                         createdTime: 0,
                         createdBy: os.hostname(),
@@ -255,7 +252,7 @@ describe("CLI", () => {
         cmdexec.execute(command)
             .done((): void => {
                 sinon.assert.calledOnce(removeAccessKey);
-                sinon.assert.calledWithExactly(removeAccessKey, "7");
+                sinon.assert.calledWithExactly(removeAccessKey, "8");
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Successfully removed the \"8\" access key.");
 
@@ -335,7 +332,7 @@ describe("CLI", () => {
         cmdexec.execute(command)
             .done((): void => {
                 sinon.assert.calledOnce(removeApp);
-                sinon.assert.calledWithExactly(removeApp, "1");
+                sinon.assert.calledWithExactly(removeApp, "a");
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Successfully removed the \"a\" app.");
 
@@ -435,7 +432,7 @@ describe("CLI", () => {
                 var actual: string = log.args[0][0];
                 var expected = {
                     "collaborators":
-                        { 
+                        {
                             "a@a.com": { permission: "Owner", isCurrentAccount: true },
                             "b@b.com": { permission: "Collaborator", isCurrentAccount: false }
                         }
@@ -543,7 +540,7 @@ describe("CLI", () => {
         cmdexec.execute(command)
             .done((): void => {
                 sinon.assert.calledOnce(removeDeployment);
-                sinon.assert.calledWithExactly(removeDeployment, "1", "4");
+                sinon.assert.calledWithExactly(removeDeployment, "a", "Staging");
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Successfully removed the \"Staging\" deployment from the \"a\" app.");
 

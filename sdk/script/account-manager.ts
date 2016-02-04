@@ -35,7 +35,6 @@ export interface CodePushError {
 }
 
 interface PackageToUpload {
-    label: string;
     description: string;
     appVersion: string;
     isMandatory: boolean;
@@ -85,22 +84,14 @@ export class AccountManager {
     public addAccessKey(machine: string, description?: string): Promise<AccessKey> {
         return this.generateAccessKey()
             .then((newAccessKey: string) => {
-                var accessKey: AccessKey = { id: null, name: newAccessKey, createdTime: new Date().getTime(), createdBy: machine, description: description };
+                var accessKey: AccessKey = { name: newAccessKey, createdTime: new Date().getTime(), createdBy: machine, description: description };
                 return this.post(`/accessKeys/`, JSON.stringify(accessKey), /*expectResponseBody=*/ false)
-                    .then((res: JsonResponse) => {
-                        var location: string = res.header[`location`];
-                        if (location && location.lastIndexOf(`/`) !== -1) {
-                            accessKey.id = location.substr(location.lastIndexOf(`/`) + 1);
-                            return accessKey;
-                        } else {
-                            return null;
-                        }
-                    });
+                    .then(() => accessKey);
             });
     }
 
-    public getAccessKey(accessKeyId: string): Promise<AccessKey> {
-        return this.get(`/accessKeys/${accessKeyId}`)
+    public getAccessKey(accessKey: string): Promise<AccessKey> {
+        return this.get(`/accessKeys/${accessKey}`)
             .then((res: JsonResponse) => res.body.accessKey);
     }
 
@@ -109,8 +100,8 @@ export class AccountManager {
             .then((res: JsonResponse) => res.body.accessKeys);
     }
 
-    public removeAccessKey(accessKeyId: string): Promise<void> {
-        return this.del(`/accessKeys/${accessKeyId}`)
+    public removeAccessKey(accessKey: string): Promise<void> {
+        return this.del(`/accessKeys/${accessKey}`)
             .then(() => null);
     }
 
@@ -131,95 +122,84 @@ export class AccountManager {
             .then((res: JsonResponse) => res.body.apps);
     }
 
-    public getApp(appId: string): Promise<App> {
-        return this.get(`/apps/${appId}`)
+    public getApp(appName: string): Promise<App> {
+        return this.get(`/apps/${appName}`)
             .then((res: JsonResponse) => res.body.app);
     }
 
     public addApp(appName: string): Promise<App> {
         var app: App = { name: appName };
         return this.post(`/apps/`, JSON.stringify(app), /*expectResponseBody=*/ false)
-            .then((res: JsonResponse) => {
-                var location = res.header[`location`];
-                if (location && location.lastIndexOf(`/`) !== -1) {
-                    app.id = location.substr(location.lastIndexOf(`/`) + 1);
-                    return app;
-                } else {
-                    return null;
-                }
-            });
+            .then(() => app);
     }
 
-    public removeApp(app: App | string): Promise<void> {
-        var id: string = (typeof app === `string`) ? (<string>app) : (<App>app).id;
-        return this.del(`/apps/${id}`)
+    public removeApp(appName: string): Promise<void> {
+        return this.del(`/apps/${appName}`)
             .then(() => null);
     }
 
-    public updateApp(infoToChange: App): Promise<void> {
-        return this.put(`/apps/${infoToChange.id}`, JSON.stringify(infoToChange))
-            .then((res: JsonResponse) => null);
+    public updateApp(appName: string, infoToChange: App): Promise<void> {
+        return this.put(`/apps/${appName}`, JSON.stringify(infoToChange))
+            .then(() => null);
     }
 
-    public transferApp(appId: string, email: string): Promise<void> {
-        return this.post(`/apps/${appId}/transfer/${email}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
+    public transferApp(appName: string, email: string): Promise<void> {
+        return this.post(`/apps/${appName}/transfer/${email}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
             .then(() => null);
     }
 
     // Collaborators
-    public getCollaboratorsList(appId: string): Promise<CollaboratorMap> {
-        return this.get(`/apps/${appId}/collaborators`)
+    public getCollaboratorsList(appName: string): Promise<CollaboratorMap> {
+        return this.get(`/apps/${appName}/collaborators`)
             .then((res: JsonResponse) => res.body.collaborators);
     }
 
-    public addCollaborator(appId: string, email: string): Promise<void> {
-        return this.post(`/apps/${appId}/collaborators/${email}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
+    public addCollaborator(appName: string, email: string): Promise<void> {
+        return this.post(`/apps/${appName}/collaborators/${email}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
             .then(() => null);
     }
 
-    public removeCollaborator(app: App | string, email: string): Promise<void> {
-        var id: string = (typeof app === "string") ? app : app.id;
-        return this.del(`/apps/${id}/collaborators/${email}`)
+    public removeCollaborator(appName: string, email: string): Promise<void> {
+        return this.del(`/apps/${appName}/collaborators/${email}`)
             .then(() => null);
     }
 
     // Deployments
-    public addDeployment(appId: string, name: string): Promise<Deployment> {
-        var deployment = <Deployment>{ name: name };
-        return this.post(`/apps/${appId}/deployments/`, JSON.stringify(deployment), /*expectResponseBody=*/ true)
+    public addDeployment(appName: string, deploymentName: string): Promise<Deployment> {
+        var deployment = <Deployment>{ name: deploymentName };
+        return this.post(`/apps/${appName}/deployments/`, JSON.stringify(deployment), /*expectResponseBody=*/ true)
             .then((res: JsonResponse) => res.body.deployment);
     }
 
-    public getDeployments(appId: string): Promise<Deployment[]> {
-        return this.get(`/apps/${appId}/deployments/`)
+    public getDeployments(appName: string): Promise<Deployment[]> {
+        return this.get(`/apps/${appName}/deployments/`)
             .then((res: JsonResponse) => res.body.deployments);
     }
 
-    public getDeployment(appId: string, deploymentId: string): Promise<Deployment> {
-        return this.get(`/apps/${appId}/deployments/${deploymentId}`)
+    public getDeployment(appName: string, deploymentName: string): Promise<Deployment> {
+        return this.get(`/apps/${appName}/deployments/${deploymentName}`)
             .then((res: JsonResponse) => res.body.deployment);
     }
 
-    public getDeploymentMetrics(appId: string, deploymentId: string): Promise<DeploymentMetrics> {
-        return this.get(`/apps/${appId}/deployments/${deploymentId}/metrics`)
+    public getDeploymentMetrics(appName: string, deploymentName: string): Promise<DeploymentMetrics> {
+        return this.get(`/apps/${appName}/deployments/${deploymentName}/metrics`)
             .then((res: JsonResponse) => res.body.metrics);
     }
 
-    public updateDeployment(appId: string, infoToChange: Deployment): Promise<void> {
-        return this.put(`/apps/${appId}/deployments/${infoToChange.id}`, JSON.stringify(infoToChange))
+    public updateDeployment(appName: string, deploymentName: string, infoToChange: Deployment): Promise<void> {
+        return this.put(`/apps/${appName}/deployments/${deploymentName}`, JSON.stringify(infoToChange))
             .then(() => null);
     }
 
-    public removeDeployment(appId: string, deployment: Deployment | string): Promise<void> {
-        var id: string = (typeof deployment === `string`) ? (<string>deployment) : (<Deployment>deployment).id;
-        return this.del(`/apps/${appId}/deployments/${id}`)
+    public removeDeployment(appName: string, deploymentName: string): Promise<void> {
+        return this.del(`/apps/${appName}/deployments/${deploymentName}`)
             .then(() => null);
     }
 
-    public addPackage(appId: string, deploymentId: string, fileOrPath: File | string, description: string, label: string, appVersion: string, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
+    public addPackage(appName: string, deploymentName: string, fileOrPath: File | string, description: string, appVersion: string, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var packageInfo: PackageToUpload = this.generatePackageInfo(description, label, appVersion, isMandatory);
-            var request: superagent.Request<any> = superagent.put(`${this._serverUrl}/apps/${appId}/deployments/${deploymentId}/package`);
+            var packageInfo: PackageToUpload = this.generatePackageInfo(description, appVersion, isMandatory);
+            var request: superagent.Request<any> = superagent.put(`${this._serverUrl}/apps/${appName}/deployments/${deploymentName}/package`);
             this.attachCredentials(request);
 
             var file: any;
@@ -261,23 +241,23 @@ export class AccountManager {
         });
     }
 
-    public promotePackage(appId: string, sourceDeploymentId: string, destDeploymentId: string): Promise<void> {
-        return this.post(`/apps/${appId}/deployments/${sourceDeploymentId}/promote/${destDeploymentId}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
+    public promotePackage(appName: string, sourceDeploymentName: string, destDeploymentName: string): Promise<void> {
+        return this.post(`/apps/${appName}/deployments/${sourceDeploymentName}/promote/${destDeploymentName}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
             .then(() => null);
     }
 
-    public rollbackPackage(appId: string, deploymentId: string, targetRelease?: string): Promise<void> {
-        return this.post(`/apps/${appId}/deployments/${deploymentId}/rollback/${targetRelease || ``}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
+    public rollbackPackage(appName: string, deploymentName: string, targetRelease?: string): Promise<void> {
+        return this.post(`/apps/${appName}/deployments/${deploymentName}/rollback/${targetRelease || ``}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
             .then(() => null);
     }
 
-    public getPackage(appId: string, deploymentId: string): Promise<Package> {
-        return this.get(`/apps/${appId}/deployments/${deploymentId}/package`)
+    public getPackage(appName: string, deploymentName: string): Promise<Package> {
+        return this.get(`/apps/${appName}/deployments/${deploymentName}/package`)
             .then((res: JsonResponse) => res.body.package);
     }
 
-    public getPackageHistory(appId: string, deploymentId: string): Promise<Package[]> {
-        return this.get(`/apps/${appId}/deployments/${deploymentId}/packageHistory`)
+    public getPackageHistory(appName: string, deploymentName: string): Promise<Package[]> {
+        return this.get(`/apps/${appName}/deployments/${deploymentName}/packageHistory`)
             .then((res: JsonResponse) => res.body.packageHistory);
     }
 
@@ -345,10 +325,9 @@ export class AccountManager {
         return response && response.text ? response.text : error.message;
     }
 
-    private generatePackageInfo(description: string, label: string, appVersion: string, isMandatory: boolean): PackageToUpload {
+    private generatePackageInfo(description: string, appVersion: string, isMandatory: boolean): PackageToUpload {
         return {
             description: description,
-            label: label,
             appVersion: appVersion,
             isMandatory: isMandatory
         };
@@ -367,7 +346,7 @@ export class AccountManager {
                     .toString(`base64`)
                     .replace(/\+/g, `_`)  // URL-friendly characters
                     .replace(/\//g, `-`)
-                    .concat(account.id);
+                    .concat(account.email);
 
                 return accessKey;
             });
