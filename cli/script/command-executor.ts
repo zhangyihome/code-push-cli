@@ -622,18 +622,18 @@ function getApp(appName: string): Promise<App> {
 
             for (var i = 0; i < apps.length; ++i) {
                 var app: App = apps[i];
-
                 if (app.name === appNameValue) {
+                    var isCurrentUserOwner: boolean = isCurrentAccountOwner(app.collaborators);
                     if (ownerEmailValue) {
                         var appOwner: string = getOwnerEmail(app.collaborators);
                         foundApp = appOwner && appOwner === ownerEmailValue; 
-                    } else if (!app.isOwner){
+                    } else if (!isCurrentUserOwner){
                         // found an app name matching given value but is not the owner of the app
                         // its possible there is another app with same name of which this user 
                         // is the owner, so keep this pointer for future use.
                         possibleApp = app;
                     } else {
-                        foundApp = app.isOwner;
+                        foundApp = isCurrentUserOwner;
                     }
                 }
 
@@ -646,6 +646,27 @@ function getApp(appName: string): Promise<App> {
                 return possibleApp;
             }
         });
+}
+
+function isCurrentAccountOwner(map: CollaboratorMap): boolean {
+    if (map) {
+        var ownerEmail: string = getOwnerEmailFromCollaboratorMap(map);
+        return ownerEmail && !!(<CollaboratorProperties>map[ownerEmail]).isCurrentAccount;
+    }
+
+    return false;
+}
+
+function getOwnerEmailFromCollaboratorMap(map: CollaboratorMap): string {
+    if (map) {
+        for (var key of Object.keys(map)) {
+            if ((<CollaboratorProperties>map[key]).permission === "Owner") {
+                return key;
+            }
+        }
+    }
+
+    return null;
 }
 
 function getAppId(appName: string): Promise<string> {
@@ -787,7 +808,8 @@ function formatDate(unixOffset: number): string {
 }
 
 function getAppDisplayName(app: App): string {
-    return app.isOwner ? app.name : getOwnerEmail(app.collaborators) + "/" + app.name;
+    var isCurrentUserOwner: boolean = isCurrentAccountOwner(app.collaborators);
+    return isCurrentUserOwner ? app.name : getOwnerEmail(app.collaborators) + "/" + app.name;
 }
 
 function printAppList(format: string, apps: App[], deploymentLists: string[][]): void {

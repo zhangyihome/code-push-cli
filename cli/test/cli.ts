@@ -51,11 +51,9 @@ export class SdkStub {
         return Q([<codePush.App>{
             id: "1",
             name: "a",
-            isOwner: true
         }, <codePush.App>{
             id: "2",
             name: "b",
-            isOwner: true
         }]);
     }
 

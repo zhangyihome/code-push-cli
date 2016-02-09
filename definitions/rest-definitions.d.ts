@@ -65,6 +65,7 @@ declare module "rest-definitions" {
     export interface CollaboratorProperties {
         /*generated*/ accountId?: string;
         permission: string;
+        /*generated*/ isCurrentAccount?: boolean;
     }
 
     export interface CollaboratorMap {
@@ -75,7 +76,6 @@ declare module "rest-definitions" {
         /*generated*/ id?: string;
         name: string;
         /*generated*/ collaborators?: CollaboratorMap;
-        /*generated*/ isOwner?: boolean;
     }
 
     export interface Deployment {
