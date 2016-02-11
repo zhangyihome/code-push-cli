@@ -18,7 +18,7 @@ import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
 import { AcquisitionStatus } from "code-push/script/acquisition-sdk";
-import { AccessKey, AccountManager, App, Deployment, CollaboratorMap, CollaboratorProperties, DeploymentKey, DeploymentMetrics, Package, UpdateMetrics } from "code-push";
+import { AccessKey, AccountManager, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentKey, DeploymentMetrics, Package, Permissions, UpdateMetrics } from "code-push";
 var packageJson = require("../package.json");
 import Promise = Q.Promise;
 var progress = require("progress");
@@ -107,7 +107,7 @@ export var confirm = (): Promise<boolean> => {
     });
 }
 
-var connectionInfo: IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo;
+var connectionInfo: IStandardLoginConnectionInfo | IAccessKeyLoginConnectionInfo;
 
 function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
     var hostname: string = os.hostname();
@@ -170,11 +170,9 @@ function appAdd(command: cli.IAppAddCommand): Promise<void> {
 function getOwnerEmail(map: CollaboratorMap): string {
     var ownerEmail: string = "";
     if (map) {
-        Object.keys(map).forEach((email: string) => {
-            if ((<CollaboratorProperties>map[email]).permission === "Owner") {
-                ownerEmail = email;
-            }
-        });
+        ownerEmail = Object.keys(map).filter((email: string) => {
+                return map[email].permission === Permissions.Owner;
+            })[0];
     }
 
     return ownerEmail;
@@ -250,7 +248,7 @@ function appTransfer(command: cli.IAppTransferCommand): Promise<void> {
                     if (wasConfirmed) {
                         return sdk.transferApp(appId, command.email)
                             .then((): void => {
-                                log("Successfully transferred the ownership of \"" + command.appName + "\" to the account with email \"" + command.email + "\".");
+                                log("Successfully transferred the ownership of app \"" + command.appName + "\" to the account with email \"" + command.email + "\".");
                             });
                     }
 
@@ -268,7 +266,7 @@ function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
 
             return sdk.addCollaborator(appId, command.email)
                 .then((): void => {
-                    log("Successfully added \"" + command.email + "\" as a collaborator to \"" + command.appName +"\".");
+                    log("Successfully added \"" + command.email + "\" as a collaborator to the app \"" + command.appName + "\".");
                 });
         });
 }
@@ -298,7 +296,7 @@ function removeCollaborator(command: cli.ICollaboratorRemoveCommand): Promise<vo
                     if (wasConfirmed) {
                         return sdk.removeCollaborator(appId, command.email)
                             .then((): void => {
-                                log("Successfully removed " + command.email + "as a collaborator from \"" + command.appName + "\".");
+                                log("Successfully removed \"" + command.email + "\" as a collaborator from the app \"" + command.appName + "\".");
                             });
                     }
 
@@ -335,7 +333,7 @@ export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: b
     var theAppId: string;
     var deploymentKeyList: string[];
     var deployments: Deployment[];
-    
+
     return getAppId(command.appName)
         .then((appId: string): Promise<Deployment[]> => {
             throwForInvalidAppId(appId, command.appName);
@@ -345,14 +343,14 @@ export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: b
         })
         .then((retrievedDeployments: Deployment[]): Promise<void> => {
             deployments = retrievedDeployments;
-            if (command.displayKeys) {  
+            if (command.displayKeys) {
                 var deploymentKeyPromises: Promise<string>[] = deployments.map((deployment: Deployment) => {
                     return sdk.getDeploymentKeys(theAppId, deployment.id)
                         .then((deploymentKeys: DeploymentKey[]): string => {
                             return deploymentKeys[0].key;
                         });
                 });
-                
+
                 return Q.all(deploymentKeyPromises)
                     .then((retrievedDeploymentKeyList: string[]) => {
                         deploymentKeyList = retrievedDeploymentKeyList;
@@ -380,7 +378,7 @@ export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: b
                         return Q(<void>null);
                     }
                 });
-                
+
                 return Q.all(metricsPromises);
             }
         })
@@ -470,7 +468,7 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
         });
 }
 
-function deserializeConnectionInfo(): IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo {
+function deserializeConnectionInfo(): IStandardLoginConnectionInfo | IAccessKeyLoginConnectionInfo {
     try {
         var savedConnection: string = fs.readFileSync(configFilePath, { encoding: "utf8" });
         return JSON.parse(savedConnection);
@@ -545,7 +543,7 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.deploymentList:
                     return deploymentList(<cli.IDeploymentListCommand>command);
- 
+
                 case cli.CommandType.deploymentRemove:
                     return deploymentRemove(<cli.IDeploymentRemoveCommand>command);
 
@@ -626,8 +624,8 @@ function getApp(appName: string): Promise<App> {
                     var isCurrentUserOwner: boolean = isCurrentAccountOwner(app.collaborators);
                     if (ownerEmailValue) {
                         var appOwner: string = getOwnerEmail(app.collaborators);
-                        foundApp = appOwner && appOwner === ownerEmailValue; 
-                    } else if (!isCurrentUserOwner){
+                        foundApp = appOwner && appOwner === ownerEmailValue;
+                    } else if (!isCurrentUserOwner) {
                         // found an app name matching given value but is not the owner of the app
                         // its possible there is another app with same name of which this user 
                         // is the owner, so keep this pointer for future use.
@@ -651,7 +649,7 @@ function getApp(appName: string): Promise<App> {
 function isCurrentAccountOwner(map: CollaboratorMap): boolean {
     if (map) {
         var ownerEmail: string = getOwnerEmailFromCollaboratorMap(map);
-        return ownerEmail && !!(<CollaboratorProperties>map[ownerEmail]).isCurrentAccount;
+        return ownerEmail && !!map[ownerEmail].isCurrentAccount;
     }
 
     return false;
@@ -660,7 +658,7 @@ function isCurrentAccountOwner(map: CollaboratorMap): boolean {
 function getOwnerEmailFromCollaboratorMap(map: CollaboratorMap): string {
     if (map) {
         for (var key of Object.keys(map)) {
-            if ((<CollaboratorProperties>map[key]).permission === "Owner") {
+            if (map[key].permission === Permissions.Owner) {
                 return key;
             }
         }
@@ -709,13 +707,13 @@ function getTotalActiveFromDeploymentMetrics(metrics: DeploymentMetrics): number
     Object.keys(metrics).forEach((label: string) => {
         totalActive += metrics[label].active;
     });
-    
+
     return totalActive;
 }
 
 function initiateExternalAuthenticationAsync(serverUrl: string, action: string): void {
     var message: string = `A browser is being launched to authenticate your account. Follow the instructions ` +
-                          `it displays to complete your ${action === "register" ? "registration" : "login"}.\r\n`;
+        `it displays to complete your ${action === "register" ? "registration" : "login"}.\r\n`;
 
     log(message);
     var hostname: string = os.hostname();
@@ -809,7 +807,8 @@ function formatDate(unixOffset: number): string {
 
 function getAppDisplayName(app: App): string {
     var isCurrentUserOwner: boolean = isCurrentAccountOwner(app.collaborators);
-    return isCurrentUserOwner ? app.name : getOwnerEmail(app.collaborators) + "/" + app.name;
+    var ownerEmail: string = getOwnerEmail(app.collaborators);
+    return (isCurrentUserOwner || !ownerEmail) ? app.name : ownerEmail + "/" + app.name;
 }
 
 function printAppList(format: string, apps: App[], deploymentLists: string[][]): void {
@@ -832,13 +831,12 @@ function printAppList(format: string, apps: App[], deploymentLists: string[][]):
 }
 
 function getCollaboratorDisplayName(email: string, collaboratorProperties: CollaboratorProperties): string {
-    return (collaboratorProperties.permission === "Owner") ? email + chalk.magenta(" (Owner)") : email;
+    return (collaboratorProperties.permission === Permissions.Owner) ? email + chalk.magenta(" (" + Permissions.Owner + ")") : email;
 }
 
 function printCollaboratorsList(format: string, collaborators: CollaboratorMap): void {
     if (format === "json") {
-        var dataSource = { "collaborators" : collaborators };
-
+        var dataSource = { "collaborators": collaborators };
         printJson(dataSource);
     } else if (format === "table") {
         var headers = ["E-mail Address"];
@@ -892,7 +890,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
                     row.push(getPackageString(deployment.package));
                     row.push(getPackageMetricsString(<PackageWithMetrics>(deployment.package)));
                 }
-                
+
                 dataSource.push(row);
             });
         });
@@ -922,11 +920,11 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
                 var releasedBy: string = packageObject.releasedBy ? packageObject.releasedBy : "";
                 var releaseSource: string;
                 if (packageObject.releaseMethod === "Promote") {
-                    releaseSource = `Promoted ${ packageObject.originalLabel } from "${ packageObject.originalDeployment }"`;
+                    releaseSource = `Promoted ${packageObject.originalLabel} from "${packageObject.originalDeployment}"`;
                 } else if (packageObject.releaseMethod === "Rollback") {
                     var labelNumber: number = parseInt(packageObject.label.substring(1));
                     var lastLabel: string = "v" + (labelNumber - 1);
-                    releaseSource = `Rolled back ${ lastLabel } to ${ packageObject.originalLabel }`;
+                    releaseSource = `Rolled back ${lastLabel} to ${packageObject.originalLabel}`;
                 }
 
                 if (releaseSource) {
@@ -956,7 +954,7 @@ function getPackageString(packageObject: Package): string {
         chalk.green("Mandatory: ") + (packageObject.isMandatory ? "Yes" : "No") + "\n" +
         chalk.green("Release Time: ") + formatDate(packageObject.uploadTime) + "\n" +
         chalk.green("Released By: ") + (packageObject.releasedBy ? packageObject.releasedBy : "") +
-        (packageObject.description ? wordwrap(70)("\n" + chalk.green("Description: ") + packageObject.description): "");
+        (packageObject.description ? wordwrap(70)("\n" + chalk.green("Description: ") + packageObject.description) : "");
 }
 
 function getPackageMetricsString(packageObject: PackageWithMetrics): string {
@@ -967,7 +965,7 @@ function getPackageMetricsString(packageObject: PackageWithMetrics): string {
     var activePercent: number = packageObject.metrics.totalActive
         ? packageObject.metrics.active / packageObject.metrics.totalActive * 100
         : 0.0;
-    var percentString: string; 
+    var percentString: string;
     if (activePercent === 100.0) {
         percentString = "100%";
     } else if (activePercent === 0.0) {
@@ -975,19 +973,19 @@ function getPackageMetricsString(packageObject: PackageWithMetrics): string {
     } else {
         percentString = activePercent.toPrecision(2) + "%";
     }
-    
+
     var numPending: number = packageObject.metrics.downloaded - packageObject.metrics.installed - packageObject.metrics.failed;
     var returnString: string = chalk.green("Active: ") + percentString + " (" + packageObject.metrics.active.toLocaleString() + " of " + packageObject.metrics.totalActive.toLocaleString() + ")\n" +
         chalk.green("Total: ") + packageObject.metrics.installed.toLocaleString();
-        
+
     if (numPending > 0) {
         returnString += " (" + numPending.toLocaleString() + " pending)";
-    }    
-    
+    }
+
     if (packageObject.metrics.failed) {
         returnString += "\n" + chalk.green("Rollbacks: ") + chalk.red(packageObject.metrics.failed.toLocaleString() + "");
     }
-    
+
     return returnString;
 }
 
@@ -1118,7 +1116,7 @@ function release(command: cli.IReleaseCommand): Promise<void> {
                     }
 
                     var lastTotalProgress = 0;
-                    var progressBar = new progress("Upload progress:[:bar] :percent :etas", { 
+                    var progressBar = new progress("Upload progress:[:bar] :percent :etas", {
                         complete: "=",
                         incomplete: " ",
                         width: 50,
@@ -1198,7 +1196,7 @@ function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
     // The access token should have been validated already (i.e.:  logging in).
     var json: string = tryBase64Decode(accessToken);
     var standardLoginConnectionInfo: IStandardLoginConnectionInfo;
-    
+
     try {
         standardLoginConnectionInfo = JSON.parse(json);
     } catch (ex) {

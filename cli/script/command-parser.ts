@@ -97,7 +97,7 @@ function appRemove(commandName: string, yargs: yargs.Argv): void {
 function listCollaborators(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
     yargs.usage(USAGE_PREFIX + " collaborator " + commandName + " <appName> [--format <format>]")
-        .demand(/*count*/ 3, /*max*/ 3)  // Require exactly two non-option arguments.
+        .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
         .example("collaborator " + commandName + " MyApp", "Lists collaborators for app \"MyApp\" in tabular format")
         .example("collaborator " + commandName + " MyApp --format json", "Lists collaborators for app \"MyApp\" in JSON format")
         .option("format", { default: "table", demand: false, description: "The output format (\"json\" or \"table\")", type: "string" });
@@ -108,7 +108,7 @@ function listCollaborators(commandName: string, yargs: yargs.Argv): void {
 function removeCollaborator(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
     yargs.usage(USAGE_PREFIX + " collaborator " + commandName + " <appName> <email>")
-        .demand(/*count*/ 4, /*max*/ 4)  // Require exactly three non-option arguments.
+        .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
         .example("collaborator " + commandName + " MyApp foo@bar.com", "Removes foo@bar.com from app \"MyApp\" as a collaborator");
 
     addCommonConfiguration(yargs);
@@ -141,7 +141,7 @@ function deploymentHistory(commandName: string, yargs: yargs.Argv): void {
         .example("deployment " + commandName + " MyApp MyDeployment", "Shows the release history for deployment \"MyDeployment\" from app \"MyApp\" in tabular format")
         .example("deployment " + commandName + " MyApp MyDeployment --format json", "Shows the release history for deployment \"MyDeployment\" from app \"MyApp\" in JSON format")
         .option("format", { default: "table", demand: false, description: "The output format (\"json\" or \"table\")", type: "string" })
-        .option("displayReleasedBy", { alias: "rb", default: false, demand: false, description: "Whether to display the released by email address", type: "boolean" });
+        .option("displayReleasedBy", { alias: "rb", default: false, demand: false, description: "Whether to display who performed the release", type: "boolean" });
 
     addCommonConfiguration(yargs);
 }
@@ -188,7 +188,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .command("transfer", "Transfer the ownership of an app to another account", (yargs: yargs.Argv) => {
                 yargs.usage(USAGE_PREFIX + " app transfer <appName> <email>")
                     .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
-                    .example("app transfer MyApp foo@bar.com", "Transfer the ownership of app \"MyApp\" to an account with email \"foo@bar.com\"");
+                    .example("app transfer MyApp foo@bar.com", "Transfers the ownership of app \"MyApp\" to an account with email \"foo@bar.com\"");
 
                 addCommonConfiguration(yargs);
             })

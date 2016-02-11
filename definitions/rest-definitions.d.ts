@@ -65,7 +65,6 @@ declare module "rest-definitions" {
     }
 
     export interface CollaboratorProperties {
-        /*generated*/ accountId?: string;
         permission: string;
         /*generated*/ isCurrentAccount?: boolean;
     }

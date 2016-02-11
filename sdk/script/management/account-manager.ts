@@ -23,6 +23,11 @@ export { AccessKey, Account, App, CollaboratorMap, Deployment, DeploymentKey, De
 export type UpdateMetrics = IUpdateMetrics;
 export type CollaboratorProperties = ICollaboratorProperties;
 
+export module Permissions {
+    export const Owner = "Owner";
+    export const Collaborator = "Collaborator";
+}
+
 export interface CodePushError {
     message?: string;
     statusCode?: number;
