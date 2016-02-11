@@ -948,7 +948,7 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
 
 function getPackageString(packageObject: Package): string {
     if (!packageObject) {
-        return "";
+        return chalk.magenta("No updates released").toString();
     }
 
     return chalk.green("Label: ") + packageObject.label + "\n" +
