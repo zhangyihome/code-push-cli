@@ -30,6 +30,10 @@ var userAgent: string = packageJson.name + "/" + packageJson.version;
 const ACTIVE_METRICS_KEY: string = "Active";
 const DOWNLOADED_METRICS_KEY: string = "Downloaded";
 
+interface NameToCountMap {
+    [name: string]: number;
+}
+
 interface IStandardLoginConnectionInfo {
     accessKeyName: string;
     providerName: string;
@@ -171,8 +175,8 @@ function getOwnerEmail(map: CollaboratorMap): string {
     var ownerEmail: string = "";
     if (map) {
         ownerEmail = Object.keys(map).filter((email: string) => {
-                return map[email].permission === Permissions.Owner;
-            })[0];
+            return map[email].permission === Permissions.Owner;
+        })[0];
     }
 
     return ownerEmail;
@@ -805,17 +809,35 @@ function formatDate(unixOffset: number): string {
     }
 }
 
-function getAppDisplayName(app: App): string {
-    var isCurrentUserOwner: boolean = isCurrentAccountOwner(app.collaborators);
-    var ownerEmail: string = getOwnerEmail(app.collaborators);
-    return (isCurrentUserOwner || !ownerEmail) ? app.name : ownerEmail + "/" + app.name;
+function getAppDisplayName(app: App, appNameToCountMap: NameToCountMap): string {
+    if (appNameToCountMap && appNameToCountMap[app.name] > 1) {
+        var isCurrentUserOwner: boolean = isCurrentAccountOwner(app.collaborators);
+        return isCurrentUserOwner ? app.name : getOwnerEmail(app.collaborators) + "/" + app.name;
+    } else {
+        return app.name;
+    }
+}
+
+function getNameToCountMap(apps: App[]): NameToCountMap {
+    var nameToCountMap: NameToCountMap = {};
+    apps.forEach((app: App) => {
+        var ownerEmail: string = getOwnerEmail(app.collaborators);
+        if (!nameToCountMap[app.name]) {
+            nameToCountMap[app.name] = 1;
+        } else {
+            nameToCountMap[app.name] = nameToCountMap[app.name] + 1;
+        }
+    });
+
+    return nameToCountMap;
 }
 
 function printAppList(format: string, apps: App[], deploymentLists: string[][]): void {
+    var appNameToCountMap: NameToCountMap = getNameToCountMap(apps);
+
     if (format === "json") {
         var dataSource: any[] = apps.map((app: App, index: number) => {
-
-            return { "name": getAppDisplayName(app), "deployments": deploymentLists[index] };
+            return { "name": getAppDisplayName(app, appNameToCountMap), "deployments": deploymentLists[index] };
         });
 
         printJson(dataSource);
@@ -823,7 +845,7 @@ function printAppList(format: string, apps: App[], deploymentLists: string[][]):
         var headers = ["Name", "Deployments"];
         printTable(headers, (dataSource: any[]): void => {
             apps.forEach((app: App, index: number): void => {
-                var row = [getAppDisplayName(app), wordwrap(50)(deploymentLists[index].join(", "))];
+                var row = [getAppDisplayName(app, appNameToCountMap), wordwrap(50)(deploymentLists[index].join(", "))];
                 dataSource.push(row);
             });
         });
