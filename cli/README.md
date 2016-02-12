@@ -119,7 +119,7 @@ If you will be working with other developers on the same CodePush app, you can a
 code-push collaborator add <appName> <collaboratorEmail>
 ```
 
-*NOTE: This expects the developer to have already [registered](#account-creation) with CodePush using the specified e-mail address, so simply ensure that they have done that before attempting to share the app with them.*
+*NOTE: This expects the developer to have already [registered](#account-creation) with CodePush using the specified e-mail address, so ensure that they have done that before attempting to share the app with them.*
 
 Once added, all collaborators will immediately have the following permissions with regards to the newly shared app: 
 
@@ -134,15 +134,16 @@ Inversely, that means that an app collaborator cannot do any of the following:
 1. Create, rename or delete new deployments within the app
 1. Add or remove collaborators from the app (*)
 
-*NOTE: A developer can remove him/herself as a collaborator from an add that was shared with them.*
+*NOTE: A developer can remove him/herself as a collaborator from an app that was shared with them.*
 
-Over time, if someone is no longer working on the app, you can remove them as a collaborator using the following command:
+Over time, if someone is no longer working on an app with you, you can remove them as a collaborator using the following command:
 
 ```shell
 code-push collaborator rm <appName> <collaboratorEmail>
 ```
 
-If you want to list all collaborators that have been added to an app, you can simply run the following command:
+If at any time you want to list all collaborators that have been added to an app, you can simply run the following command:
+
 ```shell
 code-push collaborator ls <appName>
 ```
@@ -155,7 +156,7 @@ code-push app transfer <appName> <newOwnerEmail>
 
 *NOTE: Just like with the `code-push collaborator add` command, this expects that the new owner has already registered with CodePush using the specified e-mail address.*
 
-Once confirmed, the specified developer becomes the app's owner and immediately receives all of the permissions associated with that role. Besides the transfer of ownership, nothing else about the app is modified (e.g. deployments, release history, collaborators). This means that you are still an app collaborator on the app, and therefore, if you want to remove yourself, you simply need to run the `code-push collaborator rm` command after transfering ownership.
+Once confirmed, the specified developer becomes the app's owner and immediately receives the permissions associated with that role. Besides the transfer of ownership, nothing else about the app is modified (e.g. deployments, release history, collaborators). This means that you will still be a collaborator of the app, and therefore, if you want to remove yourself, you simply need to run the `code-push collaborator rm` command after successfully transfering ownership.
 
 ## Deployment management
 
@@ -285,7 +286,7 @@ code-push promote <appName> <sourceDeploymentName> <destDeploymentName>
 code-push promote MyApp Staging Production
 ```
 
-The `promote` command wil create a new release for the destination deployment, which includes the **exact code and metadata** (description, mandatory and app store version) from the latest release of the source deployment. While you could use the `release` command to "manually" migrate an update from one environment to another, the `promote` command has the following benefits:
+The `promote` command will create a new release for the destination deployment, which includes the **exact code and metadata** (description, mandatory and app store version) from the latest release of the source deployment. While you could use the `release` command to "manually" migrate an update from one environment to another, the `promote` command has the following benefits:
 
 1. It's quicker, since you don't need to re-assemble the release assets you want to publish or remember the description/app store version that are associated with the source deployment's release.
 
