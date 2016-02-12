@@ -17,10 +17,16 @@ if (typeof window === "undefined") {
     }
 }
 
-// Aliasing UpdateMetrics as IUpdateMetrics to deal with TypeScript issue that removes unused imports.
-import { AccessKey, Account, App, Deployment, DeploymentKey, DeploymentMetrics, Package, UpdateMetrics as IUpdateMetrics } from "rest-definitions";
-export { AccessKey, Account, App, Deployment, DeploymentKey, DeploymentMetrics, Package };
+// Aliasing UpdateMetrics as IUpdateMetrics & CollaboratorProperties as ICollaboratorProperties to deal with TypeScript issue that removes unused imports.
+import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties as ICollaboratorProperties, Deployment, DeploymentKey, DeploymentMetrics, Package, UpdateMetrics as IUpdateMetrics } from "rest-definitions";
+export { AccessKey, Account, App, CollaboratorMap, Deployment, DeploymentKey, DeploymentMetrics, Package };
 export type UpdateMetrics = IUpdateMetrics;
+export type CollaboratorProperties = ICollaboratorProperties;
+
+export module Permissions {
+    export const Owner = "Owner";
+    export const Collaborator = "Collaborator";
+}
 
 export interface CodePushError {
     message?: string;
@@ -44,7 +50,6 @@ export class AccountManager {
     private _authedAgent: request.SuperAgent<any>;
     private _saveAuthedAgent: boolean = false;
     private _userAgent: string;
-
     public account: Account;
     public serverUrl: string = "http://localhost:3000";
 
@@ -498,6 +503,119 @@ export class AccountManager {
                         }
                     }
                 });
+        });
+    }
+
+    public transferApp(appId: string, email: string): Promise<void> {
+        return Promise<void>((resolve, reject, notify) => {
+            var requester = (this._authedAgent ? this._authedAgent : request);
+            var req = requester.post(this.serverUrl + "/apps/" + appId + "/transfer/" + email);
+            this.attachCredentials(req, requester);
+
+            req.end((err: any, res: request.Response) => {
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
+
+                if (res.ok) {
+                    resolve(<void>null);
+                } else {
+                    var body = tryJSON(res.text);
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
+        });
+    }
+
+    // Collaborators
+    public getCollaboratorsList(appId: string): Promise<CollaboratorMap> {
+        return Promise<CollaboratorMap>((resolve, reject, notify) => {
+            var requester = (this._authedAgent ? this._authedAgent : request);
+
+            var req = requester.get(this.serverUrl + "/apps/" + appId + "/collaborators");
+            this.attachCredentials(req, requester);
+
+            req.end((err: any, res: request.Response) => {
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
+
+                var body = tryJSON(res.text);
+                if (res.ok) {
+                    if (body) {
+                        resolve(body.collaborators);
+                    } else {
+                        reject(<CodePushError>{ message: "Could not parse response: " + res.text, statusCode: res.status });
+                    }
+                } else {
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
+        });
+    }
+
+    public addCollaborator(appId: string, email: string): Promise<void> {
+        return Promise<void>((resolve, reject, notify) => {
+            var requester = (this._authedAgent ? this._authedAgent : request);
+
+            var req = requester.post(this.serverUrl + "/apps/" + appId + "/collaborators/" + email);
+            this.attachCredentials(req, requester);
+
+            req.end((err: any, res: request.Response) => {
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
+
+                if (res.ok) {
+                    resolve(null);
+                } else {
+                    var body = tryJSON(res.text);
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
+        });
+    }
+
+    public removeCollaborator(app: App | string, email: string): Promise<void> {
+        return Promise<void>((resolve, reject, notify) => {
+            var id: string = (typeof app === "string") ? app : app.id;
+            var requester = (this._authedAgent ? this._authedAgent : request);
+
+            var req = requester.del(this.serverUrl + "/apps/" + id + "/collaborators/" + email);
+            this.attachCredentials(req, requester);
+
+            req.end((err: any, res: request.Response) => {
+                if (err) {
+                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    return;
+                }
+
+                if (res.ok) {
+                    resolve(null);
+                } else {
+                    var body = tryJSON(res.text);
+                    if (body) {
+                        reject(<CodePushError>body);
+                    } else {
+                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                    }
+                }
+            });
         });
     }
 
