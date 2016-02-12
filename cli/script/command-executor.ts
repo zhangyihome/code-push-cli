@@ -646,7 +646,7 @@ function getApp(appName: string): Promise<App> {
 function isCurrentAccountOwner(map: CollaboratorMap): boolean {
     if (map) {
         var ownerEmail: string = getOwnerEmail(map);
-        return ownerEmail && !!map[ownerEmail].isCurrentAccount;
+        return ownerEmail && map[ownerEmail].isCurrentAccount;
     }
 
     return false;
@@ -655,7 +655,7 @@ function isCurrentAccountOwner(map: CollaboratorMap): boolean {
 function getCurrentUserEmail(map: CollaboratorMap): string {
     if (map) {
         for (var key of Object.keys(map)) {
-            if (!!map[key].isCurrentAccount) {
+            if (map[key].isCurrentAccount) {
                 return key;
             }
         }
