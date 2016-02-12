@@ -131,6 +131,7 @@ Once added, all collaborators will immediately have the following permissions wi
 Inversely, that means that an app collaborator cannot do any of the following:
 
 1. Rename or delete the app
+1. Transfer ownership of the app
 1. Create, rename or delete new deployments within the app
 1. Add or remove collaborators from the app (*)
 
@@ -156,7 +157,7 @@ code-push app transfer <appName> <newOwnerEmail>
 
 *NOTE: Just like with the `code-push collaborator add` command, this expects that the new owner has already registered with CodePush using the specified e-mail address.*
 
-Once confirmed, the specified developer becomes the app's owner and immediately receives the permissions associated with that role. Besides the transfer of ownership, nothing else about the app is modified (e.g. deployments, release history, collaborators). This means that you will still be a collaborator of the app, and therefore, if you want to remove yourself, you simply need to run the `code-push collaborator rm` command after successfully transfering ownership.
+Once confirmed, the specified developer becomes the app's owner and immediately receives the permissions associated with that role. Besides the transfer of ownership, nothing else about the app is modified (e.g. deployments, release history, collaborators). This means that you will still be a collaborator of the app, and therefore, if you want to remove yourself, you simply need to run the `code-push collaborator rm` command after successfully transferring ownership.
 
 ## Deployment management
 
