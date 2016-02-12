@@ -607,7 +607,7 @@ describe("CLI", () => {
             appName: "a",
             deploymentName: "Staging",
             format: "json",
-            displayReleasedBy: false
+            displayAuthor: false
         };
 
         var getPackageHistory: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getPackageHistory");

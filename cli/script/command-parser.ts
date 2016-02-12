@@ -136,12 +136,12 @@ function deploymentRemove(commandName: string, yargs: yargs.Argv): void {
 
 function deploymentHistory(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
-    yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> <deploymentName> [--format <format>] [--displayReleasedBy]")
+    yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> <deploymentName> [--format <format>] [--displayAuthor]")
         .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
         .example("deployment " + commandName + " MyApp MyDeployment", "Shows the release history for deployment \"MyDeployment\" from app \"MyApp\" in tabular format")
         .example("deployment " + commandName + " MyApp MyDeployment --format json", "Shows the release history for deployment \"MyDeployment\" from app \"MyApp\" in JSON format")
         .option("format", { default: "table", demand: false, description: "The output format (\"json\" or \"table\")", type: "string" })
-        .option("displayReleasedBy", { alias: "rb", default: false, demand: false, description: "Whether to display who performed the release", type: "boolean" });
+        .option("displayAuthor", { alias: "a", default: false, demand: false, description: "Whether to display who performed the release", type: "boolean" });
 
     addCommonConfiguration(yargs);
 }
@@ -495,7 +495,7 @@ function createCommand(): cli.ICommand {
                             deploymentHistoryCommand.appName = arg2;
                             deploymentHistoryCommand.deploymentName = arg3;
                             deploymentHistoryCommand.format = argv["format"];
-                            deploymentHistoryCommand.displayReleasedBy = argv["displayReleasedBy"];
+                            deploymentHistoryCommand.displayAuthor = argv["displayAuthor"];
                         }
                         break;
                 }

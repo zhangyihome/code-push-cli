@@ -171,17 +171,6 @@ function appAdd(command: cli.IAppAddCommand): Promise<void> {
         });
 }
 
-function getOwnerEmail(map: CollaboratorMap): string {
-    var ownerEmail: string = "";
-    if (map) {
-        ownerEmail = Object.keys(map).filter((email: string) => {
-            return map[email].permission === Permissions.Owner;
-        })[0];
-    }
-
-    return ownerEmail;
-}
-
 function appList(command: cli.IAppListCommand): Promise<void> {
     throwForInvalidOutputFormat(command.format);
     var apps: App[];
@@ -438,13 +427,17 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
     throwForInvalidOutputFormat(command.format);
     var storedAppId: string;
     var storedDeploymentId: string;
+    var deployments: Deployment[];
+    var currentUserEmail: string;
 
-    return getAppId(command.appName)
-        .then((appId: string): Promise<string> => {
-            throwForInvalidAppId(appId, command.appName);
-            storedAppId = appId;
 
-            return getDeploymentId(appId, command.deploymentName);
+    return getApp(command.appName)
+        .then((app: App): Promise<string> => {
+            throwForInvalidAppId(app.id, command.appName);
+            storedAppId = app.id;
+            currentUserEmail = getCurrentUserEmail(app.collaborators);
+
+            return getDeploymentId(app.id, command.deploymentName);
         })
         .then((deploymentId: string): Promise<Package[]> => {
             throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
@@ -467,7 +460,7 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
                             };
                         }
                     });
-                    printDeploymentHistory(command, <PackageWithMetrics[]>packageHistory);
+                    printDeploymentHistory(command, <PackageWithMetrics[]>packageHistory, currentUserEmail);
                 });
         });
 }
@@ -524,6 +517,12 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.appRemove:
                     return appRemove(<cli.IAppRemoveCommand>command);
 
+                case cli.CommandType.appRename:
+                    return appRename(<cli.IAppRenameCommand>command);
+
+                case cli.CommandType.appTransfer:
+                    return appTransfer(<cli.IAppTransferCommand>command);
+
                 case cli.CommandType.collaboratorAdd:
                     return addCollaborator(<cli.ICollaboratorAddCommand>command);
 
@@ -532,12 +531,6 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.collaboratorRemove:
                     return removeCollaborator(<cli.ICollaboratorRemoveCommand>command);
-
-                case cli.CommandType.appRename:
-                    return appRename(<cli.IAppRenameCommand>command);
-
-                case cli.CommandType.appTransfer:
-                    return appTransfer(<cli.IAppTransferCommand>command);
 
                 case cli.CommandType.deploymentAdd:
                     return deploymentAdd(<cli.IDeploymentAddCommand>command);
@@ -652,14 +645,26 @@ function getApp(appName: string): Promise<App> {
 
 function isCurrentAccountOwner(map: CollaboratorMap): boolean {
     if (map) {
-        var ownerEmail: string = getOwnerEmailFromCollaboratorMap(map);
+        var ownerEmail: string = getOwnerEmail(map);
         return ownerEmail && !!map[ownerEmail].isCurrentAccount;
     }
 
     return false;
 }
 
-function getOwnerEmailFromCollaboratorMap(map: CollaboratorMap): string {
+function getCurrentUserEmail(map: CollaboratorMap): string {
+    if (map) {
+        for (var key of Object.keys(map)) {
+            if (!!map[key].isCurrentAccount) {
+                return key;
+            }
+        }
+    }
+
+    return null;
+}
+
+function getOwnerEmail(map: CollaboratorMap): string {
     if (map) {
         for (var key of Object.keys(map)) {
             if (map[key].permission === Permissions.Owner) {
@@ -919,7 +924,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
     }
 }
 
-function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageHistory: PackageWithMetrics[]): void {
+function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageHistory: PackageWithMetrics[], currentUserEmail: string): void {
     if (command.format === "json") {
         packageHistory.forEach((packageObject: PackageWithMetrics) => {
             if (packageObject.metrics) {
@@ -930,7 +935,7 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
         printJson(packageHistory);
     } else if (command.format === "table") {
         var headers = ["Label", "Release Time", "App Version", "Mandatory"];
-        if (command.displayReleasedBy) {
+        if (command.displayAuthor) {
             headers.push("Released By");
         }
 
@@ -939,7 +944,6 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
         printTable(headers, (dataSource: any[]) => {
             packageHistory.forEach((packageObject: Package) => {
                 var releaseTime: string = formatDate(packageObject.uploadTime);
-                var releasedBy: string = packageObject.releasedBy ? packageObject.releasedBy : "";
                 var releaseSource: string;
                 if (packageObject.releaseMethod === "Promote") {
                     releaseSource = `Promoted ${packageObject.originalLabel} from "${packageObject.originalDeployment}"`;
@@ -954,7 +958,12 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
                 }
 
                 var row = [packageObject.label, releaseTime, packageObject.appVersion, packageObject.isMandatory ? "Yes" : "No"];
-                if (command.displayReleasedBy) {
+                if (command.displayAuthor) {
+                    var releasedBy: string = packageObject.releasedBy ? packageObject.releasedBy : "";
+                    if (currentUserEmail && releasedBy === currentUserEmail) {
+                        releasedBy = "You";
+                    }
+
                     row.push(releasedBy);
                 }
 
