@@ -111,6 +111,52 @@ you can run the following command:
 code-push app ls
 ```
 
+## App Collaboration
+
+If you will be working with other developers on the same CodePush app, you can add them as collaborators using the following command:
+
+```shell
+code-push collaborator add <appName> <collaboratorEmail>
+```
+
+*NOTE: This expects the developer to have already [registered](#account-creation) with CodePush using the specified e-mail address, so simply ensure that they have done that before attempting to share the app with them.*
+
+Once added, all collaborators will immediately have the following permissions with regards to the newly shared app: 
+
+1. View the app, its collaborators, [deployments](#deployment-management) and [release history](#viewing-release-history) 
+1. [Release](#releasing-app-updates) updates to any of the app's deployments
+1. [Promote](#promoting-updates-across-deployments) an update between any of the app's deployments
+1. [Rollback](#rolling-back-undesired-updates) any of the app's deployments
+
+Inversely, that means that an app collaborator cannot do any of the following:
+
+1. Rename or delete the app
+1. Create, rename or delete new deployments within the app
+1. Add or remove collaborators from the app (*)
+
+*NOTE: A developer can remove him/herself as a collaborator from an add that was shared with them.*
+
+Over time, if someone is no longer working on the app, you can remove them as a collaborator using the following command:
+
+```shell
+code-push collaborator rm <appName> <collaboratorEmail>
+```
+
+If you want to list all collaborators that have been added to an app, you can simply run the following command:
+```shell
+code-push collaborator ls <appName>
+```
+
+Finally, if at some point, you (as the app owner) will no longer be working on the app, and you want to transfer it to another developer (or a client), you can run the following command:
+
+```shell
+code-push app transfer <appName> <newOwnerEmail>
+```
+
+*NOTE: Just like with the `code-push collaborator add` command, this expects that the new owner has already registered with CodePush using the specified e-mail address.*
+
+Once confirmed, the specified developer becomes the app's owner and immediately receives all of the permissions associated with that role. Besides the transfer of ownership, nothing else about the app is modified (e.g. deployments, release history, collaborators). This means that you are still an app collaborator on the app, and therefore, if you want to remove yourself, you simply need to run the `code-push collaborator rm` command after transfering ownership.
+
 ## Deployment management
 
 From the CodePush perspective, an app is simply a named grouping for one or more things called "deployments". While the app represents a conceptual "namespace" or "scope" for a platform-specific version of an app (e.g. the iOS port of Foo app), it's deployments represent the actual target for releasing updates (for developers) and synchronizing updates (for end-users). Deployments allow you to have multiple "environments" for each app in-flight at any given time, and help model the reality that apps typically move from a dev's personal environment to a testing/QA/staging environment, before finally making their way into production.
@@ -298,5 +344,7 @@ The history will display all attributes about each release (e.g. label, mandator
 ![Deployment History](https://cloud.githubusercontent.com/assets/696206/11605068/14e440d0-9aab-11e5-8837-69ab09bfb66c.PNG)
 
 Additionally, the history displays the install metrics for each release. You can view the details about how to interpret the metric data in the documentation for the `deployment ls` command above.
+
+By default, the history doesn't display the author of each release, but if you are collaborating on an app with other developers, and want to view who released each update, you can pass the additional `--displayAuthor` (or `-a`) flag to the history command.
 
 *NOTE: The history command can also be run using the "h" alias*
