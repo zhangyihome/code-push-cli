@@ -457,18 +457,6 @@ function isCurrentAccountOwner(map: CollaboratorMap): boolean {
     return false;
 }
 
-function getCurrentUserEmail(map: CollaboratorMap): string {
-    if (map) {
-        for (var key of Object.keys(map)) {
-            if (map[key].isCurrentAccount) {
-                return key;
-            }
-        }
-    }
-
-    return null;
-}
-
 function getOwnerEmail(map: CollaboratorMap): string {
     if (map) {
         for (var key of Object.keys(map)) {
