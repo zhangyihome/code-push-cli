@@ -193,7 +193,6 @@ export class SdkStub {
 }
 
 describe("CLI", () => {
-    var execSync: Sinon.SinonStub;
     var log: Sinon.SinonStub;
     var sandbox: Sinon.SinonSandbox;
     var spawn: Sinon.SinonStub;
@@ -208,7 +207,6 @@ describe("CLI", () => {
 
         sandbox.stub(cmdexec, "confirm", (): Promise<boolean> => Q(wasConfirmed));
         sandbox.stub(cmdexec, "createEmptyTempReleaseFolder", (): Promise<void> => Q(<void>null));
-        execSync = sandbox.stub(cmdexec, "execSync", (command: string): void => { });
         sandbox.stub(cmdexec, "getTmpDir", (): string => FAKE_TMP_DIR);
         log = sandbox.stub(cmdexec, "log", (message: string): void => { });
         sandbox.stub(cmdexec, "loginWithAccessToken", (): Promise<void> => Q(<void>null));
@@ -829,7 +827,6 @@ describe("CLI", () => {
                 releaseCommand.package = FAKE_TMP_DIR;
                 releaseCommand.appStoreVersion = "1.2.3";
                 
-                sinon.assert.calledWith(execSync, "rm -rf $TMPDIR/react-*");
                 sinon.assert.calledOnce(spawn);
                 var spawnCommand: string = spawn.args[0][0];
                 var spawnCommandArgs: string = spawn.args[0][1].join(" ");
@@ -865,7 +862,6 @@ describe("CLI", () => {
                 releaseCommand.package = FAKE_TMP_DIR;
                 releaseCommand.appStoreVersion = "1.2.3";
                 
-                sinon.assert.calledWith(execSync, "rm -rf $TMPDIR/react-*");
                 sinon.assert.calledOnce(spawn);
                 var spawnCommand: string = spawn.args[0][0];
                 var spawnCommandArgs: string = spawn.args[0][1].join(" ");

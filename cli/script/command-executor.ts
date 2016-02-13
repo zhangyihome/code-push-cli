@@ -65,7 +65,6 @@ export interface PackageWithMetrics {
 export var log = (message: string | Chalk.ChalkChain): void => console.log(message);
 export var sdk: AccountManager;
 export var spawn = childProcess.spawn;
-export var execSync = childProcess.execSync;
 export var getTmpDir = (): string => {
     return os.tmpdir();
 }
@@ -1296,18 +1295,15 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
         }
     }
     
-    // This is needed to clear the react native bundler cache:
-    // https://github.com/facebook/react-native/issues/4289
-    execSync("rm -rf $TMPDIR/react-*");
-    
     return getReactNativeProjectAppVersion(platform, projectName)
         .then((appVersion: string) => {
             releaseCommand.appStoreVersion = appVersion;
             return createEmptyTempReleaseFolder(outputFolder);
         })
-        .then(() => {
-            return runReactNativeBundleCommand(entryFile, outputFolder, platform, command.sourcemapOutput);
-        })
+        // This is needed to clear the react native bundler cache:
+        // https://github.com/facebook/react-native/issues/4289
+        .then(() => deleteFolder(`${getTmpDir()}/react-*`))
+        .then(() => runReactNativeBundleCommand(entryFile, outputFolder, platform, command.sourcemapOutput))
         .then(() => {
             log(chalk.cyan("\nReleasing update contents to CodePush:\n"));
             return release(releaseCommand);
