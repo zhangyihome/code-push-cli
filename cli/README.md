@@ -2,7 +2,7 @@
 
 CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users' devices. It works by acting as a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using the provided client SDKs for [Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push)). This allows you to have a more deterministic and direct engagement model with your userbase, when addressing bugs and/or adding small features that don't require you to re-build a binary and re-distribute it through the respective app stores.
 
-![CodePush CLI](https://cloud.githubusercontent.com/assets/116461/12527087/6efba342-c12a-11e5-944d-88b4b6a5a438.png)
+![CodePush CLI](https://cloud.githubusercontent.com/assets/116461/13024894/35c9c300-d1b1-11e5-9d46-085cfaf8a021.png)
 
 ## Installation
 
@@ -110,6 +110,54 @@ you can run the following command:
 ```
 code-push app ls
 ```
+
+## App Collaboration
+
+If you will be working with other developers on the same CodePush app, you can add them as collaborators using the following command:
+
+```shell
+code-push collaborator add <appName> <collaboratorEmail>
+```
+
+*NOTE: This expects the developer to have already [registered](#account-creation) with CodePush using the specified e-mail address, so ensure that they have done that before attempting to share the app with them.*
+
+Once added, all collaborators will immediately have the following permissions with regards to the newly shared app: 
+
+1. View the app, its collaborators, [deployments](#deployment-management) and [release history](#viewing-release-history) 
+1. [Release](#releasing-app-updates) updates to any of the app's deployments
+1. [Promote](#promoting-updates-across-deployments) an update between any of the app's deployments
+1. [Rollback](#rolling-back-undesired-updates) any of the app's deployments
+
+Inversely, that means that an app collaborator cannot do any of the following:
+
+1. Rename or delete the app
+1. Transfer ownership of the app
+1. Create, rename or delete new deployments within the app
+1. Add or remove collaborators from the app (*)
+
+*NOTE: A developer can remove him/herself as a collaborator from an app that was shared with them.*
+
+Over time, if someone is no longer working on an app with you, you can remove them as a collaborator using the following command:
+
+```shell
+code-push collaborator rm <appName> <collaboratorEmail>
+```
+
+If at any time you want to list all collaborators that have been added to an app, you can simply run the following command:
+
+```shell
+code-push collaborator ls <appName>
+```
+
+Finally, if at some point, you (as the app owner) will no longer be working on the app, and you want to transfer it to another developer (or a client), you can run the following command:
+
+```shell
+code-push app transfer <appName> <newOwnerEmail>
+```
+
+*NOTE: Just like with the `code-push collaborator add` command, this expects that the new owner has already registered with CodePush using the specified e-mail address.*
+
+Once confirmed, the specified developer becomes the app's owner and immediately receives the permissions associated with that role. Besides the transfer of ownership, nothing else about the app is modified (e.g. deployments, release history, collaborators). This means that you will still be a collaborator of the app, and therefore, if you want to remove yourself, you simply need to run the `code-push collaborator rm` command after successfully transferring ownership.
 
 ## Deployment management
 
@@ -239,7 +287,7 @@ code-push promote <appName> <sourceDeploymentName> <destDeploymentName>
 code-push promote MyApp Staging Production
 ```
 
-The `promote` command wil create a new release for the destination deployment, which includes the **exact code and metadata** (description, mandatory and app store version) from the latest release of the source deployment. While you could use the `release` command to "manually" migrate an update from one environment to another, the `promote` command has the following benefits:
+The `promote` command will create a new release for the destination deployment, which includes the **exact code and metadata** (description, mandatory and app store version) from the latest release of the source deployment. While you could use the `release` command to "manually" migrate an update from one environment to another, the `promote` command has the following benefits:
 
 1. It's quicker, since you don't need to re-assemble the release assets you want to publish or remember the description/app store version that are associated with the source deployment's release.
 
@@ -298,5 +346,7 @@ The history will display all attributes about each release (e.g. label, mandator
 ![Deployment History](https://cloud.githubusercontent.com/assets/696206/11605068/14e440d0-9aab-11e5-8837-69ab09bfb66c.PNG)
 
 Additionally, the history displays the install metrics for each release. You can view the details about how to interpret the metric data in the documentation for the `deployment ls` command above.
+
+By default, the history doesn't display the author of each release, but if you are collaborating on an app with other developers, and want to view who released each update, you can pass the additional `--displayAuthor` (or `-a`) flag to the history command.
 
 *NOTE: The history command can also be run using the "h" alias*

@@ -64,7 +64,17 @@ declare module "rest-definitions" {
         /*const*/ username: string;
     }
 
+    export interface CollaboratorProperties {
+        /*generated*/ isCurrentAccount?: boolean;
+        permission: string;
+    }
+
+    export interface CollaboratorMap {
+        [email: string]: CollaboratorProperties;
+    }
+
     export interface App {
+        /*generated*/ collaborators?: CollaboratorMap;
         /*generated*/ id?: string;
         name: string;
     }
@@ -90,6 +100,7 @@ declare module "rest-definitions" {
         /*generated*/ diffSize?: number;
         /*generated*/ originalLabel?: string;       // Set on "Promote" and "Rollback"
         /*generated*/ originalDeployment?: string;  // Set on "Promote"
+        /*generated*/ releasedBy?: string;          // Set by commitPackage
         /*generated*/ releaseMethod?: string;       // "Upload", "Promote" or "Rollback". Unknown if unspecified
         /*generated*/ size: number;
         /*generated*/ uploadTime: number;

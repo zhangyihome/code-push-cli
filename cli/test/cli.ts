@@ -38,6 +38,10 @@ export class SdkStub {
         });
     }
 
+    public addCollaborator(name: string, email: string): Promise<void> {
+        return Q(<void>null);
+    }
+
     public addDeployment(appId: string, name: string): Promise<codePush.Deployment> {
         return Q(<codePush.Deployment>{
             id: "deploymentId",
@@ -58,10 +62,12 @@ export class SdkStub {
     public getApps(): Promise<codePush.App[]> {
         return Q([<codePush.App>{
             id: "1",
-            name: "a"
+            name: "a",
+            collaborators: { "a@a.com": { permission: "Owner", isCurrentAccount: true } }
         }, <codePush.App>{
             id: "2",
-            name: "b"
+            name: "b",
+            collaborators: { "a@a.com": { permission: "Owner", isCurrentAccount: true } }
         }]);
     }
 
@@ -140,6 +146,19 @@ export class SdkStub {
         });
     }
 
+    public getCollaboratorsList(app: codePush.App): Promise<any> {
+        return Q({
+            "a@a.com": {
+                permission: "Owner",
+                isCurrentAccount: true
+            },
+            "b@b.com": {
+                permission: "Collaborator",
+                isCurrentAccount: false
+            }
+        });
+    }
+
     public release(appId: string, deploymentId: string): Promise<string> {
         return Q("Successfully released");
     }
@@ -152,11 +171,19 @@ export class SdkStub {
         return Q(<void>null);
     }
 
+    public removeCollaborator(name: string, email: string): Promise<void> {
+        return Q(<void>null);
+    }
+
     public removeDeployment(appId: string, deployment: string): Promise<void> {
         return Q(<void>null);
     }
 
     public updateApp(app: codePush.App): Promise<void> {
+        return Q(<void>null);
+    }
+
+    public transferApp(app: codePush.App): Promise<void> {
         return Q(<void>null);
     }
 
@@ -318,8 +345,8 @@ describe("CLI", () => {
 
                 var actual: string = log.args[0][0];
                 var expected = [
-                    { name: "a", deployments: ["Production", "Staging"] },
-                    { name: "b", deployments: ["Production", "Staging"] }
+                    { name: "a", deployments: ["Production", "Staging"]},
+                    { name: "b", deployments: ["Production", "Staging"]}
                 ];
 
                 assertJsonDescribesObject(actual, expected);
@@ -384,6 +411,90 @@ describe("CLI", () => {
                 done();
             });
     });
+
+    it("appTransfer transfers app", (done: MochaDone): void => {
+        var command: cli.IAppTransferCommand = {
+            type: cli.CommandType.appTransfer,
+            appName: "a",
+            email: "b@b.com"
+        };
+
+        var transferApp: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "transferApp");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(transferApp);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, "Successfully transferred the ownership of app \"a\" to the account with email \"b@b.com\".");
+
+                done();
+            });
+    });
+
+    it("collaboratorAdd adds collaborator", (done: MochaDone): void => {
+        var command: cli.ICollaboratorAddCommand = {
+            type: cli.CommandType.collaboratorAdd,
+            appName: "a",
+            email: "b@b.com"
+        };
+
+        var addCollaborator: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "addCollaborator");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(addCollaborator);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, "Successfully added \"b@b.com\" as a collaborator to the app \"a\".");
+
+                done();
+            });
+    });
+
+    it("collaboratorList lists collaborators email and properties", (done: MochaDone): void => {
+        var command: cli.ICollaboratorListCommand = {
+            type: cli.CommandType.collaboratorList,
+            appName: "a",
+            format: "json"
+        };
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(log);
+                assert.equal(log.args[0].length, 1);
+
+                var actual: string = log.args[0][0];
+                var expected = {
+                    "collaborators":
+                        { 
+                            "a@a.com": { permission: "Owner", isCurrentAccount: true },
+                            "b@b.com": { permission: "Collaborator", isCurrentAccount: false }
+                        }
+                };
+
+                assertJsonDescribesObject(actual, expected);
+                done();
+            });
+    });
+
+    it("collaboratorRemove removes collaborator", (done: MochaDone): void => {
+        var command: cli.ICollaboratorRemoveCommand = {
+            type: cli.CommandType.collaboratorRemove,
+            appName: "a",
+            email: "b@b.com"
+        };
+
+        var removeCollaborator: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeCollaborator");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(removeCollaborator);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, "Successfully removed \"b@b.com\" as a collaborator from the app \"a\".");
+
+                done();
+            });
+    });
+
 
     it("deploymentAdd reports new app name and ID", (done: MochaDone): void => {
         var command: cli.IDeploymentAddCommand = {
@@ -517,7 +628,8 @@ describe("CLI", () => {
             type: cli.CommandType.deploymentHistory,
             appName: "a",
             deploymentName: "Staging",
-            format: "json"
+            format: "json",
+            displayAuthor: false
         };
 
         var getPackageHistory: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getPackageHistory");

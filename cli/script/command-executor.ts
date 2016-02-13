@@ -21,15 +21,21 @@ import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
 import { AcquisitionStatus } from "code-push/script/acquisition-sdk";
-import { AccessKey, AccountManager, App, Deployment, DeploymentKey, DeploymentMetrics, Package, UpdateMetrics } from "code-push";
+import { AccessKey, AccountManager, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentKey, DeploymentMetrics, Package, Permissions, UpdateMetrics } from "code-push";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
+var emailValidator = require("email-validator");
 var packageJson = require("../package.json");
+var progress = require("progress");
 import Promise = Q.Promise;
 var userAgent: string = packageJson.name + "/" + packageJson.version;
 
 const ACTIVE_METRICS_KEY: string = "Active";
 const DOWNLOADED_METRICS_KEY: string = "Downloaded";
+
+interface NameToCountMap {
+    [name: string]: number;
+}
 
 interface IStandardLoginConnectionInfo {
     accessKeyName: string;
@@ -113,7 +119,7 @@ export var confirm = (): Promise<boolean> => {
     });
 }
 
-var connectionInfo: IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo;
+var connectionInfo: IStandardLoginConnectionInfo | IAccessKeyLoginConnectionInfo;
 
 function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
     var hostname: string = os.hostname();
@@ -176,11 +182,11 @@ function appAdd(command: cli.IAppAddCommand): Promise<void> {
 function appList(command: cli.IAppListCommand): Promise<void> {
     throwForInvalidOutputFormat(command.format);
     var apps: App[];
-
     return sdk.getApps()
         .then((retrievedApps: App[]): Promise<string[][]> => {
             apps = retrievedApps;
             var deploymentListPromises: Promise<string[]>[] = apps.map((app: App) => {
+
                 return sdk.getDeployments(app.id)
                     .then((deployments: Deployment[]) => {
                         var deploymentList: string[] = deployments
@@ -238,6 +244,75 @@ export var createEmptyTempReleaseFolder = (folderPath: string) => {
         });
 };
 
+function appTransfer(command: cli.IAppTransferCommand): Promise<void> {
+    throwForInvalidEmail(command.email);
+
+    return getAppId(command.appName)
+        .then((appId: string): Promise<void> => {
+            throwForInvalidAppId(appId, command.appName);
+
+            return confirm()
+                .then((wasConfirmed: boolean): Promise<void> => {
+                    if (wasConfirmed) {
+                        return sdk.transferApp(appId, command.email)
+                            .then((): void => {
+                                log("Successfully transferred the ownership of app \"" + command.appName + "\" to the account with email \"" + command.email + "\".");
+                            });
+                    }
+
+                    log("App transfer cancelled.");
+                });
+        });
+}
+
+function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
+    throwForInvalidEmail(command.email);
+
+    return getAppId(command.appName)
+        .then((appId: string): Promise<void> => {
+            throwForInvalidAppId(appId, command.appName);
+
+            return sdk.addCollaborator(appId, command.email)
+                .then((): void => {
+                    log("Successfully added \"" + command.email + "\" as a collaborator to the app \"" + command.appName + "\".");
+                });
+        });
+}
+
+function listCollaborators(command: cli.ICollaboratorListCommand): Promise<void> {
+    throwForInvalidOutputFormat(command.format);
+    return getAppId(command.appName)
+        .then((appId: string): Promise<void> => {
+            throwForInvalidAppId(appId, command.appName);
+
+            return sdk.getCollaboratorsList(appId)
+                .then((retrievedCollaborators: CollaboratorMap): void => {
+                    printCollaboratorsList(command.format, retrievedCollaborators);
+                });
+        });
+}
+
+function removeCollaborator(command: cli.ICollaboratorRemoveCommand): Promise<void> {
+    throwForInvalidEmail(command.email);
+
+    return getAppId(command.appName)
+        .then((appId: string): Promise<void> => {
+            throwForInvalidAppId(appId, command.appName);
+
+            return confirm()
+                .then((wasConfirmed: boolean): Promise<void> => {
+                    if (wasConfirmed) {
+                        return sdk.removeCollaborator(appId, command.email)
+                            .then((): void => {
+                                log("Successfully removed \"" + command.email + "\" as a collaborator from the app \"" + command.appName + "\".");
+                            });
+                    }
+
+                    log("App collaborator removal cancelled.");
+                });
+        });
+}
+
 function deleteConnectionInfoCache(): void {
     try {
         fs.unlinkSync(configFilePath);
@@ -278,7 +353,7 @@ export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: b
     var theAppId: string;
     var deploymentKeyList: string[];
     var deployments: Deployment[];
-    
+
     return getAppId(command.appName)
         .then((appId: string): Promise<Deployment[]> => {
             throwForInvalidAppId(appId, command.appName);
@@ -288,14 +363,14 @@ export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: b
         })
         .then((retrievedDeployments: Deployment[]): Promise<void> => {
             deployments = retrievedDeployments;
-            if (command.displayKeys) {  
+            if (command.displayKeys) {
                 var deploymentKeyPromises: Promise<string>[] = deployments.map((deployment: Deployment) => {
                     return sdk.getDeploymentKeys(theAppId, deployment.id)
                         .then((deploymentKeys: DeploymentKey[]): string => {
                             return deploymentKeys[0].key;
                         });
                 });
-                
+
                 return Q.all(deploymentKeyPromises)
                     .then((retrievedDeploymentKeyList: string[]) => {
                         deploymentKeyList = retrievedDeploymentKeyList;
@@ -323,7 +398,7 @@ export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: b
                         return Q(<void>null);
                     }
                 });
-                
+
                 return Q.all(metricsPromises);
             }
         })
@@ -379,13 +454,17 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
     throwForInvalidOutputFormat(command.format);
     var storedAppId: string;
     var storedDeploymentId: string;
+    var deployments: Deployment[];
+    var currentUserEmail: string;
 
-    return getAppId(command.appName)
-        .then((appId: string): Promise<string> => {
-            throwForInvalidAppId(appId, command.appName);
-            storedAppId = appId;
 
-            return getDeploymentId(appId, command.deploymentName);
+    return getApp(command.appName)
+        .then((app: App): Promise<string> => {
+            throwForInvalidAppId(app.id, command.appName);
+            storedAppId = app.id;
+            currentUserEmail = getCurrentUserEmail(app.collaborators);
+
+            return getDeploymentId(app.id, command.deploymentName);
         })
         .then((deploymentId: string): Promise<Package[]> => {
             throwForInvalidDeploymentId(deploymentId, command.deploymentName, command.appName);
@@ -408,12 +487,12 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
                             };
                         }
                     });
-                    printDeploymentHistory(command, <PackageWithMetrics[]>packageHistory);
+                    printDeploymentHistory(command, <PackageWithMetrics[]>packageHistory, currentUserEmail);
                 });
         });
 }
 
-function deserializeConnectionInfo(): IStandardLoginConnectionInfo|IAccessKeyLoginConnectionInfo {
+function deserializeConnectionInfo(): IStandardLoginConnectionInfo | IAccessKeyLoginConnectionInfo {
     try {
         var savedConnection: string = fs.readFileSync(configFilePath, { encoding: "utf8" });
         return JSON.parse(savedConnection);
@@ -468,6 +547,18 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.appRename:
                     return appRename(<cli.IAppRenameCommand>command);
 
+                case cli.CommandType.appTransfer:
+                    return appTransfer(<cli.IAppTransferCommand>command);
+
+                case cli.CommandType.collaboratorAdd:
+                    return addCollaborator(<cli.ICollaboratorAddCommand>command);
+
+                case cli.CommandType.collaboratorList:
+                    return listCollaborators(<cli.ICollaboratorListCommand>command);
+
+                case cli.CommandType.collaboratorRemove:
+                    return removeCollaborator(<cli.ICollaboratorRemoveCommand>command);
+
                 case cli.CommandType.deploymentAdd:
                     return deploymentAdd(<cli.IDeploymentAddCommand>command);
 
@@ -476,7 +567,7 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.deploymentList:
                     return deploymentList(<cli.IDeploymentListCommand>command);
- 
+
                 case cli.CommandType.deploymentRemove:
                     return deploymentRemove(<cli.IDeploymentRemoveCommand>command);
 
@@ -546,16 +637,81 @@ function getAccessKeyId(accessKeyName: string): Promise<string> {
 }
 
 function getApp(appName: string): Promise<App> {
+    var ownerEmailValue: string;
+    var appNameValue: string = appName;
+    var delimiterIndex: number = appName.indexOf("/");
+
+    if (delimiterIndex !== -1) {
+        ownerEmailValue = appName.substring(0, delimiterIndex);
+        appNameValue = appName.substring(delimiterIndex + 1);
+
+        throwForInvalidEmail(ownerEmailValue);
+    }
+
     return sdk.getApps()
         .then((apps: App[]): App => {
+            var foundApp = false;
+            var possibleApp: App;
+
             for (var i = 0; i < apps.length; ++i) {
                 var app: App = apps[i];
+                if (app.name === appNameValue) {
+                    var isCurrentUserOwner: boolean = isCurrentAccountOwner(app.collaborators);
+                    if (ownerEmailValue) {
+                        var appOwner: string = getOwnerEmail(app.collaborators);
+                        foundApp = appOwner && appOwner === ownerEmailValue;
+                    } else if (!isCurrentUserOwner) {
+                        // found an app name matching given value but is not the owner of the app
+                        // its possible there is another app with same name of which this user 
+                        // is the owner, so keep this pointer for future use.
+                        possibleApp = app;
+                    } else {
+                        foundApp = isCurrentUserOwner;
+                    }
+                }
 
-                if (app.name === appName) {
+                if (foundApp) {
                     return app;
                 }
             }
+
+            if (possibleApp) {
+                return possibleApp;
+            }
         });
+}
+
+function isCurrentAccountOwner(map: CollaboratorMap): boolean {
+    if (map) {
+        var ownerEmail: string = getOwnerEmail(map);
+        return ownerEmail && map[ownerEmail].isCurrentAccount;
+    }
+
+    return false;
+}
+
+function getCurrentUserEmail(map: CollaboratorMap): string {
+    if (map) {
+        for (var key of Object.keys(map)) {
+            if (map[key].isCurrentAccount) {
+                return key;
+            }
+        }
+    }
+
+    return null;
+}
+
+function getOwnerEmail(map: CollaboratorMap): string {
+    if (map) {
+        for (var key of Object.keys(map)) {
+            if (map[key].permission === Permissions.Owner) {
+                return key;
+            }
+        }
+    }
+
+    return null;
 }
 
 function getAppId(appName: string): Promise<string> {
@@ -598,13 +754,13 @@ function getTotalActiveFromDeploymentMetrics(metrics: DeploymentMetrics): number
     Object.keys(metrics).forEach((label: string) => {
         totalActive += metrics[label].active;
     });
-    
+
     return totalActive;
 }
 
 function initiateExternalAuthenticationAsync(serverUrl: string, action: string): void {
     var message: string = `A browser is being launched to authenticate your account. Follow the instructions ` +
-                          `it displays to complete your ${action === "register" ? "registration" : "login"}.\r\n`;
+        `it displays to complete your ${action === "register" ? "registration" : "login"}.\r\n`;
 
     log(message);
     var hostname: string = os.hostname();
@@ -696,17 +852,62 @@ function formatDate(unixOffset: number): string {
     }
 }
 
+function getAppDisplayName(app: App, appNameToCountMap: NameToCountMap): string {
+    if (appNameToCountMap && appNameToCountMap[app.name] > 1) {
+        var isCurrentUserOwner: boolean = isCurrentAccountOwner(app.collaborators);
+        return isCurrentUserOwner ? app.name : getOwnerEmail(app.collaborators) + "/" + app.name;
+    } else {
+        return app.name;
+    }
+}
+
+function getNameToCountMap(apps: App[]): NameToCountMap {
+    var nameToCountMap: NameToCountMap = {};
+    apps.forEach((app: App) => {
+        var ownerEmail: string = getOwnerEmail(app.collaborators);
+        if (!nameToCountMap[app.name]) {
+            nameToCountMap[app.name] = 1;
+        } else {
+            nameToCountMap[app.name] = nameToCountMap[app.name] + 1;
+        }
+    });
+
+    return nameToCountMap;
+}
+
 function printAppList(format: string, apps: App[], deploymentLists: string[][]): void {
+    var appNameToCountMap: NameToCountMap = getNameToCountMap(apps);
+
     if (format === "json") {
         var dataSource: any[] = apps.map((app: App, index: number) => {
-            return { "name": app.name, "deployments": deploymentLists[index] };
+            return { "name": getAppDisplayName(app, appNameToCountMap), "deployments": deploymentLists[index] };
         });
+
         printJson(dataSource);
     } else if (format === "table") {
         var headers = ["Name", "Deployments"];
         printTable(headers, (dataSource: any[]): void => {
             apps.forEach((app: App, index: number): void => {
-                var row = [app.name, wordwrap(50)(deploymentLists[index].join(", "))];
+                var row = [getAppDisplayName(app, appNameToCountMap), wordwrap(50)(deploymentLists[index].join(", "))];
+                dataSource.push(row);
+            });
+        });
+    }
+}
+
+function getCollaboratorDisplayName(email: string, collaboratorProperties: CollaboratorProperties): string {
+    return (collaboratorProperties.permission === Permissions.Owner) ? email + chalk.magenta(" (" + Permissions.Owner + ")") : email;
+}
+
+function printCollaboratorsList(format: string, collaborators: CollaboratorMap): void {
+    if (format === "json") {
+        var dataSource = { "collaborators": collaborators };
+        printJson(dataSource);
+    } else if (format === "table") {
+        var headers = ["E-mail Address"];
+        printTable(headers, (dataSource: any[]): void => {
+            Object.keys(collaborators).forEach((email: string): void => {
+                var row = [getCollaboratorDisplayName(email, collaborators[email])];
                 dataSource.push(row);
             });
         });
@@ -720,80 +921,93 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
             if (command.displayKeys) {
                 deploymentJson.deploymentKey = deploymentKeys[index];
             }
-            
+
             if (deployment.package) {
                 var packageWithMetrics = <PackageWithMetrics>(deployment.package);
                 if (packageWithMetrics.metrics) {
                     delete packageWithMetrics.metrics.totalActive;
                 }
             }
-            
+
             return deploymentJson;
         });
+
         printJson(dataSource);
     } else if (command.format === "table") {
         var headers = ["Name"];
         if (command.displayKeys) {
             headers.push("Deployment Key");
         }
-        
+
         if (showPackage) {
             headers.push("Update Metadata");
             headers.push("Install Metrics");
         }
-        
+
         printTable(headers, (dataSource: any[]): void => {
             deployments.forEach((deployment: Deployment, index: number): void => {
                 var row = [deployment.name];
                 if (command.displayKeys) {
                     row.push(deploymentKeys[index]);
                 }
-                
+
                 if (showPackage) {
                     row.push(getPackageString(deployment.package));
                     row.push(getPackageMetricsString(<PackageWithMetrics>(deployment.package)));
                 }
-                
+
                 dataSource.push(row);
             });
         });
     }
 }
 
-function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageHistory: PackageWithMetrics[]): void {
+function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageHistory: PackageWithMetrics[], currentUserEmail: string): void {
     if (command.format === "json") {
         packageHistory.forEach((packageObject: PackageWithMetrics) => {
             if (packageObject.metrics) {
                 delete packageObject.metrics.totalActive;
             }
         });
-        
+
         printJson(packageHistory);
     } else if (command.format === "table") {
-        printTable(["Label", "Release Time", "App Version", "Mandatory", "Description", "Install Metrics"], (dataSource: any[]) => {
+        var headers = ["Label", "Release Time", "App Version", "Mandatory"];
+        if (command.displayAuthor) {
+            headers.push("Released By");
+        }
+
+        headers.push("Description", "Install Metrics");
+
+        printTable(headers, (dataSource: any[]) => {
             packageHistory.forEach((packageObject: Package) => {
                 var releaseTime: string = formatDate(packageObject.uploadTime);
                 var releaseSource: string;
                 if (packageObject.releaseMethod === "Promote") {
-                    releaseSource = `Promoted ${ packageObject.originalLabel } from "${ packageObject.originalDeployment }"`;
+                    releaseSource = `Promoted ${packageObject.originalLabel} from "${packageObject.originalDeployment}"`;
                 } else if (packageObject.releaseMethod === "Rollback") {
                     var labelNumber: number = parseInt(packageObject.label.substring(1));
                     var lastLabel: string = "v" + (labelNumber - 1);
-                    releaseSource = `Rolled back ${ lastLabel } to ${ packageObject.originalLabel }`;
+                    releaseSource = `Rolled back ${lastLabel} to ${packageObject.originalLabel}`;
                 }
 
                 if (releaseSource) {
                     releaseTime += "\n" + chalk.magenta(`(${releaseSource})`).toString();
                 }
 
-                dataSource.push([
-                    packageObject.label,
-                    releaseTime,
-                    packageObject.appVersion,
-                    packageObject.isMandatory ? "Yes" : "No",
-                    packageObject.description ? wordwrap(30)(packageObject.description) : "",
-                    getPackageMetricsString(packageObject)
-                ]);
+                var row = [packageObject.label, releaseTime, packageObject.appVersion, packageObject.isMandatory ? "Yes" : "No"];
+                if (command.displayAuthor) {
+                    var releasedBy: string = packageObject.releasedBy ? packageObject.releasedBy : "";
+                    if (currentUserEmail && releasedBy === currentUserEmail) {
+                        releasedBy = "You";
+                    }
+
+                    row.push(releasedBy);
+                }
+
+                row.push(packageObject.description ? wordwrap(30)(packageObject.description) : "", getPackageMetricsString(packageObject));
+
+                dataSource.push(row);
             });
         });
     }
@@ -807,8 +1021,9 @@ function getPackageString(packageObject: Package): string {
     return chalk.green("Label: ") + packageObject.label + "\n" +
         chalk.green("App Version: ") + packageObject.appVersion + "\n" +
         chalk.green("Mandatory: ") + (packageObject.isMandatory ? "Yes" : "No") + "\n" +
-        chalk.green("Release Time: ") + formatDate(packageObject.uploadTime) +
-        (packageObject.description ? wordwrap(70)("\n" + chalk.green("Description: ") + packageObject.description): "");
+        chalk.green("Release Time: ") + formatDate(packageObject.uploadTime) + "\n" +
+        chalk.green("Released By: ") + (packageObject.releasedBy ? packageObject.releasedBy : "") +
+        (packageObject.description ? wordwrap(70)("\n" + chalk.green("Description: ") + packageObject.description) : "");
 }
 
 function getPackageMetricsString(packageObject: PackageWithMetrics): string {
@@ -819,7 +1034,7 @@ function getPackageMetricsString(packageObject: PackageWithMetrics): string {
     var activePercent: number = packageObject.metrics.totalActive
         ? packageObject.metrics.active / packageObject.metrics.totalActive * 100
         : 0.0;
-    var percentString: string; 
+    var percentString: string;
     if (activePercent === 100.0) {
         percentString = "100%";
     } else if (activePercent === 0.0) {
@@ -827,19 +1042,19 @@ function getPackageMetricsString(packageObject: PackageWithMetrics): string {
     } else {
         percentString = activePercent.toPrecision(2) + "%";
     }
-    
+
     var numPending: number = packageObject.metrics.downloaded - packageObject.metrics.installed - packageObject.metrics.failed;
     var returnString: string = chalk.green("Active: ") + percentString + " (" + packageObject.metrics.active.toLocaleString() + " of " + packageObject.metrics.totalActive.toLocaleString() + ")\n" +
         chalk.green("Total: ") + packageObject.metrics.installed.toLocaleString();
-        
+
     if (numPending > 0) {
         returnString += " (" + numPending.toLocaleString() + " pending)";
-    }    
-    
+    }
+
     if (packageObject.metrics.failed) {
         returnString += "\n" + chalk.green("Rollbacks: ") + chalk.red(packageObject.metrics.failed.toLocaleString() + "");
     }
-    
+
     return returnString;
 }
 
@@ -1014,7 +1229,7 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
                     }
 
                     var lastTotalProgress = 0;
-                    var progressBar = new progress("Upload progress:[:bar] :percent :etas", { 
+                    var progressBar = new progress("Upload progress:[:bar] :percent :etas", {
                         complete: "=",
                         incomplete: " ",
                         width: 50,
@@ -1194,7 +1409,7 @@ function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
     // The access token should have been validated already (i.e.:  logging in).
     var json: string = tryBase64Decode(accessToken);
     var standardLoginConnectionInfo: IStandardLoginConnectionInfo;
-    
+
     try {
         standardLoginConnectionInfo = JSON.parse(json);
     } catch (ex) {
@@ -1252,6 +1467,12 @@ function throwForInvalidApp(app: App, appName: string): void {
 function throwForInvalidAppId(appId: string, appName: string): void {
     if (!appId) {
         throw new Error("App \"" + appName + "\" does not exist.");
+    }
+}
+
+function throwForInvalidEmail(email: string): void {
+    if (!emailValidator.validate(email)) {
+        throw new Error("\"" + email + "\" is an invalid e-mail address.");
     }
 }
 
