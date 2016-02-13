@@ -94,6 +94,26 @@ function appRemove(commandName: string, yargs: yargs.Argv): void {
     addCommonConfiguration(yargs);
 }
 
+function listCollaborators(commandName: string, yargs: yargs.Argv): void {
+    isValidCommand = true;
+    yargs.usage(USAGE_PREFIX + " collaborator " + commandName + " <appName> [--format <format>]")
+        .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
+        .example("collaborator " + commandName + " MyApp", "Lists collaborators for app \"MyApp\" in tabular format")
+        .example("collaborator " + commandName + " MyApp --format json", "Lists collaborators for app \"MyApp\" in JSON format")
+        .option("format", { default: "table", demand: false, description: "The output format (\"json\" or \"table\")", type: "string" });
+
+    addCommonConfiguration(yargs);
+}
+
+function removeCollaborator(commandName: string, yargs: yargs.Argv): void {
+    isValidCommand = true;
+    yargs.usage(USAGE_PREFIX + " collaborator " + commandName + " <appName> <email>")
+        .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
+        .example("collaborator " + commandName + " MyApp foo@bar.com", "Removes foo@bar.com from app \"MyApp\" as a collaborator");
+
+    addCommonConfiguration(yargs);
+}
+
 function deploymentList(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
     yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> [--format <format>] [--displayKeys]")
@@ -116,11 +136,12 @@ function deploymentRemove(commandName: string, yargs: yargs.Argv): void {
 
 function deploymentHistory(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
-    yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> <deploymentName> [--format <format>]")
+    yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> <deploymentName> [--format <format>] [--displayAuthor]")
         .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
         .example("deployment " + commandName + " MyApp MyDeployment", "Shows the release history for deployment \"MyDeployment\" from app \"MyApp\" in tabular format")
         .example("deployment " + commandName + " MyApp MyDeployment --format json", "Shows the release history for deployment \"MyDeployment\" from app \"MyApp\" in JSON format")
-        .option("format", { default: "table", demand: false, description: "The output format (\"json\" or \"table\")", type: "string" });
+        .option("format", { default: "table", demand: false, description: "The output format (\"json\" or \"table\")", type: "string" })
+        .option("displayAuthor", { alias: "a", default: false, demand: false, description: "Whether to display who performed the release", type: "boolean" });
 
     addCommonConfiguration(yargs);
 }
@@ -164,6 +185,13 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             })
             .command("list", "List the apps associated with your account", (yargs: yargs.Argv) => appList("list", yargs))
             .command("ls", "List the apps associated with your account", (yargs: yargs.Argv) => appList("ls", yargs))
+            .command("transfer", "Transfer the ownership of an app to another account", (yargs: yargs.Argv) => {
+                yargs.usage(USAGE_PREFIX + " app transfer <appName> <email>")
+                    .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
+                    .example("app transfer MyApp foo@bar.com", "Transfers the ownership of app \"MyApp\" to an account with email \"foo@bar.com\"");
+
+                addCommonConfiguration(yargs);
+            })
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
         addCommonConfiguration(yargs);
@@ -183,6 +211,26 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName>")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
             .example("promote MyApp Staging Production", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\"");
+
+        addCommonConfiguration(yargs);
+    })
+    .command("collaborator", "View and manage collaborators for a given app", (yargs: yargs.Argv) => {
+        isValidCommandCategory = true;
+        yargs.usage(USAGE_PREFIX + " collaborator <command>")
+            .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
+            .command("add", "Add a new collaborator to the given app", (yargs: yargs.Argv): void => {
+                isValidCommand = true;
+                yargs.usage(USAGE_PREFIX + " collaborator add <appName> <email>")
+                    .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
+                    .example("collaborator add MyApp foo@bar.com", "Adds foo@bar.com as a collaborator to app \"MyApp\"");
+
+                addCommonConfiguration(yargs);
+            })
+            .command("remove", "Remove an app from your account", (yargs: yargs.Argv) => removeCollaborator("remove", yargs))
+            .command("rm", "Remove an app from your account", (yargs: yargs.Argv) => removeCollaborator("rm", yargs))
+            .command("list", "List the apps associated with your account", (yargs: yargs.Argv) => listCollaborators("list", yargs))
+            .command("ls", "List the apps associated with your account", (yargs: yargs.Argv) => listCollaborators("ls", yargs))
+            .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
         addCommonConfiguration(yargs);
     })
@@ -340,6 +388,50 @@ function createCommand(): cli.ICommand {
                             appRenameCommand.newAppName = arg3;
                         }
                         break;
+
+                    case "transfer":
+                        if (arg2 && arg3) {
+                            cmd = { type: cli.CommandType.appTransfer };
+
+                            var appTransferCommand = <cli.IAppTransferCommand>cmd;
+
+                            appTransferCommand.appName = arg2;
+                            appTransferCommand.email = arg3;
+                        }
+                        break;
+                }
+                break;
+
+            case "collaborator":
+                switch (arg1) {
+                    case "add":
+                        if (arg2 && arg3) {
+                            cmd = { type: cli.CommandType.collaboratorAdd };
+
+                            (<cli.ICollaboratorAddCommand>cmd).appName = arg2;
+                            (<cli.ICollaboratorAddCommand>cmd).email = arg3;
+                        }
+                        break;
+
+                    case "list":
+                    case "ls":
+                        if (arg2) {
+                            cmd = { type: cli.CommandType.collaboratorList };
+
+                            (<cli.ICollaboratorListCommand>cmd).appName = arg2;
+                            (<cli.ICollaboratorListCommand>cmd).format = argv["format"];
+                        }
+                        break;
+
+                    case "remove":
+                    case "rm":
+                        if (arg2 && arg3) {
+                            cmd = { type: cli.CommandType.collaboratorRemove };
+
+                            (<cli.ICollaboratorRemoveCommand>cmd).appName = arg2;
+                            (<cli.ICollaboratorAddCommand>cmd).email = arg3;
+                        }
+                        break;
                 }
                 break;
 
@@ -403,6 +495,7 @@ function createCommand(): cli.ICommand {
                             deploymentHistoryCommand.appName = arg2;
                             deploymentHistoryCommand.deploymentName = arg3;
                             deploymentHistoryCommand.format = argv["format"];
+                            deploymentHistoryCommand.displayAuthor = argv["displayAuthor"];
                         }
                         break;
                 }

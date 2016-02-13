@@ -6,6 +6,10 @@
     appList,
     appRemove,
     appRename,
+    appTransfer,
+    collaboratorAdd,
+    collaboratorList,
+    collaboratorRemove,
     deploymentAdd,
     deploymentHistory,
     deploymentList,
@@ -53,6 +57,26 @@ export interface IAppRenameCommand extends ICommand {
     newAppName: string;
 }
 
+export interface IAppTransferCommand extends ICommand {
+    appName: string;
+    email: string;
+}
+
+export interface ICollaboratorAddCommand extends ICommand {
+    appName: string;
+    email: string;
+}
+
+export interface ICollaboratorListCommand extends ICommand {
+    appName: string;
+    format: string;
+}
+
+export interface ICollaboratorRemoveCommand extends ICommand {
+    appName: string;
+    email: string;
+}
+
 export interface IDeploymentAddCommand extends ICommand {
     appName: string;
     deploymentName: string;
@@ -62,6 +86,7 @@ export interface IDeploymentHistoryCommand extends ICommand {
     appName: string;
     deploymentName: string;
     format: string;
+    displayAuthor: boolean;
 }
 
 export interface IDeploymentListCommand extends ICommand {

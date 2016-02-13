@@ -18,10 +18,16 @@ if (typeof window === `undefined`) {
     }
 }
 
-// Aliasing UpdateMetrics as IUpdateMetrics to deal with TypeScript issue that removes unused imports.
-import { AccessKey, Account, App, Deployment, DeploymentMetrics, Package, UpdateMetrics as IUpdateMetrics } from "rest-definitions";
-export { AccessKey, Account, App, Deployment, DeploymentMetrics, Package };
+// Aliasing UpdateMetrics as IUpdateMetrics & CollaboratorProperties as ICollaboratorProperties to deal with TypeScript issue that removes unused imports.
+import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties as ICollaboratorProperties, Deployment, DeploymentMetrics, Package, UpdateMetrics as IUpdateMetrics } from "rest-definitions";
+export { AccessKey, Account, App, CollaboratorMap, Deployment, DeploymentMetrics, Package };
 export type UpdateMetrics = IUpdateMetrics;
+export type CollaboratorProperties = ICollaboratorProperties;
+
+export module Permissions {
+    export const Owner = "Owner";
+    export const Collaborator = "Collaborator";
+}
 
 export interface CodePushError {
     message?: string;
@@ -153,6 +159,28 @@ export class AccountManager {
     public updateApp(infoToChange: App): Promise<void> {
         return this.put(`/apps/${infoToChange.id}`, JSON.stringify(infoToChange))
             .then((res: JsonResponse) => null);
+    }
+
+    public transferApp(appId: string, email: string): Promise<void> {
+        return this.post(`/apps/${appId}/transfer/${email}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
+            .then(() => null);
+    }
+
+    // Collaborators
+    public getCollaboratorsList(appId: string): Promise<CollaboratorMap> {
+        return this.get(`/apps/${appId}/collaborators`)
+            .then((res: JsonResponse) => res.body.collaborators);
+    }
+
+    public addCollaborator(appId: string, email: string): Promise<void> {
+        return this.post(`/apps/${appId}/collaborators/${email}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
+            .then(() => null);
+    }
+
+    public removeCollaborator(app: App | string, email: string): Promise<void> {
+        var id: string = (typeof app === "string") ? app : app.id;
+        return this.del(`/apps/${id}/collaborators/${email}`)
+            .then(() => null);
     }
 
     // Deployments
