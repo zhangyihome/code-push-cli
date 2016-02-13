@@ -330,7 +330,7 @@
                     <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/CLI.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
                 </header>  
                 <article class="doc-content">               
-                    <p><img src="https://cloud.githubusercontent.com/assets/116461/12527087/6efba342-c12a-11e5-944d-88b4b6a5a438.png" alt="CodePush CLI"></p>
+                    <p><img src="https://cloud.githubusercontent.com/assets/116461/13024894/35c9c300-d1b1-11e5-9d46-085cfaf8a021.png" alt="CodePush CLI"></p>
 
 <h2>Installation</h2>
 
@@ -407,6 +407,46 @@ code-push app add MyApp-iOS
 you can run the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push app ls
 </code></pre></div>
+<h2>App Collaboration</h2>
+
+<p>If you will be working with other developers on the same CodePush app, you can add them as collaborators using the following command:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push collaborator add &lt;appName&gt; &lt;collaboratorEmail&gt;
+</code></pre></div>
+<p><em>NOTE: This expects the developer to have already <a href="#account-creation">registered</a> with CodePush using the specified e-mail address, so ensure that they have done that before attempting to share the app with them.</em></p>
+
+<p>Once added, all collaborators will immediately have the following permissions with regards to the newly shared app: </p>
+
+<ol>
+<li>View the app, its collaborators, <a href="#deployment-management">deployments</a> and <a href="#viewing-release-history">release history</a> </li>
+<li><a href="#releasing-app-updates">Release</a> updates to any of the app&rsquo;s deployments</li>
+<li><a href="#promoting-updates-across-deployments">Promote</a> an update between any of the app&rsquo;s deployments</li>
+<li><a href="#rolling-back-undesired-updates">Rollback</a> any of the app&rsquo;s deployments</li>
+</ol>
+
+<p>Inversely, that means that an app collaborator cannot do any of the following:</p>
+
+<ol>
+<li>Rename or delete the app</li>
+<li>Transfer ownership of the app</li>
+<li>Create, rename or delete new deployments within the app</li>
+<li>Add or remove collaborators from the app (*)</li>
+</ol>
+
+<p><em>NOTE: A developer can remove him/herself as a collaborator from an app that was shared with them.</em></p>
+
+<p>Over time, if someone is no longer working on an app with you, you can remove them as a collaborator using the following command:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push collaborator rm &lt;appName&gt; &lt;collaboratorEmail&gt;
+</code></pre></div>
+<p>If at any time you want to list all collaborators that have been added to an app, you can simply run the following command:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push collaborator ls &lt;appName&gt;
+</code></pre></div>
+<p>Finally, if at some point, you (as the app owner) will no longer be working on the app, and you want to transfer it to another developer (or a client), you can run the following command:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push app transfer &lt;appName&gt; &lt;newOwnerEmail&gt;
+</code></pre></div>
+<p><em>NOTE: Just like with the <code>code-push collaborator add</code> command, this expects that the new owner has already registered with CodePush using the specified e-mail address.</em></p>
+
+<p>Once confirmed, the specified developer becomes the app&rsquo;s owner and immediately receives the permissions associated with that role. Besides the transfer of ownership, nothing else about the app is modified (e.g. deployments, release history, collaborators). This means that you will still be a collaborator of the app, and therefore, if you want to remove yourself, you simply need to run the <code>code-push collaborator rm</code> command after successfully transferring ownership.</p>
+
 <h2>Deployment management</h2>
 
 <p>From the CodePush perspective, an app is simply a named grouping for one or more things called &ldquo;deployments&rdquo;. While the app represents a conceptual &ldquo;namespace&rdquo; or &ldquo;scope&rdquo; for a platform-specific version of an app (e.g. the iOS port of Foo app), it&rsquo;s deployments represent the actual target for releasing updates (for developers) and synchronizing updates (for end-users). Deployments allow you to have multiple &ldquo;environments&rdquo; for each app in-flight at any given time, and help model the reality that apps typically move from a dev&rsquo;s personal environment to a testing/QA/staging environment, before finally making their way into production.</p>
@@ -578,7 +618,7 @@ code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push promote &lt;appName&gt; &lt;sourceDeploymentName&gt; &lt;destDeploymentName&gt;
 code-push promote MyApp Staging Production
 </code></pre></div>
-<p>The <code>promote</code> command wil create a new release for the destination deployment, which includes the <strong>exact code and metadata</strong> (description, mandatory and app store version) from the latest release of the source deployment. While you could use the <code>release</code> command to &ldquo;manually&rdquo; migrate an update from one environment to another, the <code>promote</code> command has the following benefits:</p>
+<p>The <code>promote</code> command will create a new release for the destination deployment, which includes the <strong>exact code and metadata</strong> (description, mandatory and app store version) from the latest release of the source deployment. While you could use the <code>release</code> command to &ldquo;manually&rdquo; migrate an update from one environment to another, the <code>promote</code> command has the following benefits:</p>
 
 <ol>
 <li><p>It&rsquo;s quicker, since you don&rsquo;t need to re-assemble the release assets you want to publish or remember the description/app store version that are associated with the source deployment&rsquo;s release.</p></li>
@@ -669,6 +709,8 @@ code-push rollback MyApp Production
 <p><img src="https://cloud.githubusercontent.com/assets/696206/11605068/14e440d0-9aab-11e5-8837-69ab09bfb66c.PNG" alt="Deployment History"></p>
 
 <p>Additionally, the history displays the install metrics for each release. You can view the details about how to interpret the metric data in the documentation for the <code>deployment ls</code> command above.</p>
+
+<p>By default, the history doesn&rsquo;t display the author of each release, but if you are collaborating on an app with other developers, and want to view who released each update, you can pass the additional <code>--displayAuthor</code> (or <code>-a</code>) flag to the history command.</p>
 
 <p><em>NOTE: The history command can also be run using the &ldquo;h&rdquo; alias</em></p>
   

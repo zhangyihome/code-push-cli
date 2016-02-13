@@ -697,7 +697,17 @@ code-push release MyApp codepush.js 1.0.0
 </code></pre></div>
 <p>Retrieves the metadata about the currently installed &ldquo;package&rdquo; (e.g. description, installation time). This can be useful for scenarios such as displaying a &ldquo;what&rsquo;s new?&rdquo; dialog after an update has been applied or checking whether there is a pending update that is waiting to be applied via a resume or restart.</p>
 
-<p>This method returns a <code>Promise</code> which resolves to the <a href="#localpackage"><code>LocalPackage</code></a> instance that represents the currently running update. </p>
+<p>This method returns a <code>Promise</code> which resolves to one of two possible values:</p>
+
+<ol>
+<li><p><code>null</code> if the app is currently running the JS bundle from the binary and not a CodePush update. This occurs in the following scenarios:</p>
+
+<ol>
+<li>The end-user installed the app binary and has yet to install a CodePush update</li>
+<li>The end-user installed an update of the binary (e.g. from the store), which cleared away the old CodePush updates, and gave precedence back to the JS binary in the binary.</li>
+</ol></li>
+<li><p>A <a href="#localpackage"><code>LocalPackage</code></a> instance which represents the metadata for the currently running CodePush update.</p></li>
+</ol>
 
 <p>Example Usage: </p>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.getCurrentPackage()
@@ -830,9 +840,8 @@ codePush.sync({ updateDialog: true }, (status) =&gt; {
 <li><p><strong>codePush.SyncStatus.UP_TO_DATE</strong> <em>(4)</em> - The app is up-to-date with the CodePush server.</p></li>
 <li><p><strong>codePush.SyncStatus.UPDATE_IGNORED</strong> <em>(5)</em> - The app had an optional update which the end user chose to ignore. (This is only applicable when the <code>updateDialog</code> is used)</p></li>
 <li><p><strong>codePush.SyncStatus.UPDATE_INSTALLED</strong> <em>(6)</em> - The update has been installed and will be run either immediately after the <code>syncStatusChangedCallback</code> function returns or the next time the app resumes/restarts, depending on the <code>InstallMode</code> specified in <code>SyncOptions</code>.</p></li>
+<li><p><strong>codePush.SyncStatus.SYNC_IN_PROGRESS</strong> <em>(7)</em> - There is an ongoing <code>sync</code> operation running which prevents the current call from being executed.</p></li>
 </ul>
-
-<p>If the update check and/or the subsequent download fails for any reason, the <code>Promise</code> object returned by <code>sync</code> will be rejected with the reason.</p>
 
 <p>The <code>sync</code> method can be called anywhere you&rsquo;d like to check for an update. That could be in the <code>componentWillMount</code> lifecycle event of your root component, the onPress handler of a <code>&lt;TouchableHighlight&gt;</code> component, in the callback of a periodic timer, or whatever else makes sense for your needs. Just like the <code>checkForUpdate</code> method, it will perform the network request to check for an update in the background, so it won&rsquo;t impact your UI thread and/or JavaScript thread&rsquo;s responsiveness.</p>
 
@@ -914,6 +923,7 @@ codePush.sync({ updateDialog: true }, (status) =&gt; {
 <li><strong>codePush.SyncStatus.UP_TO_DATE</strong> <em>(4)</em> - The app is fully up-to-date with the configured deployment.</li>
 <li><strong>codePush.SyncStatus.UPDATE_IGNORED</strong> <em>(5)</em> - The app has an optional update, which the end user chose to ignore. (This is only applicable when the <code>updateDialog</code> is used)</li>
 <li><strong>codePush.SyncStatus.UPDATE_INSTALLED</strong> <em>(6)</em> - An available update has been installed and will be run either immediately after the <code>syncStatusChangedCallback</code> function returns or the next time the app resumes/restarts, depending on the <code>InstallMode</code> specified in <code>SyncOptions</code>.</li>
+<li><strong>codePush.SyncStatus.SYNC_IN_PROGRESS</strong> <em>(7)</em> - There is an ongoing <code>sync</code> operation running which prevents the current call from being executed.</li>
 <li><strong>codePush.SyncStatus.UNKNOWN_ERROR</strong> <em>(-1)</em> - The sync operation encountered an unknown error. </li>
 </ul>
 
