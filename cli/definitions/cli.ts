@@ -17,6 +17,7 @@
     promote,
     register,
     release,
+    releaseReact,
     rollback
 }
 
@@ -107,6 +108,16 @@ export interface IReleaseCommand extends ICommand {
     mandatory: boolean;
     appStoreVersion: string;
     package: string;
+}
+
+export interface IReleaseReactCommand extends ICommand {
+    appName: string;
+    deploymentName: string;
+    description: string;
+    entryFile?: string;
+    mandatory: boolean;
+    platform: string;
+    sourcemapOutput?: string;
 }
 
 export interface IRollbackCommand extends ICommand {

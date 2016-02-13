@@ -7,9 +7,17 @@ import * as cli from "../definitions/cli";
 import * as cmdexec from "../script/command-executor";
 import * as os from "os";
 
+var process = require("process");
+
 function assertJsonDescribesObject(json: string, object: Object): void {
     // Make sure JSON is indented correctly
     assert.equal(json, JSON.stringify(object, /*replacer=*/ null, /*spacing=*/ 2));
+}
+
+function ensureInTestAppDirectory(): void {
+    if (!~__dirname.indexOf("/resources/TestApp")) {
+        process.chdir(__dirname + "/resources/TestApp");
+    }
 }
 
 export class SdkStub {
@@ -158,10 +166,13 @@ export class SdkStub {
 }
 
 describe("CLI", () => {
+    var execSync: Sinon.SinonStub;
     var log: Sinon.SinonStub;
     var sandbox: Sinon.SinonSandbox;
+    var spawn: Sinon.SinonStub;
     var wasConfirmed = true;
     const RELEASE_FAILED_ERROR_MESSAGE: string = "It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).";
+    const FAKE_TMP_DIR = "dummyfolder";
 
     beforeEach((): void => {
         wasConfirmed = true;
@@ -169,9 +180,20 @@ describe("CLI", () => {
         sandbox = sinon.sandbox.create();
 
         sandbox.stub(cmdexec, "confirm", (): Promise<boolean> => Q(wasConfirmed));
+        sandbox.stub(cmdexec, "createEmptyTempReleaseFolder", (): Promise<void> => Q(<void>null));
+        execSync = sandbox.stub(cmdexec, "execSync", (command: string): void => { });
+        sandbox.stub(cmdexec, "getTmpDir", (): string => FAKE_TMP_DIR);
         log = sandbox.stub(cmdexec, "log", (message: string): void => { });
         sandbox.stub(cmdexec, "loginWithAccessToken", (): Promise<void> => Q(<void>null));
-
+        spawn = sandbox.stub(cmdexec, "spawn", (command: string, commandArgs: string[]): any => {
+            return {
+                stdout: { on: () => { } },
+                stderr: { on: () => { } },
+                on: (event: string, callback: () => void) => { 
+                    callback();
+                }
+            };
+        });
         cmdexec.sdk = <any>new SdkStub();
     });
 
@@ -588,7 +610,164 @@ describe("CLI", () => {
 
         releaseHelperFunction(command, done);
     });
+    
+    it("release-react fails if CWD does not contain package.json", (done: MochaDone): void => {
+        var command: cli.IReleaseReactCommand = {
+            type: cli.CommandType.releaseReact,
+            appName: "a",
+            deploymentName: "Staging",
+            description: "Test invalid folder",
+            mandatory: false,
+            platform: "ios"
+        };
 
+        var release: Sinon.SinonSpy = sandbox.spy(cmdexec, "release");
+        var releaseReact: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseReact");
+        
+        cmdexec.execute(command)
+            .then(() => {
+                done(new Error("Did not throw error."));
+            })
+            .catch((err) => {
+                assert.equal(err.message, "Unable to find or read \"package.json\" in the CWD. The \"release-react\" command must be executed in a React Native project folder.");
+                sinon.assert.notCalled(release);
+                sinon.assert.threw(releaseReact, "Error");
+                sinon.assert.notCalled(spawn);
+                done();
+            })
+            .done();
+    });
+
+    it("release-react fails if entryFile does not exist", (done: MochaDone): void => {
+        var command: cli.IReleaseReactCommand = {
+            type: cli.CommandType.releaseReact,
+            appName: "a",
+            deploymentName: "Staging",
+            description: "Test invalid entryFile",
+            entryFile: "doesntexist.js",
+            mandatory: false,
+            platform: "ios"
+        };
+        
+        ensureInTestAppDirectory();
+
+        var release: Sinon.SinonSpy = sandbox.spy(cmdexec, "release");
+        var releaseReact: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseReact");
+        
+        cmdexec.execute(command)
+            .then(() => {
+                done(new Error("Did not throw error."));
+            })
+            .catch((err) => {
+                assert.equal(err.message, "Entry file \"doesntexist.js\" does not exist.");
+                sinon.assert.notCalled(release);
+                sinon.assert.threw(releaseReact, "Error");
+                sinon.assert.notCalled(spawn);
+                done();
+            })
+            .done();
+    });
+
+    it("release-react fails if platform is invalid", (done: MochaDone): void => {        
+        var command: cli.IReleaseReactCommand = {
+            type: cli.CommandType.releaseReact,
+            appName: "a",
+            deploymentName: "Staging",
+            description: "Test invalid platform",
+            mandatory: false,
+            platform: "blackberry",
+        };
+        
+        ensureInTestAppDirectory();
+        
+        var release: Sinon.SinonSpy = sandbox.spy(cmdexec, "release");
+        var releaseReact: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseReact");
+        
+        cmdexec.execute(command)
+            .then(() => {
+                done(new Error("Did not throw error."));
+            })
+            .catch((err) => {
+                assert.equal(err.message, "Platform must be either \"ios\" or \"android\".");
+                sinon.assert.notCalled(release);
+                sinon.assert.threw(releaseReact, "Error");
+                sinon.assert.notCalled(spawn);
+                done();
+            })
+            .done();
+    });
+
+    it("release-react defaults entry file to index.{platform}.js if not provided", (done: MochaDone): void => {
+        var command: cli.IReleaseReactCommand = {
+            type: cli.CommandType.releaseReact,
+            appName: "a",
+            deploymentName: "Staging",
+            description: "Test default entry file",
+            mandatory: false,
+            platform: "ios"
+        };
+        
+        ensureInTestAppDirectory();
+        
+        var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release", () => { return Q(<void>null) });
+        
+        cmdexec.execute(command)
+            .then(() => {
+                var releaseCommand: cli.IReleaseCommand = <any>command;
+                releaseCommand.package = FAKE_TMP_DIR;
+                releaseCommand.appStoreVersion = "1.2.3";
+                
+                sinon.assert.calledWith(execSync, "rm -rf $TMPDIR/react-*");
+                sinon.assert.calledOnce(spawn);
+                var spawnCommand: string = spawn.args[0][0];
+                var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+                assert.equal(spawnCommand, "react-native");
+                assert.equal(
+                    spawnCommandArgs, 
+                    `bundle --assets-dest ${FAKE_TMP_DIR}/CodePush --bundle-output ${FAKE_TMP_DIR}/CodePush/main.jsbundle --dev false --entry-file index.ios.js --platform ios`
+                );
+                assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
+                done();
+            })
+            .done();
+    });
+    
+    it("release-react generates sourcemaps", (done: MochaDone): void => {
+        var command: cli.IReleaseReactCommand = {
+            type: cli.CommandType.releaseReact,
+            appName: "a",
+            deploymentName: "Staging",
+            description: "Test generates sourcemaps",
+            mandatory: false,
+            platform: "android",
+            sourcemapOutput: "index.android.js.map"
+        };
+        
+        ensureInTestAppDirectory();
+        
+        var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release", () => { return Q(<void>null) });
+        
+        cmdexec.execute(command)
+            .then(() => {
+                var releaseCommand: cli.IReleaseCommand = <any>command;
+                releaseCommand.package = FAKE_TMP_DIR;
+                releaseCommand.appStoreVersion = "1.2.3";
+                
+                sinon.assert.calledWith(execSync, "rm -rf $TMPDIR/react-*");
+                sinon.assert.calledOnce(spawn);
+                var spawnCommand: string = spawn.args[0][0];
+                var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+                assert.equal(spawnCommand, "react-native");
+                assert.equal(
+                    spawnCommandArgs, 
+                    `bundle --assets-dest ${FAKE_TMP_DIR}/CodePush --bundle-output ${FAKE_TMP_DIR}/CodePush/main.jsbundle --dev false --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
+                );
+                assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
+                done();
+            })
+            .done();
+    });
+    
     function releaseHelperFunction(command: cli.IReleaseCommand, done: MochaDone): void {
         var release: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "release");
         cmdexec.execute(command)
