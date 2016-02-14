@@ -1363,7 +1363,7 @@ function requestAccessToken(): Promise<string> {
 }
 
 export var runReactNativeBundleCommand = (entryFile: string, outputFolder: string, platform: string, sourcemapOutput: string): Promise<void> => {
-    var reactNativeBundleCommandArgs = [
+    var reactNativeBundleArgs = [
         path.join("node_modules", "react-native", "local-cli", "cli.js"), "bundle",
         "--assets-dest", outputFolder,
         "--bundle-output", path.join(outputFolder, "main.jsbundle"),
@@ -1373,12 +1373,12 @@ export var runReactNativeBundleCommand = (entryFile: string, outputFolder: strin
     ];
     
     if (sourcemapOutput) {
-        reactNativeBundleCommandArgs.push("--sourcemap-output", sourcemapOutput);
+        reactNativeBundleArgs.push("--sourcemap-output", sourcemapOutput);
     }
     
     log(chalk.cyan("Running \"react-native bundle\" command:\n"));
-    var reactNativeBundleCommand = spawn("node", reactNativeBundleCommandArgs);
-    log(`node ${reactNativeBundleCommandArgs.join(" ")}`);
+    var reactNativeBundleCommand = spawn("node", reactNativeBundleArgs);
+    log(`node ${reactNativeBundleArgs.join(" ")}`);
     
     return Promise<void>((resolve, reject, notify) => {
         reactNativeBundleCommand.stdout.on("data", (data: Buffer) => {
