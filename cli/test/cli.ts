@@ -1,6 +1,7 @@
 ﻿import * as assert from "assert";
 import * as sinon from "sinon";
 import Q = require("q");
+import * as path from "path";
 import Promise = Q.Promise;
 import * as codePush from "code-push";
 import * as cli from "../definitions/cli";
@@ -198,7 +199,6 @@ describe("CLI", () => {
     var spawn: Sinon.SinonStub;
     var wasConfirmed = true;
     const RELEASE_FAILED_ERROR_MESSAGE: string = "It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).";
-    const FAKE_TMP_DIR = "dummyfolder";
 
     beforeEach((): void => {
         wasConfirmed = true;
@@ -207,7 +207,6 @@ describe("CLI", () => {
 
         sandbox.stub(cmdexec, "confirm", (): Promise<boolean> => Q(wasConfirmed));
         sandbox.stub(cmdexec, "createEmptyTempReleaseFolder", (): Promise<void> => Q(<void>null));
-        sandbox.stub(cmdexec, "getTmpDir", (): string => FAKE_TMP_DIR);
         log = sandbox.stub(cmdexec, "log", (message: string): void => { });
         sandbox.stub(cmdexec, "loginWithAccessToken", (): Promise<void> => Q(<void>null));
         spawn = sandbox.stub(cmdexec, "spawn", (command: string, commandArgs: string[]): any => {
@@ -824,16 +823,16 @@ describe("CLI", () => {
         cmdexec.execute(command)
             .then(() => {
                 var releaseCommand: cli.IReleaseCommand = <any>command;
-                releaseCommand.package = FAKE_TMP_DIR;
+                releaseCommand.package = path.join(os.tmpdir(), "CodePush");
                 releaseCommand.appStoreVersion = "1.2.3";
                 
                 sinon.assert.calledOnce(spawn);
                 var spawnCommand: string = spawn.args[0][0];
                 var spawnCommandArgs: string = spawn.args[0][1].join(" ");
-                assert.equal(spawnCommand, "react-native");
+                assert.equal(spawnCommand, "node");
                 assert.equal(
                     spawnCommandArgs, 
-                    `bundle --assets-dest ${FAKE_TMP_DIR}/CodePush --bundle-output ${FAKE_TMP_DIR}/CodePush/main.jsbundle --dev false --entry-file index.ios.js --platform ios`
+                    `node_modules/react-native/local-cli/cli.js bundle --assets-dest ${os.tmpdir()}/CodePush --bundle-output ${os.tmpdir()}/CodePush/main.jsbundle --dev false --entry-file index.ios.js --platform ios`
                 );
                 assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
                 done();
@@ -859,16 +858,16 @@ describe("CLI", () => {
         cmdexec.execute(command)
             .then(() => {
                 var releaseCommand: cli.IReleaseCommand = <any>command;
-                releaseCommand.package = FAKE_TMP_DIR;
+                releaseCommand.package = path.join(os.tmpdir(), "CodePush");
                 releaseCommand.appStoreVersion = "1.2.3";
                 
                 sinon.assert.calledOnce(spawn);
                 var spawnCommand: string = spawn.args[0][0];
                 var spawnCommandArgs: string = spawn.args[0][1].join(" ");
-                assert.equal(spawnCommand, "react-native");
+                assert.equal(spawnCommand, "node");
                 assert.equal(
                     spawnCommandArgs, 
-                    `bundle --assets-dest ${FAKE_TMP_DIR}/CodePush --bundle-output ${FAKE_TMP_DIR}/CodePush/main.jsbundle --dev false --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
+                    `node_modules/react-native/local-cli/cli.js bundle --assets-dest ${os.tmpdir()}/CodePush --bundle-output ${os.tmpdir()}/CodePush/main.jsbundle --dev false --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
                 );
                 assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
                 done();

@@ -44,8 +44,5 @@
     "wordwrap": "1.0.0",
     "yargs": "^3.15.0",
     "yazl": "2.2.2"
-  },
-  "peerDependencies": {
-    "react-native-cli": "^0.1.10"
   }
 }

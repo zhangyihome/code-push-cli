@@ -65,9 +65,6 @@ export interface PackageWithMetrics {
 export var log = (message: string | Chalk.ChalkChain): void => console.log(message);
 export var sdk: AccountManager;
 export var spawn = childProcess.spawn;
-export var getTmpDir = (): string => {
-    return os.tmpdir();
-}
 
 export var loginWithAccessToken = (): Promise<void> => {
     if (!connectionInfo) {
@@ -1258,7 +1255,7 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
 export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => {
     var platform: string = command.platform.toLowerCase();
     var entryFile: string = command.entryFile;
-    var outputFolder: string = path.join(getTmpDir(), "CodePush");
+    var outputFolder: string = path.join(os.tmpdir(), "CodePush");
     var releaseCommand: cli.IReleaseCommand = <any>command;
     releaseCommand.package = outputFolder;
     
@@ -1302,7 +1299,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
         })
         // This is needed to clear the react native bundler cache:
         // https://github.com/facebook/react-native/issues/4289
-        .then(() => deleteFolder(`${getTmpDir()}/react-*`))
+        .then(() => deleteFolder(`${os.tmpdir()}/react-*`))
         .then(() => runReactNativeBundleCommand(entryFile, outputFolder, platform, command.sourcemapOutput))
         .then(() => {
             log(chalk.cyan("\nReleasing update contents to CodePush:\n"));
@@ -1366,7 +1363,7 @@ function requestAccessToken(): Promise<string> {
 
 export var runReactNativeBundleCommand = (entryFile: string, outputFolder: string, platform: string, sourcemapOutput: string): Promise<void> => {
     var reactNativeBundleCommandArgs = [
-        "bundle",
+        path.join("node_modules", "react-native", "local-cli", "cli.js"), "bundle",
         "--assets-dest", outputFolder,
         "--bundle-output", path.join(outputFolder, "main.jsbundle"),
         "--dev", false,
@@ -1379,8 +1376,8 @@ export var runReactNativeBundleCommand = (entryFile: string, outputFolder: strin
     }
     
     log(chalk.cyan("Running \"react-native bundle\" command:\n"));
-    var reactNativeBundleCommand = spawn("react-native", reactNativeBundleCommandArgs);
-    log(`react-native ${reactNativeBundleCommandArgs.join(" ")}`);
+    var reactNativeBundleCommand = spawn("node", reactNativeBundleCommandArgs);
+    log(`node ${reactNativeBundleCommandArgs.join(" ")}`);
     
     return Promise<void>((resolve, reject, notify) => {
         reactNativeBundleCommand.stdout.on("data", (data: Buffer) => {
