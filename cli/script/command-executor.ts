@@ -4,6 +4,7 @@ import * as base64 from "base-64";
 import * as chalk from "chalk";
 var childProcess = require("child_process");
 import * as fs from "fs";
+var g2js = require("gradle-to-js/lib/parser");
 import * as moment from "moment";
 var opener = require("opener");
 import * as os from "os";
@@ -1078,23 +1079,23 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
             throw new Error("Unable to parse the \"CFBundleShortVersionString\" from \"Info.plist\".");
         }
     } else {
-        try {
-            var buildGradleContents: string = fs.readFileSync(path.join("android", "app", "build.gradle")).toString();
-        } catch (err) {
+        var buildGradlePath: string = path.join("android", "app", "build.gradle");
+        if (fileDoesNotExistOrIsDirectory(buildGradlePath)) {
             throw new Error("Unable to find or read \"build.gradle\" in the \"android/app\" folder.");
         }
         
-        var appVersionRegex: RegExp = /versionName\s+"(.*?)"/;
-        var parsedBuildGradle: string[] = buildGradleContents.match(appVersionRegex);
-        if (parsedBuildGradle && parsedBuildGradle[1]) {
-             if (semver.valid(parsedBuildGradle[1]) === null) {
-                throw new Error("Please update \"build.gradle\" to use a semver compliant \"versionName\", for example \"1.0.3\".");
-            } else {
-                return Q(parsedBuildGradle[1]);
-            }
-        } else {
-            throw new Error("Unable to parse the \"versionName\" from \"build.gradle\".");
-        }
+        return g2js.parseFile(buildGradlePath)
+            .then((buildGradle: any) => {
+                var appVersion: string = buildGradle.android.defaultConfig.versionName;
+                if (semver.valid(appVersion) === null) {
+                    throw new Error("Please update \"build.gradle\" to use a semver compliant \"versionName\", for example \"1.0.3\".");
+                } else {
+                    return appVersion;
+                }
+            })
+            .catch((err: Error) => {
+                throw new Error("Unable to parse the \"versionName\" from \"build.gradle\".");
+            });
     }
 }
 
