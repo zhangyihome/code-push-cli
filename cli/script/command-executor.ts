@@ -9,6 +9,7 @@ import * as moment from "moment";
 var opener = require("opener");
 import * as os from "os";
 import * as path from "path";
+var plist = require("plist");
 var progress = require("progress");
 var prompt = require("prompt");
 import * as Q from "q";
@@ -1067,13 +1068,12 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
             }
         }
         
-        var appVersionRegex: RegExp = /CFBundleShortVersionString\s*<\s*\/key\s*>\s*<\s*string\s*>(.*?)<\s*\/string\s*>/;
-        var parsedInfoPlist: string[] = infoPlistContents.match(appVersionRegex);
-        if (parsedInfoPlist && parsedInfoPlist[1]) {
-             if (semver.valid(parsedInfoPlist[1]) === null) {
+        var parsedInfoPlist: any = plist.parse(infoPlistContents);
+        if (parsedInfoPlist && parsedInfoPlist.CFBundleShortVersionString) {
+             if (semver.valid(parsedInfoPlist.CFBundleShortVersionString) === null) {
                 throw new Error("Please update \"Info.plist\" to use a semver-compliant \"CFBundleShortVersionString\", for example \"1.0.3\".");
             } else {
-                return Q(parsedInfoPlist[1]);
+                return Q(parsedInfoPlist.CFBundleShortVersionString);
             }
         } else {
             throw new Error("Unable to parse the \"CFBundleShortVersionString\" from \"Info.plist\".");
