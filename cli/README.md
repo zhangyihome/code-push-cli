@@ -204,6 +204,8 @@ When the metrics cell reports `No installs recorded`, that indicates that the se
 
 ## Releasing app updates
 
+*Note: If your app is built using React Native, we have created a different command that automates the process of generating the update contents and infers some of the parameters (e.g. targetBinaryVersion) from the project's `Info.plist` or `build.gradle`, thereby helping you to avoid performing some manual steps and hitting some common pitfalls as a result. Check out the section: [Releasing updates to a React Native app](#Releasing-updates-to-a-React-Native-app).*
+
 Once your app has been configured to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
 
 ```
@@ -277,6 +279,11 @@ If an end-user is currently running `v2`, and they query the server for an updat
 If you never release an update that is marked as mandatory, then the above behavior doesn't apply to you, since the server will never change an optional release to mandatory unless there were intermingled mandatory updates as illustrated above. Additionally, if a release is marked as mandatory, it will never be converted to optional, since that wouldn't make any sense. The server will only change an optional release to mandatory in order to respect the semantics described above.
 
 *NOTE: This parameter can be set using either "--mandatory" or "-m"*
+
+## Releasing updates to a React Native app
+
+
+
 
 ## Promoting updates across deployments
 
