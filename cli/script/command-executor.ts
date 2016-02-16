@@ -1085,16 +1085,16 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
         }
         
         return g2js.parseFile(buildGradlePath)
+            .catch((err: Error) => {
+                throw new Error("Unable to parse the \"versionName\" from \"build.gradle\".");
+            })
             .then((buildGradle: any) => {
-                var appVersion: string = buildGradle.android.defaultConfig.versionName;
+                var appVersion: string = buildGradle.android.defaultConfig.versionName.replace(/"/g, "").trim();
                 if (semver.valid(appVersion) === null) {
                     throw new Error("Please update \"build.gradle\" to use a semver compliant \"versionName\", for example \"1.0.3\".");
                 } else {
                     return appVersion;
                 }
-            })
-            .catch((err: Error) => {
-                throw new Error("Unable to parse the \"versionName\" from \"build.gradle\".");
             });
     }
 }
