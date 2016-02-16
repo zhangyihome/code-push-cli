@@ -209,7 +209,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
     })
     .command("release-react", "Release a new version of your React Native app to a specific deployment", (yargs: yargs.Argv) => {
         yargs.usage(USAGE_PREFIX + " release-react <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--entryFile <entryFile>] [--mandatory] [--sourcemapOutput <sourcemapOutput>]")
-            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly four non-option arguments.
+            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
             .example("release-react MyApp ios", "Release the React Native iOS project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
             .example("release-react MyApp android -d Production", "Release the React Native Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })

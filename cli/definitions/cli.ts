@@ -126,21 +126,20 @@ export interface IRegisterCommand extends ICommand {
     serverUrl: string;
 }
 
-export interface IReleaseCommand extends ICommand {
+export interface IReleaseBaseCommand extends ICommand {
     appName: string;
     deploymentName: string;
     description: string;
     mandatory: boolean;
+}
+
+export interface IReleaseCommand extends IReleaseBaseCommand {
     appStoreVersion: string;
     package: string;
 }
 
-export interface IReleaseReactCommand extends ICommand {
-    appName: string;
-    deploymentName: string;
-    description: string;
+export interface IReleaseReactCommand extends IReleaseBaseCommand {
     entryFile?: string;
-    mandatory: boolean;
     platform: string;
     sourcemapOutput?: string;
 }

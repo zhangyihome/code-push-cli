@@ -1071,7 +1071,7 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
         var parsedInfoPlist: string[] = infoPlistContents.match(appVersionRegex);
         if (parsedInfoPlist && parsedInfoPlist[1]) {
              if (semver.valid(parsedInfoPlist[1]) === null) {
-                throw new Error("Please update \"Info.plist\" to use a semver compliant \"CFBundleShortVersionString\", for example \"1.0.3\".");
+                throw new Error("Please update \"Info.plist\" to use a semver-compliant \"CFBundleShortVersionString\", for example \"1.0.3\".");
             } else {
                 return Q(parsedInfoPlist[1]);
             }
@@ -1091,7 +1091,7 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
             .then((buildGradle: any) => {
                 var appVersion: string = buildGradle.android.defaultConfig.versionName.replace(/"/g, "").trim();
                 if (semver.valid(appVersion) === null) {
-                    throw new Error("Please update \"build.gradle\" to use a semver compliant \"versionName\", for example \"1.0.3\".");
+                    throw new Error("Please update \"build.gradle\" to use a semver-compliant \"versionName\", for example \"1.0.3\".");
                 } else {
                     return appVersion;
                 }
@@ -1167,7 +1167,7 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
     if (isBinaryOrZip(command.package)) {
         throw new Error("It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).");
     } else if (semver.valid(command.appStoreVersion) === null) {
-        throw new Error("Please use a semver compliant app store version, for example \"1.0.3\".");
+        throw new Error("Please use a semver-compliant app store version, for example \"1.0.3\".");
     }
 
     return getAppId(command.appName)
@@ -1377,19 +1377,19 @@ export var runReactNativeBundleCommand = (entryFile: string, outputFolder: strin
     }
     
     log(chalk.cyan("Running \"react-native bundle\" command:\n"));
-    var reactNativeBundleCommand = spawn("node", reactNativeBundleArgs);
+    var reactNativeBundleProcess = spawn("node", reactNativeBundleArgs);
     log(`node ${reactNativeBundleArgs.join(" ")}`);
     
     return Promise<void>((resolve, reject, notify) => {
-        reactNativeBundleCommand.stdout.on("data", (data: Buffer) => {
+        reactNativeBundleProcess.stdout.on("data", (data: Buffer) => {
             log(data.toString().trim());
         });
 
-        reactNativeBundleCommand.stderr.on("data", (data: Buffer) => {
+        reactNativeBundleProcess.stderr.on("data", (data: Buffer) => {
             console.error(data.toString().trim());
         });
 
-        reactNativeBundleCommand.on("close", (exitCode: number) => {
+        reactNativeBundleProcess.on("close", (exitCode: number) => {
             if (exitCode) {
                 reject(new Error(`"react-native bundle" command exited with code ${exitCode}.`));
             }
