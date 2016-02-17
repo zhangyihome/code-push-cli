@@ -54,7 +54,7 @@ export class AccountManager {
 
     constructor(accessKey: string, userAgent?: string, serverUrl?: string) {
         this._accessKey = accessKey;
-        this._userAgent = userAgent || (`${packageJson.name}/${packageJson.version}`);
+        this._userAgent = userAgent;
         this._serverUrl = serverUrl || `https://codepush.azurewebsites.net`;
     }
 
@@ -334,9 +334,12 @@ export class AccountManager {
     }
 
     private attachCredentials(request: superagent.Request<any>): void {
-        request.set(`User-Agent`, this._userAgent);
         request.set(`Accept`, `application/vnd.code-push.${AccountManager.API_VERSION}+json`);
         request.set(`Authorization`, `Bearer ${this._accessKey}`);
+        if (this._userAgent) {
+            request.set(`User-Agent`, this._userAgent);
+        }
+        request.set(`X-CodePush-SDK-Version`, `${packageJson.name}/${packageJson.version}`);
     }
 
     private generateAccessKey(): Promise<string> {
