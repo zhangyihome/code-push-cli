@@ -204,7 +204,7 @@ When the metrics cell reports `No installs recorded`, that indicates that the se
 
 ## Releasing app updates
 
-*Note: If your app is built using React Native, we have a different command that automates generating the update contents and infering some of the parameters (e.g. `targetBinaryVersion`) from the project's metadata. Check out the section: [Releasing updates to a React Native app](#releasing-updates-to-a-react-native-app).*
+*Note: If your app is built using React Native, we have a different command that automates generating the update contents and inferring some of the parameters (e.g. `targetBinaryVersion`) from the project's metadata. Check out the section: [Releasing updates to a React Native app](#releasing-updates-to-a-react-native-app).*
 
 Once your app has been configured to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
 
