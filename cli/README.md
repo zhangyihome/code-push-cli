@@ -298,7 +298,7 @@ This `release-react` command does two things in addition to running the vanilla 
 1. It runs the [`react-native bundle` command](#update-contents-parameter) to generate the update contents in a temporary folder
 2. It infers the [`targetBinaryVersion` of this release](#target-binary-version-parameter) by reading the contents of the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` if this update is for Android clients).
 
-It then calls the vanilla `release` by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the `react-native bundle` command and also avoid common pitfalls such as supplying a wrong `targetBinaryVersion` parameter.
+It then calls the vanilla `release` command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the `react-native bundle` command and also avoid common pitfalls such as supplying a wrong `targetBinaryVersion` parameter.
 
 ### Platform parameter
 
