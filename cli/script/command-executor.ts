@@ -2,14 +2,19 @@
 
 import * as base64 from "base-64";
 import * as chalk from "chalk";
+var childProcess = require("child_process");
 import * as fs from "fs";
+var g2js = require("gradle-to-js/lib/parser");
 import * as moment from "moment";
 var opener = require("opener");
 import * as os from "os";
 import * as path from "path";
+var plist = require("plist");
+var progress = require("progress");
 var prompt = require("prompt");
 import * as Q from "q";
 import * as recursiveFs from "recursive-fs";
+var rimraf = require("rimraf");
 import * as semver from "semver";
 import slash = require("slash");
 var Table = require("cli-table");
@@ -19,12 +24,12 @@ import wordwrap = require("wordwrap");
 import * as cli from "../definitions/cli";
 import { AcquisitionStatus } from "code-push/script/acquisition-sdk";
 import { AccessKey, AccountManager, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentKey, DeploymentMetrics, Package, Permissions, UpdateMetrics } from "code-push";
-var packageJson = require("../package.json");
-import Promise = Q.Promise;
-var progress = require("progress");
-var emailValidator = require("email-validator");
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
+var emailValidator = require("email-validator");
+var packageJson = require("../package.json");
+var progress = require("progress");
+import Promise = Q.Promise;
 var userAgent: string = packageJson.name + "/" + packageJson.version;
 
 const ACTIVE_METRICS_KEY: string = "Active";
@@ -59,8 +64,9 @@ export interface PackageWithMetrics {
     metrics?: UpdateMetricsWithTotalActive;
 }
 
-export var sdk: AccountManager;
 export var log = (message: string | Chalk.ChalkChain): void => console.log(message);
+export var sdk: AccountManager;
+export var spawn = childProcess.spawn;
 
 export var loginWithAccessToken = (): Promise<void> => {
     if (!connectionInfo) {
@@ -229,6 +235,13 @@ function appRename(command: cli.IAppRenameCommand): Promise<void> {
         });
 }
 
+export var createEmptyTempReleaseFolder = (folderPath: string) => {
+    return deleteFolder(folderPath)
+        .then(() => {
+            fs.mkdirSync(folderPath);
+        });
+};
+
 function appTransfer(command: cli.IAppTransferCommand): Promise<void> {
     throwForInvalidEmail(command.email);
 
@@ -305,6 +318,18 @@ function deleteConnectionInfoCache(): void {
         log("Successfully logged-out. The session token file located at " + chalk.cyan(configFilePath) + " has been deleted.\r\n");
     } catch (ex) {
     }
+}
+
+function deleteFolder(folderPath: string): Promise<void> {
+    return Promise<void>((resolve, reject, notify) => {
+        rimraf(folderPath, (err: any) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(<void>null);
+            }
+        });
+    });
 }
 
 function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
@@ -552,6 +577,9 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.release:
                     return release(<cli.IReleaseCommand>command);
+                    
+                case cli.CommandType.releaseReact:
+                    return releaseReact(<cli.IReleaseReactCommand>command);
 
                 case cli.CommandType.rollback:
                     return rollback(<cli.IRollbackCommand>command);
@@ -561,6 +589,14 @@ export function execute(command: cli.ICommand): Promise<void> {
                     log("Invalid command:  " + JSON.stringify(command));
             }
         });
+}
+
+function fileDoesNotExistOrIsDirectory(filePath: string): boolean {
+    try {
+        return fs.lstatSync(filePath).isDirectory();
+    } catch (error) {
+        return true;
+    }
 }
 
 function generateRandomFilename(length: number): string {
@@ -1020,6 +1056,60 @@ function getPackageMetricsString(packageObject: PackageWithMetrics): string {
     return returnString;
 }
 
+function getReactNativeProjectAppVersion(platform: string, projectName: string): Promise<string> {
+    if (platform === "ios") {
+        try {
+            var infoPlistContainingFolder: string = path.join("iOS", projectName);
+            var infoPlistContents: string = fs.readFileSync(path.join(infoPlistContainingFolder, "Info.plist")).toString();
+        } catch (err) {
+            try {
+                infoPlistContainingFolder = "iOS";
+                infoPlistContents = fs.readFileSync(path.join(infoPlistContainingFolder, "Info.plist")).toString();
+            } catch (err) {
+                throw new Error(`Unable to find or read "Info.plist" in the "iOS/${projectName}" or "iOS" folders.`);
+            }
+        }
+        
+        try {
+            var parsedInfoPlist: any = plist.parse(infoPlistContents);
+        } catch (err) {
+            throw new Error(`Unable to parse the "${infoPlistContainingFolder}/Info.plist" file, it could be malformed.`);
+        }
+        
+        if (parsedInfoPlist && parsedInfoPlist.CFBundleShortVersionString) {
+            if (semver.valid(parsedInfoPlist.CFBundleShortVersionString) === null) {
+                throw new Error(`Please update "${infoPlistContainingFolder}/Info.plist" to use a semver-compliant \"CFBundleShortVersionString\", for example "1.0.3".`);
+            } else {
+                return Q(parsedInfoPlist.CFBundleShortVersionString);
+            }
+        } else {
+            throw new Error(`The "CFBundleShortVersionString" key does not exist in "${infoPlistContainingFolder}/Info.plist".`);
+        }
+    } else {
+        var buildGradlePath: string = path.join("android", "app", "build.gradle");
+        if (fileDoesNotExistOrIsDirectory(buildGradlePath)) {
+            throw new Error("Unable to find or read \"build.gradle\" in the \"android/app\" folder.");
+        }
+        
+        return g2js.parseFile(buildGradlePath)
+            .catch((err: Error) => {
+                throw new Error("Unable to parse the \"android/app/build.gradle\" file, it could be malformed.");
+            })
+            .then((buildGradle: any) => {
+                if (buildGradle.android && buildGradle.android.defaultConfig && buildGradle.android.defaultConfig.versionName) {
+                    var appVersion: string = buildGradle.android.defaultConfig.versionName.replace(/"/g, "").trim();
+                    if (semver.valid(appVersion) === null) {
+                        throw new Error("Please update \"android/app/build.gradle\" to use a semver-compliant \"android.defaultConfig.versionName\", for example \"1.0.3\".");
+                    } else {
+                        return appVersion;
+                    }
+                } else {
+                    throw new Error("The \"android/app/build.gradle\" file does not include a value for android.defaultConfig.versionName.");
+                }
+            });
+    }
+}
+
 function printJson(object: any): void {
     log(JSON.stringify(object, /*replacer=*/ null, /*spacing=*/ 2));
 }
@@ -1084,11 +1174,11 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
         });
 }
 
-function release(command: cli.IReleaseCommand): Promise<void> {
+export var release = (command: cli.IReleaseCommand): Promise<void> => {
     if (isBinaryOrZip(command.package)) {
         throw new Error("It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).");
     } else if (semver.valid(command.appStoreVersion) === null) {
-        throw new Error("Please use a semver compliant app store version, for example \"1.0.3\".");
+        throw new Error("Please use a semver-compliant app store version, for example \"1.0.3\".");
     }
 
     return getAppId(command.appName)
@@ -1174,6 +1264,66 @@ function release(command: cli.IReleaseCommand): Promise<void> {
         });
 }
 
+export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => {
+    var platform: string = command.platform.toLowerCase();
+    var entryFile: string = command.entryFile;
+    var outputFolder: string = path.join(os.tmpdir(), "CodePush");
+    var releaseCommand: cli.IReleaseCommand = <any>command;
+    releaseCommand.package = outputFolder;
+    
+    if (platform !== "ios" && platform !== "android") {
+        throw new Error("Platform must be either \"ios\" or \"android\".");
+    }
+    
+    try {
+        var projectPackageJson: any = require(path.join(process.cwd(), "package.json"));
+        var projectName: string = projectPackageJson.name;
+        if (!projectName) {
+            throw new Error("The \"package.json\" file in the CWD does not have the \"name\" field set.");
+        }
+        
+        if (!projectPackageJson.dependencies["react-native"]) {
+            throw new Error("The project in the CWD is not a React Native project.");
+        }
+    } catch (error) {
+        throw new Error("Unable to find or read \"package.json\" in the CWD. The \"release-react\" command must be executed in a React Native project folder.");
+    }
+    
+    if (!entryFile) {
+        entryFile = `index.${platform}.js`;
+        if (fileDoesNotExistOrIsDirectory(entryFile)) {
+            entryFile = "index.js";
+        }
+        
+        if (fileDoesNotExistOrIsDirectory(entryFile)) {
+            throw new Error(`Entry file "index.${platform}.js" or "index.js" does not exist.`);
+        }
+    } else {
+        if (fileDoesNotExistOrIsDirectory(entryFile)) {
+            throw new Error(`Entry file "${entryFile}" does not exist.`);
+        }
+    }
+    
+    return getReactNativeProjectAppVersion(platform, projectName)
+        .then((appVersion: string) => {
+            releaseCommand.appStoreVersion = appVersion;
+            return createEmptyTempReleaseFolder(outputFolder);
+        })
+        // This is needed to clear the react native bundler cache:
+        // https://github.com/facebook/react-native/issues/4289
+        .then(() => deleteFolder(`${os.tmpdir()}/react-*`))
+        .then(() => runReactNativeBundleCommand(entryFile, outputFolder, platform, command.sourcemapOutput))
+        .then(() => {
+            log(chalk.cyan("\nReleasing update contents to CodePush:\n"));
+            return release(releaseCommand);
+        })
+        .then(() => deleteFolder(outputFolder))
+        .catch((err: Error) => {
+            deleteFolder(outputFolder);
+            throw err;
+        });
+}
+
 function rollback(command: cli.IRollbackCommand): Promise<void> {
     var appId: string;
 
@@ -1223,6 +1373,43 @@ function requestAccessToken(): Promise<string> {
     });
 }
 
+export var runReactNativeBundleCommand = (entryFile: string, outputFolder: string, platform: string, sourcemapOutput: string): Promise<void> => {
+    var reactNativeBundleArgs = [
+        path.join("node_modules", "react-native", "local-cli", "cli.js"), "bundle",
+        "--assets-dest", outputFolder,
+        "--bundle-output", path.join(outputFolder, "main.jsbundle"),
+        "--dev", false,
+        "--entry-file", entryFile,
+        "--platform", platform,
+    ];
+    
+    if (sourcemapOutput) {
+        reactNativeBundleArgs.push("--sourcemap-output", sourcemapOutput);
+    }
+    
+    log(chalk.cyan("Running \"react-native bundle\" command:\n"));
+    var reactNativeBundleProcess = spawn("node", reactNativeBundleArgs);
+    log(`node ${reactNativeBundleArgs.join(" ")}`);
+    
+    return Promise<void>((resolve, reject, notify) => {
+        reactNativeBundleProcess.stdout.on("data", (data: Buffer) => {
+            log(data.toString().trim());
+        });
+
+        reactNativeBundleProcess.stderr.on("data", (data: Buffer) => {
+            console.error(data.toString().trim());
+        });
+
+        reactNativeBundleProcess.on("close", (exitCode: number) => {
+            if (exitCode) {
+                reject(new Error(`"react-native bundle" command exited with code ${exitCode}.`));
+            }
+            
+            resolve(<void>null);
+        });
+    });
+}
+
 function serializeConnectionInfo(serverUrl: string, accessToken: string): void {
     // The access token should have been validated already (i.e.:  logging in).
     var json: string = tryBase64Decode(accessToken);
@@ -1268,7 +1455,6 @@ function throwForMissingCredentials(accessKeyName: string, providerName: string,
     if (!accessKeyName) throw new Error("Access key is missing.");
     if (!providerName) throw new Error("Provider name is missing.");
     if (!providerUniqueId) throw new Error("Provider unique ID is missing.");
-
 }
 
 function throwForInvalidAccessKeyId(accessKeyId: string, accessKeyName: string): void {

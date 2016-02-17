@@ -199,11 +199,24 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
     .command("release", "Release a new version of your app to a specific deployment", (yargs: yargs.Argv) => {
         yargs.usage(USAGE_PREFIX + " release <appName> <updateContentsPath> <targetBinaryVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory]")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
-            .example("release MyApp app.js 1.0.3", "Release the \"app.js\" file to the \"MyApp\" app's staging deployment, targeting the 1.0.3 binary version")
+            .example("release MyApp app.js 1.0.3", "Release the \"app.js\" file to the \"MyApp\" app's \"Staging\" deployment, targeting the 1.0.3 binary version")
             .example("release MyApp ./platforms/ios/www 1.0.3 -d Production", "Release the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting the 1.0.3 binary version")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" });
+
+        addCommonConfiguration(yargs);
+    })
+    .command("release-react", "Release a new version of your React Native app to a specific deployment", (yargs: yargs.Argv) => {
+        yargs.usage(USAGE_PREFIX + " release-react <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--entryFile <entryFile>] [--mandatory] [--sourcemapOutput <sourcemapOutput>]")
+            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
+            .example("release-react MyApp ios", "Release the React Native iOS project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
+            .example("release-react MyApp android -d Production", "Release the React Native Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
+            .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
+            .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
+            .option("entryFile", { alias: "e", default: null, demand: false, description: "The path to the root JS file. If unspecified, \"index.<platform>.js\" and then \"index.js\" will be tried and used if they exist.", type: "string" })
+            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
+            .option("sourcemapOutput", { alias: "s", default: null, demand: false, description: "The path to where the sourcemap for the resulting bundle should be stored. If unspecified, sourcemaps will not be generated.", type: "string" });
 
         addCommonConfiguration(yargs);
     })
@@ -553,6 +566,23 @@ function createCommand(): cli.ICommand {
                 }
                 break;
 
+            case "release-react":
+                if (arg1 && arg2) {
+                    cmd = { type: cli.CommandType.releaseReact };
+
+                    var releaseReactCommand = <cli.IReleaseReactCommand>cmd;
+
+                    releaseReactCommand.appName = arg1;
+                    releaseReactCommand.platform = arg2;
+                    
+                    releaseReactCommand.deploymentName = argv["deploymentName"];
+                    releaseReactCommand.description = argv["description"] ? backslash(argv["description"]) : "";
+                    releaseReactCommand.entryFile = argv["entryFile"];
+                    releaseReactCommand.mandatory = argv["mandatory"];
+                    releaseReactCommand.sourcemapOutput = argv["sourcemapOutput"];
+                }
+                break;
+                
             case "rollback":
                 if (arg1 && arg2) {
                     cmd = { type: cli.CommandType.rollback };
