@@ -1059,24 +1059,31 @@ function getPackageMetricsString(packageObject: PackageWithMetrics): string {
 function getReactNativeProjectAppVersion(platform: string, projectName: string): Promise<string> {
     if (platform === "ios") {
         try {
-            var infoPlistContents: string = fs.readFileSync(path.join("iOS", projectName, "Info.plist")).toString();
+            var infoPlistContainingFolder: string = path.join("iOS", projectName);
+            var infoPlistContents: string = fs.readFileSync(path.join(infoPlistContainingFolder, "Info.plist")).toString();
         } catch (err) {
             try {
-                infoPlistContents = fs.readFileSync(path.join("iOS", "Info.plist")).toString();
+                infoPlistContainingFolder = "iOS";
+                infoPlistContents = fs.readFileSync(path.join(infoPlistContainingFolder, "Info.plist")).toString();
             } catch (err) {
                 throw new Error(`Unable to find or read "Info.plist" in the "iOS/${projectName}" or "iOS" folders.`);
             }
         }
         
-        var parsedInfoPlist: any = plist.parse(infoPlistContents);
+        try {
+            var parsedInfoPlist: any = plist.parse(infoPlistContents);
+        } catch (err) {
+            throw new Error(`Unable to parse the "${infoPlistContainingFolder}/Info.plist" file, it could be malformed.`);
+        }
+        
         if (parsedInfoPlist && parsedInfoPlist.CFBundleShortVersionString) {
-             if (semver.valid(parsedInfoPlist.CFBundleShortVersionString) === null) {
-                throw new Error("Please update \"Info.plist\" to use a semver-compliant \"CFBundleShortVersionString\", for example \"1.0.3\".");
+            if (semver.valid(parsedInfoPlist.CFBundleShortVersionString) === null) {
+                throw new Error(`Please update "${infoPlistContainingFolder}/Info.plist" to use a semver-compliant \"CFBundleShortVersionString\", for example "1.0.3".`);
             } else {
                 return Q(parsedInfoPlist.CFBundleShortVersionString);
             }
         } else {
-            throw new Error("Unable to parse the \"CFBundleShortVersionString\" from \"Info.plist\".");
+            throw new Error(`The "CFBundleShortVersionString" key does not exist in "${infoPlistContainingFolder}/Info.plist".`);
         }
     } else {
         var buildGradlePath: string = path.join("android", "app", "build.gradle");
@@ -1086,14 +1093,18 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
         
         return g2js.parseFile(buildGradlePath)
             .catch((err: Error) => {
-                throw new Error("Unable to parse the \"versionName\" from \"build.gradle\".");
+                throw new Error("Unable to parse the \"android/app/build.gradle\" file, it could be malformed.");
             })
             .then((buildGradle: any) => {
-                var appVersion: string = buildGradle.android.defaultConfig.versionName.replace(/"/g, "").trim();
-                if (semver.valid(appVersion) === null) {
-                    throw new Error("Please update \"build.gradle\" to use a semver-compliant \"versionName\", for example \"1.0.3\".");
+                if (buildGradle.android && buildGradle.android.defaultConfig && buildGradle.android.defaultConfig.versionName) {
+                    var appVersion: string = buildGradle.android.defaultConfig.versionName.replace(/"/g, "").trim();
+                    if (semver.valid(appVersion) === null) {
+                        throw new Error("Please update \"android/app/build.gradle\" to use a semver-compliant \"android.defaultConfig.versionName\", for example \"1.0.3\".");
+                    } else {
+                        return appVersion;
+                    }
                 } else {
-                    return appVersion;
+                    throw new Error("The \"android/app/build.gradle\" file does not include a value for android.defaultConfig.versionName.");
                 }
             });
     }
@@ -1265,7 +1276,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
     }
     
     try {
-        var projectPackageJson = require(path.join(process.cwd(), "package.json"));
+        var projectPackageJson: any = require(path.join(process.cwd(), "package.json"));
         var projectName: string = projectPackageJson.name;
         if (!projectName) {
             throw new Error("The \"package.json\" file in the CWD does not have the \"name\" field set.");
