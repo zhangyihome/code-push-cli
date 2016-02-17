@@ -18,7 +18,7 @@ import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
 import { AcquisitionStatus } from "code-push/script/acquisition-sdk";
-import { AccessKey, AccountManager, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Package, Permissions, UpdateMetrics } from "code-push";
+import { AccessKey, Account, AccountManager, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Package, Permissions, UpdateMetrics } from "code-push";
 var packageJson = require("../package.json");
 import Promise = Q.Promise;
 var progress = require("progress");
