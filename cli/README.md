@@ -204,6 +204,8 @@ When the metrics cell reports `No installs recorded`, that indicates that the se
 
 ## Releasing app updates
 
+*Note: If your app is built using React Native, we have a different command that automates generating the update contents and inferring some of the parameters (e.g. `targetBinaryVersion`) from the project's metadata. Check out the section: [Releasing updates to a React Native app](#releasing-updates-to-a-react-native-app).*
+
 Once your app has been configured to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
 
 ```
@@ -277,6 +279,50 @@ If an end-user is currently running `v2`, and they query the server for an updat
 If you never release an update that is marked as mandatory, then the above behavior doesn't apply to you, since the server will never change an optional release to mandatory unless there were intermingled mandatory updates as illustrated above. Additionally, if a release is marked as mandatory, it will never be converted to optional, since that wouldn't make any sense. The server will only change an optional release to mandatory in order to respect the semantics described above.
 
 *NOTE: This parameter can be set using either "--mandatory" or "-m"*
+
+## Releasing updates to a React Native app
+
+After configuring your React Native app to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
+
+```
+code-push release-react <appName> <platform> 
+[--deploymentName <deploymentName>]
+[--description <description>]
+[--entryFile <entryFile>]
+[--mandatory]
+[--sourcemapOutput <sourcemapOutput>]
+```
+
+This `release-react` command does two things in addition to running the vanilla `release` command described in the [previous section](#releasing-app-updates):
+
+1. It runs the [`react-native bundle` command](#update-contents-parameter) to generate the update contents in a temporary folder
+2. It infers the [`targetBinaryVersion` of this release](#target-binary-version-parameter) by reading the contents of the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients).
+
+It then calls the vanilla `release` command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the `react-native bundle` command and also avoid common pitfalls such as supplying a wrong `targetBinaryVersion` parameter.
+
+### Platform parameter
+
+This specifies which platform the current update is targeting, and can be either `ios` or `android` (case-insensitive).
+
+### Deployment name parameter
+
+This is the same parameter as the one described in the [above section](#deployment-name-parameter).
+
+### Description parameter
+
+This is the same parameter as the one described in the [above section](#description-parameter).
+
+### Entry file parameter
+
+This specifies the relative path to the root JavaScript file of the app. If left unspecified, the command will first assume the entry file to be `index.ios.js` or `index.android.js` depending on the `platform` parameter supplied, following which it will use `index.js` if the previous file does not exist.
+
+### Mandatory parameter
+
+This is the same parameter as the one described in the [above section](#mandatory-parameter).
+
+### Sourcemap output parameter
+
+This specifies the relative path to where the sourcemap file for resulting update's JS bundle should be generated. If left unspecified, sourcemaps will not be generated.
 
 ## Promoting updates across deployments
 
