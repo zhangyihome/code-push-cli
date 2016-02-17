@@ -95,12 +95,9 @@ export class AccountManager {
     }
 
     public addAccessKey(machine: string, description?: string): Promise<AccessKey> {
-        return this.generateAccessKey()
-            .then((newAccessKey: string) => {
-                var accessKey: AccessKey = { name: newAccessKey, createdTime: new Date().getTime(), createdBy: machine, description: description };
-                return this.post(urlEncode `/accessKeys/`, JSON.stringify(accessKey), /*expectResponseBody=*/ false)
-                    .then(() => accessKey);
-            });
+        var accessKeyRequest: AccessKey = { createdBy: machine, description: description };
+        return this.post(urlEncode `/accessKeys/`, JSON.stringify(accessKeyRequest), /*expectResponseBody=*/ true)
+            .then((response: JsonResponse) => response.body.accessKey);
     }
 
     public getAccessKey(accessKey: string): Promise<AccessKey> {
@@ -353,18 +350,5 @@ export class AccountManager {
             request.set(`User-Agent`, this._userAgent);
         }
         request.set(`X-CodePush-SDK-Version`, `${packageJson.name}/${packageJson.version}`);
-    }
-
-    private generateAccessKey(): Promise<string> {
-        return this.getAccountInfo()
-            .then((account: Account) => {
-                var accessKey = crypto.randomBytes(21)
-                    .toString(`base64`)
-                    .replace(/\+/g, `_`)  // URL-friendly characters
-                    .replace(/\//g, `-`)
-                    .concat(account.email);
-
-                return accessKey;
-            });
     }
 }
