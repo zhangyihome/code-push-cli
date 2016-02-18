@@ -206,10 +206,10 @@ export class AccountManager {
             .then(() => null);
     }
 
-    public addPackage(appName: string, deploymentName: string, fileOrPath: File | string, description: string, appVersion: string, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
+    public releasePackage(appName: string, deploymentName: string, fileOrPath: File | string, description: string, appVersion: string, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             var packageInfo: PackageToUpload = this.generatePackageInfo(description, appVersion, isMandatory);
-            var request: superagent.Request<any> = superagent.put(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/package`);
+            var request: superagent.Request<any> = superagent.post(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`);
             this.attachCredentials(request);
 
             var file: any;
@@ -259,11 +259,6 @@ export class AccountManager {
     public rollbackPackage(appName: string, deploymentName: string, targetRelease?: string): Promise<void> {
         return this.post(urlEncode `/apps/${appName}/deployments/${deploymentName}/rollback/${targetRelease || ``}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
             .then(() => null);
-    }
-
-    public getPackage(appName: string, deploymentName: string): Promise<Package> {
-        return this.get(urlEncode `/apps/${appName}/deployments/${deploymentName}/package`)
-            .then((res: JsonResponse) => res.body.package);
     }
 
     public getPackageHistory(appName: string, deploymentName: string): Promise<Package[]> {
