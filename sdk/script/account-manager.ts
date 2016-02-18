@@ -122,7 +122,7 @@ export class AccountManager {
     }
 
     public updateAccountInfo(accountInfoToChange: Account): Promise<void> {
-        return this.put(urlEncode `/account`, JSON.stringify(accountInfoToChange))
+        return this.patch(urlEncode `/account`, JSON.stringify(accountInfoToChange))
             .then(() => null);
     }
 
@@ -149,7 +149,7 @@ export class AccountManager {
     }
 
     public updateApp(appName: string, infoToChange: App): Promise<void> {
-        return this.put(urlEncode `/apps/${appName}`, JSON.stringify(infoToChange))
+        return this.patch(urlEncode `/apps/${appName}`, JSON.stringify(infoToChange))
             .then(() => null);
     }
 
@@ -197,7 +197,7 @@ export class AccountManager {
     }
 
     public updateDeployment(appName: string, deploymentName: string, infoToChange: Deployment): Promise<void> {
-        return this.put(urlEncode `/apps/${appName}/deployments/${deploymentName}`, JSON.stringify(infoToChange))
+        return this.patch(urlEncode `/apps/${appName}/deployments/${deploymentName}`, JSON.stringify(infoToChange))
             .then(() => null);
     }
 
@@ -274,8 +274,8 @@ export class AccountManager {
         return this.makeApiRequest(`post`, endpoint, requestBody, expectResponseBody, contentType);
     }
 
-    private put(endpoint: string, requestBody: string, expectResponseBody: boolean = false, contentType: string = `application/json;charset=UTF-8`): Promise<JsonResponse> {
-        return this.makeApiRequest(`put`, endpoint, requestBody, expectResponseBody, contentType);
+    private patch(endpoint: string, requestBody: string, expectResponseBody: boolean = false, contentType: string = `application/json;charset=UTF-8`): Promise<JsonResponse> {
+        return this.makeApiRequest(`patch`, endpoint, requestBody, expectResponseBody, contentType);
     }
 
     private del(endpoint: string, expectResponseBody: boolean = false): Promise<JsonResponse> {
