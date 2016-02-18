@@ -8,12 +8,12 @@ var packageJson = require("../../package.json");
 
 declare var fs: any;
 
-if (typeof window === `undefined`) {
-    fs = require(`fs`);
+if (typeof window === "undefined") {
+    fs = require("fs");
 } else {
     fs = {
         createReadStream: (fileOrPath: string): void => {
-            throw new Error(`Tried to call a node fs function from the browser.`);
+            throw new Error("Tried to call a node fs function from the browser.");
         }
     }
 }
@@ -59,7 +59,7 @@ function urlEncode(strings: string[], ...values: string[]): string {
 }
 
 export class AccountManager {
-    private static API_VERSION = `v2`;
+    private static API_VERSION = "v2";
 
     private _accessKey: string;
     private _serverUrl: string;
@@ -68,7 +68,7 @@ export class AccountManager {
     constructor(accessKey: string, userAgent?: string, serverUrl?: string) {
         this._accessKey = accessKey;
         this._userAgent = userAgent;
-        this._serverUrl = serverUrl || `https://codepush.azurewebsites.net`;
+        this._serverUrl = serverUrl || "https://codepush.azurewebsites.net";
     }
 
     public get accessKey(): string {
@@ -213,15 +213,15 @@ export class AccountManager {
             this.attachCredentials(request);
 
             var file: any;
-            if (typeof fileOrPath === `string`) {
+            if (typeof fileOrPath === "string") {
                 file = fs.createReadStream(<string>fileOrPath);
             } else {
                 file = fileOrPath;
             }
 
-            request.attach(`package`, file)
-                .field(`packageInfo`, JSON.stringify(packageInfo))
-                .on(`progress`, (event: any) => {
+            request.attach("package", file)
+                .field("packageInfo", JSON.stringify(packageInfo))
+                .on("progress", (event: any) => {
                     if (uploadProgressCallback && event && event.total > 0) {
                         var currentProgress: number = event.loaded / event.total * 100;
                         uploadProgressCallback(currentProgress);
@@ -267,19 +267,19 @@ export class AccountManager {
     }
 
     private get(endpoint: string, expectResponseBody: boolean = true): Promise<JsonResponse> {
-        return this.makeApiRequest(`get`, endpoint, /*requestBody=*/ null, expectResponseBody, /*contentType=*/ null);
+        return this.makeApiRequest("get", endpoint, /*requestBody=*/ null, expectResponseBody, /*contentType=*/ null);
     }
 
-    private post(endpoint: string, requestBody: string, expectResponseBody: boolean, contentType: string = `application/json;charset=UTF-8`): Promise<JsonResponse> {
-        return this.makeApiRequest(`post`, endpoint, requestBody, expectResponseBody, contentType);
+    private post(endpoint: string, requestBody: string, expectResponseBody: boolean, contentType: string = "application/json;charset=UTF-8"): Promise<JsonResponse> {
+        return this.makeApiRequest("post", endpoint, requestBody, expectResponseBody, contentType);
     }
 
-    private patch(endpoint: string, requestBody: string, expectResponseBody: boolean = false, contentType: string = `application/json;charset=UTF-8`): Promise<JsonResponse> {
-        return this.makeApiRequest(`patch`, endpoint, requestBody, expectResponseBody, contentType);
+    private patch(endpoint: string, requestBody: string, expectResponseBody: boolean = false, contentType: string = "application/json;charset=UTF-8"): Promise<JsonResponse> {
+        return this.makeApiRequest("patch", endpoint, requestBody, expectResponseBody, contentType);
     }
 
     private del(endpoint: string, expectResponseBody: boolean = false): Promise<JsonResponse> {
-        return this.makeApiRequest(`del`, endpoint, /*requestBody=*/ null, expectResponseBody, /*contentType=*/ null);
+        return this.makeApiRequest("del", endpoint, /*requestBody=*/ null, expectResponseBody, /*contentType=*/ null);
     }
 
     private makeApiRequest(method: string, endpoint: string, requestBody: string, expectResponseBody: boolean, contentType: string): Promise<JsonResponse> {
@@ -289,7 +289,7 @@ export class AccountManager {
 
             if (requestBody) {
                 if (contentType) {
-                    request = request.set(`Content-Type`, contentType);
+                    request = request.set("Content-Type", contentType);
                 }
 
                 request = request.send(requestBody);
@@ -339,11 +339,11 @@ export class AccountManager {
     }
 
     private attachCredentials(request: superagent.Request<any>): void {
-        request.set(`Accept`, `application/vnd.code-push.${AccountManager.API_VERSION}+json`);
-        request.set(`Authorization`, `Bearer ${this._accessKey}`);
+        request.set("Accept", `application/vnd.code-push.${AccountManager.API_VERSION}+json`);
+        request.set("Authorization", `Bearer ${this._accessKey}`);
         if (this._userAgent) {
-            request.set(`User-Agent`, this._userAgent);
+            request.set("User-Agent", this._userAgent);
         }
-        request.set(`X-CodePush-SDK-Version`, `${packageJson.name}/${packageJson.version}`);
+        request.set("X-CodePush-SDK-Version", `${packageJson.name}/${packageJson.version}`);
     }
 }
