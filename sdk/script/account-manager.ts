@@ -344,6 +344,6 @@ export class AccountManager {
         if (this._userAgent) {
             request.set("User-Agent", this._userAgent);
         }
-        request.set("X-CodePush-SDK-Version", `${packageJson.name}/${packageJson.version}`);
+        request.set("X-CodePush-SDK-Version", packageJson.version);
     }
 }
