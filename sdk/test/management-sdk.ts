@@ -33,8 +33,6 @@ describe("Management SDK", () => {
             manager.getDeployments.bind(manager, "appName"),
             manager.updateDeployment.bind(manager, "appName", "deploymentName", { name: "newDeploymentName" }),
             manager.removeDeployment.bind(manager, "appName", "deploymentName"),
-
-            manager.getPackage.bind(manager, ""),
         ];
 
         var result = Q<void>(null);
@@ -172,15 +170,6 @@ describe("Management SDK", () => {
 
         manager.removeDeployment("appName", "deploymentName").done((obj: any) => {
             assert.ok(!obj);
-            done();
-        }, rejectHandler);
-    });
-
-    it("getPackage handles success response", (done: MochaDone) => {
-        mockReturn(JSON.stringify({ package: {} }), 200);
-
-        manager.getPackage("appName", "deploymentName").done((obj: any) => {
-            assert.ok(obj);
             done();
         }, rejectHandler);
     });

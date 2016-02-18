@@ -9,9 +9,9 @@ declare module "rest-definitions" {
     /*inout*/
     export interface AccessKey {
         createdBy: string;
-        createdTime: number;
+        /*generated*/ createdTime?: number;
         description?: string;
-        /*key*/ name: string;
+        /*generated key*/ name?: string;
     }
 
     /*out*/
@@ -96,7 +96,7 @@ declare module "rest-definitions" {
 
     /*inout*/
     export interface Deployment {
-        /*generated*/ key?: string;
+        /*generated key*/ key?: string;
         /*key*/ name: string;
         /*generated*/ package?: Package
     }
