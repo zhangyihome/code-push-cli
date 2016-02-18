@@ -49,7 +49,7 @@ interface JsonResponse {
 function urlEncode(strings: string[], ...values: string[]): string {
     var result = "";
     for (var i = 0; i < strings.length; i++) {
-        result += strings[i];   // Assumes that template string will not start with a substitution
+        result += strings[i];
         if (i < values.length) {
             result += encodeURIComponent(values[i]);
         }
@@ -59,7 +59,7 @@ function urlEncode(strings: string[], ...values: string[]): string {
 }
 
 export class AccountManager {
-    private static API_VERSION = "v2";
+    private static API_VERSION: number = 2;
 
     private _accessKey: string;
     private _serverUrl: string;
@@ -339,7 +339,7 @@ export class AccountManager {
     }
 
     private attachCredentials(request: superagent.Request<any>): void {
-        request.set("Accept", `application/vnd.code-push.${AccountManager.API_VERSION}+json`);
+        request.set("Accept", `application/vnd.code-push.v${AccountManager.API_VERSION}+json`);
         request.set("Authorization", `Bearer ${this._accessKey}`);
         if (this._userAgent) {
             request.set("User-Agent", this._userAgent);
