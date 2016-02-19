@@ -196,37 +196,6 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
         addCommonConfiguration(yargs);
     })
-    .command("release", "Release a new version of your app to a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " release <appName> <updateContentsPath> <targetBinaryVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory]")
-            .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
-            .example("release MyApp app.js 1.0.3", "Release the \"app.js\" file to the \"MyApp\" app's \"Staging\" deployment, targeting the 1.0.3 binary version")
-            .example("release MyApp ./platforms/ios/www 1.0.3 -d Production", "Release the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting the 1.0.3 binary version")
-            .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
-            .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
-            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" });
-
-        addCommonConfiguration(yargs);
-    })
-    .command("release-react", "Release a new version of your React Native app to a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " release-react <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--entryFile <entryFile>] [--mandatory] [--sourcemapOutput <sourcemapOutput>]")
-            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
-            .example("release-react MyApp ios", "Release the React Native iOS project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
-            .example("release-react MyApp android -d Production", "Release the React Native Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
-            .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
-            .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
-            .option("entryFile", { alias: "e", default: null, demand: false, description: "The path to the root JS file. If unspecified, \"index.<platform>.js\" and then \"index.js\" will be tried and used if they exist.", type: "string" })
-            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
-            .option("sourcemapOutput", { alias: "s", default: null, demand: false, description: "The path to where the sourcemap for the resulting bundle should be stored. If unspecified, sourcemaps will not be generated.", type: "string" });
-
-        addCommonConfiguration(yargs);
-    })
-    .command("promote", "Promote the package from one deployment of your app to another", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName>")
-            .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
-            .example("promote MyApp Staging Production", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\"");
-
-        addCommonConfiguration(yargs);
-    })
     .command("collaborator", "View and manage collaborators for a given app", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         yargs.usage(USAGE_PREFIX + " collaborator <command>")
@@ -244,15 +213,6 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .command("list", "List the apps associated with your account", (yargs: yargs.Argv) => listCollaborators("list", yargs))
             .command("ls", "List the apps associated with your account", (yargs: yargs.Argv) => listCollaborators("ls", yargs))
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
-
-        addCommonConfiguration(yargs);
-    })
-    .command("rollback", "Performs a rollback on the latest package of a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " rollback <appName> <deploymentName> [--targetRelease <releaseLabel>]")
-            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
-            .example("rollback MyApp Production", "Perform a rollback on the \"Production\" deployment of \"MyApp\"")
-            .example("rollback MyApp Production --targetRelease v4", "Perform a rollback on the \"Production\" deployment of \"MyApp\" to the v4 release")
-            .option("targetRelease", { alias: "r", default: null, demand: false, description: "The label of the release to be rolled back to (e.g. v4)", type: "string" });
 
         addCommonConfiguration(yargs);
     })
@@ -308,6 +268,13 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("local", { demand: false, description: "Whether to delete the current session's access key on the server", type: "boolean" });
         addCommonConfiguration(yargs);
     })
+    .command("promote", "Promote the package from one deployment of your app to another", (yargs: yargs.Argv) => {
+        yargs.usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName>")
+            .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
+            .example("promote MyApp Staging Production", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\"");
+
+        addCommonConfiguration(yargs);
+    })
     .command("register", "Register a new account with the CodePush server", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         isValidCommand = true;
@@ -315,6 +282,39 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
             .example("register", "Creates a new user account on the CodePush server")
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
+
+        addCommonConfiguration(yargs);
+    })
+    .command("release", "Release a new version of your app to a specific deployment", (yargs: yargs.Argv) => {
+        yargs.usage(USAGE_PREFIX + " release <appName> <updateContentsPath> <targetBinaryVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory]")
+            .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
+            .example("release MyApp app.js 1.0.3", "Release the \"app.js\" file to the \"MyApp\" app's \"Staging\" deployment, targeting the 1.0.3 binary version")
+            .example("release MyApp ./platforms/ios/www 1.0.3 -d Production", "Release the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting the 1.0.3 binary version")
+            .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
+            .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
+            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" });
+
+        addCommonConfiguration(yargs);
+    })
+    .command("release-react", "Release a new version of your React Native app to a specific deployment", (yargs: yargs.Argv) => {
+        yargs.usage(USAGE_PREFIX + " release-react <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--entryFile <entryFile>] [--mandatory] [--sourcemapOutput <sourcemapOutput>]")
+            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
+            .example("release-react MyApp ios", "Release the React Native iOS project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
+            .example("release-react MyApp android -d Production", "Release the React Native Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
+            .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
+            .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
+            .option("entryFile", { alias: "e", default: null, demand: false, description: "The path to the root JS file. If unspecified, \"index.<platform>.js\" and then \"index.js\" will be tried and used if they exist.", type: "string" })
+            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
+            .option("sourcemapOutput", { alias: "s", default: null, demand: false, description: "The path to where the sourcemap for the resulting bundle should be stored. If unspecified, sourcemaps will not be generated.", type: "string" });
+
+        addCommonConfiguration(yargs);
+    })
+    .command("rollback", "Performs a rollback on the latest package of a specific deployment", (yargs: yargs.Argv) => {
+        yargs.usage(USAGE_PREFIX + " rollback <appName> <deploymentName> [--targetRelease <releaseLabel>]")
+            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
+            .example("rollback MyApp Production", "Perform a rollback on the \"Production\" deployment of \"MyApp\"")
+            .example("rollback MyApp Production --targetRelease v4", "Perform a rollback on the \"Production\" deployment of \"MyApp\" to the v4 release")
+            .option("targetRelease", { alias: "r", default: null, demand: false, description: "The label of the release to be rolled back to (e.g. v4)", type: "string" });
 
         addCommonConfiguration(yargs);
     })
