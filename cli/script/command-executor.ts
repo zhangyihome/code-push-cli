@@ -598,6 +598,7 @@ function printAppList(format: string, apps: App[], deploymentLists: string[][]):
         var dataSource: any[] = apps.map((app: App, index: number) => {
             var augmentedApp: any = app;
             augmentedApp.deployments = deploymentLists[index];
+            return augmentedApp;
         });
 
         printJson(dataSource);
