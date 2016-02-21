@@ -183,12 +183,14 @@ code-push deployment rm <appName> <deploymentName>
 If at any time you'd like to view the list of deployments that a specific app includes, you can simply run the following command:
 
 ```
-code-push deployment ls <appName> [--displayKeys]
+code-push deployment ls <appName> [--displayKeys|-k]
 ```
 
 This will display not only the list of deployments, but also the update metadata (e.g. mandatory, description) and installation metrics for their latest release:
 
 ![Deployment lis](https://cloud.githubusercontent.com/assets/116461/12526883/7730991c-c127-11e5-9196-98e9ceec758f.png)
+
+*NOTE: Due to their infrequent use and needed screen real estate, deployment keys aren't displayed by default. If you need to view them, simply make sure to pass the `-k` flag to the `deployment ls` command.*
 
 The install metrics have the following meaning:
 
@@ -204,7 +206,7 @@ When the metrics cell reports `No installs recorded`, that indicates that the se
 
 ## Releasing app updates
 
-*Note: If your app is built using React Native, we have a different command that automates generating the update contents and inferring some of the parameters (e.g. `targetBinaryVersion`) from the project's metadata. Check out the section: [Releasing updates to a React Native app](#releasing-updates-to-a-react-native-app).*
+*NOTE: If your app is built using React Native, we have a different command that automates generating the update contents and inferring some of the parameters (e.g. `targetBinaryVersion`) from the project's metadata. Check out the section: [Releasing updates to a React Native app](#releasing-updates-to-a-react-native-app).*
 
 Once your app has been configured to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
 
