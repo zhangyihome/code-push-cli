@@ -1120,6 +1120,12 @@ th {
     font-size: 1.6em; }
   .post ul li {
     font-size: 1.6em; }
+    .post ul li p {
+      font-size: 1em; }
+  .post ol li {
+    font-size: 1.6em; }
+    .post ol li p {
+      font-size: 1em; }
   .post .author {
     padding-left: 4px; }
   .post .post-header {

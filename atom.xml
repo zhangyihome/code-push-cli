@@ -4,13 +4,41 @@
  <title>CodePush</title>
  <link href="http://microsoft.github.io/code-push/blog/atom.xml" rel="self"/>
  <link href="http://microsoft.github.io/code-push/blog/"/>
- <updated>2016-02-12T20:37:21-08:00</updated>
+ <updated>2016-02-22T11:45:52-08:00</updated>
  <id>http://microsoft.github.io/code-push/blog</id>
  <author>
    <name></name>
    <email></email>
  </author>
 
+ 
+ <entry>
+   <title>Web-like release agility for React Native Apps</title>
+   <link href="http://microsoft.github.io/code-push/blog/articles/DevOpsExp.html"/>
+   <updated>2016-02-22T00:00:00-08:00</updated>
+   <id>http://microsoft.github.io/code-push/blog/articles/DevOpsExp</id>
+   <content type="html">&lt;p&gt;It’s been a few months since we opened up our beta program and we couldn’t be happier about all the support and excitement we&amp;rsquo;ve seen from the community! Thanks to your feedback we have made tons of fixes and added features to enable new scenarios that aim to make your React Native development cycle that much better. &lt;/p&gt;
+
+&lt;p&gt;In lieu of the ReactJS Conf 2016, we want to emphasize how much we care about this community and making your DevOps experience as seamless as possible. For those of you who were not able to attend our session, we covered the integration between three products that enable you to provide Continuous Integration (CI) and Continuous Deployment (CD) for your React Native apps: VSTS, HockeyApp and CodePush. &lt;/p&gt;
+
+&lt;p&gt;Visual Studio Team Services (formerly Visual Studio Online) and Team Foundation Services 2015, provide a cross-platform build system that allows you to easily configure builds for any platform you might want to target. By ading HockeyApp, you enable a robust beta distribution and reporting framework that allows you to deploy beta apps and collect feedback from internal or external testers. Finally, with CodePush you are able to build upon the beta capabilities provided by HockeyApp and deploy beta as well production updates, reaching the full cycle of your app’s distribution.   &lt;/p&gt;
+
+&lt;p&gt;All of these services work great as single units, however for a great React Native CI and CD story, one that takes you seamlessly from build, to beta and finally to production, we hope you check out all three, as we continue to improve the integration between them.  &lt;/p&gt;
+
+&lt;p&gt;Follow these links to get started with these great services:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Streamline the CI setup for your React Native app using &lt;a href=&quot;https://marketplace.visualstudio.com/items?itemName=ms-vsclient.react-native-extension&quot;&gt;VSTS&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/slowpath/react-native-hockeyapp&quot;&gt;Get started using HockeyApp&lt;/a&gt; for React Native&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a href=&quot;http://microsoft.github.io/code-push/docs/react-native.html#link-2&quot;&gt;Get started using CodePush&lt;/a&gt; for React Native&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Automate deployments to app stores from your automated CI builds using the &lt;a href=&quot;https://marketplace.visualstudio.com/items?itemName=ms.hockeyappA&quot;&gt;HockeyApp&lt;/a&gt; and &lt;a href=&quot;https://marketplace.visualstudio.com/items?itemName=ms-vsclient.code-push&quot;&gt;CodePush&lt;/a&gt; extensions  &lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Thanks again for your interest and feedback thus far. We have many more improvements coming very soon, and look forward to put them on your hands! As always, please don’t hesitate to &lt;a href=&quot;mailto:codepush@microsoft.com&quot;&gt;ping us&lt;/a&gt; if you have questions or any issues. &lt;/p&gt;
+
+&lt;p&gt;Thanks! &lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>CodePush enters "open beta"</title>

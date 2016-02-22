@@ -7,6 +7,20 @@
 		<atom:link href="http://microsoft.github.io/code-push/blog/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>Web-like release agility for React Native Apps</title>
+				
+					<dc:creator>Ruben Rios</dc:creator>
+				        
+				
+					<description>&lt;p&gt;It’s been a few months since we opened up our beta program and we couldn’t be happier about all the support and excitement we&amp;rsquo;ve seen from the community! Thanks to your feedback we have made tons of fixes and added features to enable new scenarios that aim to make your React Native development cycle that much better. &lt;/p&gt;
+</description>
+				
+				<pubDate>Mon, 22 Feb 2016 00:00:00 -0800</pubDate>
+				<link>http://microsoft.github.io/code-push/blog/articles/DevOpsExp.html</link>
+				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/DevOpsExp.html</guid>
+			</item>
+		
+			<item>
 				<title>CodePush enters &quot;open beta&quot;</title>
 				
 					<dc:creator>Jonathan Carter</dc:creator>
