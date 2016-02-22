@@ -330,7 +330,7 @@
                     <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/CLI.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
                 </header>  
                 <article class="doc-content">               
-                    <p><img src="https://cloud.githubusercontent.com/assets/116461/13024894/35c9c300-d1b1-11e5-9d46-085cfaf8a021.png" alt="CodePush CLI"></p>
+                    <p><img src="https://cloud.githubusercontent.com/assets/8598682/13232100/9846bc28-d962-11e5-8212-0965f267119d.png" alt="CodePush CLI"></p>
 
 <h2>Installation</h2>
 
@@ -463,11 +463,13 @@ you can run the following command:</p>
 code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 </code></pre></div>
 <p>If at any time you&rsquo;d like to view the list of deployments that a specific app includes, you can simply run the following command:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment ls &lt;appName&gt; [--displayKeys]
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment ls &lt;appName&gt; [--displayKeys|-k]
 </code></pre></div>
 <p>This will display not only the list of deployments, but also the update metadata (e.g. mandatory, description) and installation metrics for their latest release:</p>
 
 <p><img src="https://cloud.githubusercontent.com/assets/116461/12526883/7730991c-c127-11e5-9196-98e9ceec758f.png" alt="Deployment lis"></p>
+
+<p><em>NOTE: Due to their infrequent use and needed screen real estate, deployment keys aren&rsquo;t displayed by default. If you need to view them, simply make sure to pass the <code>-k</code> flag to the <code>deployment ls</code> command.</em></p>
 
 <p>The install metrics have the following meaning:</p>
 
@@ -481,6 +483,8 @@ code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 <p>When the metrics cell reports <code>No installs recorded</code>, that indicates that the server hasn&rsquo;t seen any activity for this release. This could either be because it precluded the plugin versions that included telemtry support, or no end-users have synchronized with the CodePush server yet. As soon as an install happens, you will begin to see metrics populate in the CLI for the release.</p>
 
 <h2>Releasing app updates</h2>
+
+<p><em>NOTE: If your app is built using React Native, we have a different command that automates generating the update contents and inferring some of the parameters (e.g. <code>targetBinaryVersion</code>) from the project&rsquo;s metadata. Check out the section: <a href="#releasing-updates-to-a-react-native-app">Releasing updates to a React Native app</a>.</em></p>
 
 <p>Once your app has been configured to query for updates against the CodePush service&ndash;using your desired deployment&ndash;you can begin pushing updates to it using the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push release &lt;appName&gt; &lt;updateContents&gt; &lt;targetBinaryVersion&gt;
@@ -535,7 +539,7 @@ code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 
 <h3>Target binary version parameter</h3>
 
-<p>This specifies the semver compliant (e.g. <code>1.0.0</code> not <code>1.0</code>) store/binary version of the application you are releasing the update for. Only users running this <strong>exact version</strong> will receive the update. Users running an older and/or newer version of the app binary will not receive this update, for the following reasons:</p>
+<p>This specifies the semver-compliant (e.g. <code>1.0.0</code> not <code>1.0</code>) store/binary version of the application you are releasing the update for. Only users running this <strong>exact version</strong> will receive the update. Users running an older and/or newer version of the app binary will not receive this update, for the following reasons:</p>
 
 <ol>
 <li><p>If a user is running an older binary version, it&rsquo;s possible that there are breaking changes in the CodePush update that wouldn&rsquo;t be compatible with what they&rsquo;re running.</p></li>
@@ -611,6 +615,49 @@ code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 <p>If you never release an update that is marked as mandatory, then the above behavior doesn&rsquo;t apply to you, since the server will never change an optional release to mandatory unless there were intermingled mandatory updates as illustrated above. Additionally, if a release is marked as mandatory, it will never be converted to optional, since that wouldn&rsquo;t make any sense. The server will only change an optional release to mandatory in order to respect the semantics described above.</p>
 
 <p><em>NOTE: This parameter can be set using either &ldquo;&ndash;mandatory&rdquo; or &ldquo;-m&rdquo;</em></p>
+
+<h2>Releasing updates to a React Native app</h2>
+
+<p>After configuring your React Native app to query for updates against the CodePush service&ndash;using your desired deployment&ndash;you can begin pushing updates to it using the following command:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push release-react &lt;appName&gt; &lt;platform&gt; 
+[--deploymentName &lt;deploymentName&gt;]
+[--description &lt;description&gt;]
+[--entryFile &lt;entryFile&gt;]
+[--mandatory]
+[--sourcemapOutput &lt;sourcemapOutput&gt;]
+</code></pre></div>
+<p>This <code>release-react</code> command does two things in addition to running the vanilla <code>release</code> command described in the <a href="#releasing-app-updates">previous section</a>:</p>
+
+<ol>
+<li>It runs the <a href="#update-contents-parameter"><code>react-native bundle</code> command</a> to generate the update contents in a temporary folder</li>
+<li>It infers the <a href="#target-binary-version-parameter"><code>targetBinaryVersion</code> of this release</a> by reading the contents of the project&rsquo;s metadata (<code>Info.plist</code> if this update is for iOS clients, and <code>build.gradle</code> for Android clients).</li>
+</ol>
+
+<p>It then calls the vanilla <code>release</code> command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the <code>react-native bundle</code> command and also avoid common pitfalls such as supplying a wrong <code>targetBinaryVersion</code> parameter.</p>
+
+<h3>Platform parameter</h3>
+
+<p>This specifies which platform the current update is targeting, and can be either <code>ios</code> or <code>android</code> (case-insensitive).</p>
+
+<h3>Deployment name parameter</h3>
+
+<p>This is the same parameter as the one described in the <a href="#deployment-name-parameter">above section</a>.</p>
+
+<h3>Description parameter</h3>
+
+<p>This is the same parameter as the one described in the <a href="#description-parameter">above section</a>.</p>
+
+<h3>Entry file parameter</h3>
+
+<p>This specifies the relative path to the root JavaScript file of the app. If left unspecified, the command will first assume the entry file to be <code>index.ios.js</code> or <code>index.android.js</code> depending on the <code>platform</code> parameter supplied, following which it will use <code>index.js</code> if the previous file does not exist.</p>
+
+<h3>Mandatory parameter</h3>
+
+<p>This is the same parameter as the one described in the <a href="#mandatory-parameter">above section</a>.</p>
+
+<h3>Sourcemap output parameter</h3>
+
+<p>This specifies the relative path to where the sourcemap file for resulting update&rsquo;s JS bundle should be generated. If left unspecified, sourcemaps will not be generated.</p>
 
 <h2>Promoting updates across deployments</h2>
 

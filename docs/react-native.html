@@ -370,8 +370,12 @@
 <td>v1.4.0-v1.6.0 <em>(introduced iOS asset support)</em></td>
 </tr>
 <tr>
-<td>v0.19.0</td>
-<td>v1.7.0 <em>(introduced Android asset support)</em></td>
+<td>v0.19.0-v0.20.0</td>
+<td>v1.7.0+ <em>(introduced Android asset support)</em></td>
+</tr>
+<tr>
+<td>v0.21.0+</td>
+<td>TBD :) We work hard to respond to new RN releases, but they do occasionally break us. We will update this chart with each RN release, so that users can check to see what our &ldquo;official&rdquo; support is.</td>
 </tr>
 </tbody></table>
 
@@ -381,6 +385,8 @@
 <div class="highlight"><pre><code class="language-shell" data-lang="shell">npm install --save react-native-code-push
 </code></pre></div>
 <p>As with all other React Native plugins, the integration experience is different for iOS and Android, so perform the following setup steps depending on which platform(s) you are targetting.</p>
+
+<p>If you want to see how other projects have integrated with CodePush, you can check out the excellent <a href="#example-apps">example apps</a> provided by the community.</p>
 
 <h2>iOS Setup</h2>
 
@@ -440,7 +446,7 @@ Add a new value, <code>$(SRCROOT)/../node_modules/react-native-code-push</code> 
 <p>To let the CodePush runtime know which deployment it should query for updates against, perform the following steps:</p>
 
 <ol>
-<li><p>Open your app&rsquo;s <code>Info.plist</code> file and add a new entry named <code>CodePushDeploymentKey</code>, whose value is the key of the deployment you want to configure this app against (e.g. the key for the <code>Staging</code> deployment for the <code>FooBar</code> app). You can retrieve this value by running <code>code-push deployment ls &lt;appName&gt;</code> in the CodePush CLI, and copying the value of the <code>Deployment Key</code> column which corresponds to the deployment you want to use (see below). Note that using the deployment&rsquo;s name (e.g. Staging) will not work. That &ldquo;friendly name&rdquo; is intended only for authenticated management usage from the CLI, and not for public consumption within your app.</p>
+<li><p>Open your app&rsquo;s <code>Info.plist</code> file and add a new entry named <code>CodePushDeploymentKey</code>, whose value is the key of the deployment you want to configure this app against (e.g. the key for the <code>Staging</code> deployment for the <code>FooBar</code> app). You can retrieve this value by running <code>code-push deployment ls &lt;appName&gt; -k</code> in the CodePush CLI (the <code>-k</code> flag is necessary since keys aren&rsquo;t displayed by default) and copying the value of the <code>Deployment Key</code> column which corresponds to the deployment you want to use (see below). Note that using the deployment&rsquo;s name (e.g. Staging) will not work. That &ldquo;friendly name&rdquo; is intended only for authenticated management usage from the CLI, and not for public consumption within your app.</p>
 
 <p><img src="https://cloud.githubusercontent.com/assets/116461/11601733/13011d5e-9a8a-11e5-9ce2-b100498ffb34.png" alt="Deployment list"></p></li>
 <li><p>In your app&rsquo;s <code>Info.plist</code> make sure your <code>Bundle versions string, short</code> (aka <code>CFBundleShortVersionString</code>) value is a valid <a href="http://semver.org/">semver</a> version (e.g. 1.0.0 not 1.0)</p>
@@ -488,7 +494,8 @@ public class MainActivity extends FragmentActivity implements DefaultHardwareBac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         ...
-        // 3. Initialize CodePush with your deployment key and an instance of your MainActivity.
+        // 3. Initialize CodePush with your deployment key and an instance of your MainActivity. If you don&#39;t
+        // already have it, you can run &quot;code-push deployment ls &lt;appName&gt; -k&quot; in order to retrieve your key.
         CodePush codePush = new CodePush(&quot;d73bf5d8-4fbd-4e55-a837-accd328a21ba&quot;, this, BuildConfig.DEBUG);
         ...
         mReactInstanceManager = ReactInstanceManager.builder()
@@ -548,7 +555,8 @@ public class MainActivity extends ReactActivity {
 
     @Override
     protected List&lt;ReactPackage&gt; getPackages() {
-        // 4. Instantiate an instance of the CodePush runtime, using the right deployment key
+        // 4. Instantiate an instance of the CodePush runtime, using the right deployment key. If you don&#39;t
+        // already have it, you can run &quot;code-push deployment ls &lt;appName&gt; -k&quot; to retrieve your key.
         this._codePush = new CodePush(&quot;0dsIDongIcoH0mqAmoR0CYb5FhBZNy1w4Bf-l&quot;, this, BuildConfig.DEBUG);
 
         // 5. Add the CodePush package to the list of existing packages
@@ -981,6 +989,19 @@ codePush.sync({ updateDialog: true }, (status) =&gt; {
 <li><p><strong>getBundleUrl(String bundleName)</strong> - Returns the path to the most recent version of your app&rsquo;s JS bundle file, using the specified resource name (e.g. <code>index.android.bundle</code>). This method has the same resolution behavior as the Objective-C equivalent described above.</p></li>
 <li><p><strong>getReactPackage()</strong> - Returns a <code>ReactPackage</code> object that should be added to your <code>ReactInstanceManager</code> via its <code>addPackage</code> method. Without this, the <code>react-native-code-push</code> JS module won&rsquo;t be available to your script.</p></li>
 </ul>
+
+<h2>Example Apps</h2>
+
+<p>The React Native community has graciously created some awesome open source apps that can serve as examples for developers that are getting started. The following is a list of OSS React Native apps that are also using CodePush, and can therefore be used to see how others are using the service:</p>
+
+<ul>
+<li><a href="https://github.com/arjunkomath/Feline-for-Product-Hunt">Feline for Product Hunt</a> - An Android client for Product Hunt.</li>
+<li><a href="https://github.com/LynxITDigital/GeoEncoding">GeoEncoding</a> - An app by <a href="https://digital.lynxit.com.au">Lynx IT Digital</a> which demonstrates how to use numerous React Native components and modules.</li>
+<li><a href="https://github.com/Khan/math-facts">Math Facts</a> - An app by Khan Academy to help memorize math facts more easily.</li>
+<li><a href="https://github.com/multunus/moveit-react-native">MoveIt!</a> - An app by <a href="http://www.multunus.com">Multunus</a> that allows employees within a company to track their work-outs.</li>
+</ul>
+
+<p><em>Note: If you&rsquo;ve developed a React Native app using CodePush, that is also open-source, please let us know. We would love to add it to this list!</em></p>
   
                 </article>
             </div>  
