@@ -68,7 +68,7 @@ export class AccountManager {
     constructor(accessKey: string, userAgent?: string, serverUrl?: string) {
         this._accessKey = accessKey;
         this._userAgent = userAgent;
-        this._serverUrl = serverUrl || "https://codepush.azurewebsites.net";
+        this._serverUrl = serverUrl || "https://codepush-management.azurewebsites.net";
     }
 
     public get accessKey(): string {
