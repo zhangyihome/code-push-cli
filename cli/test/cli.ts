@@ -8,8 +8,6 @@ import * as cli from "../definitions/cli";
 import * as cmdexec from "../script/command-executor";
 import * as os from "os";
 
-var process = require("process");
-
 function assertJsonDescribesObject(json: string, object: Object): void {
     // Make sure JSON is indented correctly
     assert.equal(json, JSON.stringify(object, /*replacer=*/ null, /*spacing=*/ 2));
@@ -22,9 +20,14 @@ function ensureInTestAppDirectory(): void {
 }
 
 export class SdkStub {
+    public getAccountInfo(): Promise<codePush.Account> {
+        return Q(<codePush.Account>{
+            email: "a@a.com"
+        });
+    }
+
     public addAccessKey(machine: string, description?: string): Promise<codePush.AccessKey> {
         return Q(<codePush.AccessKey>{
-            id: "accessKeyId",
             name: "key123",
             createdTime: new Date().getTime(),
             createdBy: os.hostname(),
@@ -34,7 +37,6 @@ export class SdkStub {
 
     public addApp(name: string): Promise<codePush.App> {
         return Q(<codePush.App>{
-            id: "appId",
             name: name
         });
     }
@@ -45,14 +47,13 @@ export class SdkStub {
 
     public addDeployment(appId: string, name: string): Promise<codePush.Deployment> {
         return Q(<codePush.Deployment>{
-            id: "deploymentId",
-            name: name
+            name: name,
+            key: "6"
         });
     }
 
     public getAccessKeys(): Promise<codePush.AccessKey[]> {
         return Q([<codePush.AccessKey>{
-            id: "7",
             name: "8",
             createdTime: 0,
             createdBy: os.hostname(),
@@ -62,33 +63,21 @@ export class SdkStub {
 
     public getApps(): Promise<codePush.App[]> {
         return Q([<codePush.App>{
-            id: "1",
             name: "a",
             collaborators: { "a@a.com": { permission: "Owner", isCurrentAccount: true } }
         }, <codePush.App>{
-            id: "2",
             name: "b",
             collaborators: { "a@a.com": { permission: "Owner", isCurrentAccount: true } }
         }]);
     }
 
-    public getDeploymentKeys(appId: string, deploymentId: string): Promise<codePush.DeploymentKey[]> {
-        return Q([<codePush.DeploymentKey>{
-            description: null,
-            id: "5",
-            isPrimary: true,
-            key: "6",
-            name: "Primary"
-        }]);
-    }
-
     public getDeployments(appId: string): Promise<codePush.Deployment[]> {
         return Q([<codePush.Deployment>{
-            id: "3",
-            name: "Production"
+            name: "Production",
+            key: "6"
         }, <codePush.Deployment>{
-            id: "4",
             name: "Staging",
+            key: "6",
             package: {
                 appVersion: "1.0.0",
                 description: "fgh",
@@ -126,7 +115,7 @@ export class SdkStub {
             }
         ]);
     }
-    
+
     public getDeploymentMetrics(appId: string, deploymentId: string): Promise<any> {
         return Q({
             "1.0.0": {
@@ -208,12 +197,11 @@ describe("CLI", () => {
         sandbox.stub(cmdexec, "confirm", (): Promise<boolean> => Q(wasConfirmed));
         sandbox.stub(cmdexec, "createEmptyTempReleaseFolder", (): Promise<void> => Q(<void>null));
         log = sandbox.stub(cmdexec, "log", (message: string): void => { });
-        sandbox.stub(cmdexec, "loginWithAccessToken", (): Promise<void> => Q(<void>null));
         spawn = sandbox.stub(cmdexec, "spawn", (command: string, commandArgs: string[]): any => {
             return {
                 stdout: { on: () => { } },
                 stderr: { on: () => { } },
-                on: (event: string, callback: () => void) => { 
+                on: (event: string, callback: () => void) => {
                     callback();
                 }
             };
@@ -258,7 +246,6 @@ describe("CLI", () => {
                 var actual: string = log.args[0][0];
                 var expected = [
                     {
-                        id: "7",
                         name: "8",
                         createdTime: 0,
                         createdBy: os.hostname(),
@@ -274,7 +261,7 @@ describe("CLI", () => {
     it("accessKeyRemove removes access key", (done: MochaDone): void => {
         var command: cli.IAccessKeyRemoveCommand = {
             type: cli.CommandType.accessKeyRemove,
-            accessKeyName: "8"
+            accessKey: "8"
         };
 
         var removeAccessKey: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeAccessKey");
@@ -282,7 +269,7 @@ describe("CLI", () => {
         cmdexec.execute(command)
             .done((): void => {
                 sinon.assert.calledOnce(removeAccessKey);
-                sinon.assert.calledWithExactly(removeAccessKey, "7");
+                sinon.assert.calledWithExactly(removeAccessKey, "8");
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Successfully removed the \"8\" access key.");
 
@@ -293,7 +280,7 @@ describe("CLI", () => {
     it("accessKeyRemove does not remove access key if cancelled", (done: MochaDone): void => {
         var command: cli.IAccessKeyRemoveCommand = {
             type: cli.CommandType.accessKeyRemove,
-            accessKeyName: "8"
+            accessKey: "8"
         };
 
         var removeAccessKey: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeAccessKey");
@@ -342,8 +329,26 @@ describe("CLI", () => {
 
                 var actual: string = log.args[0][0];
                 var expected = [
-                    { name: "a", deployments: ["Production", "Staging"]},
-                    { name: "b", deployments: ["Production", "Staging"]}
+                    {
+                        name: "a",
+                        collaborators: {
+                            "a@a.com": {
+                                permission: "Owner",
+                                isCurrentAccount: true
+                            }
+                        },
+                        deployments: ["Production", "Staging"]
+                    },
+                    {
+                        name: "b",
+                        collaborators: {
+                            "a@a.com": {
+                                permission: "Owner",
+                                isCurrentAccount: true
+                            }
+                        },
+                        deployments: ["Production", "Staging"]
+                    }
                 ];
 
                 assertJsonDescribesObject(actual, expected);
@@ -362,7 +367,7 @@ describe("CLI", () => {
         cmdexec.execute(command)
             .done((): void => {
                 sinon.assert.calledOnce(removeApp);
-                sinon.assert.calledWithExactly(removeApp, "1");
+                sinon.assert.calledWithExactly(removeApp, "a");
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Successfully removed the \"a\" app.");
 
@@ -462,7 +467,7 @@ describe("CLI", () => {
                 var actual: string = log.args[0][0];
                 var expected = {
                     "collaborators":
-                        { 
+                        {
                             "a@a.com": { permission: "Owner", isCurrentAccount: true },
                             "b@b.com": { permission: "Collaborator", isCurrentAccount: false }
                         }
@@ -501,12 +506,10 @@ describe("CLI", () => {
         };
 
         var addDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "addDeployment");
-        var getDeploymentKeys: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getDeploymentKeys");
 
         cmdexec.execute(command)
             .done((): void => {
                 sinon.assert.calledOnce(addDeployment);
-                sinon.assert.calledOnce(getDeploymentKeys);
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Successfully added the \"b\" deployment with key \"6\" to the \"a\" app.");
                 done();
@@ -530,10 +533,11 @@ describe("CLI", () => {
                 var expected = [
                     {
                         name: "Production",
-                        deploymentKey: "6"
+                        key: "6"
                     },
                     {
                         name: "Staging",
+                        key: "6",
                         package: {
                             appVersion: "1.0.0",
                             description: "fgh",
@@ -547,10 +551,10 @@ describe("CLI", () => {
                                 active: 123,
                                 downloaded: 321,
                                 failed: 789,
-                                installed: 456
+                                installed: 456,
+                                totalActive: 1035
                             }
-                        },
-                        deploymentKey: "6"
+                        }
                     }
                 ];
 
@@ -571,7 +575,7 @@ describe("CLI", () => {
         cmdexec.execute(command)
             .done((): void => {
                 sinon.assert.calledOnce(removeDeployment);
-                sinon.assert.calledWithExactly(removeDeployment, "1", "4");
+                sinon.assert.calledWithExactly(removeDeployment, "a", "Staging");
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Successfully removed the \"Staging\" deployment from the \"a\" app.");
 
@@ -652,7 +656,8 @@ describe("CLI", () => {
                             active: 789,
                             downloaded: 456,
                             failed: 654,
-                            installed: 987
+                            installed: 987,
+                            totalActive: 1035
                         }
                     },
                     {
@@ -668,7 +673,8 @@ describe("CLI", () => {
                             active: 123,
                             downloaded: 321,
                             failed: 789,
-                            installed: 456
+                            installed: 456,
+                            totalActive: 1035
                         }
                     }
                 ];
@@ -677,7 +683,7 @@ describe("CLI", () => {
                 done();
             });
     });
-    
+
     it("release doesn't allow releasing .zip file", (done: MochaDone): void => {
         var command: cli.IReleaseCommand = {
             type: cli.CommandType.release,
@@ -719,7 +725,7 @@ describe("CLI", () => {
 
         releaseHelperFunction(command, done);
     });
-    
+
     it("release-react fails if CWD does not contain package.json", (done: MochaDone): void => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
@@ -732,7 +738,7 @@ describe("CLI", () => {
 
         var release: Sinon.SinonSpy = sandbox.spy(cmdexec, "release");
         var releaseReact: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseReact");
-        
+
         cmdexec.execute(command)
             .then(() => {
                 done(new Error("Did not throw error."));
@@ -757,12 +763,12 @@ describe("CLI", () => {
             mandatory: false,
             platform: "ios"
         };
-        
+
         ensureInTestAppDirectory();
 
         var release: Sinon.SinonSpy = sandbox.spy(cmdexec, "release");
         var releaseReact: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseReact");
-        
+
         cmdexec.execute(command)
             .then(() => {
                 done(new Error("Did not throw error."));
@@ -777,7 +783,7 @@ describe("CLI", () => {
             .done();
     });
 
-    it("release-react fails if platform is invalid", (done: MochaDone): void => {        
+    it("release-react fails if platform is invalid", (done: MochaDone): void => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
@@ -786,12 +792,12 @@ describe("CLI", () => {
             mandatory: false,
             platform: "blackberry",
         };
-        
+
         ensureInTestAppDirectory();
-        
+
         var release: Sinon.SinonSpy = sandbox.spy(cmdexec, "release");
         var releaseReact: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseReact");
-        
+
         cmdexec.execute(command)
             .then(() => {
                 done(new Error("Did not throw error."));
@@ -815,23 +821,23 @@ describe("CLI", () => {
             mandatory: false,
             platform: "ios"
         };
-        
+
         ensureInTestAppDirectory();
-        
+
         var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release", () => { return Q(<void>null) });
-        
+
         cmdexec.execute(command)
             .then(() => {
                 var releaseCommand: cli.IReleaseCommand = <any>command;
                 releaseCommand.package = path.join(os.tmpdir(), "CodePush");
                 releaseCommand.appStoreVersion = "1.2.3";
-                
+
                 sinon.assert.calledOnce(spawn);
                 var spawnCommand: string = spawn.args[0][0];
                 var spawnCommandArgs: string = spawn.args[0][1].join(" ");
                 assert.equal(spawnCommand, "node");
                 assert.equal(
-                    spawnCommandArgs, 
+                    spawnCommandArgs,
                     `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", "main.jsbundle")} --dev false --entry-file index.ios.js --platform ios`
                 );
                 assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
@@ -839,7 +845,7 @@ describe("CLI", () => {
             })
             .done();
     });
-    
+
     it("release-react generates sourcemaps", (done: MochaDone): void => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
@@ -850,23 +856,23 @@ describe("CLI", () => {
             platform: "android",
             sourcemapOutput: "index.android.js.map"
         };
-        
+
         ensureInTestAppDirectory();
-        
+
         var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release", () => { return Q(<void>null) });
-        
+
         cmdexec.execute(command)
             .then(() => {
                 var releaseCommand: cli.IReleaseCommand = <any>command;
                 releaseCommand.package = path.join(os.tmpdir(), "CodePush");
                 releaseCommand.appStoreVersion = "1.2.3";
-                
+
                 sinon.assert.calledOnce(spawn);
                 var spawnCommand: string = spawn.args[0][0];
                 var spawnCommandArgs: string = spawn.args[0][1].join(" ");
                 assert.equal(spawnCommand, "node");
                 assert.equal(
-                    spawnCommandArgs, 
+                    spawnCommandArgs,
                     `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", "main.jsbundle")} --dev false --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
                 );
                 assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
@@ -874,7 +880,7 @@ describe("CLI", () => {
             })
             .done();
     });
-    
+
     function releaseHelperFunction(command: cli.IReleaseCommand, done: MochaDone): void {
         var release: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "release");
         cmdexec.execute(command)

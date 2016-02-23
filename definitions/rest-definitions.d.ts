@@ -1,16 +1,25 @@
 declare module "rest-definitions" {
+    /**
+     * Annotations for properties on 'inout' interfaces:
+     * - generated: This property cannot be specified on any input requests (PUT/PATCH/POST).
+     *              As a result, generated properties are always marked as optional.
+     * - key: This property is the identifier for an object, with certain uniqueness constraints.
+     */
+
+    /*inout*/
     export interface AccessKey {
-        /*generated*/ id?: string;
-        name: string;
         createdBy: string;
-        createdTime: number;
+        /*generated*/ createdTime?: number;
         description?: string;
+        /*generated key*/ name?: string;
     }
-    
+
+    /*out*/
     export interface DeploymentMetrics {
         [packageLabelOrAppVersion: string]: UpdateMetrics
     }
 
+    /*in*/
     export interface DeploymentStatusReport {
         appVersion: string;
         clientUniqueId?: string;
@@ -20,36 +29,41 @@ declare module "rest-definitions" {
         label?: string;
         status?: string;
     }
-    
+
+    /*in*/
     export interface DownloadReport {
         clientUniqueId: string;
         deploymentKey: string;
         label: string;
     }
 
-    export interface PackageInfo {
-        appVersion: string;
-        description: string;
-        isMandatory: boolean;
+    /*inout*/
+    interface PackageInfo {
+        appVersion?: string;
+        description?: string;
+        isMandatory?: boolean;
         /*generated*/ label?: string;
-        /*generated*/ packageHash: string;
+        /*generated*/ packageHash?: string;
     }
 
+    /*out*/
     export interface UpdateCheckResponse extends PackageInfo {
-        /*generated*/ downloadURL: string;
-        /*generated*/ isAvailable: boolean;
-        /*generated*/ packageSize: number;
-        /*generated*/ updateAppVersion?: boolean;
+        downloadURL?: string;
+        isAvailable: boolean;
+        packageSize?: number;
+        updateAppVersion?: boolean;
     }
 
+    /*in*/
     export interface UpdateCheckRequest {
         appVersion: string;
         deploymentKey: string;
-        isCompanion: boolean;
-        label: string;
-        packageHash: string;
+        isCompanion?: boolean;
+        label?: string;
+        packageHash?: string;
     }
-    
+
+    /*out*/
     export interface UpdateMetrics {
         active: number;
         downloaded?: number;
@@ -57,42 +71,37 @@ declare module "rest-definitions" {
         installed?: number;
     }
 
+    /*inout*/
     export interface Account {
-        email: string;
-        /*generated*/ id?: string;
+        /*key*/ email: string;
         name: string;
-        /*const*/ username: string;
     }
 
+    /*out*/
     export interface CollaboratorProperties {
-        /*generated*/ isCurrentAccount?: boolean;
+        isCurrentAccount?: boolean;
         permission: string;
     }
 
+    /*out*/
     export interface CollaboratorMap {
         [email: string]: CollaboratorProperties;
     }
 
+    /*inout*/
     export interface App {
         /*generated*/ collaborators?: CollaboratorMap;
-        /*generated*/ id?: string;
-        name: string;
+        /*key*/ name: string;
     }
 
+    /*inout*/
     export interface Deployment {
-        /*generated*/ id?: string;
-        name: string;
-        package?: Package
+        /*generated key*/ key?: string;
+        /*key*/ name: string;
+        /*generated*/ package?: Package
     }
 
-    export interface DeploymentKey {
-        description: string;
-        /*generated*/ id?: string;
-        isPrimary: boolean;
-        /*generated*/ key: string;
-        name: string;
-    }
-
+    /*inout*/
     export interface Package extends PackageInfo {
         /*generated*/ blobUrl: string;
         /*generated*/ diffAgainstPackageHash?: string;

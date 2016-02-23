@@ -3,7 +3,7 @@
 import * as assert from "assert";
 import * as Q from "q";
 
-import {AccountManager} from "../script/management/account-manager";
+import { AccountManager } from "../script/account-manager";
 
 var request = require("superagent");
 
@@ -11,7 +11,7 @@ var manager: AccountManager;
 describe("Management SDK", () => {
 
     beforeEach(() => {
-        manager = new AccountManager(/*serverUrl=*/ "http://localhost", /*userAgent=*/ "unit-test/1.0.0");
+        manager = new AccountManager(/*accessKey=*/ "dummyAccessKey", /*userAgent=*/ "unit-test/1.0.0", /*serverUrl=*/ "http://localhost");
     });
 
     after(() => {
@@ -24,20 +24,15 @@ describe("Management SDK", () => {
 
         var methodsWithErrorHandling: any[] = [
             manager.addApp.bind(manager, "appName"),
-            manager.getApp.bind(manager, "appId"),
-            manager.updateApp.bind(manager, {}),
-            manager.removeApp.bind(manager, "appId"),
+            manager.getApp.bind(manager, "appName"),
+            manager.updateApp.bind(manager, "appName", {}),
+            manager.removeApp.bind(manager, "appName"),
 
-            manager.addDeployment.bind(manager, "appId", "name"),
-            manager.getDeployment.bind(manager, "appId", "deploymentId"),
-            manager.getDeployments.bind(manager, "appId"),
-            manager.updateDeployment.bind(manager, "appId", { id: "deploymentToChange" }),
-            manager.removeDeployment.bind(manager, "appId", { id: "deploymentToChange" }),
-
-            manager.getDeploymentKeys.bind(manager, "appId", "deploymentId"),
-
-            manager.getPackage.bind(manager, ""),
-            manager.logout.bind(manager),
+            manager.addDeployment.bind(manager, "appName", "deploymentName"),
+            manager.getDeployment.bind(manager, "appName", "deploymentName"),
+            manager.getDeployments.bind(manager, "appName"),
+            manager.updateDeployment.bind(manager, "appName", "deploymentName", { name: "newDeploymentName" }),
+            manager.removeDeployment.bind(manager, "appName", "deploymentName"),
         ];
 
         var result = Q<void>(null);
@@ -92,26 +87,25 @@ describe("Management SDK", () => {
         });
     });
 
-    it("addApp handles location header", (done: MochaDone) => {
-        mockReturn(JSON.stringify({ success: true }), 200, { location: "/appId" });
+    it("addApp handles successful response", (done: MochaDone) => {
+        mockReturn(JSON.stringify({ success: true }), 201, { location: "/appName" });
         manager.addApp("appName").done((obj) => {
             assert.ok(obj);
             done();
         }, rejectHandler);
     });
 
-    it("addApp handles missing location header", (done: MochaDone) => {
-        mockReturn(JSON.stringify({ success: true }), 200, {});
+    it("addApp handles error response", (done: MochaDone) => {
+        mockReturn(JSON.stringify({ success: false }), 404, {});
         manager.addApp("appName").done((obj) => {
-            assert.ok(!obj);
-            done();
-        }, rejectHandler);
+            throw new Error("Call should not complete successfully");
+        }, (error: Error) => done());
     });
 
     it("getApp handles JSON response", (done: MochaDone) => {
         mockReturn(JSON.stringify({ app: {} }), 200, {});
 
-        manager.getApp("appId").done((obj: any) => {
+        manager.getApp("appName").done((obj: any) => {
             assert.ok(obj);
             done();
         }, rejectHandler);
@@ -120,7 +114,7 @@ describe("Management SDK", () => {
     it("updateApp handles success response", (done: MochaDone) => {
         mockReturn(JSON.stringify({ apps: [] }), 200, {});
 
-        manager.updateApp(<any>{}).done((obj: any) => {
+        manager.updateApp("appName", <any>{}).done((obj: any) => {
             assert.ok(!obj);
             done();
         }, rejectHandler);
@@ -129,26 +123,17 @@ describe("Management SDK", () => {
     it("removeApp handles success response", (done: MochaDone) => {
         mockReturn("", 200, {});
 
-        manager.removeApp("appId").done((obj: any) => {
+        manager.removeApp("appName").done((obj: any) => {
             assert.ok(!obj);
             done();
         }, rejectHandler);
     });
 
     it("addDeployment handles success response", (done: MochaDone) => {
-        mockReturn("", 200, { location: "/deploymentId" });
+        mockReturn(JSON.stringify({ deployment: { name: "name", key: "key" } }), 201, { location: "/deploymentName" });
 
-        manager.addDeployment("appId", "name").done((obj: any) => {
+        manager.addDeployment("appName", "deploymentName").done((obj: any) => {
             assert.ok(obj);
-            done();
-        }, rejectHandler);
-    });
-
-    it("addDeployment handles missing location header", (done: MochaDone) => {
-        mockReturn("", 200, {});
-
-        manager.addDeployment("appId", "name").done((obj: any) => {
-            assert.ok(!obj);
             done();
         }, rejectHandler);
     });
@@ -156,7 +141,7 @@ describe("Management SDK", () => {
     it("getDeployment handles JSON response", (done: MochaDone) => {
         mockReturn(JSON.stringify({ deployment: {} }), 200, {});
 
-        manager.getDeployment("appId", "deploymentId").done((obj: any) => {
+        manager.getDeployment("appName", "deploymentName").done((obj: any) => {
             assert.ok(obj);
             done();
         }, rejectHandler);
@@ -165,7 +150,7 @@ describe("Management SDK", () => {
     it("getDeployments handles JSON response", (done: MochaDone) => {
         mockReturn(JSON.stringify({ deployments: [] }), 200, {});
 
-        manager.getDeployments("appId").done((obj: any) => {
+        manager.getDeployments("appName").done((obj: any) => {
             assert.ok(obj);
             done();
         }, rejectHandler);
@@ -174,7 +159,7 @@ describe("Management SDK", () => {
     it("updateDeployment handles success response", (done: MochaDone) => {
         mockReturn(JSON.stringify({ apps: [] }), 200, {});
 
-        manager.updateDeployment("appId", <any>{id: "deploymentId"}).done((obj: any) => {
+        manager.updateDeployment("appName", "deploymentName", { name: "newDeploymentName" }).done((obj: any) => {
             assert.ok(!obj);
             done();
         }, rejectHandler);
@@ -183,26 +168,8 @@ describe("Management SDK", () => {
     it("removeDeployment handles success response", (done: MochaDone) => {
         mockReturn("", 200, {});
 
-        manager.removeDeployment("appId", "deploymentId").done((obj: any) => {
+        manager.removeDeployment("appName", "deploymentName").done((obj: any) => {
             assert.ok(!obj);
-            done();
-        }, rejectHandler);
-    });
-
-    it("getDeploymentKeys handles JSON response", (done: MochaDone) => {
-        mockReturn(JSON.stringify({ deploymentKeys: [] }), 200, {});
-
-        manager.getDeploymentKeys("appId", "deploymentId").done((obj: any) => {
-            assert.ok(obj);
-            done();
-        }, rejectHandler);
-    });
-
-    it("getPackage handles success response", (done: MochaDone) => {
-        mockReturn(JSON.stringify({ package: {} }), 200);
-
-        manager.getPackage("appId", "deploymentId").done((obj: any) => {
-            assert.ok(obj);
             done();
         }, rejectHandler);
     });
@@ -210,7 +177,7 @@ describe("Management SDK", () => {
     it("getPackageHistory handles success response with no packages", (done: MochaDone) => {
         mockReturn(JSON.stringify({ packageHistory: [] }), 200);
 
-        manager.getPackageHistory("appId", "deploymentId").done((obj: any) => {
+        manager.getPackageHistory("appName", "deploymentName").done((obj: any) => {
             assert.ok(obj);
             assert.equal(obj.length, 0);
             done();
@@ -220,7 +187,7 @@ describe("Management SDK", () => {
     it("getPackageHistory handles success response with two packages", (done: MochaDone) => {
         mockReturn(JSON.stringify({ packageHistory: [ { label: "v1" }, { label: "v2" } ] }), 200);
 
-        manager.getPackageHistory("appId", "deploymentId").done((obj: any) => {
+        manager.getPackageHistory("appName", "deploymentName").done((obj: any) => {
             assert.ok(obj);
             assert.equal(obj.length, 2);
             assert.equal(obj[0].label, "v1");
@@ -232,7 +199,7 @@ describe("Management SDK", () => {
     it("getPackageHistory handles error response", (done: MochaDone) => {
         mockReturn("", 404);
 
-        manager.getPackageHistory("appId", "deploymentId").done((obj: any) => {
+        manager.getPackageHistory("appName", "deploymentName").done((obj: any) => {
             throw new Error("Call should not complete successfully");
         }, (error: Error) => done());
     });

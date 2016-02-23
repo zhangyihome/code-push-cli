@@ -1,1 +1,1 @@
-export * from "./management/account-manager";
+export * from "./account-manager";
