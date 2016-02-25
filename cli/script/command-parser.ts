@@ -1,4 +1,5 @@
-﻿import * as yargs from "yargs";
+﻿import { AccountManager } from "code-push";
+import * as yargs from "yargs";
 import * as cli from "../definitions/cli";
 import * as chalk from "chalk";
 import * as updateNotifier from "update-notifier";
@@ -6,7 +7,6 @@ import backslash = require("backslash");
 
 var packageJson = require("../package.json");
 const USAGE_PREFIX = "Usage: code-push";
-const CODE_PUSH_URL = "https://codepush.azurewebsites.net";
 
 // Command categories are:  access-key, app, release, deployment, deployment-key, login, logout, register
 var isValidCommandCategory = false;
@@ -574,7 +574,7 @@ function createCommand(): cli.ICommand {
 
                     releaseReactCommand.appName = arg1;
                     releaseReactCommand.platform = arg2;
-                    
+
                     releaseReactCommand.deploymentName = argv["deploymentName"];
                     releaseReactCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseReactCommand.entryFile = argv["entryFile"];
@@ -582,7 +582,7 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.sourcemapOutput = argv["sourcemapOutput"];
                 }
                 break;
-                
+
             case "rollback":
                 if (arg1 && arg2) {
                     cmd = { type: cli.CommandType.rollback };
@@ -601,7 +601,7 @@ function createCommand(): cli.ICommand {
 }
 
 function getServerUrl(customUrl: string): string {
-    var url: string = customUrl || CODE_PUSH_URL;
+    var url: string = customUrl || AccountManager.SERVER_URL;
 
     // Trim whitespace and a trailing slash (/) character.
     url = url.trim();

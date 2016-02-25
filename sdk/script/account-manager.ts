@@ -59,6 +59,8 @@ function urlEncode(strings: string[], ...values: string[]): string {
 }
 
 export class AccountManager {
+    public static SERVER_URL = "https://codepush-management.azurewebsites.net";
+
     private static API_VERSION: number = 2;
 
     private _accessKey: string;
@@ -68,7 +70,7 @@ export class AccountManager {
     constructor(accessKey: string, userAgent?: string, serverUrl?: string) {
         this._accessKey = accessKey;
         this._userAgent = userAgent;
-        this._serverUrl = serverUrl || "https://codepush-management.azurewebsites.net";
+        this._serverUrl = serverUrl || AccountManager.SERVER_URL;
     }
 
     public get accessKey(): string {
