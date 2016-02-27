@@ -288,6 +288,7 @@ After configuring your React Native app to query for updates against the CodePus
 
 ```
 code-push release-react <appName> <platform> 
+[--bundleName <bundleName>]
 [--deploymentName <deploymentName>]
 [--description <description>]
 [--entryFile <entryFile>]
@@ -305,6 +306,10 @@ It then calls the vanilla `release` command by supplying the values for the requ
 ### Platform parameter
 
 This specifies which platform the current update is targeting, and can be either `ios` or `android` (case-insensitive).
+
+### Bundle name parameter
+
+This specifies the name of the output JS bundle file. If left unspecified, the standard bundle name will be used for the specified platform: `main.jsbundle` (iOS) and `index.android.bundle` (Android).
 
 ### Deployment name parameter
 
