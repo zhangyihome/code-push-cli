@@ -301,7 +301,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
             .example("release-react MyApp ios", "Release the React Native iOS project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
             .example("release-react MyApp android -d Production", "Release the React Native Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
-            .option("bundleName", { alias: "b", default: null, demand: false, description: "The name of the output JS bundle. If unspecified, \"main.jsbundle\" or \"index.android.bundle\" will be used depending on the platform (iOS/Android)", type: "string" })
+            .option("bundleName", { alias: "b", default: null, demand: false, description: "The name of the output JS bundle. If omitted, the standard bundle name will be used for the specified platform: \"main.jsbundle\" (iOS) and \"index.android.bundle\" (Android)", type: "string" })
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("entryFile", { alias: "e", default: null, demand: false, description: "The path to the root JS file. If unspecified, \"index.<platform>.js\" and then \"index.js\" will be tried and used if they exist.", type: "string" })
