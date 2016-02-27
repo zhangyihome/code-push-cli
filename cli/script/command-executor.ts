@@ -1035,7 +1035,7 @@ export var runReactNativeBundleCommand = (entryFile: string, outputFolder: strin
     var reactNativeBundleArgs = [
         path.join("node_modules", "react-native", "local-cli", "cli.js"), "bundle",
         "--assets-dest", outputFolder,
-        "--bundle-output", path.join(outputFolder, "main.jsbundle"),
+        "--bundle-output", path.join(outputFolder, platform === "ios" ? "main.jsbundle" : "index.android.bundle"),
         "--dev", false,
         "--entry-file", entryFile,
         "--platform", platform,

@@ -873,7 +873,7 @@ describe("CLI", () => {
                 assert.equal(spawnCommand, "node");
                 assert.equal(
                     spawnCommandArgs,
-                    `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", "main.jsbundle")} --dev false --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
+                    `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", "index.android.bundle")} --dev false --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
                 );
                 assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
                 done();
