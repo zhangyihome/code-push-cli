@@ -813,6 +813,42 @@ describe("CLI", () => {
     });
 
     it("release-react defaults entry file to index.{platform}.js if not provided", (done: MochaDone): void => {
+        var bundleName = "bundle.js";
+        var command: cli.IReleaseReactCommand = {
+            type: cli.CommandType.releaseReact,
+            appName: "a",
+            bundleName: bundleName,
+            deploymentName: "Staging",
+            description: "Test default entry file",
+            mandatory: false,
+            platform: "ios"
+        };
+
+        ensureInTestAppDirectory();
+
+        var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release", () => { return Q(<void>null) });
+
+        cmdexec.execute(command)
+            .then(() => {
+                var releaseCommand: cli.IReleaseCommand = <any>command;
+                releaseCommand.package = path.join(os.tmpdir(), "CodePush");
+                releaseCommand.appStoreVersion = "1.2.3";
+
+                sinon.assert.calledOnce(spawn);
+                var spawnCommand: string = spawn.args[0][0];
+                var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+                assert.equal(spawnCommand, "node");
+                assert.equal(
+                    spawnCommandArgs,
+                    `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)} --dev false --entry-file index.ios.js --platform ios`
+                );
+                assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
+                done();
+            })
+            .done();
+    });
+
+    it("release-react defaults bundle name to \"main.jsbundle\" if not provided and platform is \"ios\"", (done: MochaDone): void => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
@@ -845,11 +881,47 @@ describe("CLI", () => {
             })
             .done();
     });
-
-    it("release-react generates sourcemaps", (done: MochaDone): void => {
+    
+    it("release-react defaults bundle name to \"index.android.bundle\" if not provided and platform is \"android\"", (done: MochaDone): void => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
+            deploymentName: "Staging",
+            description: "Test default entry file",
+            mandatory: false,
+            platform: "android"
+        };
+
+        ensureInTestAppDirectory();
+
+        var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release", () => { return Q(<void>null) });
+
+        cmdexec.execute(command)
+            .then(() => {
+                var releaseCommand: cli.IReleaseCommand = <any>command;
+                releaseCommand.package = path.join(os.tmpdir(), "CodePush");
+                releaseCommand.appStoreVersion = "1.2.3";
+
+                sinon.assert.calledOnce(spawn);
+                var spawnCommand: string = spawn.args[0][0];
+                var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+                assert.equal(spawnCommand, "node");
+                assert.equal(
+                    spawnCommandArgs,
+                    `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", "index.android.bundle")} --dev false --entry-file index.android.js --platform android`
+                );
+                assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
+                done();
+            })
+            .done();
+    });
+    
+    it("release-react generates sourcemaps", (done: MochaDone): void => {
+        var bundleName = "bundle.js";
+        var command: cli.IReleaseReactCommand = {
+            type: cli.CommandType.releaseReact,
+            appName: "a",
+            bundleName: bundleName,
             deploymentName: "Staging",
             description: "Test generates sourcemaps",
             mandatory: false,
@@ -873,7 +945,7 @@ describe("CLI", () => {
                 assert.equal(spawnCommand, "node");
                 assert.equal(
                     spawnCommandArgs,
-                    `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", "index.android.bundle")} --dev false --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
+                    `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)} --dev false --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
                 );
                 assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
                 done();

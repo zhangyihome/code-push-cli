@@ -934,13 +934,22 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
 }
 
 export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => {
-    var platform: string = command.platform.toLowerCase();
+    var bundleName: string = command.bundleName;
     var entryFile: string = command.entryFile;
     var outputFolder: string = path.join(os.tmpdir(), "CodePush");
+    var platform: string = command.platform.toLowerCase();
     var releaseCommand: cli.IReleaseCommand = <any>command;
     releaseCommand.package = outputFolder;
 
-    if (platform !== "ios" && platform !== "android") {
+    if (platform === "ios") {
+        if (!bundleName) {
+            bundleName = "main.jsbundle";
+        }
+    } else if (platform === "android") {
+        if (!bundleName) {
+            bundleName = "index.android.bundle";
+        }
+    } else {
         throw new Error("Platform must be either \"ios\" or \"android\".");
     }
 
@@ -981,7 +990,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
         // This is needed to clear the react native bundler cache:
         // https://github.com/facebook/react-native/issues/4289
         .then(() => deleteFolder(`${os.tmpdir()}/react-*`))
-        .then(() => runReactNativeBundleCommand(entryFile, outputFolder, platform, command.sourcemapOutput))
+        .then(() => runReactNativeBundleCommand(bundleName, entryFile, outputFolder, platform, command.sourcemapOutput))
         .then(() => {
             log(chalk.cyan("\nReleasing update contents to CodePush:\n"));
             return release(releaseCommand);
@@ -1031,11 +1040,11 @@ function requestAccessToken(): Promise<string> {
     });
 }
 
-export var runReactNativeBundleCommand = (entryFile: string, outputFolder: string, platform: string, sourcemapOutput: string): Promise<void> => {
+export var runReactNativeBundleCommand = (bundleName: string, entryFile: string, outputFolder: string, platform: string, sourcemapOutput: string): Promise<void> => {
     var reactNativeBundleArgs = [
         path.join("node_modules", "react-native", "local-cli", "cli.js"), "bundle",
         "--assets-dest", outputFolder,
-        "--bundle-output", path.join(outputFolder, platform === "ios" ? "main.jsbundle" : "index.android.bundle"),
+        "--bundle-output", path.join(outputFolder, bundleName),
         "--dev", false,
         "--entry-file", entryFile,
         "--platform", platform,
