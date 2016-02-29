@@ -602,8 +602,8 @@ function createCommand(): cli.ICommand {
     }
 }
 
-function getServerUrl(customUrl: string): string {
-    var url: string = customUrl || AccountManager.SERVER_URL;
+function getServerUrl(url: string): string {
+    if (!url) return null;
 
     // Trim whitespace and a trailing slash (/) character.
     url = url.trim();
