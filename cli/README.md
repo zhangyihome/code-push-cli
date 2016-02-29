@@ -25,7 +25,7 @@ Before you can begin releasing app updates, you need to create a CodePush accoun
 code-push register
 ```
 
-This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. Once authenticated, it will create a CodePush account "linked" to your GitHub/MSA identity, and generate an access token you can copy/paste into the CLI in order to login.
+This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. Once authenticated, it will create a CodePush account "linked" to your GitHub/MSA identity, and generate an access key you can copy/paste into the CLI in order to login.
 
 *Note: After registering, you are automatically logged-in with the CLI, so until you explicitly log out, you don't need to login again from the same machine.*
 
@@ -37,23 +37,23 @@ Every command within the CodePush CLI requires authentication, and therefore, be
 code-push login
 ```
 
-This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. This will generate an access token that you need to copy/paste into the CLI (it will prompt you for it). You are now succesfully authenticated and can safely close your browser window.
+This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. This will generate an access key that you need to copy/paste into the CLI (it will prompt you for it). You are now succesfully authenticated and can safely close your browser window.
 
-When you login from the CLI, your access token (kind of like a cookie) is persisted to disk so that you don't have to login everytime you attempt to access your account. In order to delete this file from your computer, simply run the following command:
+When you login from the CLI, your access key is persisted to disk for the duration of your session so that you don't have to login everytime you attempt to access your account. In order to end your session and delete this access key, simply run the following command:
 
 ```
 code-push logout
 ```
 
-If you forget to logout from a machine you'd prefer not to leave a running session on (e.g. your friend's laptop), you can use the following commands to list and remove any "live" access tokens.
-The list of access keys will display the name of the machine the token was created on, as well as the time the login occurred. This should make it easy to spot keys you don't want to keep around.
+If you forget to logout from a machine you'd prefer not to leave a running session on (e.g. your friend's laptop), you can use the following commands to list and remove any "live" access keys.
+The list of access keys will display the name of the machine the key was created on, as well as the time the login occurred. This should make it easy to spot keys you don't want to keep around.
 
 ```
 code-push access-key ls
 code-push access-key rm <accessKey>
 ```
 
-If you need additional keys, that can be used to authenticate against the CodePush service without needing to give access to your GitHub and/or Microsoft crendentials, you can run the following command to create one (along with a description of what it is for):
+If you need additional keys that can be used to authenticate against the CodePush service without needing to give access to your GitHub and/or Microsoft credentials, you can run the following command to create a persistent one (along with a description of what it is for):
 
 ```
 code-push access-key add "VSO Integration"
@@ -102,7 +102,7 @@ If at some point you no longer need an app, you can remove it from the server us
 code-push app rm <appName>
 ```
 
-Do this with caution since any apps that have been configured to use it will obviously stop receiving updates. 
+Do this with caution since any apps that have been configured to use it will obviously stop receiving updates.
 
 Finally, if you want to list all apps that you've registered with the CodePush server,
 you can run the following command:
@@ -121,9 +121,9 @@ code-push collaborator add <appName> <collaboratorEmail>
 
 *NOTE: This expects the developer to have already [registered](#account-creation) with CodePush using the specified e-mail address, so ensure that they have done that before attempting to share the app with them.*
 
-Once added, all collaborators will immediately have the following permissions with regards to the newly shared app: 
+Once added, all collaborators will immediately have the following permissions with regards to the newly shared app:
 
-1. View the app, its collaborators, [deployments](#deployment-management) and [release history](#viewing-release-history) 
+1. View the app, its collaborators, [deployments](#deployment-management) and [release history](#viewing-release-history)
 1. [Release](#releasing-app-updates) updates to any of the app's deployments
 1. [Promote](#promoting-updates-across-deployments) an update between any of the app's deployments
 1. [Rollback](#rolling-back-undesired-updates) any of the app's deployments
@@ -238,7 +238,7 @@ This specifies the semver-compliant (e.g. `1.0.0` not `1.0`) store/binary versio
 
 1. If a user is running an older binary version, it's possible that there are breaking changes in the CodePush update that wouldn't be compatible with what they're running.
 
-2. If a user is running a newer binary version, then it's presumed that what they are running is newer (and potentially imcompatible) with the CodePush update.  
+2. If a user is running a newer binary version, then it's presumed that what they are running is newer (and potentially imcompatible) with the CodePush update.
 
 The following table outlines the value that CodePush expects you to provide for each respective app type:
 
@@ -287,7 +287,7 @@ If you never release an update that is marked as mandatory, then the above behav
 After configuring your React Native app to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
 
 ```
-code-push release-react <appName> <platform> 
+code-push release-react <appName> <platform>
 [--bundleName <bundleName>]
 [--deploymentName <deploymentName>]
 [--description <description>]
@@ -344,7 +344,7 @@ The `promote` command will create a new release for the destination deployment, 
 
 1. It's quicker, since you don't need to re-assemble the release assets you want to publish or remember the description/app store version that are associated with the source deployment's release.
 
-2. It's less error-prone, since the promote operartion ensures that the exact thing that you already tested in the source deployment (e.g. `Staging`) will become active in the destination deployment (e.g. `Production`). 
+2. It's less error-prone, since the promote operartion ensures that the exact thing that you already tested in the source deployment (e.g. `Staging`) will become active in the destination deployment (e.g. `Production`).
 
 We recommend that all users take advantage of the automatically created `Staging` and `Production` environments, and do all releases directly to `Staging`, and then perform a `promote` from `Staging` to `Production` after performing the appropriate testing.
 
@@ -367,7 +367,7 @@ This has the effect of creating a new release for the deployment that includes t
 | v2      | Added new feature | No        |
 | v3      | Bug fixes         | Yes       |
 
-If you ran the `rollback` command on that deployment, a new release (`v4`) would be created that included the contents of the `v2` release. 
+If you ran the `rollback` command on that deployment, a new release (`v4`) would be created that included the contents of the `v2` release.
 
 | Release                     | Description       | Mandatory |
 |-----------------------------|-------------------|-----------|

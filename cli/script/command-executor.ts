@@ -248,7 +248,7 @@ function deleteConnectionInfoCache(): void {
     try {
         fs.unlinkSync(configFilePath);
 
-        log("Successfully logged-out. The session token file located at " + chalk.cyan(configFilePath) + " has been deleted.\r\n");
+        log("Successfully logged-out. The session file located at " + chalk.cyan(configFilePath) + " has been deleted.\r\n");
     } catch (ex) {
     }
 }
@@ -518,29 +518,18 @@ function login(command: cli.ILoginCommand): Promise<void> {
     } else {
         initiateExternalAuthenticationAsync(command.serverUrl, "login");
 
-        return loginWithAccessTokenInternal(command.serverUrl);
+        return loginWithAccessKeyInternal(command.serverUrl);
     }
 }
 
-function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
-    return requestAccessToken()
-        .then((accessToken: string): Promise<void> => {
-            if (accessToken === null) {
+function loginWithAccessKeyInternal(serverUrl: string): Promise<void> {
+    return requestAccessKey()
+        .then((accessKey: string): Promise<void> => {
+            if (accessKey === null) {
                 // The user has aborted the synchronous prompt (e.g.:  via [CTRL]+[C]).
                 return;
             }
 
-            try {
-                var decoded: string = base64.decode(accessToken);
-                var connectionInfo: ILegacyLoginConnectionInfo = JSON.parse(decoded);
-            } catch (error) {
-            }
-
-            if (!connectionInfo) {
-                throw new Error("Invalid access token.");
-            }
-
-            var accessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
             sdk = new AccountManager(accessKey, userAgent, serverUrl);
 
             return sdk.isAuthenticated()
@@ -548,7 +537,7 @@ function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
                     if (isAuthenticated) {
                         serializeConnectionInfo(serverUrl, accessKey);
                     } else {
-                        throw new Error("Invalid access token.");
+                        throw new Error("Invalid access key.");
                     }
                 });
         });
@@ -843,7 +832,7 @@ function printTable(columnNames: string[], readData: (dataSource: any[]) => void
 function register(command: cli.IRegisterCommand): Promise<void> {
     initiateExternalAuthenticationAsync(command.serverUrl, "register");
 
-    return loginWithAccessTokenInternal(command.serverUrl);
+    return loginWithAccessKeyInternal(command.serverUrl);
 }
 
 function promote(command: cli.IPromoteCommand): Promise<void> {
@@ -1017,7 +1006,7 @@ function rollback(command: cli.IRollbackCommand): Promise<void> {
         });
 }
 
-function requestAccessToken(): Promise<string> {
+function requestAccessKey(): Promise<string> {
     return Promise<string>((resolve, reject, notify): void => {
         prompt.message = "";
         prompt.delimiter = "";
@@ -1027,7 +1016,7 @@ function requestAccessToken(): Promise<string> {
         prompt.get({
             properties: {
                 response: {
-                    description: chalk.cyan("Enter your access token: ")
+                    description: chalk.cyan("Enter your access key: ")
                 }
             }
         }, (err: any, result: any): void => {
@@ -1078,11 +1067,11 @@ export var runReactNativeBundleCommand = (bundleName: string, entryFile: string,
 }
 
 function serializeConnectionInfo(serverUrl: string, accessKey: string): void {
-    var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = <ILoginConnectionInfo>{ serverUrl: serverUrl, accessKey: accessKey };
+    var connectionInfo: ILoginConnectionInfo = <ILoginConnectionInfo>{ serverUrl: serverUrl, accessKey: accessKey };
     var json: string = JSON.stringify(connectionInfo);
     fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
 
-    log("\r\nSuccessfully logged-in. Your session token was written to " + chalk.cyan(configFilePath) + ". You can run the " + chalk.cyan("code-push logout") + " command at any time to delete this file and terminate your session.\r\n");
+    log("\r\nSuccessfully logged-in. Your session file was written to " + chalk.cyan(configFilePath) + ". You can run the " + chalk.cyan("code-push logout") + " command at any time to delete this file and terminate your session.\r\n");
 }
 
 function isBinaryOrZip(path: string): boolean {
