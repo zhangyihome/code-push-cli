@@ -113,7 +113,6 @@ export interface ILoginCommand extends ICommand {
 }
 
 export interface ILogoutCommand extends ICommand {
-    isLocal: boolean;
 }
 
 export interface IPromoteCommand extends ICommand {

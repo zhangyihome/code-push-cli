@@ -51,6 +51,7 @@ interface ILoginConnectionInfo {
     accessKey: string;
     // The 'serverUrl' property has been obsoleted
     customServerUrl?: string;   // A custom serverUrl for internal debugging purposes
+    preserveAccessKeyOnLogout?: boolean;
 }
 
 interface IPackageFile {
@@ -69,6 +70,8 @@ export interface PackageWithMetrics {
 export var log = (message: string | Chalk.ChalkChain): void => console.log(message);
 export var sdk: AccountManager;
 export var spawn = childProcess.spawn;
+
+var connectionInfo: ILoginConnectionInfo;
 
 export var confirm = (): Promise<boolean> => {
     return Promise<boolean>((resolve, reject, notify): void => {
@@ -375,7 +378,7 @@ function deserializeConnectionInfo(): ILoginConnectionInfo {
 }
 
 export function execute(command: cli.ICommand): Promise<void> {
-    var connectionInfo: ILoginConnectionInfo = deserializeConnectionInfo();
+    connectionInfo = deserializeConnectionInfo();
 
     return Q(<void>null)
         .then(() => {
@@ -520,7 +523,7 @@ function login(command: cli.ILoginCommand): Promise<void> {
         return sdk.isAuthenticated()
             .then((isAuthenticated: boolean): void => {
                 if (isAuthenticated) {
-                    serializeConnectionInfo(command.accessKey, command.serverUrl);
+                    serializeConnectionInfo(command.accessKey, /*preserveAccessKeyOnLogout*/ true, command.serverUrl);
                 } else {
                     throw new Error("Invalid access key.");
                 }
@@ -545,7 +548,7 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string): Pr
             return sdk.isAuthenticated()
                 .then((isAuthenticated: boolean): void => {
                     if (isAuthenticated) {
-                        serializeConnectionInfo(accessKey, serverUrl);
+                        serializeConnectionInfo(accessKey, /*preserveAccessKeyOnLogout*/ false, serverUrl);
                     } else {
                         throw new Error("Invalid access key.");
                     }
@@ -554,17 +557,25 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string): Pr
 }
 
 function logout(command: cli.ILogoutCommand): Promise<void> {
+    var delayedError: Error;
     return Q(<void>null)
         .then((): Promise<void> => {
-            if (!command.isLocal) {
+            if (!connectionInfo.preserveAccessKeyOnLogout) {
                 return sdk.removeAccessKey(sdk.accessKey)
                     .then((): void => {
-                        log("Removed access key " + sdk.accessKey + ".");
-                        sdk = null;
+                        log(`Removed access key ${sdk.accessKey}.`);
                     });
+            } else {
+                log("Warning: Your access key is still valid for future sessions. Please explicitly remove it if desired.");
             }
         })
-        .then((): void => deleteConnectionInfoCache(), (): void => deleteConnectionInfoCache());
+        .catch((err: Error) => delayedError = err)
+        .then((): void => {
+            sdk = null;
+            deleteConnectionInfoCache();
+
+            if (delayedError) throw delayedError;
+        });
 }
 
 function formatDate(unixOffset: number): string {
@@ -1061,11 +1072,12 @@ export var runReactNativeBundleCommand = (bundleName: string, entryFile: string,
     });
 }
 
-function serializeConnectionInfo(accessKey: string, serverUrl?: string): void {
-    var connectionInfo: ILoginConnectionInfo = { accessKey: accessKey };
-    if (serverUrl) {
-        connectionInfo.customServerUrl = serverUrl;
+function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: boolean, customServerUrl?: string): void {
+    var connectionInfo: ILoginConnectionInfo = { accessKey: accessKey, preserveAccessKeyOnLogout: preserveAccessKeyOnLogout };
+    if (customServerUrl) {
+        connectionInfo.customServerUrl = customServerUrl;
     }
+
     var json: string = JSON.stringify(connectionInfo);
     fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
 
