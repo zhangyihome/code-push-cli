@@ -39,16 +39,18 @@ interface NameToCountMap {
     [name: string]: number;
 }
 
+/** Deprecated */
 interface ILegacyLoginConnectionInfo {
     accessKeyName: string;
-    providerName: string;
-    providerUniqueId: string;
-    serverUrl: string;
+    // The 'providerName' property has been obsoleted
+    // The 'providerUniqueId' property has been obsoleted
+    // The 'serverUrl' property has been obsoleted
 }
 
 interface ILoginConnectionInfo {
     accessKey: string;
-    serverUrl: string;
+    // The 'serverUrl' property has been obsoleted
+    customServerUrl?: string;   // A custom serverUrl for internal debugging purposes
 }
 
 interface IPackageFile {
@@ -248,7 +250,7 @@ function deleteConnectionInfoCache(): void {
     try {
         fs.unlinkSync(configFilePath);
 
-        log("Successfully logged-out. The session token file located at " + chalk.cyan(configFilePath) + " has been deleted.\r\n");
+        log(`Successfully logged-out. The session file located at ${chalk.cyan(configFilePath)} has been deleted.\r\n`);
     } catch (ex) {
     }
 }
@@ -354,17 +356,26 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
         });
 }
 
-function deserializeConnectionInfo(): ILegacyLoginConnectionInfo | ILoginConnectionInfo {
+function deserializeConnectionInfo(): ILoginConnectionInfo {
     try {
         var savedConnection: string = fs.readFileSync(configFilePath, { encoding: "utf8" });
-        return JSON.parse(savedConnection);
+        var connectionInfo: ILegacyLoginConnectionInfo | ILoginConnectionInfo = JSON.parse(savedConnection);
+
+        // If the connection info is in the legacy format, convert it to the modern format
+        if ((<ILegacyLoginConnectionInfo>connectionInfo).accessKeyName) {
+            connectionInfo = <ILoginConnectionInfo>{
+                accessKey: (<ILegacyLoginConnectionInfo>connectionInfo).accessKeyName
+            };
+        }
+
+        return <ILoginConnectionInfo>connectionInfo;
     } catch (ex) {
         return;
     }
 }
 
 export function execute(command: cli.ICommand): Promise<void> {
-    var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = deserializeConnectionInfo();
+    var connectionInfo: ILoginConnectionInfo = deserializeConnectionInfo();
 
     return Q(<void>null)
         .then(() => {
@@ -383,8 +394,7 @@ export function execute(command: cli.ICommand): Promise<void> {
                         throw new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server.");
                     }
 
-                    var accessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
-                    sdk = new AccountManager(accessKey, userAgent, connectionInfo.serverUrl);
+                    sdk = new AccountManager(connectionInfo.accessKey, userAgent, connectionInfo.customServerUrl);
                     break;
             }
 
@@ -493,13 +503,13 @@ function getTotalActiveFromDeploymentMetrics(metrics: DeploymentMetrics): number
     return totalActive;
 }
 
-function initiateExternalAuthenticationAsync(serverUrl: string, action: string): void {
+function initiateExternalAuthenticationAsync(action: string, serverUrl?: string): void {
     var message: string = `A browser is being launched to authenticate your account. Follow the instructions ` +
         `it displays to complete your ${action === "register" ? "registration" : "login"}.\r\n`;
 
     log(message);
     var hostname: string = os.hostname();
-    var url: string = serverUrl + "/auth/" + action + "?hostname=" + hostname;
+    var url: string = `${serverUrl || AccountManager.SERVER_URL}/auth/${action}?hostname=${hostname}`;
     opener(url);
 }
 
@@ -510,61 +520,37 @@ function login(command: cli.ILoginCommand): Promise<void> {
         return sdk.isAuthenticated()
             .then((isAuthenticated: boolean): void => {
                 if (isAuthenticated) {
-                    serializeConnectionInfo(command.serverUrl, command.accessKey);
+                    serializeConnectionInfo(command.accessKey, command.serverUrl);
                 } else {
                     throw new Error("Invalid access key.");
                 }
             });
     } else {
-        initiateExternalAuthenticationAsync(command.serverUrl, "login");
-
-        return loginWithAccessTokenInternal(command.serverUrl);
+        return loginWithExternalAuthentication("login", command.serverUrl);
     }
 }
 
-function loginWithAccessTokenInternal(serverUrl: string): Promise<void> {
-    return requestAccessToken()
-        .then((accessToken: string): Promise<void> => {
-            if (accessToken === null) {
+function loginWithExternalAuthentication(action: string, serverUrl?: string): Promise<void> {
+    initiateExternalAuthenticationAsync(action, serverUrl);
+
+    return requestAccessKey()
+        .then((accessKey: string): Promise<void> => {
+            if (accessKey === null) {
                 // The user has aborted the synchronous prompt (e.g.:  via [CTRL]+[C]).
                 return;
             }
 
-            try {
-                var decoded: string = base64.decode(accessToken);
-                var connectionInfo: ILegacyLoginConnectionInfo = JSON.parse(decoded);
-            } catch (error) {
-            }
-
-            if (!connectionInfo) {
-                throw new Error("Invalid access token.");
-            }
-
-            var accessKey: string = getAccessKeyFromConnectionInfo(connectionInfo);
             sdk = new AccountManager(accessKey, userAgent, serverUrl);
 
             return sdk.isAuthenticated()
                 .then((isAuthenticated: boolean): void => {
                     if (isAuthenticated) {
-                        serializeConnectionInfo(serverUrl, accessKey);
+                        serializeConnectionInfo(accessKey, serverUrl);
                     } else {
-                        throw new Error("Invalid access token.");
+                        throw new Error("Invalid access key.");
                     }
                 });
         });
-}
-
-function getAccessKeyFromConnectionInfo(connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo): string {
-    if (!connectionInfo) return null;
-
-    var legacyLoginConnectionInfo: ILegacyLoginConnectionInfo = <ILegacyLoginConnectionInfo>connectionInfo;
-    var loginConnectionInfo: ILoginConnectionInfo = <ILoginConnectionInfo>connectionInfo;
-
-    if (legacyLoginConnectionInfo.accessKeyName) {
-        return legacyLoginConnectionInfo.accessKeyName;
-    } else {
-        return loginConnectionInfo.accessKey;
-    }
 }
 
 function logout(command: cli.ILogoutCommand): Promise<void> {
@@ -841,9 +827,7 @@ function printTable(columnNames: string[], readData: (dataSource: any[]) => void
 }
 
 function register(command: cli.IRegisterCommand): Promise<void> {
-    initiateExternalAuthenticationAsync(command.serverUrl, "register");
-
-    return loginWithAccessTokenInternal(command.serverUrl);
+    return loginWithExternalAuthentication("register", command.serverUrl);
 }
 
 function promote(command: cli.IPromoteCommand): Promise<void> {
@@ -1017,7 +1001,7 @@ function rollback(command: cli.IRollbackCommand): Promise<void> {
         });
 }
 
-function requestAccessToken(): Promise<string> {
+function requestAccessKey(): Promise<string> {
     return Promise<string>((resolve, reject, notify): void => {
         prompt.message = "";
         prompt.delimiter = "";
@@ -1027,7 +1011,7 @@ function requestAccessToken(): Promise<string> {
         prompt.get({
             properties: {
                 response: {
-                    description: chalk.cyan("Enter your access token: ")
+                    description: chalk.cyan("Enter your access key: ")
                 }
             }
         }, (err: any, result: any): void => {
@@ -1077,12 +1061,15 @@ export var runReactNativeBundleCommand = (bundleName: string, entryFile: string,
     });
 }
 
-function serializeConnectionInfo(serverUrl: string, accessKey: string): void {
-    var connectionInfo: ILegacyLoginConnectionInfo|ILoginConnectionInfo = <ILoginConnectionInfo>{ serverUrl: serverUrl, accessKey: accessKey };
+function serializeConnectionInfo(accessKey: string, serverUrl?: string): void {
+    var connectionInfo: ILoginConnectionInfo = { accessKey: accessKey };
+    if (serverUrl) {
+        connectionInfo.customServerUrl = serverUrl;
+    }
     var json: string = JSON.stringify(connectionInfo);
     fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
 
-    log("\r\nSuccessfully logged-in. Your session token was written to " + chalk.cyan(configFilePath) + ". You can run the " + chalk.cyan("code-push logout") + " command at any time to delete this file and terminate your session.\r\n");
+    log(`\r\nSuccessfully logged-in. Your session file was written to ${chalk.cyan(configFilePath)}. You can run the ${chalk.cyan("code-push logout")} command at any time to delete this file and terminate your session.\r\n`);
 }
 
 function isBinaryOrZip(path: string): boolean {

@@ -108,7 +108,7 @@ export interface IDeploymentRenameCommand extends ICommand {
 }
 
 export interface ILoginCommand extends ICommand {
-    serverUrl: string;
+    serverUrl?: string;
     accessKey: string;
 }
 
@@ -123,7 +123,7 @@ export interface IPromoteCommand extends ICommand {
 }
 
 export interface IRegisterCommand extends ICommand {
-    serverUrl: string;
+    serverUrl?: string;
 }
 
 export interface IReleaseBaseCommand extends ICommand {
