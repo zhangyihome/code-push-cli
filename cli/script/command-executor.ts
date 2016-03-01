@@ -250,7 +250,7 @@ function deleteConnectionInfoCache(): void {
     try {
         fs.unlinkSync(configFilePath);
 
-        log("Successfully logged-out. The session file located at " + chalk.cyan(configFilePath) + " has been deleted.\r\n");
+        log(`Successfully logged-out. The session file located at ${chalk.cyan(configFilePath)} has been deleted.\r\n`);
     } catch (ex) {
     }
 }
@@ -509,7 +509,7 @@ function initiateExternalAuthenticationAsync(action: string, serverUrl?: string)
 
     log(message);
     var hostname: string = os.hostname();
-    var url: string = (serverUrl || AccountManager.SERVER_URL) + "/auth/" + action + "?hostname=" + hostname;
+    var url: string = `${serverUrl || AccountManager.SERVER_URL}/auth/${action}?hostname=${hostname}`;
     opener(url);
 }
 
@@ -1069,7 +1069,7 @@ function serializeConnectionInfo(accessKey: string, serverUrl?: string): void {
     var json: string = JSON.stringify(connectionInfo);
     fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
 
-    log("\r\nSuccessfully logged-in. Your session file was written to " + chalk.cyan(configFilePath) + ". You can run the " + chalk.cyan("code-push logout") + " command at any time to delete this file and terminate your session.\r\n");
+    log(`\r\nSuccessfully logged-in. Your session file was written to ${chalk.cyan(configFilePath)}. You can run the ${chalk.cyan("code-push logout")} command at any time to delete this file and terminate your session.\r\n`);
 }
 
 function isBinaryOrZip(path: string): boolean {
