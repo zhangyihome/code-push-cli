@@ -65,7 +65,7 @@ After creating the new key, you can specify its value using the `--accessKey` fl
 code-push login --accessKey <accessKey>
 ```
 
-When logging in via this method, the access key will not be automatically invalidated on logout, and can be used in future sessions until it is explicitly removed.
+When logging in via this method, the access key will not be automatically invalidated on logout, and can be used in future sessions until it is explicitly removed from the CodePush server. However, it is still recommended to log out once your session is complete, in order to remove your credentials from disk.
 
 ## App management
 
