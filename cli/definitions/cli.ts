@@ -131,6 +131,7 @@ export interface IReleaseBaseCommand extends ICommand {
     deploymentName: string;
     description: string;
     mandatory: boolean;
+    rollout: string;
 }
 
 export interface IReleaseCommand extends IReleaseBaseCommand {

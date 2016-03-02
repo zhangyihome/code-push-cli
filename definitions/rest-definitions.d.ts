@@ -42,6 +42,7 @@ declare module "rest-definitions" {
         appVersion?: string;
         description?: string;
         isMandatory?: boolean;
+        rollout?: number;
         /*generated*/ label?: string;
         /*generated*/ packageHash?: string;
     }

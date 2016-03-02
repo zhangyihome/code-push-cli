@@ -286,13 +286,15 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         addCommonConfiguration(yargs);
     })
     .command("release", "Release a new version of your app to a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " release <appName> <updateContentsPath> <targetBinaryVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory]")
+        yargs.usage(USAGE_PREFIX + " release <appName> <updateContentsPath> <targetBinaryVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory] [--rollout <rolloutPercentage>]")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
             .example("release MyApp app.js 1.0.3", "Release the \"app.js\" file to the \"MyApp\" app's \"Staging\" deployment, targeting the 1.0.3 binary version")
             .example("release MyApp ./platforms/ios/www 1.0.3 -d Production", "Release the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting the 1.0.3 binary version")
+            .example("release MyApp ./platforms/ios/www 1.0.3 -d Production -r 20", "Release the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting the 1.0.3 binary version and will be rolled out to about 20% of the users")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
-            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" });
+            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "string" });
 
         addCommonConfiguration(yargs);
     })
@@ -564,6 +566,7 @@ function createCommand(): cli.ICommand {
                     releaseCommand.deploymentName = argv["deploymentName"];
                     releaseCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseCommand.mandatory = argv["mandatory"];
+                    releaseCommand.rollout = argv["rollout"];
                 }
                 break;
 
@@ -581,6 +584,7 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseReactCommand.entryFile = argv["entryFile"];
                     releaseReactCommand.mandatory = argv["mandatory"];
+                    releaseCommand.rollout = argv["rollout"];
                     releaseReactCommand.sourcemapOutput = argv["sourcemapOutput"];
                 }
                 break;

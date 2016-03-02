@@ -34,6 +34,7 @@ var userAgent: string = packageJson.name + "/" + packageJson.version;
 
 const ACTIVE_METRICS_KEY: string = "Active";
 const DOWNLOADED_METRICS_KEY: string = "Downloaded";
+const ROLLOUT_PERCENTAGE_REGEX: RegExp = /^(100|[1-9][0-9]|[1-9])$/;
 
 interface NameToCountMap {
     [name: string]: number;
@@ -677,6 +678,12 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
                     releaseTime += "\n" + chalk.magenta(`(${releaseSource})`).toString();
                 }
 
+                var rollout: string = (packageObject.rollout && packageObject.rollout !== 100) ? packageObject.rollout + "" : "";
+                if (rollout) {
+                    var rolloutString: string = `Rolled out to ${rollout}% of the users`;
+                    releaseTime += "\n" + chalk.magenta(`(${rolloutString})`).toString();
+                }
+
                 var row = [packageObject.label, releaseTime, packageObject.appVersion, packageObject.isMandatory ? "Yes" : "No"];
                 if (command.displayAuthor) {
                     var releasedBy: string = packageObject.releasedBy ? packageObject.releasedBy : "";
@@ -704,7 +711,8 @@ function getPackageString(packageObject: Package): string {
         chalk.green("App Version: ") + packageObject.appVersion + "\n" +
         chalk.green("Mandatory: ") + (packageObject.isMandatory ? "Yes" : "No") + "\n" +
         chalk.green("Release Time: ") + formatDate(packageObject.uploadTime) + "\n" +
-        chalk.green("Released By: ") + (packageObject.releasedBy ? packageObject.releasedBy : "") +
+        chalk.green("Released By: ") + (packageObject.releasedBy ? packageObject.releasedBy : "") + "\n" +
+        chalk.green("Rolled Out To: ") + (packageObject.rollout ? packageObject.rollout + "%" : "100%") +
         (packageObject.description ? wordwrap(70)("\n" + chalk.green("Description: ") + packageObject.description) : "");
 }
 
@@ -837,12 +845,18 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
         });
 }
 
-export var release = (command: cli.IReleaseCommand): Promise<void> => {
+function validateReleaseOptions(command: cli.IReleaseCommand) {
     if (isBinaryOrZip(command.package)) {
         throw new Error("It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).");
     } else if (semver.valid(command.appStoreVersion) === null) {
         throw new Error("Please use a semver-compliant app store version, for example \"1.0.3\".");
+    } else if (command.rollout && !ROLLOUT_PERCENTAGE_REGEX.test(command.rollout)) {
+        throw new Error("Please specify rollout percentage as a whole number between 1 and 100 inclusive.");
     }
+}
+
+export var release = (command: cli.IReleaseCommand): Promise<void> => {
+    validateReleaseOptions(command);
 
     var filePath: string = command.package;
     var getPackageFilePromise: Promise<IPackageFile>;
@@ -904,9 +918,10 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
         lastTotalProgress = currentProgress;
     }
 
+    var rollout: number = command.rollout ? parseInt(command.rollout) : 100;
     return getPackageFilePromise
         .then((file: IPackageFile): Promise<void> => {
-            return sdk.releasePackage(command.appName, command.deploymentName, file.path, command.description, command.appStoreVersion, command.mandatory, uploadProgress)
+            return sdk.releasePackage(command.appName, command.deploymentName, file.path, command.description, command.appStoreVersion, rollout, command.mandatory, uploadProgress)
                 .then((): void => {
                     log("Successfully released an update containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
 

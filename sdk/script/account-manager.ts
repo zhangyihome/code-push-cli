@@ -38,6 +38,7 @@ interface PackageToUpload {
     description: string;
     appVersion: string;
     isMandatory: boolean;
+    rollout: number;
 }
 
 interface JsonResponse {
@@ -208,9 +209,9 @@ export class AccountManager {
             .then(() => null);
     }
 
-    public releasePackage(appName: string, deploymentName: string, fileOrPath: File | string, description: string, appVersion: string, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
+    public releasePackage(appName: string, deploymentName: string, fileOrPath: File | string, description: string, appVersion: string, rollout: number, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var packageInfo: PackageToUpload = this.generatePackageInfo(description, appVersion, isMandatory);
+            var packageInfo: PackageToUpload = this.generatePackageInfo(description, appVersion, isMandatory, rollout);
             var request: superagent.Request<any> = superagent.post(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`);
             this.attachCredentials(request);
 
@@ -332,11 +333,12 @@ export class AccountManager {
         return response && response.text ? response.text : error.message;
     }
 
-    private generatePackageInfo(description: string, appVersion: string, isMandatory: boolean): PackageToUpload {
+    private generatePackageInfo(description: string, appVersion: string, isMandatory: boolean, rollout: number): PackageToUpload {
         return {
             description: description,
             appVersion: appVersion,
-            isMandatory: isMandatory
+            isMandatory: isMandatory,
+            rollout: rollout
         };
     }
 

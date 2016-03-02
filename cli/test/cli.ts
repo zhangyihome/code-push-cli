@@ -691,6 +691,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "test releasing zip file",
             mandatory: false,
+            rollout: "100",
             appStoreVersion: "1.0.0",
             package: "/fake/path/test/file.zip"
         };
@@ -705,6 +706,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "test releasing ipa file",
             mandatory: false,
+            rollout: "100",
             appStoreVersion: "1.0.0",
             package: "/fake/path/test/file.ipa"
         };
@@ -719,6 +721,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "test releasing apk file",
             mandatory: false,
+            rollout: "100",
             appStoreVersion: "1.0.0",
             package: "/fake/path/test/file.apk"
         };
@@ -733,6 +736,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test invalid folder",
             mandatory: false,
+            rollout: "100",
             platform: "ios"
         };
 
@@ -761,6 +765,7 @@ describe("CLI", () => {
             description: "Test invalid entryFile",
             entryFile: "doesntexist.js",
             mandatory: false,
+            rollout: "100",
             platform: "ios"
         };
 
@@ -790,6 +795,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test invalid platform",
             mandatory: false,
+            rollout: "100",
             platform: "blackberry",
         };
 
@@ -821,6 +827,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test default entry file",
             mandatory: false,
+            rollout: "100",
             platform: "ios"
         };
 
@@ -855,6 +862,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test default entry file",
             mandatory: false,
+            rollout: "100",
             platform: "ios"
         };
 
@@ -889,6 +897,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test default entry file",
             mandatory: false,
+            rollout: "100",
             platform: "android"
         };
 
@@ -925,6 +934,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test generates sourcemaps",
             mandatory: false,
+            rollout: "100",
             platform: "android",
             sourcemapOutput: "index.android.js.map"
         };
