@@ -264,7 +264,6 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " logout")
             .demand(/*count*/ 1, /*max*/ 1)  // Require exactly one non-option argument.
             .example("logout", "Log out and end your session");
-            // The 'logout --local' option is obsoleted
         addCommonConfiguration(yargs);
     })
     .command("promote", "Promote the package from one deployment of your app to another", (yargs: yargs.Argv) => {

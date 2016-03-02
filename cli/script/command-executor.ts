@@ -42,14 +42,10 @@ interface NameToCountMap {
 /** Deprecated */
 interface ILegacyLoginConnectionInfo {
     accessKeyName: string;
-    // The 'providerName' property has been obsoleted
-    // The 'providerUniqueId' property has been obsoleted
-    // The 'serverUrl' property has been obsoleted
 }
 
 interface ILoginConnectionInfo {
     accessKey: string;
-    // The 'serverUrl' property has been obsoleted
     customServerUrl?: string;   // A custom serverUrl for internal debugging purposes
     preserveAccessKeyOnLogout?: boolean;
 }
@@ -557,7 +553,6 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string): Pr
 }
 
 function logout(command: cli.ILogoutCommand): Promise<void> {
-    var delayedError: Error;
     return Q(<void>null)
         .then((): Promise<void> => {
             if (!connectionInfo.preserveAccessKeyOnLogout) {
@@ -565,16 +560,11 @@ function logout(command: cli.ILogoutCommand): Promise<void> {
                     .then((): void => {
                         log(`Removed access key ${sdk.accessKey}.`);
                     });
-            } else {
-                log("Warning: Your access key is still valid for future sessions. Please explicitly remove it if desired.");
             }
         })
-        .catch((err: Error) => delayedError = err)
-        .then((): void => {
+        .finally((): void => {
             sdk = null;
             deleteConnectionInfoCache();
-
-            if (delayedError) throw delayedError;
         });
 }
 
