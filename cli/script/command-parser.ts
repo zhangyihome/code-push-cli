@@ -286,10 +286,10 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         addCommonConfiguration(yargs);
     })
     .command("release", "Release a new version of your app to a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " release <appName> <updateContentsPath> <targetBinaryVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory]")
+        yargs.usage(USAGE_PREFIX + " release <appName> <updateContentsPath> <targetBinaryRange> [--deploymentName <deploymentName>] [--description <description>] [--mandatory]")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
-            .example("release MyApp app.js 1.0.3", "Release the \"app.js\" file to the \"MyApp\" app's \"Staging\" deployment, targeting the 1.0.3 binary version")
-            .example("release MyApp ./platforms/ios/www 1.0.3 -d Production", "Release the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting the 1.0.3 binary version")
+            .example("release MyApp app.js \"*\"", "Release the \"app.js\" file to the \"MyApp\" app's \"Staging\" deployment, targeting any binary version using the \"*\" wildcard range syntax.")
+            .example("release MyApp ./platforms/ios/www 1.0.3 -d Production", "Release the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting only the 1.0.3 binary version")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" });
@@ -297,7 +297,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         addCommonConfiguration(yargs);
     })
     .command("release-react", "Release a new version of your React Native app to a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " release-react <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--entryFile <entryFile>] [--mandatory] [--sourcemapOutput <sourcemapOutput>]")
+        yargs.usage(USAGE_PREFIX + " release-react <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--entryFile <entryFile>] [--mandatory] [--sourcemapOutput <sourcemapOutput>] [--targetBinaryRange <targetBinaryRange>]")
             .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
             .example("release-react MyApp ios", "Release the React Native iOS project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
             .example("release-react MyApp android -d Production", "Release the React Native Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
@@ -306,7 +306,8 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("entryFile", { alias: "e", default: null, demand: false, description: "The path to the root JS file. If unspecified, \"index.<platform>.js\" and then \"index.js\" will be tried and used if they exist.", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
-            .option("sourcemapOutput", { alias: "s", default: null, demand: false, description: "The path to where the sourcemap for the resulting bundle should be stored. If unspecified, sourcemaps will not be generated.", type: "string" });
+            .option("sourcemapOutput", { alias: "s", default: null, demand: false, description: "The path to where the sourcemap for the resulting bundle should be stored. If unspecified, sourcemaps will not be generated.", type: "string" })
+            .option("targetBinaryRange", { alias: "t", default: null, demand: false, description: "The semver range expression spanning all the binary app store versions that should get this update. If omitted, the update will default to target only the same version as the current binary version specified in \"Info.plist\" (iOS) or \"build.gradle\" (Android)", type: "string" });
 
         addCommonConfiguration(yargs);
     })
@@ -326,7 +327,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
     .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommandCategory)  // Report unrecognized, non-hyphenated command category.
     .fail((msg: string) => showHelp(/*showRootDescription*/ true))  // Suppress the default error message.
     .argv;
-
+    
 function createCommand(): cli.ICommand {
     var cmd: cli.ICommand;
 
@@ -560,7 +561,8 @@ function createCommand(): cli.ICommand {
 
                     releaseCommand.appName = arg1;
                     releaseCommand.package = arg2;
-                    releaseCommand.appStoreVersion = arg3;
+                    // Floating points e.g. "1.2" gets parsed as a number by default, but semver requires strings.
+                    releaseCommand.appStoreVersion = arg3.toString();
                     releaseCommand.deploymentName = argv["deploymentName"];
                     releaseCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseCommand.mandatory = argv["mandatory"];
@@ -582,6 +584,7 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.entryFile = argv["entryFile"];
                     releaseReactCommand.mandatory = argv["mandatory"];
                     releaseReactCommand.sourcemapOutput = argv["sourcemapOutput"];
+                    releaseReactCommand.appStoreVersion = argv["targetBinaryRange"];
                 }
                 break;
 
