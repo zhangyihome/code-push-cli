@@ -58,6 +58,7 @@ declare module "rest-definitions" {
     /*in*/
     export interface UpdateCheckRequest {
         appVersion: string;
+        clientUniqueId?: string;
         deploymentKey: string;
         isCompanion?: boolean;
         label?: string;
