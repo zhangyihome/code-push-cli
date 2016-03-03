@@ -11,7 +11,7 @@ var manager: AccountManager;
 describe("Management SDK", () => {
 
     beforeEach(() => {
-        manager = new AccountManager(/*accessKey=*/ "dummyAccessKey", /*userAgent=*/ "unit-test/1.0.0", /*serverUrl=*/ "http://localhost");
+        manager = new AccountManager(/*accessKey=*/ "dummyAccessKey", /*customHeaders=*/ null, /*serverUrl=*/ "http://localhost");
     });
 
     after(() => {

@@ -40,8 +40,10 @@ interface PackageToUpload {
     isMandatory: boolean;
 }
 
+export type Headers = { [headerName: string]: string };
+
 interface JsonResponse {
-    header: { [headerName: string]: string };
+    headers: Headers;
     body?: any;
 }
 
@@ -65,13 +67,13 @@ export class AccountManager {
 
     private _accessKey: string;
     private _serverUrl: string;
-    private _userAgent: string;
+    private _customHeaders: Headers;
 
-    constructor(accessKey: string, userAgent?: string, serverUrl?: string) {
+    constructor(accessKey: string, customHeaders?: Headers, serverUrl?: string) {
         if (!accessKey) throw new Error("An access key must be specified.");
 
         this._accessKey = accessKey;
-        this._userAgent = userAgent;
+        this._customHeaders = customHeaders;
         this._serverUrl = serverUrl || AccountManager.SERVER_URL;
     }
 
@@ -315,7 +317,7 @@ export class AccountManager {
                         reject(<CodePushError>{ message: `Could not parse response: ${res.text}`, statusCode: res.status });
                     } else {
                         resolve(<JsonResponse>{
-                            header: res.header,
+                            headers: res.header,
                             body: body
                         });
                     }
@@ -343,11 +345,14 @@ export class AccountManager {
     }
 
     private attachCredentials(request: superagent.Request<any>): void {
+        if (this._customHeaders) {
+            for (var headerName in this._customHeaders) {
+                request.set(headerName, this._customHeaders[headerName]);
+            }
+        }
+
         request.set("Accept", `application/vnd.code-push.v${AccountManager.API_VERSION}+json`);
         request.set("Authorization", `Bearer ${this._accessKey}`);
-        if (this._userAgent) {
-            request.set("User-Agent", this._userAgent);
-        }
         request.set("X-CodePush-SDK-Version", packageJson.version);
     }
 }

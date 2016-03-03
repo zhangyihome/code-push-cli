@@ -23,16 +23,18 @@ import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
 import { AcquisitionStatus } from "code-push/script/acquisition-sdk";
-import { AccessKey, Account, AccountManager, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Package, Permissions, UpdateMetrics } from "code-push";
+import { AccessKey, Account, AccountManager, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, Permissions, UpdateMetrics } from "code-push";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var emailValidator = require("email-validator");
 var packageJson = require("../package.json");
 var progress = require("progress");
 import Promise = Q.Promise;
-var userAgent: string = packageJson.name + "/" + packageJson.version;
 
 const ACTIVE_METRICS_KEY: string = "Active";
+const CLI_HEADERS: Headers = {
+    "X-CodePush-CLI-Version": packageJson.version
+};
 const DOWNLOADED_METRICS_KEY: string = "Downloaded";
 
 interface NameToCountMap {
@@ -393,7 +395,7 @@ export function execute(command: cli.ICommand): Promise<void> {
                         throw new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server.");
                     }
 
-                    sdk = new AccountManager(connectionInfo.accessKey, userAgent, connectionInfo.customServerUrl);
+                    sdk = new AccountManager(connectionInfo.accessKey, CLI_HEADERS, connectionInfo.customServerUrl);
                     break;
             }
 
@@ -515,7 +517,7 @@ function initiateExternalAuthenticationAsync(action: string, serverUrl?: string)
 function login(command: cli.ILoginCommand): Promise<void> {
     // Check if one of the flags were provided.
     if (command.accessKey) {
-        sdk = new AccountManager(command.accessKey, userAgent, command.serverUrl);
+        sdk = new AccountManager(command.accessKey, CLI_HEADERS, command.serverUrl);
         return sdk.isAuthenticated()
             .then((isAuthenticated: boolean): void => {
                 if (isAuthenticated) {
@@ -539,7 +541,7 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string): Pr
                 return;
             }
 
-            sdk = new AccountManager(accessKey, userAgent, serverUrl);
+            sdk = new AccountManager(accessKey, CLI_HEADERS, serverUrl);
 
             return sdk.isAuthenticated()
                 .then((isAuthenticated: boolean): void => {
