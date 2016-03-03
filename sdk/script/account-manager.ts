@@ -68,6 +68,8 @@ export class AccountManager {
     private _userAgent: string;
 
     constructor(accessKey: string, userAgent?: string, serverUrl?: string) {
+        if (!accessKey) throw new Error("An access key must be specified.");
+
         this._accessKey = accessKey;
         this._userAgent = userAgent;
         this._serverUrl = serverUrl || AccountManager.SERVER_URL;
