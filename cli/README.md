@@ -244,19 +244,23 @@ This specifies a [semver range expression](https://github.com/npm/node-semver#ad
 | `^1.2.3`         | Equivalent to `>=1.2.3 <2.0.0`                                                         |
 | `*`              | Any device configured to consume updates from your CodePush app                        |
 
+*NOTE: If your semver expression starts with a special shell character, the command may not execute correctly if you do not wrap the value in quotes as the shell will not supply the right values to our CLI process. Therefore, it is best to wrap your `targetBinaryRange` parameter in double quotes when calling the `release` command, e.g. `code-push release MyApp updateContents ">1.2.3"`.
+
 You would want to restrict updates to target specific binary versions of your app, for the following reasons:
 
 1. If a user is running an older binary version, it's possible that there are breaking changes in the CodePush update that wouldn't be compatible with what they're running.
 
 2. If a user is running a newer binary version, then it's presumed that what they are running is newer (and potentially incompatible) with the CodePush update.
 
-The following table outlines the semver value that CodePush expects your range to satisfy for each respective app type:
+The following table outlines the version value that CodePush expects your update's semver range to satisfy for each respective app type:
 
 | Platform               | Source of app store version                                                  |
 |------------------------|------------------------------------------------------------------------------|
 | Cordova                | The `<widget version>` attribute in the `config.xml` file                    |
 | React Native (Android) | The `android.defaultConfig.versionName` property in your `build.gradle` file |
 | React Native (iOS)     | The `CFBundleShortVersionString` key in the `Info.plist` file                |
+
+*NOTE: If the app store version in the metadata files are missing a patch version, e.g. `2.0`, it will be treated as having a patch version of `0`, i.e. `2.0 -> 2.0.0`.
 
 ### Deployment name parameter
 
