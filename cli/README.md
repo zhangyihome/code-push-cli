@@ -244,7 +244,7 @@ This specifies a [semver range expression](https://github.com/npm/node-semver#ad
 | `^1.2.3`         | Equivalent to `>=1.2.3 <2.0.0`                                                         |
 | `*`              | Any device configured to consume updates from your CodePush app                        |
 
-*NOTE: If your semver expression starts with a special shell character, the command may not execute correctly if you do not wrap the value in quotes as the shell will not supply the right values to our CLI process. Therefore, it is best to wrap your `targetBinaryRange` parameter in double quotes when calling the `release` command, e.g. `code-push release MyApp updateContents ">1.2.3"`.
+*NOTE: If your semver expression starts with a special shell character or operator such as `>` or `^`, the command may not execute correctly if you do not wrap the value in quotes as the shell will not supply the right values to our CLI process. Therefore, it is best to wrap your `targetBinaryRange` parameter in double quotes when calling the `release` command, e.g. `code-push release MyApp updateContents ">1.2.3"`.
 
 You would want to restrict updates to target specific binary versions of your app, for the following reasons:
 

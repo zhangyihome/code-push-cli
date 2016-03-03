@@ -695,7 +695,7 @@ describe("CLI", () => {
             package: "./resources"
         };
 
-        releaseHelperFunction(command, done, "Please use a semver-compliant target binary version range, for example \"^1.0.3\".");
+        releaseHelperFunction(command, done, "Please use a semver-compliant target binary version range, for example \"1.0.0\", \"*\" or \"^1.2.3\".");
     });
 
     it("release doesn't allow releasing .zip file", (done: MochaDone): void => {
@@ -853,7 +853,7 @@ describe("CLI", () => {
                 done(new Error("Did not throw error."));
             })
             .catch((err) => {
-                assert.equal(err.message, "Please use a semver-compliant target binary version range, for example \"^1.0.3\".");
+                assert.equal(err.message, "Please use a semver-compliant target binary version range, for example \"1.0.0\", \"*\" or \"^1.2.3\".");
                 sinon.assert.notCalled(release);
                 sinon.assert.threw(releaseReact, "Error");
                 sinon.assert.notCalled(spawn);

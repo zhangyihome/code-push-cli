@@ -848,7 +848,7 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
     if (isBinaryOrZip(command.package)) {
         throw new Error("It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).");
     } else if (semver.validRange(command.appStoreVersion) === null) {
-        throw new Error("Please use a semver-compliant target binary version range, for example \"^1.0.3\".");
+        throw new Error("Please use a semver-compliant target binary version range, for example \"1.0.0\", \"*\" or \"^1.2.3\".");
     }
 
     var filePath: string = command.package;
@@ -974,7 +974,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
     }
     
     if (command.appStoreVersion && semver.validRange(command.appStoreVersion) === null) {
-        throw new Error("Please use a semver-compliant target binary version range, for example \"^1.0.3\".");
+        throw new Error("Please use a semver-compliant target binary version range, for example \"1.0.0\", \"*\" or \"^1.2.3\".");
     }
     
     var appVersionPromise: Promise<string> = command.appStoreVersion
