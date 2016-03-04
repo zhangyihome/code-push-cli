@@ -1,1 +1,1 @@
-export * from "./account-manager";
+export * from "./management-sdk";
