@@ -450,7 +450,7 @@ export function execute(command: cli.ICommand): Promise<void> {
                     return login(<cli.ILoginCommand>command);
 
                 case cli.CommandType.logout:
-                    return logout(<cli.ILogoutCommand>command);
+                    return logout(command);
 
                 case cli.CommandType.promote:
                     return promote(<cli.IPromoteCommand>command);
@@ -552,7 +552,7 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string): Pr
         });
 }
 
-function logout(command: cli.ILogoutCommand): Promise<void> {
+function logout(command: cli.ICommand): Promise<void> {
     return Q(<void>null)
         .then((): Promise<void> => {
             if (!connectionInfo.preserveAccessKeyOnLogout) {

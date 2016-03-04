@@ -112,9 +112,6 @@ export interface ILoginCommand extends ICommand {
     accessKey: string;
 }
 
-export interface ILogoutCommand extends ICommand {
-}
-
 export interface IPromoteCommand extends ICommand {
     appName: string;
     sourceDeploymentName: string;
