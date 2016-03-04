@@ -91,7 +91,7 @@ export class SdkStub {
         }]);
     }
 
-    public getPackageHistory(appId: string, deploymentId: string): Promise<codePush.Package[]> {
+    public getDeploymentHistory(appId: string, deploymentId: string): Promise<codePush.Package[]> {
         return Q([
             <codePush.Package>{
                 description: null,
@@ -136,7 +136,7 @@ export class SdkStub {
         });
     }
 
-    public getCollaboratorsList(app: codePush.App): Promise<any> {
+    public getCollaborators(app: codePush.App): Promise<any> {
         return Q({
             "a@a.com": {
                 permission: "Owner",
@@ -633,11 +633,11 @@ describe("CLI", () => {
             displayAuthor: false
         };
 
-        var getPackageHistory: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getPackageHistory");
+        var getDeploymentHistory: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getDeploymentHistory");
 
         cmdexec.execute(command)
             .done((): void => {
-                sinon.assert.calledOnce(getPackageHistory);
+                sinon.assert.calledOnce(getDeploymentHistory);
                 sinon.assert.calledOnce(log);
                 assert.equal(log.args[0].length, 1);
 
@@ -881,7 +881,7 @@ describe("CLI", () => {
             })
             .done();
     });
-    
+
     it("release-react defaults bundle name to \"index.android.bundle\" if not provided and platform is \"android\"", (done: MochaDone): void => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
@@ -915,7 +915,7 @@ describe("CLI", () => {
             })
             .done();
     });
-    
+
     it("release-react generates sourcemaps", (done: MochaDone): void => {
         var bundleName = "bundle.js";
         var command: cli.IReleaseReactCommand = {

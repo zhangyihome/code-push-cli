@@ -225,7 +225,7 @@ function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
 function listCollaborators(command: cli.ICollaboratorListCommand): Promise<void> {
     throwForInvalidOutputFormat(command.format);
 
-    return sdk.getCollaboratorsList(command.appName)
+    return sdk.getCollaborators(command.appName)
         .then((retrievedCollaborators: CollaboratorMap): void => {
             printCollaboratorsList(command.format, retrievedCollaborators);
         });
@@ -337,12 +337,12 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
 
     return Q.all<any>([
         sdk.getAccountInfo(),
-        sdk.getPackageHistory(command.appName, command.deploymentName),
+        sdk.getDeploymentHistory(command.appName, command.deploymentName),
         sdk.getDeploymentMetrics(command.appName, command.deploymentName)
     ])
-        .spread<void>((account: Account, packageHistory: Package[], metrics: DeploymentMetrics): void => {
+        .spread<void>((account: Account, deploymentHistory: Package[], metrics: DeploymentMetrics): void => {
             var totalActive: number = getTotalActiveFromDeploymentMetrics(metrics);
-            packageHistory.forEach((packageObject: Package) => {
+            deploymentHistory.forEach((packageObject: Package) => {
                 if (metrics[packageObject.label]) {
                     (<PackageWithMetrics>packageObject).metrics = {
                         active: metrics[packageObject.label].active,
@@ -353,7 +353,7 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
                     };
                 }
             });
-            printDeploymentHistory(command, <PackageWithMetrics[]>packageHistory, account.email);
+            printDeploymentHistory(command, <PackageWithMetrics[]>deploymentHistory, account.email);
         });
 }
 
@@ -653,9 +653,9 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
     }
 }
 
-function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageHistory: PackageWithMetrics[], currentUserEmail: string): void {
+function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, deploymentHistory: PackageWithMetrics[], currentUserEmail: string): void {
     if (command.format === "json") {
-        printJson(packageHistory);
+        printJson(deploymentHistory);
     } else if (command.format === "table") {
         var headers = ["Label", "Release Time", "App Version", "Mandatory"];
         if (command.displayAuthor) {
@@ -665,7 +665,7 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
         headers.push("Description", "Install Metrics");
 
         printTable(headers, (dataSource: any[]) => {
-            packageHistory.forEach((packageObject: Package) => {
+            deploymentHistory.forEach((packageObject: Package) => {
                 var releaseTime: string = formatDate(packageObject.uploadTime);
                 var releaseSource: string;
                 if (packageObject.releaseMethod === "Promote") {
@@ -834,7 +834,7 @@ function register(command: cli.IRegisterCommand): Promise<void> {
 }
 
 function promote(command: cli.IPromoteCommand): Promise<void> {
-    return sdk.promotePackage(command.appName, command.sourceDeploymentName, command.destDeploymentName)
+    return sdk.promote(command.appName, command.sourceDeploymentName, command.destDeploymentName)
         .then((): void => {
             log("Successfully promoted the \"" + command.sourceDeploymentName + "\" deployment of the \"" + command.appName + "\" app to the \"" + command.destDeploymentName + "\" deployment.");
         });
@@ -909,7 +909,7 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
 
     return getPackageFilePromise
         .then((file: IPackageFile): Promise<void> => {
-            return sdk.releasePackage(command.appName, command.deploymentName, file.path, command.description, command.appStoreVersion, command.mandatory, uploadProgress)
+            return sdk.release(command.appName, command.deploymentName, file.path, command.description, command.appStoreVersion, command.mandatory, uploadProgress)
                 .then((): void => {
                     log("Successfully released an update containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
 
@@ -997,7 +997,7 @@ function rollback(command: cli.IRollbackCommand): Promise<void> {
                 return;
             }
 
-            return sdk.rollbackPackage(command.appName, command.deploymentName, command.targetRelease || undefined)
+            return sdk.rollback(command.appName, command.deploymentName, command.targetRelease || undefined)
                 .then((): void => {
                     log("Successfully performed a rollback on the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
                 });

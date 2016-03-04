@@ -174,20 +174,20 @@ describe("Management SDK", () => {
         }, rejectHandler);
     });
 
-    it("getPackageHistory handles success response with no packages", (done: MochaDone) => {
-        mockReturn(JSON.stringify({ packageHistory: [] }), 200);
+    it("getDeploymentHistory handles success response with no packages", (done: MochaDone) => {
+        mockReturn(JSON.stringify({ history: [] }), 200);
 
-        manager.getPackageHistory("appName", "deploymentName").done((obj: any) => {
+        manager.getDeploymentHistory("appName", "deploymentName").done((obj: any) => {
             assert.ok(obj);
             assert.equal(obj.length, 0);
             done();
         }, rejectHandler);
     });
 
-    it("getPackageHistory handles success response with two packages", (done: MochaDone) => {
-        mockReturn(JSON.stringify({ packageHistory: [ { label: "v1" }, { label: "v2" } ] }), 200);
+    it("getDeploymentHistory handles success response with two packages", (done: MochaDone) => {
+        mockReturn(JSON.stringify({ history: [ { label: "v1" }, { label: "v2" } ] }), 200);
 
-        manager.getPackageHistory("appName", "deploymentName").done((obj: any) => {
+        manager.getDeploymentHistory("appName", "deploymentName").done((obj: any) => {
             assert.ok(obj);
             assert.equal(obj.length, 2);
             assert.equal(obj[0].label, "v1");
@@ -196,10 +196,10 @@ describe("Management SDK", () => {
         }, rejectHandler);
     });
 
-    it("getPackageHistory handles error response", (done: MochaDone) => {
+    it("getDeploymentHistory handles error response", (done: MochaDone) => {
         mockReturn("", 404);
 
-        manager.getPackageHistory("appName", "deploymentName").done((obj: any) => {
+        manager.getDeploymentHistory("appName", "deploymentName").done((obj: any) => {
             throw new Error("Call should not complete successfully");
         }, (error: Error) => done());
     });

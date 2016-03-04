@@ -165,7 +165,7 @@ export class AccountManager {
     }
 
     // Collaborators
-    public getCollaboratorsList(appName: string): Promise<CollaboratorMap> {
+    public getCollaborators(appName: string): Promise<CollaboratorMap> {
         return this.get(urlEncode `/apps/${appName}/collaborators`)
             .then((res: JsonResponse) => res.body.collaborators);
     }
@@ -197,11 +197,6 @@ export class AccountManager {
             .then((res: JsonResponse) => res.body.deployment);
     }
 
-    public getDeploymentMetrics(appName: string, deploymentName: string): Promise<DeploymentMetrics> {
-        return this.get(urlEncode `/apps/${appName}/deployments/${deploymentName}/metrics`)
-            .then((res: JsonResponse) => res.body.metrics);
-    }
-
     public updateDeployment(appName: string, deploymentName: string, infoToChange: Deployment): Promise<void> {
         return this.patch(urlEncode `/apps/${appName}/deployments/${deploymentName}`, JSON.stringify(infoToChange))
             .then(() => null);
@@ -212,7 +207,17 @@ export class AccountManager {
             .then(() => null);
     }
 
-    public releasePackage(appName: string, deploymentName: string, fileOrPath: File | string, description: string, appVersion: string, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
+    public getDeploymentMetrics(appName: string, deploymentName: string): Promise<DeploymentMetrics> {
+        return this.get(urlEncode `/apps/${appName}/deployments/${deploymentName}/metrics`)
+            .then((res: JsonResponse) => res.body.metrics);
+    }
+
+    public getDeploymentHistory(appName: string, deploymentName: string): Promise<Package[]> {
+        return this.get(urlEncode `/apps/${appName}/deployments/${deploymentName}/history`)
+            .then((res: JsonResponse) => res.body.history);
+    }
+
+    public release(appName: string, deploymentName: string, fileOrPath: File | string, description: string, appVersion: string, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             var packageInfo: PackageToUpload = this.generatePackageInfo(description, appVersion, isMandatory);
             var request: superagent.Request<any> = superagent.post(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`);
@@ -257,19 +262,14 @@ export class AccountManager {
         });
     }
 
-    public promotePackage(appName: string, sourceDeploymentName: string, destDeploymentName: string): Promise<void> {
+    public promote(appName: string, sourceDeploymentName: string, destDeploymentName: string): Promise<void> {
         return this.post(urlEncode `/apps/${appName}/deployments/${sourceDeploymentName}/promote/${destDeploymentName}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
             .then(() => null);
     }
 
-    public rollbackPackage(appName: string, deploymentName: string, targetRelease?: string): Promise<void> {
+    public rollback(appName: string, deploymentName: string, targetRelease?: string): Promise<void> {
         return this.post(urlEncode `/apps/${appName}/deployments/${deploymentName}/rollback/${targetRelease || ``}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
             .then(() => null);
-    }
-
-    public getPackageHistory(appName: string, deploymentName: string): Promise<Package[]> {
-        return this.get(urlEncode `/apps/${appName}/deployments/${deploymentName}/packageHistory`)
-            .then((res: JsonResponse) => res.body.packageHistory);
     }
 
     private get(endpoint: string, expectResponseBody: boolean = true): Promise<JsonResponse> {
