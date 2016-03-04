@@ -765,13 +765,7 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
             if (semver.valid(parsedInfoPlist.CFBundleShortVersionString) || missingPatchVersionRegex.test(parsedInfoPlist.CFBundleShortVersionString)) {
                 return Q(parsedInfoPlist.CFBundleShortVersionString);
             } else {
-                throw new Error("Please update \"" + infoPlistContainingFolder + "/Info.plist\" to use a semver-compliant \"CFBundleShortVersionString\", for example \"1.0.3\".");
-            }
-            
-            if (semver.valid(parsedInfoPlist.CFBundleShortVersionString) === null) {
-                throw new Error(`Please update "${infoPlistContainingFolder}/Info.plist" to use a semver-compliant \"CFBundleShortVersionString\", for example "1.0.3".`);
-            } else {
-                return Q(parsedInfoPlist.CFBundleShortVersionString);
+                throw new Error(`The "CFBundleShortVersionString" key in "${infoPlistContainingFolder}/Info.plist" needs to have at least a major and minor version, for example "2.0" or "1.0.3".`);
             }
         } else {
             throw new Error(`The "CFBundleShortVersionString" key does not exist in "${infoPlistContainingFolder}/Info.plist".`);
@@ -792,7 +786,7 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
                     if (semver.valid(appVersion) || missingPatchVersionRegex.test(appVersion)) {
                         return appVersion;
                     } else {
-                        throw new Error("Please update \"android/app/build.gradle\" to use a semver-compliant \"android.defaultConfig.versionName\", for example \"1.0.3\".");
+                        throw new Error("The \"android.defaultConfig.versionName\" property in \"android/app/build.gradle\" needs to have at least a major and minor version, for example \"2.0\" or \"1.0.3\".");
                     }
                 } else {
                     throw new Error("The \"android/app/build.gradle\" file does not include a value for android.defaultConfig.versionName.");
