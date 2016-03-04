@@ -3,7 +3,7 @@ import * as sinon from "sinon";
 import Q = require("q");
 import * as path from "path";
 import Promise = Q.Promise;
-import * as codePush from "code-push";
+import * as codePush from "code-push/script/types";
 import * as cli from "../definitions/cli";
 import * as cmdexec from "../script/command-executor";
 import * as os from "os";

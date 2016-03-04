@@ -22,8 +22,8 @@ import * as yazl from "yazl";
 import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
-import { AcquisitionStatus } from "code-push/script/acquisition-sdk";
-import { AccessKey, Account, AccountManager, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, Permissions, UpdateMetrics } from "code-push";
+import { AccountManager } from "code-push";
+import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, UpdateMetrics } from "code-push/script/types";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var emailValidator = require("email-validator");
@@ -603,7 +603,7 @@ function printAppList(format: string, apps: App[], deploymentLists: string[][]):
 }
 
 function getCollaboratorDisplayName(email: string, collaboratorProperties: CollaboratorProperties): string {
-    return (collaboratorProperties.permission === Permissions.Owner) ? email + chalk.magenta(" (" + Permissions.Owner + ")") : email;
+    return (collaboratorProperties.permission === AccountManager.PERMISSIONS.OWNER) ? email + chalk.magenta(" (Owner)") : email;
 }
 
 function printCollaboratorsList(format: string, collaborators: CollaboratorMap): void {

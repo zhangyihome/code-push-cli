@@ -4,6 +4,8 @@ import crypto = require("crypto");
 import Promise = Q.Promise;
 import superagent = require("superagent");
 
+import { AccessKey, Account, App, CodePushError, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, UpdateMetrics } from "./types";
+
 var packageJson = require("../../package.json");
 
 declare var fs: any;
@@ -18,29 +20,11 @@ if (typeof window === "undefined") {
     }
 }
 
-// Aliasing UpdateMetrics as IUpdateMetrics & CollaboratorProperties as ICollaboratorProperties to deal with TypeScript issue that removes unused imports.
-import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties as ICollaboratorProperties, Deployment, DeploymentMetrics, Package, UpdateMetrics as IUpdateMetrics } from "rest-definitions";
-export { AccessKey, Account, App, CollaboratorMap, Deployment, DeploymentMetrics, Package };
-export type UpdateMetrics = IUpdateMetrics;
-export type CollaboratorProperties = ICollaboratorProperties;
-
-export module Permissions {
-    export const Owner = "Owner";
-    export const Collaborator = "Collaborator";
-}
-
-export interface CodePushError {
-    message?: string;
-    statusCode?: number;
-}
-
 interface PackageToUpload {
     description: string;
     appVersion: string;
     isMandatory: boolean;
 }
-
-export type Headers = { [headerName: string]: string };
 
 interface JsonResponse {
     headers: Headers;
@@ -61,6 +45,10 @@ function urlEncode(strings: string[], ...values: string[]): string {
 }
 
 export class AccountManager {
+    public static PERMISSIONS = {
+        OWNER: "Owner",
+        COLLABORATOR: "Collaborator"
+    };
     public static SERVER_URL = "https://codepush-management.azurewebsites.net";
 
     private static API_VERSION: number = 2;
