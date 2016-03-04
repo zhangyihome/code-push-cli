@@ -347,7 +347,7 @@ This specifies the relative path to where the sourcemap file for resulting updat
 
 ### Target binary range parameter
 
-This is the same parameter as the one described in the [above section](#target-binary-range-parameter).
+This is the same parameter as the one described in the [above section](#target-binary-range-parameter). If left unspecified, the command defaults to targeting only the specified version in the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients).
 
 ## Promoting updates across deployments
 
