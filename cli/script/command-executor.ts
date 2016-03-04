@@ -741,7 +741,7 @@ function getPackageMetricsString(packageObject: PackageWithMetrics): string {
 }
 
 function getReactNativeProjectAppVersion(platform: string, projectName: string): Promise<string> {
-    var missingPatchVersionRegex = /^\d+\.\d+$/;
+    var missingPatchVersionRegex: RegExp = /^\d+\.\d+$/;
     if (platform === "ios") {
         try {
             var infoPlistContainingFolder: string = path.join("iOS", projectName);
@@ -841,10 +841,9 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
 export var release = (command: cli.IReleaseCommand): Promise<void> => {
     if (isBinaryOrZip(command.package)) {
         throw new Error("It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).");
-    } else if (semver.validRange(command.appStoreVersion) === null) {
-        throw new Error("Please use a semver-compliant target binary version range, for example \"1.0.0\", \"*\" or \"^1.2.3\".");
-    }
-
+    } 
+    
+    throwForInvalidSemverRange(command.appStoreVersion);
     var filePath: string = command.package;
     var getPackageFilePromise: Promise<IPackageFile>;
     var isSingleFilePackage: boolean = true;
@@ -967,8 +966,8 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
         }
     }
     
-    if (command.appStoreVersion && semver.validRange(command.appStoreVersion) === null) {
-        throw new Error("Please use a semver-compliant target binary version range, for example \"1.0.0\", \"*\" or \"^1.2.3\".");
+    if (command.appStoreVersion) {
+        throwForInvalidSemverRange(command.appStoreVersion);
     }
     
     var appVersionPromise: Promise<string> = command.appStoreVersion
@@ -1092,6 +1091,12 @@ function throwForInvalidEmail(email: string): void {
         throw new Error("\"" + email + "\" is an invalid e-mail address.");
     }
 }
+
+function throwForInvalidSemverRange(semverRange: string): void {
+    if (semver.validRange(semverRange) === null) {
+        throw new Error("Please use a semver-compliant target binary version range, for example \"1.0.0\", \"*\" or \"^1.2.3\".");
+    }
+} 
 
 function throwForInvalidOutputFormat(format: string): void {
     switch (format) {
