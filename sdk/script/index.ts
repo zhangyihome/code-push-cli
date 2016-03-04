@@ -1,1 +1,2 @@
-export * from "./management-sdk";
+import AccountManager = require("./management-sdk");
+export = AccountManager;

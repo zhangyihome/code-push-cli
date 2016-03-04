@@ -1,5 +1,6 @@
 ﻿/// <reference path="../../definitions/generated/code-push.d.ts" />
 
+import AccountManager = require("code-push");
 import * as base64 from "base-64";
 import * as chalk from "chalk";
 var childProcess = require("child_process");
@@ -22,7 +23,6 @@ import * as yazl from "yazl";
 import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
-import { AccountManager } from "code-push";
 import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, UpdateMetrics } from "code-push/script/types";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");

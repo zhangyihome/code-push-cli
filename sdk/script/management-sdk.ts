@@ -44,7 +44,7 @@ function urlEncode(strings: string[], ...values: string[]): string {
     return result;
 }
 
-export class AccountManager {
+class AccountManager {
     public static PERMISSIONS = {
         OWNER: "Owner",
         COLLABORATOR: "Collaborator"
@@ -344,3 +344,5 @@ export class AccountManager {
         request.set("X-CodePush-SDK-Version", packageJson.version);
     }
 }
+
+export = AccountManager;
