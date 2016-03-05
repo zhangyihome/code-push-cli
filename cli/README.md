@@ -344,9 +344,9 @@ This is the same parameter as the one described in the [above section](#mandator
 
 This specifies the relative path to where the sourcemap file for resulting update's JS bundle should be generated. If left unspecified, sourcemaps will not be generated.
 
-### Target binary range parameter
+### Target binary version parameter
 
-This is the same parameter as the one described in the [above section](#target-binary-range-parameter). If left unspecified, the command defaults to targeting only the specified version in the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients).
+This is the same parameter as the one described in the [above section](#target-binary-version-parameter). If left unspecified, the command defaults to targeting only the specified version in the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients).
 
 ## Promoting updates across deployments
 
