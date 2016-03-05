@@ -206,12 +206,12 @@ When the metrics cell reports `No installs recorded`, that indicates that the se
 
 ## Releasing app updates
 
-*NOTE: If your app is built using React Native, we have a different command that automates generating the update contents and inferring some of the parameters (e.g. `targetBinaryRange`) from the project's metadata. Check out the section: [Releasing updates to a React Native app](#releasing-updates-to-a-react-native-app).*
+*NOTE: If your app is built using React Native, we have a different command that automates generating the update contents and inferring some of the parameters (e.g. `targetBinaryVersion`) from the project's metadata. Check out the section: [Releasing updates to a React Native app](#releasing-updates-to-a-react-native-app).*
 
 Once your app has been configured to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
 
 ```
-code-push release <appName> <updateContents> <targetBinaryRange>
+code-push release <appName> <updateContents> <targetBinaryVersion>
 [--deploymentName <deploymentName>]
 [--description <description>]
 [--mandatory]
@@ -232,9 +232,15 @@ It's important that the path you specify refers to the platform-specific, prepar
 | React Native wo/assets (iOS)     | `react-native bundle --platform ios --entry-file <entryFile> --bundle-output <bundleOutput> --dev false`                                                   | Value of the `--bundle-output` option                                                                 |
 | React Native w/assets (iOS)      | `react-native bundle --platform ios --entry-file <entryFile> --bundle-output <releaseFolder>/<bundleOutput> --assets-dest <releaseFolder> --dev false` | Value of the `--assets-dest` option, which should represent a newly created directory that includes your assets and JS bundle |
 
-### Target binary range parameter
+### Target binary version parameter
 
-This specifies a [semver range expression](https://github.com/npm/node-semver#advanced-range-syntax) that covers all the store/binary versions that this update applies to. Any client device running a version of the binary that satisfies the range expression (i.e. `semver.satisfies(version, range)` returns `true`) will get the update. Examples of valid semver range expressions are as follows:
+This specifies the store/binary version of the application you are releasing the update for, so that only users running that version will receive the update, while users running an older and/or newer version of the app binary will not. This is useful for the following reasons:
+
+1. If a user is running an older binary version, it's possible that there are breaking changes in the CodePush update that wouldn't be compatible with what they're running.
+
+2. If a user is running a newer binary version, then it's presumed that what they are running is newer (and potentially incompatible) with the CodePush update.
+
+If you ever want an update to target multiple versions of the app store binary, we also allow you to specify the parameter as a [semver range expression](https://github.com/npm/node-semver#advanced-range-syntax). That way, any client device running a version of the binary that satisfies the range expression (i.e. `semver.satisfies(version, range)` returns `true`) will get the update. Examples of valid semver range expressions are as follows:
 
 | Range Expression | Who gets the update                                                                    |
 |------------------|----------------------------------------------------------------------------------------|
@@ -247,13 +253,7 @@ This specifies a [semver range expression](https://github.com/npm/node-semver#ad
 | `^1.2.3`         | Equivalent to `>=1.2.3 <2.0.0`                                                         |
 
 *NOTE: If your semver expression starts with a special shell character or operator such as `>`, `^`, or **
-*, the command may not execute correctly if you do not wrap the value in quotes as the shell will not supply the right values to our CLI process. Therefore, it is best to wrap your `targetBinaryRange` parameter in double quotes when calling the `release` command, e.g. `code-push release MyApp updateContents ">1.2.3"`.*
-
-You would want to restrict updates to target specific binary versions of your app, for the following reasons:
-
-1. If a user is running an older binary version, it's possible that there are breaking changes in the CodePush update that wouldn't be compatible with what they're running.
-
-2. If a user is running a newer binary version, then it's presumed that what they are running is newer (and potentially incompatible) with the CodePush update.
+*, the command may not execute correctly if you do not wrap the value in quotes as the shell will not supply the right values to our CLI process. Therefore, it is best to wrap your `targetBinaryVersion` parameter in double quotes when calling the `release` command, e.g. `code-push release MyApp updateContents ">1.2.3"`.*
 
 The following table outlines the version value that CodePush expects your update's semver range to satisfy for each respective app type:
 
@@ -316,9 +316,9 @@ code-push release-react <appName> <platform>
 This `release-react` command does two things in addition to running the vanilla `release` command described in the [previous section](#releasing-app-updates):
 
 1. It runs the [`react-native bundle` command](#update-contents-parameter) to generate the update contents in a temporary folder
-2. It infers the [`targetBinaryRange` of this release](#target-binary-range-parameter) by reading the contents of the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients), and defaults to target only the specified version in the metadata.
+2. It infers the [`targetBinaryVersion` of this release](#target-binary-range-parameter) by reading the contents of the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients), and defaults to target only the specified version in the metadata.
 
-It then calls the vanilla `release` command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the `react-native bundle` command and also avoid common pitfalls such as supplying a wrong `targetBinaryRange` parameter.
+It then calls the vanilla `release` command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the `react-native bundle` command and also avoid common pitfalls such as supplying an invalid `targetBinaryVersion` parameter.
 
 ### Platform parameter
 
