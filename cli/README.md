@@ -230,19 +230,36 @@ It's important that the path you specify refers to the platform-specific, prepar
 
 ### Target binary version parameter
 
-This specifies the semver-compliant (e.g. `1.0.0` not `1.0`) store/binary version of the application you are releasing the update for. Only users running this **exact version** will receive the update. Users running an older and/or newer version of the app binary will not receive this update, for the following reasons:
+This specifies the store/binary version of the application you are releasing the update for, so that only users running that version will receive the update, while users running an older and/or newer version of the app binary will not. This is useful for the following reasons:
 
 1. If a user is running an older binary version, it's possible that there are breaking changes in the CodePush update that wouldn't be compatible with what they're running.
 
 2. If a user is running a newer binary version, then it's presumed that what they are running is newer (and potentially incompatible) with the CodePush update.
 
-The following table outlines the value that CodePush expects you to provide for each respective app type:
+If you ever want an update to target multiple versions of the app store binary, we also allow you to specify the parameter as a [semver range expression](https://github.com/npm/node-semver#advanced-range-syntax). That way, any client device running a version of the binary that satisfies the range expression (i.e. `semver.satisfies(version, range)` returns `true`) will get the update. Examples of valid semver range expressions are as follows:
+
+| Range Expression | Who gets the update                                                                    |
+|------------------|----------------------------------------------------------------------------------------|
+| `1.2.3`          | Only devices running the specific binary app store version `1.2.3` of your app         |
+| `*`              | Any device configured to consume updates from your CodePush app                        |
+| `1.2.x`          | Devices running major version 1, minor version 2 and any patch version of your app     |
+| `1.2.3 - 1.2.7`  | Devices running any binary version between `1.2.3` (inclusive) and `1.2.7` (inclusive) |
+| `>=1.2.3 <1.2.7` | Devices running any binary version between `1.2.3` (inclusive) and `1.2.7` (exclusive) |
+| `~1.2.3`         | Equivalent to `>=1.2.3 <1.3.0`                                                         |
+| `^1.2.3`         | Equivalent to `>=1.2.3 <2.0.0`                                                         |
+
+*NOTE: If your semver expression starts with a special shell character or operator such as `>`, `^`, or **
+*, the command may not execute correctly if you do not wrap the value in quotes as the shell will not supply the right values to our CLI process. Therefore, it is best to wrap your `targetBinaryVersion` parameter in double quotes when calling the `release` command, e.g. `code-push release MyApp updateContents ">1.2.3"`.*
+
+The following table outlines the version value that CodePush expects your update's semver range to satisfy for each respective app type:
 
 | Platform               | Source of app store version                                                  |
 |------------------------|------------------------------------------------------------------------------|
 | Cordova                | The `<widget version>` attribute in the `config.xml` file                    |
 | React Native (Android) | The `android.defaultConfig.versionName` property in your `build.gradle` file |
 | React Native (iOS)     | The `CFBundleShortVersionString` key in the `Info.plist` file                |
+
+*NOTE: If the app store version in the metadata files are missing a patch version, e.g. `2.0`, it will be treated as having a patch version of `0`, i.e. `2.0 -> 2.0.0`.
 
 ### Deployment name parameter
 
@@ -295,9 +312,9 @@ code-push release-react <appName> <platform>
 This `release-react` command does two things in addition to running the vanilla `release` command described in the [previous section](#releasing-app-updates):
 
 1. It runs the [`react-native bundle` command](#update-contents-parameter) to generate the update contents in a temporary folder
-2. It infers the [`targetBinaryVersion` of this release](#target-binary-version-parameter) by reading the contents of the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients).
+2. It infers the [`targetBinaryVersion` of this release](#target-binary-range-parameter) by reading the contents of the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients), and defaults to target only the specified version in the metadata.
 
-It then calls the vanilla `release` command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the `react-native bundle` command and also avoid common pitfalls such as supplying a wrong `targetBinaryVersion` parameter.
+It then calls the vanilla `release` command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the `react-native bundle` command and also avoid common pitfalls such as supplying an invalid `targetBinaryVersion` parameter.
 
 ### Platform parameter
 
@@ -326,6 +343,10 @@ This is the same parameter as the one described in the [above section](#mandator
 ### Sourcemap output parameter
 
 This specifies the relative path to where the sourcemap file for resulting update's JS bundle should be generated. If left unspecified, sourcemaps will not be generated.
+
+### Target binary version parameter
+
+This is the same parameter as the one described in the [above section](#target-binary-version-parameter). If left unspecified, the command defaults to targeting only the specified version in the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients).
 
 ## Promoting updates across deployments
 

@@ -742,6 +742,7 @@ function getPackageMetricsString(packageObject: PackageWithMetrics): string {
 }
 
 function getReactNativeProjectAppVersion(platform: string, projectName: string): Promise<string> {
+    var missingPatchVersionRegex: RegExp = /^\d+\.\d+$/;
     if (platform === "ios") {
         try {
             var infoPlistContainingFolder: string = path.join("iOS", projectName);
@@ -762,10 +763,10 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
         }
 
         if (parsedInfoPlist && parsedInfoPlist.CFBundleShortVersionString) {
-            if (semver.valid(parsedInfoPlist.CFBundleShortVersionString) === null) {
-                throw new Error(`Please update "${infoPlistContainingFolder}/Info.plist" to use a semver-compliant \"CFBundleShortVersionString\", for example "1.0.3".`);
-            } else {
+            if (semver.valid(parsedInfoPlist.CFBundleShortVersionString) || missingPatchVersionRegex.test(parsedInfoPlist.CFBundleShortVersionString)) {
                 return Q(parsedInfoPlist.CFBundleShortVersionString);
+            } else {
+                throw new Error(`The "CFBundleShortVersionString" key in "${infoPlistContainingFolder}/Info.plist" needs to have at least a major and minor version, for example "2.0" or "1.0.3".`);
             }
         } else {
             throw new Error(`The "CFBundleShortVersionString" key does not exist in "${infoPlistContainingFolder}/Info.plist".`);
@@ -783,10 +784,10 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
             .then((buildGradle: any) => {
                 if (buildGradle.android && buildGradle.android.defaultConfig && buildGradle.android.defaultConfig.versionName) {
                     var appVersion: string = buildGradle.android.defaultConfig.versionName.replace(/"/g, "").trim();
-                    if (semver.valid(appVersion) === null) {
-                        throw new Error("Please update \"android/app/build.gradle\" to use a semver-compliant \"android.defaultConfig.versionName\", for example \"1.0.3\".");
-                    } else {
+                    if (semver.valid(appVersion) || missingPatchVersionRegex.test(appVersion)) {
                         return appVersion;
+                    } else {
+                        throw new Error("The \"android.defaultConfig.versionName\" property in \"android/app/build.gradle\" needs to have at least a major and minor version, for example \"2.0\" or \"1.0.3\".");
                     }
                 } else {
                     throw new Error("The \"android/app/build.gradle\" file does not include a value for android.defaultConfig.versionName.");
@@ -841,10 +842,9 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
 export var release = (command: cli.IReleaseCommand): Promise<void> => {
     if (isBinaryOrZip(command.package)) {
         throw new Error("It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).");
-    } else if (semver.valid(command.appStoreVersion) === null) {
-        throw new Error("Please use a semver-compliant app store version, for example \"1.0.3\".");
-    }
-
+    } 
+    
+    throwForInvalidSemverRange(command.appStoreVersion);
     var filePath: string = command.package;
     var getPackageFilePromise: Promise<IPackageFile>;
     var isSingleFilePackage: boolean = true;
@@ -966,8 +966,16 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
             throw new Error(`Entry file "${entryFile}" does not exist.`);
         }
     }
+    
+    if (command.appStoreVersion) {
+        throwForInvalidSemverRange(command.appStoreVersion);
+    }
+    
+    var appVersionPromise: Promise<string> = command.appStoreVersion
+        ? Q(command.appStoreVersion)
+        : getReactNativeProjectAppVersion(platform, projectName);
 
-    return getReactNativeProjectAppVersion(platform, projectName)
+    return appVersionPromise
         .then((appVersion: string) => {
             releaseCommand.appStoreVersion = appVersion;
             return createEmptyTempReleaseFolder(outputFolder);
@@ -1085,6 +1093,12 @@ function throwForInvalidEmail(email: string): void {
         throw new Error("\"" + email + "\" is an invalid e-mail address.");
     }
 }
+
+function throwForInvalidSemverRange(semverRange: string): void {
+    if (semver.validRange(semverRange) === null) {
+        throw new Error("Please use a semver-compliant target binary version range, for example \"1.0.0\", \"*\" or \"^1.2.3\".");
+    }
+} 
 
 function throwForInvalidOutputFormat(format: string): void {
     switch (format) {

@@ -124,13 +124,13 @@ export interface IRegisterCommand extends ICommand {
 
 export interface IReleaseBaseCommand extends ICommand {
     appName: string;
+    appStoreVersion: string;
     deploymentName: string;
     description: string;
     mandatory: boolean;
 }
 
 export interface IReleaseCommand extends IReleaseBaseCommand {
-    appStoreVersion: string;
     package: string;
 }
 
