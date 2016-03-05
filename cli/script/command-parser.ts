@@ -261,11 +261,9 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
     .command("logout", "Log out of the current session", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         isValidCommand = true;
-        yargs.usage(USAGE_PREFIX + " logout [--local]")
+        yargs.usage(USAGE_PREFIX + " logout")
             .demand(/*count*/ 1, /*max*/ 1)  // Require exactly one non-option argument.
-            .example("logout", "Log out and also remove the access key used for the current session")
-            .example("logout --local", "Log out but allow the use of the same access key for future logins")
-            .option("local", { demand: false, description: "Whether to delete the current session's access key on the server", type: "boolean" });
+            .example("logout", "Log out and end your session");
         addCommonConfiguration(yargs);
     })
     .command("promote", "Promote the package from one deployment of your app to another", (yargs: yargs.Argv) => {
@@ -527,10 +525,6 @@ function createCommand(): cli.ICommand {
 
             case "logout":
                 cmd = { type: cli.CommandType.logout };
-
-                var logoutCommand = <cli.ILogoutCommand>cmd;
-
-                logoutCommand.isLocal = argv["local"];
                 break;
 
             case "promote":
@@ -577,7 +571,7 @@ function createCommand(): cli.ICommand {
 
                     releaseReactCommand.appName = arg1;
                     releaseReactCommand.platform = arg2;
-                    
+
                     releaseReactCommand.bundleName = argv["bundleName"];
                     releaseReactCommand.deploymentName = argv["deploymentName"];
                     releaseReactCommand.description = argv["description"] ? backslash(argv["description"]) : "";

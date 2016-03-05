@@ -42,15 +42,12 @@ interface NameToCountMap {
 /** Deprecated */
 interface ILegacyLoginConnectionInfo {
     accessKeyName: string;
-    // The 'providerName' property has been obsoleted
-    // The 'providerUniqueId' property has been obsoleted
-    // The 'serverUrl' property has been obsoleted
 }
 
 interface ILoginConnectionInfo {
     accessKey: string;
-    // The 'serverUrl' property has been obsoleted
     customServerUrl?: string;   // A custom serverUrl for internal debugging purposes
+    preserveAccessKeyOnLogout?: boolean;
 }
 
 interface IPackageFile {
@@ -69,6 +66,8 @@ export interface PackageWithMetrics {
 export var log = (message: string | Chalk.ChalkChain): void => console.log(message);
 export var sdk: AccountManager;
 export var spawn = childProcess.spawn;
+
+var connectionInfo: ILoginConnectionInfo;
 
 export var confirm = (): Promise<boolean> => {
     return Promise<boolean>((resolve, reject, notify): void => {
@@ -375,7 +374,7 @@ function deserializeConnectionInfo(): ILoginConnectionInfo {
 }
 
 export function execute(command: cli.ICommand): Promise<void> {
-    var connectionInfo: ILoginConnectionInfo = deserializeConnectionInfo();
+    connectionInfo = deserializeConnectionInfo();
 
     return Q(<void>null)
         .then(() => {
@@ -451,7 +450,7 @@ export function execute(command: cli.ICommand): Promise<void> {
                     return login(<cli.ILoginCommand>command);
 
                 case cli.CommandType.logout:
-                    return logout(<cli.ILogoutCommand>command);
+                    return logout(command);
 
                 case cli.CommandType.promote:
                     return promote(<cli.IPromoteCommand>command);
@@ -520,7 +519,7 @@ function login(command: cli.ILoginCommand): Promise<void> {
         return sdk.isAuthenticated()
             .then((isAuthenticated: boolean): void => {
                 if (isAuthenticated) {
-                    serializeConnectionInfo(command.accessKey, command.serverUrl);
+                    serializeConnectionInfo(command.accessKey, /*preserveAccessKeyOnLogout*/ true, command.serverUrl);
                 } else {
                     throw new Error("Invalid access key.");
                 }
@@ -545,7 +544,7 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string): Pr
             return sdk.isAuthenticated()
                 .then((isAuthenticated: boolean): void => {
                     if (isAuthenticated) {
-                        serializeConnectionInfo(accessKey, serverUrl);
+                        serializeConnectionInfo(accessKey, /*preserveAccessKeyOnLogout*/ false, serverUrl);
                     } else {
                         throw new Error("Invalid access key.");
                     }
@@ -553,18 +552,20 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string): Pr
         });
 }
 
-function logout(command: cli.ILogoutCommand): Promise<void> {
+function logout(command: cli.ICommand): Promise<void> {
     return Q(<void>null)
         .then((): Promise<void> => {
-            if (!command.isLocal) {
+            if (!connectionInfo.preserveAccessKeyOnLogout) {
                 return sdk.removeAccessKey(sdk.accessKey)
                     .then((): void => {
-                        log("Removed access key " + sdk.accessKey + ".");
-                        sdk = null;
+                        log(`Removed access key ${sdk.accessKey}.`);
                     });
             }
         })
-        .then((): void => deleteConnectionInfoCache(), (): void => deleteConnectionInfoCache());
+        .finally((): void => {
+            sdk = null;
+            deleteConnectionInfoCache();
+        });
 }
 
 function formatDate(unixOffset: number): string {
@@ -1069,11 +1070,12 @@ export var runReactNativeBundleCommand = (bundleName: string, entryFile: string,
     });
 }
 
-function serializeConnectionInfo(accessKey: string, serverUrl?: string): void {
-    var connectionInfo: ILoginConnectionInfo = { accessKey: accessKey };
-    if (serverUrl) {
-        connectionInfo.customServerUrl = serverUrl;
+function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: boolean, customServerUrl?: string): void {
+    var connectionInfo: ILoginConnectionInfo = { accessKey: accessKey, preserveAccessKeyOnLogout: preserveAccessKeyOnLogout };
+    if (customServerUrl) {
+        connectionInfo.customServerUrl = customServerUrl;
     }
+
     var json: string = JSON.stringify(connectionInfo);
     fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
 

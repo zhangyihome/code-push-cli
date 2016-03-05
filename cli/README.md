@@ -59,17 +59,13 @@ If you need additional keys that can be used to authenticate against the CodePus
 code-push access-key add "VSTS Integration"
 ```
 
-After creating the new key, you can specify its value using the `--accessKey` flag of the `login` command, which allows you to perform the "headless" authentication, as opposed to launching a browser.
+After creating the new key, you can specify its value using the `--accessKey` flag of the `login` command, which allows you to perform "headless" authentication, as opposed to launching a browser.
 
 ```
 code-push login --accessKey <accessKey>
 ```
 
-If you want to log out of your current session, but still be able to reuse the same key for future logins, run the following command:
-
-```
-code-push logout --local
-```
+When logging in via this method, the access key will not be automatically invalidated on logout, and can be used in future sessions until it is explicitly removed from the CodePush server. However, it is still recommended to log out once your session is complete, in order to remove your credentials from disk.
 
 ## App management
 
