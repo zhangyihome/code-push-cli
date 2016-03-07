@@ -302,6 +302,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("bundleName", { alias: "b", default: null, demand: false, description: "The name of the output JS bundle. If omitted, the standard bundle name will be used for the specified platform: \"main.jsbundle\" (iOS) and \"index.android.bundle\" (Android)", type: "string" })
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
+            .option("development", { alias: "dev", default: false, demand: false, description: "Whether to generate a unminified, development JS bundle.", type: "boolean" })
             .option("entryFile", { alias: "e", default: null, demand: false, description: "The path to the root JS file. If unspecified, \"index.<platform>.js\" and then \"index.js\" will be tried and used if they exist.", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
             .option("sourcemapOutput", { alias: "s", default: null, demand: false, description: "The path to where the sourcemap for the resulting bundle should be stored. If unspecified, sourcemaps will not be generated.", type: "string" })
@@ -575,6 +576,7 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.bundleName = argv["bundleName"];
                     releaseReactCommand.deploymentName = argv["deploymentName"];
                     releaseReactCommand.description = argv["description"] ? backslash(argv["description"]) : "";
+                    releaseReactCommand.development = argv["development"];
                     releaseReactCommand.entryFile = argv["entryFile"];
                     releaseReactCommand.mandatory = argv["mandatory"];
                     releaseReactCommand.sourcemapOutput = argv["sourcemapOutput"];

@@ -983,7 +983,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
         // This is needed to clear the react native bundler cache:
         // https://github.com/facebook/react-native/issues/4289
         .then(() => deleteFolder(`${os.tmpdir()}/react-*`))
-        .then(() => runReactNativeBundleCommand(bundleName, entryFile, outputFolder, platform, command.sourcemapOutput))
+        .then(() => runReactNativeBundleCommand(bundleName, command.development || false, entryFile, outputFolder, platform, command.sourcemapOutput))
         .then(() => {
             log(chalk.cyan("\nReleasing update contents to CodePush:\n"));
             return release(releaseCommand);
@@ -1033,12 +1033,12 @@ function requestAccessKey(): Promise<string> {
     });
 }
 
-export var runReactNativeBundleCommand = (bundleName: string, entryFile: string, outputFolder: string, platform: string, sourcemapOutput: string): Promise<void> => {
+export var runReactNativeBundleCommand = (bundleName: string, development: boolean, entryFile: string, outputFolder: string, platform: string, sourcemapOutput: string): Promise<void> => {
     var reactNativeBundleArgs = [
         path.join("node_modules", "react-native", "local-cli", "cli.js"), "bundle",
         "--assets-dest", outputFolder,
         "--bundle-output", path.join(outputFolder, bundleName),
-        "--dev", false,
+        "--dev", development,
         "--entry-file", entryFile,
         "--platform", platform,
     ];
