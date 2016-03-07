@@ -6,7 +6,7 @@ import superagent = require("superagent");
 
 import { AccessKey, Account, App, CodePushError, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, UpdateMetrics } from "./types";
 
-var packageJson = require("../../package.json");
+var packageJson = require("../package.json");
 
 declare var fs: any;
 
