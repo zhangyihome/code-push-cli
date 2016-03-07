@@ -603,7 +603,7 @@ function printAppList(format: string, apps: App[], deploymentLists: string[][]):
 }
 
 function getCollaboratorDisplayName(email: string, collaboratorProperties: CollaboratorProperties): string {
-    return (collaboratorProperties.permission === AccountManager.PERMISSIONS.OWNER) ? email + chalk.magenta(" (Owner)") : email;
+    return (collaboratorProperties.permission === AccountManager.AppPermission.OWNER) ? email + chalk.magenta(" (Owner)") : email;
 }
 
 function printCollaboratorsList(format: string, collaborators: CollaboratorMap): void {
@@ -909,7 +909,7 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
 
     return getPackageFilePromise
         .then((file: IPackageFile): Promise<void> => {
-            return sdk.release(command.appName, command.deploymentName, file.path, command.description, command.appStoreVersion, command.mandatory, uploadProgress)
+            return sdk.release(command.appName, command.deploymentName, file.path, command.appStoreVersion, command.description, command.mandatory, uploadProgress)
                 .then((): void => {
                     log("Successfully released an update containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
 

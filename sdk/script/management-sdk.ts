@@ -45,7 +45,7 @@ function urlEncode(strings: string[], ...values: string[]): string {
 }
 
 class AccountManager {
-    public static PERMISSIONS = {
+    public static AppPermission = {
         OWNER: "Owner",
         COLLABORATOR: "Collaborator"
     };
@@ -205,9 +205,9 @@ class AccountManager {
             .then((res: JsonResponse) => res.body.history);
     }
 
-    public release(appName: string, deploymentName: string, fileOrPath: File | string, description: string, appVersion: string, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
+    public release(appName: string, deploymentName: string, fileOrPath: File | string, targetBinaryVersion: string, description: string, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var packageInfo: PackageToUpload = this.generatePackageInfo(description, appVersion, isMandatory);
+            var packageInfo: PackageToUpload = this.generatePackageInfo(description, targetBinaryVersion, isMandatory);
             var request: superagent.Request<any> = superagent.post(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`);
             this.attachCredentials(request);
 
