@@ -28,6 +28,7 @@ import { AccessKey, Account, AccountManager, App, CollaboratorMap, CollaboratorP
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var emailValidator = require("email-validator");
 var packageJson = require("../package.json");
+var parseXml = Q.denodeify(require("xml2js").parseString);
 var progress = require("progress");
 import Promise = Q.Promise;
 var userAgent: string = packageJson.name + "/" + packageJson.version;
@@ -461,6 +462,9 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.release:
                     return release(<cli.IReleaseCommand>command);
 
+                case cli.CommandType.releaseCordova:
+                    return releaseCordova(<cli.IReleaseCordovaCommand>command);
+
                 case cli.CommandType.releaseReact:
                     return releaseReact(<cli.IReleaseReactCommand>command);
 
@@ -842,8 +846,8 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
 export var release = (command: cli.IReleaseCommand): Promise<void> => {
     if (isBinaryOrZip(command.package)) {
         throw new Error("It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).");
-    } 
-    
+    }
+
     throwForInvalidSemverRange(command.appStoreVersion);
     var filePath: string = command.package;
     var getPackageFilePromise: Promise<IPackageFile>;
@@ -918,6 +922,58 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
         });
 }
 
+export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void> => {
+    var platform: string = command.platform.toLowerCase();
+
+    if (platform === "ios") {
+    } else if (platform === "android") {
+    } else {
+        throw new Error("Platform must be either \"ios\" or \"android\".");
+    }
+
+    try {
+        var configString: string = fs.readFileSync(path.join(process.cwd(), "config.xml"), { encoding: "utf8" });
+        var configPromise = parseXml(configString);
+        var releaseCommand: cli.IReleaseCommand;
+
+        releaseCommand.deploymentName = command.deploymentName;
+        releaseCommand.mandatory = command.mandatory;
+        releaseCommand.type = cli.CommandType.release;
+
+        return configPromise.then((parsedConfig: any) => {
+            var config = parsedConfig.widget;
+
+            var releaseTargetVersion: string;
+            if (command.appStoreVersion) {
+                releaseTargetVersion = command.appStoreVersion;
+            } else {
+                releaseTargetVersion = config['$'].version;
+            }
+
+            throwForInvalidSemverRange(releaseTargetVersion);
+            releaseCommand.appStoreVersion = releaseTargetVersion;
+
+            var releaseDescription: string;
+            if (command.description) {
+                releaseDescription = command.description;
+            } else {
+                //xml2js returns the fields outside of $ as arrays, so take the first value
+                releaseDescription = config.description[0];
+            }
+
+            releaseCommand.description = releaseDescription;
+            
+            if (command.appName) {
+                releaseCommand.appName = command.appName;
+            } else {
+                releaseCommand.appName = config.name[0];
+            }
+        });
+    } catch (error) {
+        throw new Error("Unable to find or read \"config.xml\" in the CWD. The \"release-cordova\" command must be executed in a Cordova project folder.");
+    }
+}
+
 export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => {
     var bundleName: string = command.bundleName;
     var entryFile: string = command.entryFile;
@@ -966,11 +1022,11 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
             throw new Error(`Entry file "${entryFile}" does not exist.`);
         }
     }
-    
+
     if (command.appStoreVersion) {
         throwForInvalidSemverRange(command.appStoreVersion);
     }
-    
+
     var appVersionPromise: Promise<string> = command.appStoreVersion
         ? Q(command.appStoreVersion)
         : getReactNativeProjectAppVersion(platform, projectName);
@@ -1098,7 +1154,7 @@ function throwForInvalidSemverRange(semverRange: string): void {
     if (semver.validRange(semverRange) === null) {
         throw new Error("Please use a semver-compliant target binary version range, for example \"1.0.0\", \"*\" or \"^1.2.3\".");
     }
-} 
+}
 
 function throwForInvalidOutputFormat(format: string): void {
     switch (format) {
