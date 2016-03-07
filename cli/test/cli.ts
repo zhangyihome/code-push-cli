@@ -978,7 +978,7 @@ describe("CLI", () => {
             bundleName: bundleName,
             deploymentName: "Staging",
             development: true,
-            description: "Test generates sourcemaps",
+            description: "Test generates dev bundle",
             mandatory: false,
             platform: "android",
             sourcemapOutput: "index.android.js.map"
