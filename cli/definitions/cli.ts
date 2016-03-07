@@ -136,6 +136,7 @@ export interface IReleaseCommand extends IReleaseBaseCommand {
 
 export interface IReleaseReactCommand extends IReleaseBaseCommand {
     bundleName?: string;
+    development?: boolean;
     entryFile?: string;
     platform: string;
     sourcemapOutput?: string;

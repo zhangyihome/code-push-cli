@@ -969,6 +969,45 @@ describe("CLI", () => {
             .done();
     });
     
+    it("release-react generates dev bundle", (done: MochaDone): void => {
+        var bundleName = "bundle.js";
+        var command: cli.IReleaseReactCommand = {
+            type: cli.CommandType.releaseReact,
+            appName: "a",
+            appStoreVersion: null,
+            bundleName: bundleName,
+            deploymentName: "Staging",
+            development: true,
+            description: "Test generates dev bundle",
+            mandatory: false,
+            platform: "android",
+            sourcemapOutput: "index.android.js.map"
+        };
+
+        ensureInTestAppDirectory();
+
+        var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release", () => { return Q(<void>null) });
+
+        cmdexec.execute(command)
+            .then(() => {
+                var releaseCommand: cli.IReleaseCommand = <any>command;
+                releaseCommand.package = path.join(os.tmpdir(), "CodePush");
+                releaseCommand.appStoreVersion = "1.2.3";
+
+                sinon.assert.calledOnce(spawn);
+                var spawnCommand: string = spawn.args[0][0];
+                var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+                assert.equal(spawnCommand, "node");
+                assert.equal(
+                    spawnCommandArgs,
+                    `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)} --dev true --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
+                );
+                assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
+                done();
+            })
+            .done();
+    });
+    
     it("release-react generates sourcemaps", (done: MochaDone): void => {
         var bundleName = "bundle.js";
         var command: cli.IReleaseReactCommand = {

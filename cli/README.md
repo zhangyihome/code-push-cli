@@ -304,6 +304,7 @@ code-push release-react <appName> <platform>
 [--bundleName <bundleName>]
 [--deploymentName <deploymentName>]
 [--description <description>]
+[--development <development>]
 [--entryFile <entryFile>]
 [--mandatory]
 [--sourcemapOutput <sourcemapOutput>]
@@ -331,6 +332,10 @@ This is the same parameter as the one described in the [above section](#deployme
 ### Description parameter
 
 This is the same parameter as the one described in the [above section](#description-parameter).
+
+### Development parameter
+
+This specifies whether to generate a unminified, development JS bundle.
 
 ### Entry file parameter
 
