@@ -115,11 +115,6 @@ class AccountManager {
             .then((res: JsonResponse) => res.body.account);
     }
 
-    public updateAccountInfo(accountInfoToChange: Account): Promise<void> {
-        return this.patch(urlEncode `/account`, JSON.stringify(accountInfoToChange))
-            .then(() => null);
-    }
-
     // Apps
     public getApps(): Promise<App[]> {
         return this.get(urlEncode `/apps`)
