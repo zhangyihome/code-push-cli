@@ -851,7 +851,7 @@ function validateReleaseOptions(command: cli.IReleaseCommand) {
     } else if (semver.valid(command.appStoreVersion) === null) {
         throw new Error("Please use a semver-compliant app store version, for example \"1.0.3\".");
     } else if (command.rollout && !ROLLOUT_PERCENTAGE_REGEX.test(command.rollout)) {
-        throw new Error("Please specify rollout percentage as a whole number between 1 and 100 inclusive.");
+        throw new Error("Please specify rollout percentage as an integer number between 1 and 100 inclusive.");
     }
 }
 
@@ -918,7 +918,7 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
         lastTotalProgress = currentProgress;
     }
 
-    var rollout: number = command.rollout ? parseInt(command.rollout) : 100;
+    var rollout: number = command.rollout ? parseInt(command.rollout) : null;
     return getPackageFilePromise
         .then((file: IPackageFile): Promise<void> => {
             return sdk.releasePackage(command.appName, command.deploymentName, file.path, command.description, command.appStoreVersion, rollout, command.mandatory, uploadProgress)
