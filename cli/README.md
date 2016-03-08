@@ -434,4 +434,4 @@ You can clear the release history associated with a deployment using the followi
 code-push deployment history <appName> <deploymentName>
 ```
 
-After running this command, client devices configured to receive updates from this deployment using its associated deployment key will no longer be able to receive the updates that have been cleared. This command is irreversible, and therefore should not be used in a production deployment.
+After running this command, client devices configured to receive updates from this deployment using its associated deployment key will no longer receive those updates that have been cleared. This command is irreversible, and therefore should not be used in a production deployment.
