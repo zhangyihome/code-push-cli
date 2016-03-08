@@ -31,7 +31,7 @@ A JavaScript library for programmatically managing your CodePush account (e.g. c
 
 ## API Reference
 
-The `code-push` module exports a single class (typically referred to as `CodePush`), which represents a proxy to the CodePush account management REST API. This class has a single constructor for authenticating with the CodePush service, and a collection of instance methods that correspond to the commands in the management [CLI](https://github.com/Microsoft/code-push/blob/master/cli/README.md), and allow you to programmatically control every aspect of your CodePush account.
+The `code-push` module exports a single class (typically referred to as `CodePush`), which represents a proxy to the CodePush account management REST API. This class has a single constructor for authenticating with the CodePush service, and a collection of instance methods that correspond to the commands in the management [CLI](https://github.com/Microsoft/code-push/blob/master/cli/README.md), which allow you to programmatically control every aspect of your CodePush account.
 
 ### Constructors
 
