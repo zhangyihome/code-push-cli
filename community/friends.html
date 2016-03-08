@@ -22,7 +22,7 @@
 
   <title>
     
-      Frequently Asked Questions &middot; CodePush
+      Friends of CodePush &middot; CodePush
     
   </title>
   
@@ -99,65 +99,151 @@
 		      <ul class="nav navbar-nav">
 				<li class=""><a href="/code-push/index.html#getting_started">Get Started</a></li>
 				<li class=""><a href="/code-push/docs/index.html">Documentation</a></li>
-		        <li class="active"><a href="/code-push/faq/index.html">FAQ</a></li>
+		        <li class=""><a href="/code-push/faq/index.html">FAQ</a></li>
 				<li class=""><a href="/code-push/blog/index.html">Blog</a></li>
-                <li class=""><a href="/code-push/community/friends.html">Friends</a></li>
+                <li class=" active "><a href="/code-push/community/friends.html">Friends</a></li>
 		      </ul>
 		    </div><!-- /.navbar-collapse -->
 		</div><!-- /.container-fluid -->
 	</nav>				   		
 </header>
 <div class="top_navbar_spacer"></div>
-	<div class="faq">                 
-    <h1 class="page-title">Frequently Asked Questions</h1>
-    <div id="content" class="container main_content">      
-        <h3>1. Does the Apple App Store allow developers to perform these types of updates?</h3>
-
-<p>According to section 3.3.2 of Apple&rsquo;s <a href="https://developer.apple.com/programs/ios/information/iOS_Program_Information_4_3_15.pdf">developer agreement</a>, as long as you are using the CodePush service to release bug fixes and improvements/features that maintain the app&rsquo;s original/presented purpose (i.e. don&rsquo;t CodePush a calculator into a first-person shooter), then you will be fine, and your users will be happy. In order to provide a tangible example, our team published a (pretty cheesy!) CodePush-ified game to the <a href="https://play.google.com/store/apps/details?id=io.cordova.myapp72c482&amp;hl=en">Google Play Store</a> and <a href="https://itunes.apple.com/us/app/how-many-aliens-can-you-kill/id1046682941?ls=1&amp;mt=8">Apple App Store</a>, and had no problems getting it through the review process.</p>
-
-<p>Because Cordova apps are executed within a WebView, and React Native apps are executed within JavaScriptCore, from a technology perspective, these runtimes are unique in their ability to leverage dynamic code downloads according to the aforementioned Apple developer agreement.</p>
-
-<hr>
-
-<h3>2. What will the service cost?</h3>
-
-<p>While CodePush is in beta, it will remain completely free to use. Whether or not that will change over time is still TBD. We&rsquo;re excited to see how developers make use of the service, and we look forward to getting lots of feedback from developers before making any changes to the pricing model.</p>
-
-<hr>
-
-<h3>3. How should I interpret the beta status of the service?</h3>
-
-<p>The CodePush service, our <a href="https://github.com/Microsoft/code-push/cli">management CLI</a> and the <a href="https://github.com/Microsoft/cordova-plugin-code-push">Cordova</a>
-and <a href="https://github.com/Microsoft/react-native-code-push">React Native SDKs</a> are currently in a production-quality state. However, we believe that there are other key scenarios/features we need to implement before stamping it as &ldquo;RTM&rdquo;. Additionally, we want to gather as much feedback and experiences from developers to ensure we are building the right thing.</p>
-
-<p>While the service is in beta, we don&rsquo;t recommend using it for doing production deployments, since we don&rsquo;t currently offer any specific SLA.  </p>
-
-<hr>
-
-<h3>4. Which Cordova platforms are supported?</h3>
-
-<p>Our <a href="https://github.com/Microsoft/cordova-plugin-code-push">Cordova plugin</a> currently supports Android and iOS. Windows support is coming soon and we would love to hear any <a href="mailto:codepushfeed@microsoft.com">feedback</a> regarding interest in other platforms. </p>
-
-<hr>
-
-<h3>5. Which React Native platforms are supported?</h3>
-
-<p>Our <a href="https://github.com/Microsoft/react-native-code-push">React Native plugin</a> supports both iOS and Android. As new platforms are introduced to React Native (e.g. Windows), we will add CodePush support as well.</p>
-
-<hr>
-
-<h3>6. What about support for &ldquo;platform X&rdquo;?</h3>
-
-<p>The CodePush service is completely agnostic to app platform, and we want to enable any and all compelling scenarios as they arise. If you have any suggestions regarding which platform we should go after next, please don&rsquo;t hesitate to <a href="mailto:codepushfeed@microsoft.com">reach out</a>.</p>
-
-<hr>
-
-<h3>7. Is the service really limited to pushing just &ldquo;code&rdquo;?</h3>
-
-<p>The CodePush service itself is concerned simply with synchronizing files between developers and their end-users. It is our client SDKs that layer the opinion on top regarding the types of files they help synchronize. For example, the Cordova plugin will sync any files which live in the platform-specific www folder (including images, etc.), and the React Native plugin will sync your JS bundle file and any image assets.</p>
-
-<p>In the future, we are excited to experiment/implement client SDKs that enable new compelling scenarios, as well as support app platforms other then those which are JavaScript-based. If you have any suggestions or feedback here, please <a href="mailto:codepushfeed@microsoft.com">let us know</a>!</p>
-
+	<div class="friends">
+    <div class="friendbar-content friend-info">
+        <div data-hash-nav="friends" class="has-hash-nav clearfix friend-contentcontainer">            
+            <center>
+                <h1>Friends of CodePush</h1>
+                <p class="introduction">The following list represents some great examples of mobile experiences using CodePush to perform over-the-air updates</p>
+            </center>            
+            <div class="friend-container">
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/bhagavad-gita-lite/id1071711190?ls=1&mt=8"><img src="/code-push/assets/images/friends/bhagavadgita.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/convoy-driver/id1045368390?ls=1&ammt=8"><img src="/code-push/assets/images/friends/convoy.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/delivery.com-food-alcohol/id435168129?mt=8"><img src="/code-push/assets/images/friends/deliverycom.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/evocq-live-events-your-way/id1050974001?mt=8"><img src="/code-push/assets/images/friends/evocq.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/fanvision-golf/id1081891275?mt=8"><img src="/code-push/assets/images/friends/fanvisiongolf.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://play.google.com/store/apps/details?id=com.arjunkomath.product_hunt&hl=en"><img src="/code-push/assets/images/friends/felineforproducthunt.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/gou-huo/id1001476888?mt=8"><img src="/code-push/assets/images/friends/gofire.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/goodnight-never-alone-at-night/id962923207?l=zh&ls=1&mt=8" ><img src="/code-push/assets/images/friends/goodnight.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://play.google.com/store/apps/details?id=com.herepin.mercury"><img src="/code-push/assets/images/friends/herepin.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/ca/app/hypebae-x-fitboi-streetwear/id989735184?mt=8"><img src="/code-push/assets/images/friends/hypebaexfitboi.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/justwatch-streaming-search/id979227482?mt=8"><img src="/code-push/assets/images/friends/justwatch.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/sg/app/luxglove/id1031016059?mt=8"><img src="/code-push/assets/images/friends/luxglove.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://github.com/Khan/math-facts"><img src="/code-push/assets/images/friends/mathfacts.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/mobabuild-builds-for-league/id1059193502?mt=8"><img src="/code-push/assets/images/friends/mobabuild.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://github.com/multunus/moveit-react-native"><img src="/code-push/assets/images/friends/moveit.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/myappointment/id1055361158?mt=8"><img src="/code-push/assets/images/friends/myappointment.jpeg" class="friend-logo"></a>                        
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/nudgit-for-merchants/id711750999?mt=8"><img src="/code-push/assets/images/friends/nudgitformerchants.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/nl/app/pimmr/id1023343303?mt=8"><img src="/code-push/assets/images/friends/pimmr.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/robin-rooms-meeting-room-schedule/id947566115?mt=8" ><img src="/code-push/assets/images/friends/robinrooms.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://play.google.com/store/apps/details?id=jobs.savvy.mobile&hl=en"><img src="/code-push/assets/images/friends/savvy.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/smooth.../id1046192115?ls=1&mt=8"><img src="/code-push/assets/images/friends/smooth.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/swipes-meal-sharing-made-easy/id1037536474?mt=8"><img src="/code-push/assets/images/friends/swipes.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/townske-stunning-city-guides/id1018136179?mt=8" ><img src="/code-push/assets/images/friends/townske.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/tucci-reservations-at-elusive/id1039661754?mt=8"><img src="/code-push/assets/images/friends/tucci.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/app/id1071060001"><img src="/code-push/assets/images/friends/yesno.png" class="friend-logo"></a>
+                    </div>
+                </div>
+            </div>
+            <p style="text-align:center">All logos used by permission of the respective owners.  If you'd like to add your logo, please <a href="https://github.com/microsoft/code-push/issues/new?title=New+Website+Logo%3A+%5Binsert+name%5D%0A&amp;body=Please+fill+the+following+out%3A%0A%0A-+Name%3A+%28correctly+formatted%29%0A-+Homepage+(or+app+store)+url%3A+%28homepage%2Fapp+store%2Fprimary+entry+point+for+users%29%0A-+Brand+Guidelines%2FLicensing%3A+%28or+anything+we+need+to+know+before+using+your+logo%29%0A-+Logo%3A+%28svg+if+possible%2C+pngs+over+300x300px+with+transparent+backgrounds+are+also+acceptable%29%0A%0A%3E+Example%3A%0A%3E%0A%3E+Name%3A+Microsoft%0A%3E+Homepage+url%3A+https%3A%2F%2Fmicrosoft.com%0A%3E+Brand+Guidelines%2FLicensing%3A+https%3A%2F%2Fwww.microsoft.com%2Fen-us%2Flegal%2Fintellectualproperty%2Ftrademarks%2Fusage%2Flogo.aspx%0A%3E+Logo%3A+https%3A%2F%2Fnews.microsoft.com%2Fmicrosoft-news-center-photos%2Fmsft_logo_rgb_c-gray%2F%0A">fill out this short form</a>.</p>            
+        </div>
     </div>
 </div>
 	<footer>

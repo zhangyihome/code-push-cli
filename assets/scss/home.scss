@@ -90,12 +90,6 @@
     }
 }
 
-@media (max-width: $screen-xs-max) {
-    .hero_logo_container .signup-banner {
-        margin-top:3.7em;
-    }
-}
-
 .hero pre {
     background-color: $brand-light-gray;
     border-color: $brand-light-gray;
@@ -118,40 +112,6 @@
 
     .hero pre {
         margin-top: -5em;
-    }
-}
-
-@media (min-width: $screen-sm) {
-    /* Center the navs when not collapsed */
-    .navbar_center {
-        text-align: center;
-        height: 50px;
-    }
-
-    .navbar_center > ul {
-        display: inline-block;
-        float: none;
-    }
-
-    .npm-banner {
-        padding-top: 40px;
-    }
-}
-
-@media (min-width: $screen-lg) {
-    /* Center the navs when not collapsed */
-    .navbar_center {
-        text-align: center;
-        height: 50px;
-    }
-
-    .navbar_center > ul {
-        display: inline-block;
-        float: none;
-    }
-
-    .npm-banner {
-        padding-top: 40px;
     }
 }
 
@@ -476,26 +436,6 @@
     }
 }
 
-@media (min-width: $screen-md) {
-    .getting_started {
-        p {
-            padding-top: 4px;
-        }
-
-        h2 {
-            margin-top: 0px;
-            margin-left: 0px;
-            margin-bottom: 20px;
-        }
-
-        h2 > span {
-            position: relative;
-            top: 44px;
-            left: -60px;
-        }
-    }
-}
-
 .number_circle {
     width: 2.0em;
     height: 2.0em;
@@ -508,26 +448,6 @@
     background-color: $brand-accent-color;
     border-radius: 50%;
     margin-top: -0.5em;
-}
-
-@media (min-width: $screen-md) {
-    //Let's us put a numbered circle as aligned to h2 on medium-large devices
-    .number_circle {
-        margin-left: 15px;
-        width: 2.4em;
-        height: 2.4em;
-        font-size: 2.4em;
-        // To make it look like Bootstrap's column padding default is padding it
-        position: absolute;
-        left: 0;
-    }
-
-    .getting-started-text {
-        padding-left: calc(15px + 70px);
-
-        //Bootstrap's default + 50px extra for the number circle
-   
-    }
 }
 
 .well_code {
@@ -618,4 +538,234 @@
 
 .has-error .form-control {
     border: 2px solid $brand-hot-pink !important;
+}
+
+/*
+********* Friends ***********
+*/
+
+ .cp_friends {
+      
+      padding:2em;
+      
+      h3{
+          text-align: center;
+          padding-bottom: 1em;
+      }
+      
+      .friend-container {
+          padding-bottom: 4em;
+          margin: 0;
+          list-style: none;
+          display: -webkit-box;
+          display: -moz-box;
+          display: -ms-flexbox;
+          display: -webkit-flex;
+          display: flex;
+          justify-content: space-around;
+          flex-wrap: wrap;
+          height:20em;
+      }
+      
+      
+      .friendbar-content {
+          position: relative;
+          z-index: 5;
+          width: 100%;
+          max-width: 120em;
+          margin: 0 auto;
+          left: 3em;
+      }
+      .friend-info {
+          color: #666666;
+      }
+      
+       .friend-contentcontainer {
+          width: 100%;
+      }
+      
+      .friend-item {
+          padding: 1em;
+          width: 20em;
+          height: 100%;
+          margin-top: 1em;
+          text-align: center;
+          color: black;
+          margin: 1em;
+          line-height: 14em;
+          background-color: white;
+          
+          img{
+              width:60%;
+          }
+          
+      }
+      
+      .carousel-control, {
+        &.left,&.right{
+          background-image: none;
+          width: 4.5em;
+      }
+      span {
+        color:lightgray;
+        text-shadow: none;
+      }
+
+    }
+      
+    .carousel {
+        background-color: rgba(0, 0, 0, 0.03);
+        border-radius: .8em;
+        height: 20em; 
+    }
+    
+    .carousel-inner > .item{
+      padding:1em .5em;
+    }
+    
+    .carousel-indicators {
+        bottom: -.4em;
+        opacity: 0.4;
+        font-size: 30%;    
+        
+        .active {
+            width: 1.2em;
+            height: 1.2em;
+            margin: 0;
+            background-color:$brand-backgound-color;
+        }
+        
+    }    
+    
+    h1{
+      padding: 2em 0 2.6em 0;
+      text-align: center;   
+    }
+    
+    .more-friends{
+      p{
+        padding: 4em 0 3em 0;        
+      }
+    }
+                    
+  }
+  
+  
+@media (max-width: $screen-xs-max) {
+    
+    .hero_logo_container .signup-banner {
+        margin-top:3.7em;
+    }
+    
+    
+    .cp_friends{        
+        .carousel-control.left{
+            margin-top: -1.8em;            
+            margin-left: -1.2em;
+        }
+        .carousel-control.right {
+            margin-top: -1.8em;
+            margin-right: -1.2em;
+        }         
+    }   
+        
+}
+
+@media (min-width: $screen-sm) {
+    /* Center the navs when not collapsed */
+    .navbar_center {
+        text-align: center;
+        height: 50px;
+    }
+
+    .navbar_center > ul {
+        display: inline-block;
+        float: none;
+    }
+
+    .npm-banner {
+        padding-top: 40px;
+    }
+    
+    .cp_friends{
+        .carousel-control.left{            
+            margin-left: .5em;
+        }
+        .carousel-control.right {
+            margin-right: .5em;
+        }         
+    }      
+}
+
+
+@media (min-width: $screen-md) {
+    .getting_started {
+        p {
+            padding-top: 4px;
+        }
+
+        h2 {
+            margin-top: 0px;
+            margin-left: 0px;
+            margin-bottom: 20px;
+        }
+
+        h2 > span {
+            position: relative;
+            top: 44px;
+            left: -60px;
+        }
+    }
+    
+    //Let's us put a numbered circle as aligned to h2 on medium-large devices
+    .number_circle {
+        margin-left: 15px;
+        width: 2.4em;
+        height: 2.4em;
+        font-size: 2.4em;
+        // To make it look like Bootstrap's column padding default is padding it
+        position: absolute;
+        left: 0;
+    }
+
+    .getting-started-text {
+        padding-left: calc(15px + 70px);
+
+        //Bootstrap's default + 50px extra for the number circle   
+    }
+        
+    .cp_friends{
+        .carousel-control.left{            
+            margin-left: .2em;
+        }
+        .carousel-control.right {
+            margin-right: .2em;
+        }         
+    }    
+}
+
+@media (min-width: $screen-lg) {
+    /* Center the navs when not collapsed */
+    .navbar_center {
+        text-align: center;
+        height: 50px;
+    }
+
+    .navbar_center > ul {
+        display: inline-block;
+        float: none;
+    }
+
+    .npm-banner {
+        padding-top: 40px;
+    }
+    
+    .cp_friends{
+        .carousel-control.left{          
+            margin-left: -.4em;
+        }
+        .carousel-control.right {
+            margin-right: -.4em;
+        }         
+    }          
 }
