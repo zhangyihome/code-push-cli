@@ -26,7 +26,7 @@ export class SdkStub {
         });
     }
 
-    public addAccessKey(machine: string, description?: string): Promise<codePush.AccessKey> {
+    public addAccessKey(description: string): Promise<codePush.AccessKey> {
         return Q(<codePush.AccessKey>{
             name: "key123",
             createdTime: new Date().getTime(),

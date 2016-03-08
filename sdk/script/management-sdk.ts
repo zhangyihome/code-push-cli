@@ -1,8 +1,10 @@
 import * as base64 from "base-64";
-import Q = require("q");
 import crypto = require("crypto");
-import Promise = Q.Promise;
+import * as os from "os";
+import Q = require("q");
 import superagent = require("superagent");
+
+import Promise = Q.Promise;
 
 import { AccessKey, Account, App, CodePushError, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, UpdateMetrics } from "./types";
 
@@ -88,8 +90,13 @@ class AccountManager {
         });
     }
 
-    public addAccessKey(machine: string, description?: string): Promise<AccessKey> {
-        var accessKeyRequest: AccessKey = { createdBy: machine, description: description };
+    public addAccessKey(description: string): Promise<AccessKey> {
+        if (!description) {
+            throw new Error("A description must be specified when adding an access key.");
+        }
+
+        var hostname: string = os.hostname();
+        var accessKeyRequest: AccessKey = { createdBy: hostname, description: description };
         return this.post(urlEncode `/accessKeys/`, JSON.stringify(accessKeyRequest), /*expectResponseBody=*/ true)
             .then((response: JsonResponse) => response.body.accessKey);
     }
