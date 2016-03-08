@@ -18,6 +18,7 @@
     deploymentRename,
     login,
     logout,
+    patch,
     promote,
     register,
     release,
@@ -114,6 +115,15 @@ export interface ILoginCommand extends ICommand {
 
 export interface ILogoutCommand extends ICommand {
     isLocal: boolean;
+}
+
+export interface IPatchCommand extends ICommand {
+    appName: string;
+    deploymentName: string;
+    description: string;
+    label: string;
+    mandatory: boolean;
+    rollout: string;
 }
 
 export interface IPromoteCommand extends ICommand {

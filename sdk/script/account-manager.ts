@@ -34,10 +34,11 @@ export interface CodePushError {
     statusCode?: number;
 }
 
-interface PackageToUpload {
+interface PackageInfo {
+    appVersion?: string;
     description: string;
-    appVersion: string;
     isMandatory: boolean;
+    label?: string;
     rollout: number;
 }
 
@@ -211,7 +212,7 @@ export class AccountManager {
 
     public releasePackage(appName: string, deploymentName: string, fileOrPath: File | string, description: string, appVersion: string, rollout: number, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var packageInfo: PackageToUpload = this.generatePackageInfo(description, appVersion, isMandatory, rollout);
+            var packageInfo: PackageInfo = this.generatePackageInfo(description, appVersion, isMandatory, /*label*/ null, rollout);
             var request: superagent.Request<any> = superagent.post(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`);
             this.attachCredentials(request);
 
@@ -230,6 +231,37 @@ export class AccountManager {
                         uploadProgressCallback(currentProgress);
                     }
                 })
+                .end((err: any, res: superagent.Response) => {
+                    if (err) {
+                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                        return;
+                    }
+
+                    if (res.ok) {
+                        resolve(<void>null);
+                    } else {
+                        try {
+                            var body = JSON.parse(res.text);
+                        } catch (err) {
+                        }
+
+                        if (body) {
+                            reject(<CodePushError>body);
+                        } else {
+                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                        }
+                    }
+                });
+        });
+    }
+
+    public patchRelease(appName: string, deploymentName: string, label: string, description: string, isMandatory: boolean, rollout: number): Promise<void> {
+        return Promise<void>((resolve, reject, notify) => {
+            var packageInfo: PackageInfo = this.generatePackageInfo(description, /*appVersion*/ null, isMandatory, label, rollout);
+            var request: superagent.Request<any> = superagent.patch(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`);
+            this.attachCredentials(request);
+
+            request.field("packageInfo", JSON.stringify(packageInfo))
                 .end((err: any, res: superagent.Response) => {
                     if (err) {
                         reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
@@ -333,11 +365,12 @@ export class AccountManager {
         return response && response.text ? response.text : error.message;
     }
 
-    private generatePackageInfo(description: string, appVersion: string, isMandatory: boolean, rollout: number): PackageToUpload {
+    private generatePackageInfo(description: string, appVersion: string, isMandatory: boolean, label: string, rollout: number): PackageInfo {
         return {
-            description: description,
             appVersion: appVersion,
+            description: description,
             isMandatory: isMandatory,
+            label: label,
             rollout: rollout
         };
     }

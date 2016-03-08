@@ -268,6 +268,18 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("local", { demand: false, description: "Whether to delete the current session's access key on the server", type: "boolean" });
         addCommonConfiguration(yargs);
     })
+    .command("patch", "Update the metadata for an existing release", (yargs: yargs.Argv) => {
+        yargs.usage(USAGE_PREFIX + " patch <appName> <deploymentName> [--label <label>] [--description <description>] [--mandatory] [--rollout <rolloutPercentage>]")
+            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
+            .example("patch MyApp Production --des \"Updated description\" -r 50", "Update the description of latest release for \"MyApp\" app's \"Production\" deployment and update rollout value to 50")
+            .example("patch MyApp Production -l v3 --des \"Updated description for v3\"", "Update the description of the release with label v3 for \"MyApp\" app's \"Production\" deployment")
+            .option("label", { alias: "l", default: null, demand: false, description: "The label of the release to be updated", type: "string" })
+            .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
+            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to. This field can only be increased from the previous value.", type: "string" });
+
+        addCommonConfiguration(yargs);
+    })
     .command("promote", "Promote the package from one deployment of your app to another", (yargs: yargs.Argv) => {
         yargs.usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName>")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
@@ -534,6 +546,21 @@ function createCommand(): cli.ICommand {
                 logoutCommand.isLocal = argv["local"];
                 break;
 
+            case "patch":
+                if (arg1 && arg2) {
+                    cmd = { type: cli.CommandType.patch };
+
+                    var patchCommand = <cli.IPatchCommand>cmd;
+
+                    patchCommand.appName = arg1;
+                    patchCommand.deploymentName = arg2;
+                    patchCommand.deploymentName = argv["label"];
+                    patchCommand.description = argv["description"] ? backslash(argv["description"]) : "";
+                    patchCommand.mandatory = argv["mandatory"];
+                    patchCommand.rollout = argv["rollout"];
+                }
+                break;
+
             case "promote":
                 if (arg1 && arg2 && arg3) {
                     cmd = { type: cli.CommandType.promote };
@@ -584,7 +611,7 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseReactCommand.entryFile = argv["entryFile"];
                     releaseReactCommand.mandatory = argv["mandatory"];
-                    releaseCommand.rollout = argv["rollout"];
+                    releaseReactCommand.rollout = argv["rollout"];
                     releaseReactCommand.sourcemapOutput = argv["sourcemapOutput"];
                 }
                 break;

@@ -454,6 +454,9 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.logout:
                     return logout(<cli.ILogoutCommand>command);
 
+                case cli.CommandType.patch:
+                    return patch(<cli.IPatchCommand>command);
+
                 case cli.CommandType.promote:
                     return promote(<cli.IPromoteCommand>command);
 
@@ -845,14 +848,30 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
         });
 }
 
+function validateRollout(rollout: string): void {
+    if (rollout && !ROLLOUT_PERCENTAGE_REGEX.test(rollout)) {
+        throw new Error("Please specify rollout percentage as an integer number between 1 and 100 inclusive.");
+    }
+}
+
 function validateReleaseOptions(command: cli.IReleaseCommand) {
     if (isBinaryOrZip(command.package)) {
         throw new Error("It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).");
     } else if (semver.valid(command.appStoreVersion) === null) {
         throw new Error("Please use a semver-compliant app store version, for example \"1.0.3\".");
-    } else if (command.rollout && !ROLLOUT_PERCENTAGE_REGEX.test(command.rollout)) {
-        throw new Error("Please specify rollout percentage as an integer number between 1 and 100 inclusive.");
-    }
+    } else if (command.rollout){
+        validateRollout(command.rollout);
+    } 
+}
+
+function patch(command: cli.IPatchCommand): Promise<void> {
+    validateRollout(command.rollout);
+
+    var rollout: number = command.rollout ? parseInt(command.rollout) : null;
+    return sdk.patchRelease(command.appName, command.deploymentName, command.label, command.description, command.mandatory, rollout)
+        .then((): void => {
+            log(`Successfully updated the ${ command.label ? command.label : "latest" } release of "${command.deploymentName}" deployment of "${command.appName}" app.`);
+        });
 }
 
 export var release = (command: cli.IReleaseCommand): Promise<void> => {
