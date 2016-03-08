@@ -200,7 +200,7 @@ class AccountManager {
             .then((res: JsonResponse) => res.body.history);
     }
 
-    public release(appName: string, deploymentName: string, fileOrPath: File | string, targetBinaryVersion: string, description: string, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
+    public release(appName: string, deploymentName: string, fileOrPath: File | string, targetBinaryVersion: string, description?: string, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             var packageInfo: PackageToUpload = this.generatePackageInfo(description, targetBinaryVersion, isMandatory);
             var request: superagent.Request<any> = superagent.post(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`);
