@@ -938,12 +938,12 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
     }
 
     try {
-        var tempPrepareFile = path.join(platformCordova, "tempPrepare.js");
+        var tempPrepareFile: string = path.join(platformCordova, "tempPrepare.js");
 
         var tempPrepareContents = "var fs= require('fs'); var path = require('path'); var ConfigParser = require('cordova-common').ConfigParser; var Api = require('./Api'); var projRoot = path.join(process.cwd(), '../../..'); var project = {projectConfig: new ConfigParser(path.join(projRoot, 'config.xml')),root: projRoot,locations: {www: path.join(projRoot, 'www')}}; var preparer = new Api(); preparer.prepare(project);"
         fs.writeFileSync(tempPrepareFile, tempPrepareContents);
 
-        var prepareOptions = { cwd: platformCordova };
+        var prepareOptions: any = { cwd: platformCordova };
         var prepareProcess = spawn("node", ["tempPrepare.js"], prepareOptions);
 
         preparePromise = Promise<void>((resolve, reject, notify) => {
@@ -956,6 +956,7 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
             });
 
             prepareProcess.on("close", (exitCode: number) => {
+                fs.unlinkSync(tempPrepareFile);
                 if (exitCode) {
                     reject(new Error(`"node" command exited with code ${exitCode}.`));
                 }
