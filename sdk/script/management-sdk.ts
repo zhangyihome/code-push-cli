@@ -91,6 +91,10 @@ class AccountManager {
     }
 
     public addAccessKey(description: string): Promise<AccessKey> {
+        if (!description) {
+            throw new Error("A description must be specified when adding an access key.");
+        }
+
         var hostname: string = os.hostname();
         var accessKeyRequest: AccessKey = { createdBy: hostname, description: description };
         return this.post(urlEncode `/accessKeys/`, JSON.stringify(accessKeyRequest), /*expectResponseBody=*/ true)
