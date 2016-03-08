@@ -431,7 +431,7 @@ By default, the history doesn't display the author of each release, but if you a
 You can clear the release history associated with a deployment using the following command: 
 
 ```
-code-push deployment history <appName> <deploymentName>
+code-push deployment clear <appName> <deploymentName>
 ```
 
 After running this command, client devices configured to receive updates from this deployment using its associated deployment key will no longer receive those updates that have been cleared. This command is irreversible, and therefore should not be used in a production deployment.
