@@ -129,6 +129,7 @@ Inversely, that means that an app collaborator cannot do any of the following:
 1. Rename or delete the app
 1. Transfer ownership of the app
 1. Create, rename or delete new deployments within the app
+1. Clear a deployment's release history
 1. Add or remove collaborators from the app (*)
 
 *NOTE: A developer can remove him/herself as a collaborator from an app that was shared with them.*
@@ -434,4 +435,4 @@ You can clear the release history associated with a deployment using the followi
 code-push deployment clear <appName> <deploymentName>
 ```
 
-After running this command, client devices configured to receive updates from this deployment using its associated deployment key will no longer receive those updates that have been cleared. This command is irreversible, and therefore should not be used in a production deployment.
+After running this command, client devices configured to receive updates using its associated deployment key will no longer receive the updates that have been cleared. This command is irreversible, and therefore should not be used in a production deployment.
