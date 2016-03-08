@@ -172,8 +172,8 @@ code-push deployment add <appName> <deploymentName>
 Just like with apps, you can remove and rename deployments as well, using the following commands respectively:
 
 ```
-code-push deployment rename <appName> <deploymentName> <newDeploymentName>
 code-push deployment rm <appName> <deploymentName>
+code-push deployment rename <appName> <deploymentName> <newDeploymentName>
 ```
 
 If at any time you'd like to view the list of deployments that a specific app includes, you can simply run the following command:
@@ -425,3 +425,13 @@ Additionally, the history displays the install metrics for each release. You can
 By default, the history doesn't display the author of each release, but if you are collaborating on an app with other developers, and want to view who released each update, you can pass the additional `--displayAuthor` (or `-a`) flag to the history command.
 
 *NOTE: The history command can also be run using the "h" alias*
+
+## Clearing release history
+
+You can clear the release history associated with a deployment using the following command: 
+
+```
+code-push deployment clear <appName> <deploymentName>
+```
+
+After running this command, client devices configured to receive updates from this deployment using its associated deployment key will no longer receive those updates that have been cleared. This command is irreversible, and therefore should not be used in a production deployment.
