@@ -113,6 +113,15 @@ function removeCollaborator(commandName: string, yargs: yargs.Argv): void {
     addCommonConfiguration(yargs);
 }
 
+function deploymentClear(commandName: string, yargs: yargs.Argv): void {
+    isValidCommand = true;
+    yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> <deploymentName>")
+        .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
+        .example("deployment " + commandName + " MyApp MyDeployment", "Clears away all the updates associated with deployment \"MyDeployment\" from app \"MyApp\"");
+
+    addCommonConfiguration(yargs);
+}
+
 function deploymentList(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
     yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> [--format <format>] [--displayKeys]")
@@ -227,6 +236,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
                 addCommonConfiguration(yargs);
             })
+            .command("clear", "Clears away all the updates associated with a deployment", (yargs: yargs.Argv) => deploymentClear("clear", yargs))
             .command("remove", "Remove a deployment from an app", (yargs: yargs.Argv) => deploymentRemove("remove", yargs))
             .command("rm", "Remove a deployment from an app", (yargs: yargs.Argv) => deploymentRemove("rm", yargs))
             .command("rename", "Rename an existing deployment", (yargs: yargs.Argv) => {
@@ -458,6 +468,17 @@ function createCommand(): cli.ICommand {
 
                             deploymentAddCommand.appName = arg2;
                             deploymentAddCommand.deploymentName = arg3;
+                        }
+                        break;
+
+                    case "clear":
+                        if (arg2 && arg3) {
+                            cmd = { type: cli.CommandType.deploymentClear };
+
+                            var deploymentClearCommand = <cli.IDeploymentClearCommand>cmd;
+
+                            deploymentClearCommand.appName = arg2;
+                            deploymentClearCommand.deploymentName = arg3;
                         }
                         break;
 

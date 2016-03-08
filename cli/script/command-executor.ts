@@ -275,6 +275,20 @@ function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
         });
 }
 
+function deploymentClear(command: cli.IDeploymentAddCommand): Promise<void> {
+    return confirm()
+        .then((wasConfirmed: boolean): Promise<void> => {
+            if (wasConfirmed) {
+                return sdk.clearDeployment(command.appName, command.deploymentName)
+                    .then((): void => {
+                        log("Successfully cleared all the updates associated with the \"" + command.deploymentName + "\" deployment from the \"" + command.appName + "\" app.");
+                    })
+            }
+
+            log("Clear deployment cancelled.");
+        });
+}
+
 export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: boolean = true): Promise<void> => {
     throwForInvalidOutputFormat(command.format);
     var deployments: Deployment[];
@@ -435,6 +449,9 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.deploymentAdd:
                     return deploymentAdd(<cli.IDeploymentAddCommand>command);
+
+                case cli.CommandType.deploymentClear:
+                    return deploymentClear(<cli.IDeploymentClearCommand>command);
 
                 case cli.CommandType.deploymentHistory:
                     return deploymentHistory(<cli.IDeploymentHistoryCommand>command);

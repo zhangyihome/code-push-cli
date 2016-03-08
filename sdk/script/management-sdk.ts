@@ -169,6 +169,11 @@ class AccountManager {
         return this.post(urlEncode `/apps/${appName}/deployments/`, JSON.stringify(deployment), /*expectResponseBody=*/ true)
             .then((res: JsonResponse) => res.body.deployment);
     }
+    
+    public clearDeployment(appName: string, deploymentName: string): Promise<void> {
+        return this.del(urlEncode `/apps/${appName}/deployments/${deploymentName}/history`)
+            .then(() => null);
+    }
 
     public getDeployments(appName: string): Promise<Deployment[]> {
         return this.get(urlEncode `/apps/${appName}/deployments/`)

@@ -11,6 +11,7 @@
     collaboratorList,
     collaboratorRemove,
     deploymentAdd,
+    deploymentClear,
     deploymentHistory,
     deploymentList,
     deploymentMetrics,
@@ -79,6 +80,11 @@ export interface ICollaboratorRemoveCommand extends ICommand {
 }
 
 export interface IDeploymentAddCommand extends ICommand {
+    appName: string;
+    deploymentName: string;
+}
+
+export interface IDeploymentClearCommand extends ICommand {
     appName: string;
     deploymentName: string;
 }

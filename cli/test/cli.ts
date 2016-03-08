@@ -52,6 +52,10 @@ export class SdkStub {
         });
     }
 
+    public clearDeployment(appId: string, deployment: string): Promise<void> {
+        return Q(<void>null);
+    }
+    
     public getAccessKeys(): Promise<codePush.AccessKey[]> {
         return Q([<codePush.AccessKey>{
             name: "8",
@@ -512,6 +516,47 @@ describe("CLI", () => {
                 sinon.assert.calledOnce(addDeployment);
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Successfully added the \"b\" deployment with key \"6\" to the \"a\" app.");
+                done();
+            });
+    });
+
+    it("deploymentClear clears deployment", (done: MochaDone): void => {
+        var command: cli.IDeploymentClearCommand = {
+            type: cli.CommandType.deploymentClear,
+            appName: "a",
+            deploymentName: "Staging"
+        };
+
+        var clearDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "clearDeployment");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(clearDeployment);
+                sinon.assert.calledWithExactly(clearDeployment, "a", "Staging");
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, "Successfully cleared all the updates associated with the \"Staging\" deployment from the \"a\" app.");
+
+                done();
+            });
+    });
+
+    it("deploymentClear does not clear deployment if cancelled", (done: MochaDone): void => {
+        var command: cli.IDeploymentClearCommand = {
+            type: cli.CommandType.deploymentClear,
+            appName: "a",
+            deploymentName: "Staging"
+        };
+
+        var clearDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "clearDeployment");
+
+        wasConfirmed = false;
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.notCalled(clearDeployment);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, "Clear deployment cancelled.");
+
                 done();
             });
     });
