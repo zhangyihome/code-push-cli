@@ -1,4 +1,4 @@
-# Node.js SDK for CodePush
+# CodePush Management SDK (Node.js)
 
 A JavaScript library for programmatically managing your CodePush account (e.g. creating apps, promoting releases), which allows authoring Node.js-based build and/or deployment scripts, without needing to shell out to the [CLI](https://github.com/Microsoft/code-push/blob/master/cli/README.md).
 
