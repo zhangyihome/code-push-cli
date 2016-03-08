@@ -184,7 +184,7 @@ function appRemove(command: cli.IAppRemoveCommand): Promise<void> {
 }
 
 function appRename(command: cli.IAppRenameCommand): Promise<void> {
-    return sdk.updateApp(command.currentAppName, { name: command.newAppName })
+    return sdk.renameApp(command.currentAppName, command.newAppName)
         .then((): void => {
             log("Successfully renamed the \"" + command.currentAppName + "\" app to \"" + command.newAppName + "\".");
         });
@@ -326,7 +326,7 @@ function deploymentRemove(command: cli.IDeploymentRemoveCommand): Promise<void> 
 }
 
 function deploymentRename(command: cli.IDeploymentRenameCommand): Promise<void> {
-    return sdk.updateDeployment(command.appName, command.currentDeploymentName, { name: command.newDeploymentName })
+    return sdk.renameDeployment(command.appName, command.currentDeploymentName, command.newDeploymentName)
         .then((): void => {
             log("Successfully renamed the \"" + command.currentDeploymentName + "\" deployment to \"" + command.newDeploymentName + "\" for the \"" + command.appName + "\" app.");
         });

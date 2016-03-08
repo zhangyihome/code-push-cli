@@ -137,8 +137,8 @@ class AccountManager {
             .then(() => null);
     }
 
-    public updateApp(appName: string, infoToChange: App): Promise<void> {
-        return this.patch(urlEncode `/apps/${appName}`, JSON.stringify(infoToChange))
+    public renameApp(oldAppName: string, newAppName: string): Promise<void> {
+        return this.patch(urlEncode `/apps/${oldAppName}`, JSON.stringify({ name: newAppName }))
             .then(() => null);
     }
 
@@ -180,8 +180,8 @@ class AccountManager {
             .then((res: JsonResponse) => res.body.deployment);
     }
 
-    public updateDeployment(appName: string, deploymentName: string, infoToChange: Deployment): Promise<void> {
-        return this.patch(urlEncode `/apps/${appName}/deployments/${deploymentName}`, JSON.stringify(infoToChange))
+    public renameDeployment(appName: string, oldDeploymentName: string, newDeploymentName: string): Promise<void> {
+        return this.patch(urlEncode `/apps/${appName}/deployments/${oldDeploymentName}`, JSON.stringify({ name: newDeploymentName }))
             .then(() => null);
     }
 

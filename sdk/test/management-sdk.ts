@@ -25,13 +25,13 @@ describe("Management SDK", () => {
         var methodsWithErrorHandling: any[] = [
             manager.addApp.bind(manager, "appName"),
             manager.getApp.bind(manager, "appName"),
-            manager.updateApp.bind(manager, "appName", {}),
+            manager.renameApp.bind(manager, "appName", {}),
             manager.removeApp.bind(manager, "appName"),
 
             manager.addDeployment.bind(manager, "appName", "deploymentName"),
             manager.getDeployment.bind(manager, "appName", "deploymentName"),
             manager.getDeployments.bind(manager, "appName"),
-            manager.updateDeployment.bind(manager, "appName", "deploymentName", { name: "newDeploymentName" }),
+            manager.renameDeployment.bind(manager, "appName", "deploymentName", { name: "newDeploymentName" }),
             manager.removeDeployment.bind(manager, "appName", "deploymentName"),
         ];
 
@@ -114,7 +114,7 @@ describe("Management SDK", () => {
     it("updateApp handles success response", (done: MochaDone) => {
         mockReturn(JSON.stringify({ apps: [] }), 200, {});
 
-        manager.updateApp("appName", <any>{}).done((obj: any) => {
+        manager.renameApp("appName", "newAppName").done((obj: any) => {
             assert.ok(!obj);
             done();
         }, rejectHandler);
@@ -156,10 +156,10 @@ describe("Management SDK", () => {
         }, rejectHandler);
     });
 
-    it("updateDeployment handles success response", (done: MochaDone) => {
+    it("renameDeployment handles success response", (done: MochaDone) => {
         mockReturn(JSON.stringify({ apps: [] }), 200, {});
 
-        manager.updateDeployment("appName", "deploymentName", { name: "newDeploymentName" }).done((obj: any) => {
+        manager.renameDeployment("appName", "deploymentName", "newDeploymentName").done((obj: any) => {
             assert.ok(!obj);
             done();
         }, rejectHandler);

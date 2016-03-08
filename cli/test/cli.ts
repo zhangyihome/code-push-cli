@@ -169,7 +169,7 @@ export class SdkStub {
         return Q(<void>null);
     }
 
-    public updateApp(app: codePush.App): Promise<void> {
+    public renameApp(app: codePush.App): Promise<void> {
         return Q(<void>null);
     }
 
@@ -177,7 +177,7 @@ export class SdkStub {
         return Q(<void>null);
     }
 
-    public updateDeployment(appId: string, deployment: codePush.Deployment): Promise<void> {
+    public renameDeployment(appId: string, deployment: codePush.Deployment): Promise<void> {
         return Q(<void>null);
     }
 }
@@ -402,11 +402,11 @@ describe("CLI", () => {
             newAppName: "c"
         };
 
-        var updateApp: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "updateApp");
+        var renameApp: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "renameApp");
 
         cmdexec.execute(command)
             .done((): void => {
-                sinon.assert.calledOnce(updateApp);
+                sinon.assert.calledOnce(renameApp);
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Successfully renamed the \"a\" app to \"c\".");
 
@@ -612,11 +612,11 @@ describe("CLI", () => {
             newDeploymentName: "c"
         };
 
-        var updateDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "updateDeployment");
+        var renameDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "renameDeployment");
 
         cmdexec.execute(command)
             .done((): void => {
-                sinon.assert.calledOnce(updateDeployment);
+                sinon.assert.calledOnce(renameDeployment);
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Successfully renamed the \"Staging\" deployment to \"c\" for the \"a\" app.");
 
