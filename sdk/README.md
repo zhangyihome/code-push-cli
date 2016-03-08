@@ -21,7 +21,7 @@ A JavaScript library for programatically managing your CodePush account (e.g. cr
     var CodePush = require("code-push");    
     ```
     
-4. Create an instance of the `CodePush` class, passing it the access key you created or retreived in step #1:
+4. Create an instance of the `CodePush` class, passing it the access key you created or retrieved in step #1:
 
     ```javascript
     var codePush = new CodePush("YOUR_ACCESS_KEY");
@@ -53,15 +53,15 @@ The `code-push` module exports a single class (typically referred to as `CodePus
 
 - __getApp(appName: string): Promise&lt;App&gt;__ - Retrieves the metadata about the specified app.
 
-- __getApps(): Promise&lt;App[]&gt;__ - Retreives the list of apps associated with your CodePush account.
+- __getApps(): Promise&lt;App[]&gt;__ - Retrieves the list of apps associated with your CodePush account.
 
 - __getCollaborators(appName: string): Promise&lt;CollaboratorMap&gt;__ - Retrieves the list of collaborators associated with the specified app.
 
 - __getDeployment(appName: string, deploymentName: string): Promise&lt;Deployment&gt;__ - Retrieves the metadata for the specified app deployment.
 
-- __getDeploymentHistory(appName: string, deploymentName: string): Promise&lt;Package[]&gt;__ - Retreives the list of releases that have been made to the specified app deployment.
+- __getDeploymentHistory(appName: string, deploymentName: string): Promise&lt;Package[]&gt;__ - Retrieves the list of releases that have been made to the specified app deployment.
 
-- __getDeploymentMetrics(appName: string, deploymentName): Promise&lt;DeploymentMetrics&gt;__ - Retreives the installation metrics for the specified app deployment. 
+- __getDeploymentMetrics(appName: string, deploymentName): Promise&lt;DeploymentMetrics&gt;__ - Retrieves the installation metrics for the specified app deployment. 
 
 - __getDeployments(appName: string): Promose&lt;Deployment[]&gt;__ - Retrieves the list of deployments associated with the specified app.
 
