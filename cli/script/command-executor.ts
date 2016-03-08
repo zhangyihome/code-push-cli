@@ -67,6 +67,7 @@ export interface PackageWithMetrics {
 export var log = (message: string | Chalk.ChalkChain): void => console.log(message);
 export var sdk: AccountManager;
 export var spawn = childProcess.spawn;
+export var spawnSync = childProcess.spawnSync;
 
 var connectionInfo: ILoginConnectionInfo;
 
@@ -938,68 +939,55 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
     }
 
     try {
-        var tempPrepareFile: string = path.join(platformCordova, "tempPrepare.js");
-
-        var tempPrepareContents = "var fs= require('fs'); var path = require('path'); var ConfigParser = require('cordova-common').ConfigParser; var Api = require('./Api'); var projRoot = path.join(process.cwd(), '../../..'); var project = {projectConfig: new ConfigParser(path.join(projRoot, 'config.xml')),root: projRoot,locations: {www: path.join(projRoot, 'www')}}; var preparer = new Api(); preparer.prepare(project);"
-        fs.writeFileSync(tempPrepareFile, tempPrepareContents);
+        var tempPrepareContents = `
+        var path = require('path');
+        var ConfigParser = require('cordova-common').ConfigParser;
+        var Api = require('./Api');
+        var projRoot = path.join(process.cwd(), '../../..');
+        var project = {
+            projectConfig: new ConfigParser(path.join(projRoot, 'config.xml')),
+            root: projRoot,
+            locations: {
+                www: path.join(projRoot, 'www')
+            }
+        };
+        var preparer = new Api();
+        preparer.prepare(project);
+        `;
 
         var prepareOptions: any = { cwd: platformCordova };
-        var prepareProcess = spawn("node", ["tempPrepare.js"], prepareOptions);
-
-        preparePromise = Promise<void>((resolve, reject, notify) => {
-            prepareProcess.stdout.on("data", (data: Buffer) => {
-                log(data.toString().trim());
-            });
-
-            prepareProcess.stderr.on("data", (data: Buffer) => {
-                console.error(data.toString().trim());
-            });
-
-            prepareProcess.on("close", (exitCode: number) => {
-                fs.unlinkSync(tempPrepareFile);
-                if (exitCode) {
-                    reject(new Error(`"node" command exited with code ${exitCode}.`));
-                }
-
-                resolve(<void>null);
-            });
-        });
+        var prepareProcess = spawnSync("node", ["-e", tempPrepareContents], prepareOptions);
     } catch (error) {
         throw new Error("Unable to prepare project. Please ensure that this is a cordova project and that platform " + platform + " was added with cordova platform add " + platform);
     }
 
-    return preparePromise.then(() => {
-        try {
-            console.log(process.cwd());
-            var configString: string = fs.readFileSync(path.join(process.cwd(), "config.xml"), { encoding: "utf8" });
-            var configPromise = parseXml(configString);
-            var releaseCommand: cli.IReleaseCommand = <any>command;
+    try {
+        var configString: string = fs.readFileSync(path.join(process.cwd(), "config.xml"), { encoding: "utf8" });
+        var configPromise = parseXml(configString);
+        var releaseCommand: cli.IReleaseCommand = <any>command;
 
-            releaseCommand.package = outputFolder;
-            releaseCommand.type = cli.CommandType.release;
+        releaseCommand.package = outputFolder;
+        releaseCommand.type = cli.CommandType.release;
 
-            return configPromise.then((parsedConfig: any) => {
-                var config = parsedConfig.widget;
+        return configPromise.then((parsedConfig: any) => {
+            var config = parsedConfig.widget;
 
-                var releaseTargetVersion: string;
-                if (command.appStoreVersion) {
-                    releaseTargetVersion = command.appStoreVersion;
-                } else {
-                    releaseTargetVersion = config['$'].version;
-                }
+            var releaseTargetVersion: string;
+            if (command.appStoreVersion) {
+                releaseTargetVersion = command.appStoreVersion;
+            } else {
+                releaseTargetVersion = config['$'].version;
+            }
 
-                throwForInvalidSemverRange(releaseTargetVersion);
-                releaseCommand.appStoreVersion = releaseTargetVersion;
+            throwForInvalidSemverRange(releaseTargetVersion);
+            releaseCommand.appStoreVersion = releaseTargetVersion;
 
-                log(chalk.cyan("\nReleasing update contents to CodePush:\n"));
-                return release(releaseCommand);
-            }).catch((err: Error) => {
-                throw err;
-            });
-        } catch (error) {
-            throw new Error("Unable to find or read \"config.xml\" in the CWD. The \"release-cordova\" command must be executed in a Cordova project folder.");
-        }
-    });
+            log(chalk.cyan("\nReleasing update contents to CodePush:\n"));
+            return release(releaseCommand);
+        });
+    } catch (error) {
+        throw new Error("Unable to find or read \"config.xml\" in the CWD. The \"release-cordova\" command must be executed in a Cordova project folder.");
+    }
 }
 
 export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => {
