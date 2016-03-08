@@ -96,8 +96,7 @@ export var confirm = (): Promise<boolean> => {
 }
 
 function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
-    var hostname: string = os.hostname();
-    return sdk.addAccessKey(hostname, command.description)
+    return sdk.addAccessKey(command.description)
         .then((accessKey: AccessKey) => {
             log("Successfully created a new access key" + (command.description ? (" \"" + command.description + "\"") : "") + ": " + accessKey.name);
         });
@@ -844,8 +843,8 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
 export var release = (command: cli.IReleaseCommand): Promise<void> => {
     if (isBinaryOrZip(command.package)) {
         throw new Error("It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).");
-    } 
-    
+    }
+
     throwForInvalidSemverRange(command.appStoreVersion);
     var filePath: string = command.package;
     var getPackageFilePromise: Promise<IPackageFile>;
@@ -968,11 +967,11 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
             throw new Error(`Entry file "${entryFile}" does not exist.`);
         }
     }
-    
+
     if (command.appStoreVersion) {
         throwForInvalidSemverRange(command.appStoreVersion);
     }
-    
+
     var appVersionPromise: Promise<string> = command.appStoreVersion
         ? Q(command.appStoreVersion)
         : getReactNativeProjectAppVersion(platform, projectName);
@@ -1100,7 +1099,7 @@ function throwForInvalidSemverRange(semverRange: string): void {
     if (semver.validRange(semverRange) === null) {
         throw new Error("Please use a semver-compliant target binary version range, for example \"1.0.0\", \"*\" or \"^1.2.3\".");
     }
-} 
+}
 
 function throwForInvalidOutputFormat(format: string): void {
     switch (format) {
