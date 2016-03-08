@@ -135,12 +135,7 @@ export interface IReleaseCommand extends IReleaseBaseCommand {
     package: string;
 }
 
-export interface IReleaseCordovaCommand extends ICommand {
-    appName?: string;
-    appStoreVersion?: string;
-    deploymentName: string;
-    description?: string;
-    mandatory: boolean;
+export interface IReleaseCordovaCommand extends IReleaseCommand {
     platform: string;
 }
 

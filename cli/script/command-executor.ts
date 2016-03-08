@@ -924,54 +924,81 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
 
 export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void> => {
     var platform: string = command.platform.toLowerCase();
+    var platformFolder: string = path.join(process.cwd(), "platforms", platform);
+    var platformCordova: string = path.join(platformFolder, "cordova");
+    var outputFolder: string;
+    var preparePromise: Promise<void>;
 
     if (platform === "ios") {
+        outputFolder = path.join(platformFolder, "www");
     } else if (platform === "android") {
+        outputFolder = path.join(platformFolder, "assets", "www");
     } else {
         throw new Error("Platform must be either \"ios\" or \"android\".");
     }
 
     try {
-        var configString: string = fs.readFileSync(path.join(process.cwd(), "config.xml"), { encoding: "utf8" });
-        var configPromise = parseXml(configString);
-        var releaseCommand: cli.IReleaseCommand;
+        var tempPrepareFile = path.join(platformCordova, "tempPrepare.js");
 
-        releaseCommand.deploymentName = command.deploymentName;
-        releaseCommand.mandatory = command.mandatory;
-        releaseCommand.type = cli.CommandType.release;
+        var tempPrepareContents = "var fs= require('fs'); var path = require('path'); var ConfigParser = require('cordova-common').ConfigParser; var Api = require('./Api'); var projRoot = path.join(process.cwd(), '../../..'); var project = {projectConfig: new ConfigParser(path.join(projRoot, 'config.xml')),root: projRoot,locations: {www: path.join(projRoot, 'www')}}; var preparer = new Api(); preparer.prepare(project);"
+        fs.writeFileSync(tempPrepareFile, tempPrepareContents);
 
-        return configPromise.then((parsedConfig: any) => {
-            var config = parsedConfig.widget;
+        var prepareOptions = { cwd: platformCordova };
+        var prepareProcess = spawn("node", ["tempPrepare.js"], prepareOptions);
 
-            var releaseTargetVersion: string;
-            if (command.appStoreVersion) {
-                releaseTargetVersion = command.appStoreVersion;
-            } else {
-                releaseTargetVersion = config['$'].version;
-            }
+        preparePromise = Promise<void>((resolve, reject, notify) => {
+            prepareProcess.stdout.on("data", (data: Buffer) => {
+                log(data.toString().trim());
+            });
 
-            throwForInvalidSemverRange(releaseTargetVersion);
-            releaseCommand.appStoreVersion = releaseTargetVersion;
+            prepareProcess.stderr.on("data", (data: Buffer) => {
+                console.error(data.toString().trim());
+            });
 
-            var releaseDescription: string;
-            if (command.description) {
-                releaseDescription = command.description;
-            } else {
-                //xml2js returns the fields outside of $ as arrays, so take the first value
-                releaseDescription = config.description[0];
-            }
+            prepareProcess.on("close", (exitCode: number) => {
+                if (exitCode) {
+                    reject(new Error(`"node" command exited with code ${exitCode}.`));
+                }
 
-            releaseCommand.description = releaseDescription;
-            
-            if (command.appName) {
-                releaseCommand.appName = command.appName;
-            } else {
-                releaseCommand.appName = config.name[0];
-            }
+                resolve(<void>null);
+            });
         });
     } catch (error) {
-        throw new Error("Unable to find or read \"config.xml\" in the CWD. The \"release-cordova\" command must be executed in a Cordova project folder.");
+        throw new Error("Unable to prepare project. Please ensure that this is a cordova project and that platform " + platform + " was added with cordova platform add " + platform);
     }
+
+    return preparePromise.then(() => {
+        try {
+            console.log(process.cwd());
+            var configString: string = fs.readFileSync(path.join(process.cwd(), "config.xml"), { encoding: "utf8" });
+            var configPromise = parseXml(configString);
+            var releaseCommand: cli.IReleaseCommand = <any>command;
+
+            releaseCommand.package = outputFolder;
+            releaseCommand.type = cli.CommandType.release;
+
+            return configPromise.then((parsedConfig: any) => {
+                var config = parsedConfig.widget;
+
+                var releaseTargetVersion: string;
+                if (command.appStoreVersion) {
+                    releaseTargetVersion = command.appStoreVersion;
+                } else {
+                    releaseTargetVersion = config['$'].version;
+                }
+
+                throwForInvalidSemverRange(releaseTargetVersion);
+                releaseCommand.appStoreVersion = releaseTargetVersion;
+
+                log(chalk.cyan("\nReleasing update contents to CodePush:\n"));
+                return release(releaseCommand);
+            }).catch((err: Error) => {
+                throw err;
+            });
+        } catch (error) {
+            throw new Error("Unable to find or read \"config.xml\" in the CWD. The \"release-cordova\" command must be executed in a Cordova project folder.");
+        }
+    });
 }
 
 export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => {

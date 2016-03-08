@@ -295,11 +295,10 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         addCommonConfiguration(yargs);
     })
     .command("release-cordova", "Release a new version of your Cordova app to a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " release-cordova <platform> [--appName <appName>] [--deploymentName <deploymentName>] [--description <description>] [--mandatory] [--targetBinaryVersion <targetBinaryVersion>]")
-            .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
-            .example("release-cordova ios", "Release the Cordova iOS project in the current working directory to the app's \"Staging\" deployment. Name pulled from config.xml")
-            .example("release-cordova android -a MyApp -d Production", "Release the Cordova Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
-            .option("appName", { alias: "a", default: null, demand: false, description: "The name of the app to deploy to. Defaults to the name specified in the config.xml", type: "string"})
+        yargs.usage(USAGE_PREFIX + " release-cordova <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--mandatory] [--targetBinaryVersion <targetBinaryVersion>]")
+            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly two non-option arguments.
+            .example("release-cordova MyApp ios", "Release the Cordova iOS project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
+            .example("release-cordova MyApp android -d Production", "Release the Cordova Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
@@ -578,14 +577,14 @@ function createCommand(): cli.ICommand {
                 break;
                 
             case "release-cordova":
-                if (arg1) {
+                if (arg1 && arg2) {
                     cmd = { type: cli.CommandType.releaseCordova };
 
                     var releaseCordovaCommand = <cli.IReleaseCordovaCommand>cmd;
 
-                    releaseCordovaCommand.platform = arg1;
+                    releaseCordovaCommand.appName = arg1;
+                    releaseCordovaCommand.platform = arg2;
 
-                    releaseCordovaCommand.appName = argv["appName"];
                     releaseCordovaCommand.deploymentName = argv["deploymentName"];
                     releaseCordovaCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseCordovaCommand.mandatory = argv["mandatory"];
