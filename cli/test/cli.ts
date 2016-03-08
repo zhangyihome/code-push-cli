@@ -52,7 +52,7 @@ export class SdkStub {
         });
     }
 
-    public clearDeployment(appId: string, deployment: string): Promise<void> {
+    public clearDeploymentHistory(appId: string, deployment: string): Promise<void> {
         return Q(<void>null);
     }
     
@@ -520,34 +520,34 @@ describe("CLI", () => {
             });
     });
 
-    it("deploymentClear clears deployment", (done: MochaDone): void => {
-        var command: cli.IDeploymentClearCommand = {
-            type: cli.CommandType.deploymentClear,
+    it("deploymentHistoryClear clears deployment", (done: MochaDone): void => {
+        var command: cli.IDeploymentHistoryClearCommand = {
+            type: cli.CommandType.deploymentHistoryClear,
             appName: "a",
             deploymentName: "Staging"
         };
 
-        var clearDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "clearDeployment");
+        var clearDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "clearDeploymentHistory");
 
         cmdexec.execute(command)
             .done((): void => {
                 sinon.assert.calledOnce(clearDeployment);
                 sinon.assert.calledWithExactly(clearDeployment, "a", "Staging");
                 sinon.assert.calledOnce(log);
-                sinon.assert.calledWithExactly(log, "Successfully cleared all the updates associated with the \"Staging\" deployment from the \"a\" app.");
+                sinon.assert.calledWithExactly(log, "Successfully cleared the release history associated with the \"Staging\" deployment from the \"a\" app.");
 
                 done();
             });
     });
 
-    it("deploymentClear does not clear deployment if cancelled", (done: MochaDone): void => {
-        var command: cli.IDeploymentClearCommand = {
-            type: cli.CommandType.deploymentClear,
+    it("deploymentHistoryClear does not clear deployment if cancelled", (done: MochaDone): void => {
+        var command: cli.IDeploymentHistoryClearCommand = {
+            type: cli.CommandType.deploymentHistoryClear,
             appName: "a",
             deploymentName: "Staging"
         };
 
-        var clearDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "clearDeployment");
+        var clearDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "clearDeploymentHistory");
 
         wasConfirmed = false;
 

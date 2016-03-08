@@ -170,7 +170,7 @@ class AccountManager {
             .then((res: JsonResponse) => res.body.deployment);
     }
     
-    public clearDeployment(appName: string, deploymentName: string): Promise<void> {
+    public clearDeploymentHistory(appName: string, deploymentName: string): Promise<void> {
         return this.del(urlEncode `/apps/${appName}/deployments/${deploymentName}/history`)
             .then(() => null);
     }
