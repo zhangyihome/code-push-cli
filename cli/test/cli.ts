@@ -187,7 +187,7 @@ describe("CLI", () => {
     var sandbox: Sinon.SinonSandbox;
     var spawn: Sinon.SinonStub;
     var wasConfirmed = true;
-    const RELEASE_FAILED_ERROR_MESSAGE: string = "It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).";
+    const INVALID_RELEASE_FILE_ERROR_MESSAGE: string = "It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).";
 
     beforeEach((): void => {
         wasConfirmed = true;
@@ -684,6 +684,20 @@ describe("CLI", () => {
             });
     });
 
+    it("release doesn't allow non valid semver ranges", (done: MochaDone): void => {
+        var command: cli.IReleaseCommand = {
+            type: cli.CommandType.release,
+            appName: "a",
+            deploymentName: "Staging",
+            description: "test releasing zip file",
+            mandatory: false,
+            appStoreVersion: "not semver",
+            package: "./resources"
+        };
+
+        releaseHelperFunction(command, done, "Please use a semver-compliant target binary version range, for example \"1.0.0\", \"*\" or \"^1.2.3\".");
+    });
+
     it("release doesn't allow releasing .zip file", (done: MochaDone): void => {
         var command: cli.IReleaseCommand = {
             type: cli.CommandType.release,
@@ -695,7 +709,7 @@ describe("CLI", () => {
             package: "/fake/path/test/file.zip"
         };
 
-        releaseHelperFunction(command, done);
+        releaseHelperFunction(command, done, INVALID_RELEASE_FILE_ERROR_MESSAGE);
     });
 
     it("release doesn't allow releasing .ipa file", (done: MochaDone): void => {
@@ -709,7 +723,7 @@ describe("CLI", () => {
             package: "/fake/path/test/file.ipa"
         };
 
-        releaseHelperFunction(command, done);
+        releaseHelperFunction(command, done, INVALID_RELEASE_FILE_ERROR_MESSAGE);
     });
 
     it("release doesn't allow releasing .apk file", (done: MochaDone): void => {
@@ -723,13 +737,14 @@ describe("CLI", () => {
             package: "/fake/path/test/file.apk"
         };
 
-        releaseHelperFunction(command, done);
+        releaseHelperFunction(command, done, INVALID_RELEASE_FILE_ERROR_MESSAGE);
     });
 
     it("release-react fails if CWD does not contain package.json", (done: MochaDone): void => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
+            appStoreVersion: null,
             deploymentName: "Staging",
             description: "Test invalid folder",
             mandatory: false,
@@ -757,6 +772,7 @@ describe("CLI", () => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
+            appStoreVersion: null,
             deploymentName: "Staging",
             description: "Test invalid entryFile",
             entryFile: "doesntexist.js",
@@ -787,6 +803,7 @@ describe("CLI", () => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
+            appStoreVersion: null,
             deploymentName: "Staging",
             description: "Test invalid platform",
             mandatory: false,
@@ -812,11 +829,45 @@ describe("CLI", () => {
             .done();
     });
 
+    it("release-react fails if targetBinaryRange is not a valid semver range expression", (done: MochaDone): void => {
+        var bundleName = "bundle.js";
+        var command: cli.IReleaseReactCommand = {
+            type: cli.CommandType.releaseReact,
+            appName: "a",
+            appStoreVersion: "notsemver",
+            bundleName: bundleName,
+            deploymentName: "Staging",
+            description: "Test uses targetBinaryRange",
+            mandatory: false,
+            platform: "android",
+            sourcemapOutput: "index.android.js.map"
+        };
+
+        ensureInTestAppDirectory();
+
+        var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release", () => { return Q(<void>null) });
+        var releaseReact: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseReact");
+
+        cmdexec.execute(command)
+            .then(() => {
+                done(new Error("Did not throw error."));
+            })
+            .catch((err) => {
+                assert.equal(err.message, "Please use a semver-compliant target binary version range, for example \"1.0.0\", \"*\" or \"^1.2.3\".");
+                sinon.assert.notCalled(release);
+                sinon.assert.threw(releaseReact, "Error");
+                sinon.assert.notCalled(spawn);
+                done();
+            })
+            .done();
+    });
+
     it("release-react defaults entry file to index.{platform}.js if not provided", (done: MochaDone): void => {
         var bundleName = "bundle.js";
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
+            appStoreVersion: null,
             bundleName: bundleName,
             deploymentName: "Staging",
             description: "Test default entry file",
@@ -852,6 +903,7 @@ describe("CLI", () => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
+            appStoreVersion: null,
             deploymentName: "Staging",
             description: "Test default entry file",
             mandatory: false,
@@ -886,6 +938,7 @@ describe("CLI", () => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
+            appStoreVersion: null,
             deploymentName: "Staging",
             description: "Test default entry file",
             mandatory: false,
@@ -916,11 +969,51 @@ describe("CLI", () => {
             .done();
     });
 
+    it("release-react generates dev bundle", (done: MochaDone): void => {
+        var bundleName = "bundle.js";
+        var command: cli.IReleaseReactCommand = {
+            type: cli.CommandType.releaseReact,
+            appName: "a",
+            appStoreVersion: null,
+            bundleName: bundleName,
+            deploymentName: "Staging",
+            development: true,
+            description: "Test generates dev bundle",
+            mandatory: false,
+            platform: "android",
+            sourcemapOutput: "index.android.js.map"
+        };
+
+        ensureInTestAppDirectory();
+
+        var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release", () => { return Q(<void>null) });
+
+        cmdexec.execute(command)
+            .then(() => {
+                var releaseCommand: cli.IReleaseCommand = <any>command;
+                releaseCommand.package = path.join(os.tmpdir(), "CodePush");
+                releaseCommand.appStoreVersion = "1.2.3";
+
+                sinon.assert.calledOnce(spawn);
+                var spawnCommand: string = spawn.args[0][0];
+                var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+                assert.equal(spawnCommand, "node");
+                assert.equal(
+                    spawnCommandArgs,
+                    `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)} --dev true --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
+                );
+                assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
+                done();
+            })
+            .done();
+    });
+
     it("release-react generates sourcemaps", (done: MochaDone): void => {
         var bundleName = "bundle.js";
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
+            appStoreVersion: null,
             bundleName: bundleName,
             deploymentName: "Staging",
             description: "Test generates sourcemaps",
@@ -953,14 +1046,51 @@ describe("CLI", () => {
             .done();
     });
 
-    function releaseHelperFunction(command: cli.IReleaseCommand, done: MochaDone): void {
+    it("release-react uses specified targetBinaryRange option", (done: MochaDone): void => {
+        var bundleName = "bundle.js";
+        var command: cli.IReleaseReactCommand = {
+            type: cli.CommandType.releaseReact,
+            appName: "a",
+            appStoreVersion: ">=1.0.0 <1.0.5",
+            bundleName: bundleName,
+            deploymentName: "Staging",
+            description: "Test uses targetBinaryRange",
+            mandatory: false,
+            platform: "android",
+            sourcemapOutput: "index.android.js.map"
+        };
+
+        ensureInTestAppDirectory();
+
+        var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release", () => { return Q(<void>null) });
+
+        cmdexec.execute(command)
+            .then(() => {
+                var releaseCommand: cli.IReleaseCommand = <any>command;
+                releaseCommand.package = path.join(os.tmpdir(), "CodePush");
+
+                sinon.assert.calledOnce(spawn);
+                var spawnCommand: string = spawn.args[0][0];
+                var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+                assert.equal(spawnCommand, "node");
+                assert.equal(
+                    spawnCommandArgs,
+                    `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)} --dev false --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
+                );
+                assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
+                done();
+            })
+            .done();
+    });
+
+    function releaseHelperFunction(command: cli.IReleaseCommand, done: MochaDone, expectedError: string): void {
         var release: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "release");
         cmdexec.execute(command)
             .done((): void => {
                 throw "Error Expected";
             }, (error: any): void => {
                 assert (!!error);
-                assert.equal(error.message, RELEASE_FAILED_ERROR_MESSAGE);
+                assert.equal(error.message, expectedError);
                 done();
             });
     }
