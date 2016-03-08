@@ -47,6 +47,8 @@ The `code-push` module exports a single class (typically referred to as `CodePus
 
 - __addDeployment(appName: string, deploymentName: string): Promise&lt;Deployment&gt;__ - Creates a new deployment with the specified name, and associated with the specified app.
 
+- __clearDeploymentHistory(appName: string, deploymentName: string): Promise&lt;void&gt;__ - Clears the release history associated with the specified app deployment.
+
 - __getAccessKey(accessKey: string): Promise&lt;AccessKey&gt;__ - Retrieves the metadata about the specific access key.
 
 - __getAccessKeys(): Promise&lt;AccessKey[]&gt;__ - Retrieves the list of access keys associated with your CodePush account.
