@@ -1,5 +1,4 @@
-﻿import { AccountManager } from "code-push";
-import * as yargs from "yargs";
+﻿import * as yargs from "yargs";
 import * as cli from "../definitions/cli";
 import * as chalk from "chalk";
 import * as updateNotifier from "update-notifier";

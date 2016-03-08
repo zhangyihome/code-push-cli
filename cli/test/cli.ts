@@ -3,7 +3,7 @@ import * as sinon from "sinon";
 import Q = require("q");
 import * as path from "path";
 import Promise = Q.Promise;
-import * as codePush from "code-push";
+import * as codePush from "code-push/script/types";
 import * as cli from "../definitions/cli";
 import * as cmdexec from "../script/command-executor";
 import * as os from "os";
@@ -91,7 +91,7 @@ export class SdkStub {
         }]);
     }
 
-    public getPackageHistory(appId: string, deploymentId: string): Promise<codePush.Package[]> {
+    public getDeploymentHistory(appId: string, deploymentId: string): Promise<codePush.Package[]> {
         return Q([
             <codePush.Package>{
                 description: null,
@@ -136,7 +136,7 @@ export class SdkStub {
         });
     }
 
-    public getCollaboratorsList(app: codePush.App): Promise<any> {
+    public getCollaborators(app: codePush.App): Promise<any> {
         return Q({
             "a@a.com": {
                 permission: "Owner",
@@ -169,7 +169,7 @@ export class SdkStub {
         return Q(<void>null);
     }
 
-    public updateApp(app: codePush.App): Promise<void> {
+    public renameApp(app: codePush.App): Promise<void> {
         return Q(<void>null);
     }
 
@@ -177,7 +177,7 @@ export class SdkStub {
         return Q(<void>null);
     }
 
-    public updateDeployment(appId: string, deployment: codePush.Deployment): Promise<void> {
+    public renameDeployment(appId: string, deployment: codePush.Deployment): Promise<void> {
         return Q(<void>null);
     }
 }
@@ -402,11 +402,11 @@ describe("CLI", () => {
             newAppName: "c"
         };
 
-        var updateApp: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "updateApp");
+        var renameApp: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "renameApp");
 
         cmdexec.execute(command)
             .done((): void => {
-                sinon.assert.calledOnce(updateApp);
+                sinon.assert.calledOnce(renameApp);
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Successfully renamed the \"a\" app to \"c\".");
 
@@ -612,11 +612,11 @@ describe("CLI", () => {
             newDeploymentName: "c"
         };
 
-        var updateDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "updateDeployment");
+        var renameDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "renameDeployment");
 
         cmdexec.execute(command)
             .done((): void => {
-                sinon.assert.calledOnce(updateDeployment);
+                sinon.assert.calledOnce(renameDeployment);
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Successfully renamed the \"Staging\" deployment to \"c\" for the \"a\" app.");
 
@@ -633,11 +633,11 @@ describe("CLI", () => {
             displayAuthor: false
         };
 
-        var getPackageHistory: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getPackageHistory");
+        var getDeploymentHistory: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getDeploymentHistory");
 
         cmdexec.execute(command)
             .done((): void => {
-                sinon.assert.calledOnce(getPackageHistory);
+                sinon.assert.calledOnce(getDeploymentHistory);
                 sinon.assert.calledOnce(log);
                 assert.equal(log.args[0].length, 1);
 
@@ -933,7 +933,7 @@ describe("CLI", () => {
             })
             .done();
     });
-    
+
     it("release-react defaults bundle name to \"index.android.bundle\" if not provided and platform is \"android\"", (done: MochaDone): void => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
@@ -968,7 +968,7 @@ describe("CLI", () => {
             })
             .done();
     });
-    
+
     it("release-react generates dev bundle", (done: MochaDone): void => {
         var bundleName = "bundle.js";
         var command: cli.IReleaseReactCommand = {
@@ -1007,7 +1007,7 @@ describe("CLI", () => {
             })
             .done();
     });
-    
+
     it("release-react generates sourcemaps", (done: MochaDone): void => {
         var bundleName = "bundle.js";
         var command: cli.IReleaseReactCommand = {
@@ -1068,7 +1068,7 @@ describe("CLI", () => {
             .then(() => {
                 var releaseCommand: cli.IReleaseCommand = <any>command;
                 releaseCommand.package = path.join(os.tmpdir(), "CodePush");
-                
+
                 sinon.assert.calledOnce(spawn);
                 var spawnCommand: string = spawn.args[0][0];
                 var spawnCommandArgs: string = spawn.args[0][1].join(" ");
@@ -1082,7 +1082,7 @@ describe("CLI", () => {
             })
             .done();
     });
-    
+
     function releaseHelperFunction(command: cli.IReleaseCommand, done: MochaDone, expectedError: string): void {
         var release: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "release");
         cmdexec.execute(command)
