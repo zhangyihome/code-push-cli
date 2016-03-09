@@ -940,14 +940,14 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
     }
 
     var prepareScript = `
-        var path = require('path');
-        var ConfigParser = require('cordova-common').ConfigParser;
-        var Api = require('./Api');
+        var path = require("path");
+        var ConfigParser = require("cordova-common").ConfigParser;
+        var Api = require("./Api");
         var project = {
-            projectConfig: new ConfigParser(path.join("${projectRoot}", 'config.xml')),
+            projectConfig: new ConfigParser(path.join("${projectRoot}", "config.xml")),
             root: "${projectRoot}",
             locations: {
-                www: path.join("${projectRoot}", 'www')
+                www: path.join("${projectRoot}", "www")
             }
         };
         var preparer = new Api();

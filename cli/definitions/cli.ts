@@ -135,7 +135,7 @@ export interface IReleaseCommand extends IReleaseBaseCommand {
     package: string;
 }
 
-export interface IReleaseCordovaCommand extends IReleaseCommand {
+export interface IReleaseCordovaCommand extends IReleaseBaseCommand {
     platform: string;
 }
 
