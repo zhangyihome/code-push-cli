@@ -925,7 +925,8 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
 
 export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void> => {
     var platform: string = command.platform.toLowerCase();
-    var platformFolder: string = path.join(process.cwd(), "platforms", platform);
+    var projectRoot: string = process.cwd();
+    var platformFolder: string = path.join(projectRoot, "platforms", platform);
     var platformCordova: string = path.join(platformFolder, "cordova");
     var outputFolder: string;
     var preparePromise: Promise<void>;
@@ -943,12 +944,11 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
         var path = require('path');
         var ConfigParser = require('cordova-common').ConfigParser;
         var Api = require('./Api');
-        var projRoot = path.join(process.cwd(), '../../..');
         var project = {
-            projectConfig: new ConfigParser(path.join(projRoot, 'config.xml')),
-            root: projRoot,
+            projectConfig: new ConfigParser(path.join("${projectRoot}", 'config.xml')),
+            root: "${projectRoot}",
             locations: {
-                www: path.join(projRoot, 'www')
+                www: path.join("${projectRoot}", 'www')
             }
         };
         var preparer = new Api();
@@ -957,13 +957,17 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
 
         var prepareOptions: any = { cwd: platformCordova };
         var prepareProcess = spawnSync("node", ["-e", tempPrepareContents], prepareOptions);
+        
+        if (prepareProcess.error) {
+            throw prepareProcess.error;
+        }
     } catch (error) {
-        throw new Error("Unable to prepare project. Please ensure that this is a cordova project and that platform " + platform + " was added with cordova platform add " + platform);
+        throw new Error(`Unable to prepare project. Please ensure that this is a Cordova project and that platform "${platform}" was added with cordova platform add "${platform}"`);
     }
 
     try {
-        var configString: string = fs.readFileSync(path.join(process.cwd(), "config.xml"), { encoding: "utf8" });
-        var configPromise = parseXml(configString);
+        var configString: string = fs.readFileSync(path.join(projectRoot, "config.xml"), { encoding: "utf8" });
+        var configPromise: Promise<any> = parseXml(configString);
         var releaseCommand: cli.IReleaseCommand = <any>command;
 
         releaseCommand.package = outputFolder;
@@ -976,7 +980,7 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
             if (command.appStoreVersion) {
                 releaseTargetVersion = command.appStoreVersion;
             } else {
-                releaseTargetVersion = config['$'].version;
+                releaseTargetVersion = config["$"].version;
             }
 
             throwForInvalidSemverRange(releaseTargetVersion);
@@ -986,7 +990,7 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
             return release(releaseCommand);
         });
     } catch (error) {
-        throw new Error("Unable to find or read \"config.xml\" in the CWD. The \"release-cordova\" command must be executed in a Cordova project folder.");
+        throw new Error(`Unable to find or read "config.xml" in the CWD. The "release-cordova" command must be executed in a Cordova project folder.`);
     }
 }
 
