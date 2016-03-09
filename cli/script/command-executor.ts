@@ -848,6 +848,11 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
         });
 }
 
+function isMandatoryDefined(mandatory: any): boolean {
+    // Yargs treats a boolean argument with default value of null as an array.
+    return mandatory.length > 2;
+}
+
 function validateRollout(rollout: string): void {
     if (rollout && !ROLLOUT_PERCENTAGE_REGEX.test(rollout)) {
         throw new Error("Please specify rollout percentage as an integer number between 1 and 100 inclusive.");
@@ -868,7 +873,8 @@ function patch(command: cli.IPatchCommand): Promise<void> {
     validateRollout(command.rollout);
 
     var rollout: number = command.rollout ? parseInt(command.rollout) : null;
-    return sdk.patchRelease(command.appName, command.deploymentName, command.label, command.description, command.mandatory, rollout)
+    var isMandatory: boolean = isMandatoryDefined(command.mandatory) ? (<any>command.mandatory)[2] : null;
+    return sdk.patchRelease(command.appName, command.deploymentName, command.label, command.description, isMandatory, rollout)
         .then((): void => {
             log(`Successfully updated the ${ command.label ? command.label : "latest" } release of "${command.deploymentName}" deployment of "${command.appName}" app.`);
         });

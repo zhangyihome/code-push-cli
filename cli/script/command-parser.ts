@@ -275,7 +275,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .example("patch MyApp Production -l v3 --des \"Updated description for v3\"", "Update the description of the release with label v3 for \"MyApp\" app's \"Production\" deployment")
             .option("label", { alias: "l", default: null, demand: false, description: "The label of the release to be updated", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
-            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
+            .option("mandatory", { alias: "m", default: null, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
             .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to. This field can only be increased from the previous value.", type: "string" });
 
         addCommonConfiguration(yargs);
@@ -554,7 +554,7 @@ function createCommand(): cli.ICommand {
 
                     patchCommand.appName = arg1;
                     patchCommand.deploymentName = arg2;
-                    patchCommand.deploymentName = argv["label"];
+                    patchCommand.label = argv["label"];
                     patchCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     patchCommand.mandatory = argv["mandatory"];
                     patchCommand.rollout = argv["rollout"];
