@@ -353,6 +353,43 @@ This specifies the relative path to where the sourcemap file for resulting updat
 
 This is the same parameter as the one described in the [above section](#target-binary-version-parameter). If left unspecified, the command defaults to targeting only the specified version in the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients).
 
+## Releasing updates to a Cordova app
+After configuring your Cordova app to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
+
+```
+code-push release-cordova <appName> <platform>
+[--deploymentName <deploymentName>]
+[--description <description>]
+[--mandatory]
+[--binaryVersion <targetBinaryVersion>]
+```
+This `release-cordova` command does two things in addition to running the vanilla `release` command described in the [Releasing App Updates](#releasing-app-updates) section:
+
+1. It runs the [`cordova prepare` command](#update-contents-parameter) to generate the update contents for the specified platform
+2. It infers the [`targetBinaryVersion` of this release](#target-binary-range-parameter) by reading the version in the &lt;widget version&gt; in config.xml, and defaults to target only the specified version.
+
+It then calls the vanilla `release` command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the `cordova prepare` command and also avoid common pitfalls such as supplying an invalid `targetBinaryVersion` parameter.
+
+### Platform parameter**
+
+This specifies which platform the current update is targeting, and can be either `ios` or `android` (case-insensitive).
+
+### Deployment name parameter
+
+This is the same parameter as the one described in the [above section](#deployment-name-parameter).
+
+### Description parameter
+
+This is the same parameter as the one described in the [above section](#description-parameter).
+
+### Mandatory parameter
+
+This is the same parameter as the one described in the [above section](#mandatory-parameter).
+
+### Target binary version parameter
+
+This is the same parameter as the one described in the [above section](#target-binary-version-parameter). If left unspecified, the command defaults to targeting only the specified version in the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients).
+
 ## Promoting updates across deployments
 
 Once you've tested an update against a specific deployment (e.g. `Staging`), and you want to promote it "downstream" (e.g. dev->staging, staging->production), you can simply use the following command to copy the release from one deployment to another:
