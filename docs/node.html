@@ -22,7 +22,7 @@
 
   <title>
     
-      Getting Started &middot; CodePush
+      Management SDK &middot; CodePush
     
   </title>
   
@@ -127,11 +127,9 @@
           
           
           <li>
-            <a class="this-page" href="/code-push/docs/getting-started.html">
+            <a class="" href="/code-push/docs/getting-started.html">
                 Getting Started
             </a>
-            
-                <div id="page-toc" class="page-toc"></div>
             
           </li>
           
@@ -192,9 +190,11 @@
           
           
           <li>
-            <a class="" href="/code-push/docs/node.html">
+            <a class="this-page" href="/code-push/docs/node.html">
                 Management SDK
             </a>
+            
+                <div id="page-toc" class="page-toc"></div>
             
           </li>
           
@@ -402,43 +402,67 @@
             </div>
             <div class="row">  
                 <header class="doc-header">
-                    <h1 class="doc-title">Getting Started</h1>
-                    <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/Getting-Started.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
+                    <h1 class="doc-title">Management SDK</h1>
+                    <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/node.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
                 </header>  
                 <article class="doc-content">               
-                    <p>CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users’ devices. It works by acting as a central repository that developers can publish certain updates to (e.g. JS, HTML, CSS and image changes), and that apps can query for updates from (using our provided client SDKs). This allows you to have a more deterministic and direct engagement model with your end-users, while addressing bugs and/or adding small features that don’t require you to re-build a binary and/or re-distribute it through any public app stores.</p>
+                    <p>A JavaScript library for programmatically managing your CodePush account (e.g. creating apps, promoting releases), which allows authoring Node.js-based build and/or deployment scripts, without needing to shell out to the <a href="https://github.com/Microsoft/code-push/blob/master/cli/README.md">CLI</a>.</p>
 
-<h2>1. Install the CodePush CLI</h2>
+<h2>Getting Started</h2>
 
-<p>You manage your CodePush account using our NodeJS-based CLI. To install it, open a command prompt or terminal, and type <code>npm install -g code-push-cli</code></p>
+<ol>
+<li><p>Create an access key to authenticate with the CodePush server using the following CodePush CLI command:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push access-key add &quot;DESCRIPTION_OF_THE_KEY&quot;
+</code></pre></div>
+<p>If you already created a key that you want to use here, then you can retrieve it by running <code>code-push access-key ls</code> and using the value of the <code>Key</code> column for the key you wish to use.</p></li>
+<li><p>Install the management SDK by running <code>npm install code-push --save</code></p></li>
+<li><p>Import it using the following statement (using ES6 syntax as applicable):</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var CodePush = require(&quot;code-push&quot;);    
+</code></pre></div></li>
+<li><p>Create an instance of the <code>CodePush</code> class, passing it the access key you created or retrieved in step #1:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var codePush = new CodePush(&quot;YOUR_ACCESS_KEY&quot;);
+</code></pre></div></li>
+<li><p>Begin automating the management of your account! For more details on what you can do with this <code>codePush</code> object, refer to the API reference section below.</p></li>
+</ol>
 
-<p><strong>Note:</strong> On OSX and Linux, you may need to prefix this command with <code>sudo</code></p>
+<h2>API Reference</h2>
 
-<h2>2. Create a CodePush account</h2>
+<p>The <code>code-push</code> module exports a single class (typically referred to as <code>CodePush</code>), which represents a proxy to the CodePush account management REST API. This class has a single constructor for authenticating with the CodePush service, and a collection of instance methods that correspond to the commands in the management <a href="https://github.com/Microsoft/code-push/blob/master/cli/README.md">CLI</a>, which allow you to programmatically control every aspect of your CodePush account.</p>
 
-<p>Before you can release any updates, you first need to create a CodePush account. To do this, simply type the following command via the CLI and authenticate with either your GitHub or Microsoft account: <code>code-push register</code></p>
-
-<h2>3. Register your app with the service</h2>
-
-<p>In order to let the service know about your app, simply register it using a recognizeable name. For example: <code>code-push app add MyApp</code></p>
-
-<h2>4. CodePush-ify your app</h2>
-
-<p>Add the appropriate CodePush clients SDKs to your app, and configure them to query for updates against the app deployment created above. The following provide details on how to do this for each unique app type:</p>
+<h3>Constructors</h3>
 
 <ul>
-<li><a href="https://github.com/Microsoft/cordova-plugin-code-push#getting-started">Cordova</a></li>
-<li><a href="https://github.com/Microsoft/react-native-code-push#getting-started">React Native (iOS)</a></li>
+<li><strong>CodePush(accessKey: string)</strong> - Creates a new instance of the CodePush management SDK, using the specified access key to authenticated with the server.</li>
 </ul>
 
-<h2>5. Release an app update</h2>
+<h3>Methods</h3>
 
-<p>After making changes to your app&rsquo;s code or assets, push the update to your staging environment via the following command: <code>code-push release &lt;appName&gt; &lt;package&gt; &lt;appStoreVersion&gt;</code> to push those changes to the service.</p>
-
-<h2>6. Run your app</h2>
-
-<p>And thats it! All users running your app will receive the update using the experience you configured in step #4. For more details, refer to the <a href="cli.html">CLI</a> and client SDK documentation
-(<a href="cordova.html">Cordova</a>, <a href="react-native.html">React Native</a>).</p></p>
+<ul>
+<li><p><strong>addAccessKey(description: string): Promise&lt;AccessKey&gt;</strong> - Creates a new access key with the specified description (e.g. &ldquo;VSTS CI&rdquo;).</p></li>
+<li><p><strong>addApp(appName: string): Promise&lt;App&gt;</strong> - Creates a new CodePush app with the specified name.</p></li>
+<li><p><strong>addCollaborator(appName: string, email: string): Promise&lt;void&gt;</strong> - Adds the specified CodePush user as a collaborator to the specified CodePush app.</p></li>
+<li><p><strong>addDeployment(appName: string, deploymentName: string): Promise&lt;Deployment&gt;</strong> - Creates a new deployment with the specified name, and associated with the specified app.</p></li>
+<li><p><strong>clearDeploymentHistory(appName: string, deploymentName: string): Promise&lt;void&gt;</strong> - Clears the release history associated with the specified app deployment.</p></li>
+<li><p><strong>getAccessKey(accessKey: string): Promise&lt;AccessKey&gt;</strong> - Retrieves the metadata about the specific access key.</p></li>
+<li><p><strong>getAccessKeys(): Promise&lt;AccessKey[]&gt;</strong> - Retrieves the list of access keys associated with your CodePush account.</p></li>
+<li><p><strong>getApp(appName: string): Promise&lt;App&gt;</strong> - Retrieves the metadata about the specified app.</p></li>
+<li><p><strong>getApps(): Promise&lt;App[]&gt;</strong> - Retrieves the list of apps associated with your CodePush account.</p></li>
+<li><p><strong>getCollaborators(appName: string): Promise&lt;CollaboratorMap&gt;</strong> - Retrieves the list of collaborators associated with the specified app.</p></li>
+<li><p><strong>getDeployment(appName: string, deploymentName: string): Promise&lt;Deployment&gt;</strong> - Retrieves the metadata for the specified app deployment.</p></li>
+<li><p><strong>getDeploymentHistory(appName: string, deploymentName: string): Promise&lt;Package[]&gt;</strong> - Retrieves the list of releases that have been made to the specified app deployment.</p></li>
+<li><p><strong>getDeploymentMetrics(appName: string, deploymentName): Promise&lt;DeploymentMetrics&gt;</strong> - Retrieves the installation metrics for the specified app deployment. </p></li>
+<li><p><strong>getDeployments(appName: string): Promose&lt;Deployment[]&gt;</strong> - Retrieves the list of deployments associated with the specified app.</p></li>
+<li><p><strong>promote(appName: string, sourceDeploymentName: string, destDeploymentName: string): Promise&lt;void&gt;</strong> - Promotes the latest release from one deployment to another for the specified app.</p></li>
+<li><p><strong>release(appName: string, deploymentName: string, updateContentsPath: string, targetBinaryVersion: string, description?: string, isMandatory: boolean = false): Promise&lt;void&gt;</strong> - Releases a new update to the specified deployment.</p></li>
+<li><p><strong>removeAccessKey(accessKey: string): Promise&lt;void&gt;</strong> - Removes the specified access key from your CodePush account.</p></li>
+<li><p><strong>removeApp(appName: string): Promise&lt;void&gt;</strong> - Deletes the specified CodePush app from your account.</p></li>
+<li><p><strong>removeCollaborator(appName: string, email: string): Promise&lt;void&gt;</strong> - Removes the specified account as a collaborator from the specified app.</p></li>
+<li><p><strong>removeDeployment(appName: string, deploymentName: string): Promise&lt;void&gt;</strong> - Removes the specified deployment from the specified app.</p></li>
+<li><p><strong>renameApp(oldAppName: string, newAppName: string): Promise&lt;void&gt;</strong> - Renames an existing app.</p></li>
+<li><p><strong>renameDeployment(appName: string, oldDeploymentName: string, newDeploymentName: string): Promise&lt;void&gt;</strong> - Renames an existing deployment within the specified app.</p></li>
+<li><p><strong>rollback(appName: string, deploymentName: string, targetRelease?: string): Promise&lt;void&gt;</strong> - Rolls back the latest release within the specified deployment. Optionally allows you to target a specific release in the deployment&rsquo;s history, as opposed to rolling to the previous release.</p></li>
+<li><p><strong>transferApp(appName: string, email: string): Promise&lt;void&gt;</strong> - Transfers the ownership of the specified app to the specified account.</p></li>
+</ul>
   
                 </article>
             </div>  

@@ -97,11 +97,11 @@
 		    <!-- Collect the nav links, forms, and other content for toggling -->
 		    <div class="collapse navbar-collapse navbar_center" id="bs-example-navbar-collapse-1">
 		      <ul class="nav navbar-nav">
-				<li class=""><a href="/code-push/index.html#getting_started">Get Started</a></li>
+				<li class=""><a href="/code-push/index.html#getting_started">Getting Started</a></li>
 				<li class="active"><a href="/code-push/docs/index.html">Documentation</a></li>
 		        <li class=""><a href="/code-push/faq/index.html">FAQ</a></li>
 				<li class=""><a href="/code-push/blog/index.html">Blog</a></li>
-                <li class=""><a href="/code-push/community/friends.html">Friends</a></li>
+                <li class=""><a href="/code-push/community/friends.html">Showcase</a></li>
 		      </ul>
 		    </div><!-- /.navbar-collapse -->
 		</div><!-- /.container-fluid -->
@@ -140,6 +140,9 @@
           
           
         
+          
+          
+        
       
         
           
@@ -164,6 +167,36 @@
           
           
         
+          
+          
+        
+      
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+          <li>
+            <a class="" href="/code-push/docs/node.html">
+                Management SDK
+            </a>
+            
+          </li>
+          
+        
       
         
           
@@ -179,6 +212,9 @@
                 <div id="page-toc" class="page-toc"></div>
             
           </li>
+          
+        
+          
           
         
           
@@ -209,6 +245,9 @@
             </a>
             
           </li>
+          
+        
+          
           
         
           
@@ -253,6 +292,9 @@
                 
                 
               
+                
+                
+              
             
               
                 
@@ -274,6 +316,33 @@
                 
                 
               
+                
+                
+              
+            
+              
+                
+                
+              
+                
+                
+              
+                
+                
+              
+                
+                
+              
+                
+                
+              
+                
+                
+                <li>
+                  <a href=/code-push/docs/node.html>Management SDK</a>
+                </li>
+                
+              
             
               
                 
@@ -284,6 +353,9 @@
                 <li>
                   <a href=/code-push/docs/cordova.html>Cordova Client SDK</a>
                 </li>
+                
+              
+                
                 
               
                 
@@ -311,6 +383,9 @@
                 <li>
                   <a href=/code-push/docs/react-native.html>React Native Client SDK</a>
                 </li>
+                
+              
+                
                 
               
                 
@@ -347,11 +422,15 @@
 
 <ul>
 <li>Android (<a href="https://github.com/apache/cordova-android">cordova-android</a> 4.0.0+)</li>
-<li>iOS (<a href="https://github.com/apache/cordova-ios">cordova-ios</a> 3.9.0+)</li>
+<li>iOS (<a href="https://github.com/apache/cordova-ios">cordova-ios</a> 3.9.0+) - <em>Note: In order to use CodePush along with the <a href="https://github.com/apache/cordova-plugin-wkwebview-engine"><code>cordova-plugin-wkwebview-engine</code></a> plugin, you need to install <code>v1.5.1-beta+</code>, which includes full support for apps using either WebView.</em></li>
 </ul>
 
-<p>To check which versions of each Cordova platform you are currently using, you can run the following command:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">cordova platform version
+<p>To check which versions of each Cordova platform you are currently using, you can run the following command and inspect the <code>Installed platforms</code> list:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">cordova platform ls
+</code></pre></div>
+<p>If you&rsquo;re running an older Android and/or iOS platform than is mentioned above, and would be open to upgrading, you can easily do so by running the following commands (omitting a platform if it isn&rsquo;t neccessary):</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">cordova platform update android
+cordova platform update ios
 </code></pre></div>
 <h2>Getting Started</h2>
 
@@ -369,13 +448,21 @@
     &lt;preference name=&quot;CodePushDeploymentKey&quot; value=&quot;YOUR-IOS-DEPLOYMENT-KEY&quot; /&gt;
 &lt;/platform&gt;
 </code></pre></div>
-<p><em>NOTE: If you&rsquo;re only developing for a single platform, then you only need to specify the deployment key for either Android or iOS, so you don&rsquo;t need to add the additional <code>&lt;platform&gt;</code> element as illustrated above.</em></p></li>
-<li><p>If you&rsquo;re already using an <code>&lt;access origin&quot;*&quot; /&gt;</code> element in your <code>config.xml</code> file, then you can skip this step. Otherwise, add the following additional <code>&lt;access /&gt;</code> elements to ensure that your app can access the CodePush server endpoints:</p>
+<p>As a reminder, these keys are generated for you when you created your CodePush app via the CLI. If you need to retreive them, you can simply run <code>code-push deployment ls APP_NAME -k</code>, and grab the key for the specific deployment you want to use (e.g. <code>Staging</code>, <code>Production</code>).</p>
+
+<p><em>NOTE: We <a href="http://microsoft.github.io/code-push/docs/cli.html#link-4">recommend</a> creating a seperate CodePush app for iOS and Android, which is why the above sample illustrates declaring seperate keys for Android and iOS. If you&rsquo;re only developing for a single platform, then you only need to specify the deployment key for either Android or iOS, so you don&rsquo;t need to add the additional <code>&lt;platform&gt;</code> element as illustrated above.</em></p></li>
+<li><p>If you&rsquo;re using an <code>&lt;access origin=&quot;*&quot; /&gt;</code> element in your <code>config.xml</code> file, then your app is already allowed to communicate with the CodePush servers and you can safely skip this step. Otherwise, add the following additional <code>&lt;access /&gt;</code> elements:</p>
 <div class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;access origin=&quot;https://codepush.azurewebsites.net&quot; /&gt;
-&lt;access orogin=&quot;https://codepush.blob.core.windows.net&quot; /&gt;
+&lt;access origin=&quot;https://codepush.blob.core.windows.net&quot; /&gt;
 </code></pre></div></li>
 <li><p>To ensure that your app can access the CodePush server on <a href="https://developer.mozilla.org/en-US/docs/Web/Security/CSP/Introducing_Content_Security_Policy">CSP</a>-compliant platforms, add <code>https://codepush.azurewebsites.net</code> to the <code>Content-Security-Policy</code> <code>meta</code> tag in your <code>index.html</code> file:</p>
-<div class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src https://codepush.azurewebsites.net/ &#39;self&#39; data: gap: https://ssl.gstatic.com &#39;unsafe-eval&#39;; style-src &#39;self&#39; &#39;unsafe-inline&#39;; media-src *&quot; /&gt;
+<div class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src https://codepush.azurewebsites.net &#39;self&#39; data: gap: https://ssl.gstatic.com &#39;unsafe-eval&#39;; style-src &#39;self&#39; &#39;unsafe-inline&#39;; media-src *&quot; /&gt;
+</code></pre></div></li>
+<li><p>Finally, double-check that you already have the <a href="https://github.com/apache/cordova-plugin-whitelist"><code>cordova-plugin-whitelist</code></a> plugin installed (most apps will). To check this, simply run the following command:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">cordova plugin ls
+</code></pre></div>
+<p>If <code>cordova-plugin-whitelist</code> is in the list, then you are good to go. Otherwise, simply run the following command to add it:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">cordova plugin add cordova-plugin-whitelist
 </code></pre></div></li>
 </ol>
 
@@ -394,6 +481,8 @@
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.sync();
 </code></pre></div>
 <p>If an update is available, it will be silently downloaded, and installed the next time the app is restarted (either explicitly by the end user or by the OS), which ensures the least invasive experience for your end users. If you would like to display a confirmation dialog (an &ldquo;active install&rdquo;), or customize the update experience in any way, refer to the sync method&rsquo;s API reference for information on how to tweak this default behavior.</p>
+
+<p><em>NOTE: While <a href="https://developer.apple.com/programs/ios/information/iOS_Program_Information_4_3_15.pdf">Apple&rsquo;s developer agreement</a> fully allows performing over-the-air updates of JavaScript and assets (which is what enables CodePush!), it is against their policy for an app to display an update prompt. Because of this, we recommend that App Store-distributed apps don&rsquo;t enable the <code>updateDialog</code> option when calling <code>sync</code>, whereas Google Play and internally distributed apps (e.g. Enterprise, Fabric, HockeyApp) can choose to enable/customize it.</em></p>
 
 <h2>Releasing Updates</h2>
 
@@ -916,6 +1005,10 @@ window.codePush.checkForUpdate(onUpdateCheck, onError);
 <li><strong>DOWNLOADING_PACKAGE</strong>: Intermediate status - the update package is about to be downloaded.</li>
 <li><strong>INSTALLING_UPDATE</strong>: Intermediate status - the update package is about to be installed.</li>
 </ul>
+
+<h2>Compiling sources &amp; contributing</h2>
+
+<p>The JavaScript code in this plugin is compiled from TypeScript. Please see <a href="CONTRIBUTING.md">this page</a> for more details on contributing and how to build the project.</p>
   
                 </article>
             </div>  

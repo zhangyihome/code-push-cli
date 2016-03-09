@@ -97,11 +97,11 @@
 		    <!-- Collect the nav links, forms, and other content for toggling -->
 		    <div class="collapse navbar-collapse navbar_center" id="bs-example-navbar-collapse-1">
 		      <ul class="nav navbar-nav">
-				<li class=""><a href="/code-push/index.html#getting_started">Get Started</a></li>
+				<li class=""><a href="/code-push/index.html#getting_started">Getting Started</a></li>
 				<li class="active"><a href="/code-push/docs/index.html">Documentation</a></li>
 		        <li class=""><a href="/code-push/faq/index.html">FAQ</a></li>
 				<li class=""><a href="/code-push/blog/index.html">Blog</a></li>
-                <li class=""><a href="/code-push/community/friends.html">Friends</a></li>
+                <li class=""><a href="/code-push/community/friends.html">Showcase</a></li>
 		      </ul>
 		    </div><!-- /.navbar-collapse -->
 		</div><!-- /.container-fluid -->
@@ -140,6 +140,9 @@
           
           
         
+          
+          
+        
       
         
           
@@ -166,6 +169,36 @@
           
           
         
+          
+          
+        
+      
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+          <li>
+            <a class="" href="/code-push/docs/node.html">
+                Management SDK
+            </a>
+            
+          </li>
+          
+        
       
         
           
@@ -179,6 +212,9 @@
             </a>
             
           </li>
+          
+        
+          
           
         
           
@@ -209,6 +245,9 @@
             </a>
             
           </li>
+          
+        
+          
           
         
           
@@ -253,6 +292,9 @@
                 
                 
               
+                
+                
+              
             
               
                 
@@ -274,6 +316,33 @@
                 
                 
               
+                
+                
+              
+            
+              
+                
+                
+              
+                
+                
+              
+                
+                
+              
+                
+                
+              
+                
+                
+              
+                
+                
+                <li>
+                  <a href=/code-push/docs/node.html>Management SDK</a>
+                </li>
+                
+              
             
               
                 
@@ -284,6 +353,9 @@
                 <li>
                   <a href=/code-push/docs/cordova.html>Cordova Client SDK</a>
                 </li>
+                
+              
+                
                 
               
                 
@@ -316,6 +388,9 @@
                 
                 
               
+                
+                
+              
             
       
     </ul>
@@ -331,7 +406,7 @@
                     <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/CLI.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
                 </header>  
                 <article class="doc-content">               
-                    <p><img src="https://cloud.githubusercontent.com/assets/8598682/13232100/9846bc28-d962-11e5-8212-0965f267119d.png" alt="CodePush CLI"></p>
+                    <p><img src="https://cloud.githubusercontent.com/assets/116461/13588584/aa9f26f2-e485-11e5-8e15-43d4b266225a.png" alt="CodePush CLI"></p>
 
 <h2>Installation</h2>
 
@@ -355,40 +430,39 @@
 <p>Before you can begin releasing app updates, you need to create a CodePush account. You can do this by simply running the following command once you&rsquo;ve installed the CLI:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push register
 </code></pre></div>
-<p>This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. Once authenticated, it will create a CodePush account &ldquo;linked&rdquo; to your GitHub/MSA identity, and generate an access token you can copy/paste into the CLI in order to login.</p>
+<p>This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. Once authenticated, it will create a CodePush account &ldquo;linked&rdquo; to your GitHub/MSA identity, and generate an access key you can copy/paste into the CLI in order to login.</p>
 
 <p><em>Note: After registering, you are automatically logged-in with the CLI, so until you explicitly log out, you don&rsquo;t need to login again from the same machine.</em></p>
 
 <h2>Authentication</h2>
 
-<p>Every command within the CodePush CLI requires authentication, and therefore, before you can begin managing your account, you need to login using the Github or Microsoft account you used when registering. You can do this by running the following command:</p>
+<p>Every command within the CodePush CLI requires authentication, and therefore, before you can begin managing your account, you need to login using the GitHub or Microsoft account you used when registering. You can do this by running the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push login
 </code></pre></div>
-<p>This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. This will generate an access token that you need to copy/paste into the CLI (it will prompt you for it). You are now succesfully authenticated and can safely close your browser window.</p>
+<p>This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. This will generate an access key that you need to copy/paste into the CLI (it will prompt you for it). You are now successfully authenticated and can safely close your browser window.</p>
 
-<p>When you login from the CLI, your access token (kind of like a cookie) is persisted to disk so that you don&rsquo;t have to login everytime you attempt to access your account. In order to delete this file from your computer, simply run the following command:</p>
+<p>When you login from the CLI, your access key is persisted to disk for the duration of your session so that you don&rsquo;t have to login every time you attempt to access your account. In order to end your session and delete this access key, simply run the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push logout
 </code></pre></div>
-<p>If you forget to logout from a machine you&rsquo;d prefer not to leave a running session on (e.g. your friend&rsquo;s laptop), you can use the following commands to list and remove any &ldquo;live&rdquo; access tokens.
-The list of access keys will display the name of the machine the token was created on, as well as the time the login occurred. This should make it easy to spot keys you don&rsquo;t want to keep around.</p>
+<p>If you forget to logout from a machine you&rsquo;d prefer not to leave a running session on (e.g. your friend&rsquo;s laptop), you can use the following commands to list and remove any &ldquo;live&rdquo; access keys.
+The list of access keys will display the name of the machine the key was created on, as well as the time the login occurred. This should make it easy to spot keys you don&rsquo;t want to keep around.</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push access-key ls
 code-push access-key rm &lt;accessKey&gt;
 </code></pre></div>
-<p>If you need additional keys, that can be used to authenticate against the CodePush service without needing to give access to your GitHub and/or Microsoft crendentials, you can run the following command to create one (along with a description of what it is for):</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push access-key add &quot;VSO Integration&quot;
+<p>If you need additional keys that can be used to authenticate against the CodePush service without needing to give access to your GitHub and/or Microsoft credentials, you can run the following command to create a persistent one (along with a description of what it is for):</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push access-key add &quot;VSTS Integration&quot;
 </code></pre></div>
-<p>After creating the new key, you can specify its value using the <code>--accessKey</code> flag of the <code>login</code> command, which allows you to perform the &ldquo;headless&rdquo; authentication, as opposed to launching a browser.</p>
+<p>After creating the new key, you can specify its value using the <code>--accessKey</code> flag of the <code>login</code> command, which allows you to perform &ldquo;headless&rdquo; authentication, as opposed to launching a browser.</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push login --accessKey &lt;accessKey&gt;
 </code></pre></div>
-<p>If you want to log out of your current session, but still be able to reuse the same key for future logins, run the following command:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push logout --local
-</code></pre></div>
+<p>When logging in via this method, the access key will not be automatically invalidated on logout, and can be used in future sessions until it is explicitly removed from the CodePush server. However, it is still recommended to log out once your session is complete, in order to remove your credentials from disk.</p>
+
 <h2>App management</h2>
 
 <p>Before you can deploy any updates, you need to register an app with the CodePush service using the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push app add &lt;appName&gt;
 </code></pre></div>
-<p>If your app targets both iOS and Android, we recommend creating separate apps with CodePush. One for each platform. This way, you can manage and release updates to them seperately, which in the long run, tends to make things simpler. The naming convention that most folks use is to suffix the app name with <code>-iOS</code> and <code>-Android</code>. For example:</p>
+<p>If your app targets both iOS and Android, we recommend creating separate apps with CodePush. One for each platform. This way, you can manage and release updates to them separately, which in the long run, tends to make things simpler. The naming convention that most folks use is to suffix the app name with <code>-iOS</code> and <code>-Android</code>. For example:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push app add MyApp-Android
 code-push app add MyApp-iOS
 </code></pre></div>
@@ -397,12 +471,12 @@ code-push app add MyApp-iOS
 <p>If you decide that you don&rsquo;t like the name you gave to an app, you can rename it at any time using the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push app rename &lt;appName&gt; &lt;newAppName&gt;
 </code></pre></div>
-<p>The app&rsquo;s name is only meant to be recognizeable from the management side, and therefore, you can feel free to rename it as neccessary. It won&rsquo;t actually impact the running app, since update queries are made via deployment keys.</p>
+<p>The app&rsquo;s name is only meant to be recognizable from the management side, and therefore, you can feel free to rename it as necessary. It won&rsquo;t actually impact the running app, since update queries are made via deployment keys.</p>
 
 <p>If at some point you no longer need an app, you can remove it from the server using the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push app rm &lt;appName&gt;
 </code></pre></div>
-<p>Do this with caution since any apps that have been configured to use it will obviously stop receiving updates. </p>
+<p>Do this with caution since any apps that have been configured to use it will obviously stop receiving updates.</p>
 
 <p>Finally, if you want to list all apps that you&rsquo;ve registered with the CodePush server,
 you can run the following command:</p>
@@ -415,10 +489,10 @@ you can run the following command:</p>
 </code></pre></div>
 <p><em>NOTE: This expects the developer to have already <a href="#account-creation">registered</a> with CodePush using the specified e-mail address, so ensure that they have done that before attempting to share the app with them.</em></p>
 
-<p>Once added, all collaborators will immediately have the following permissions with regards to the newly shared app: </p>
+<p>Once added, all collaborators will immediately have the following permissions with regards to the newly shared app:</p>
 
 <ol>
-<li>View the app, its collaborators, <a href="#deployment-management">deployments</a> and <a href="#viewing-release-history">release history</a> </li>
+<li>View the app, its collaborators, <a href="#deployment-management">deployments</a> and <a href="#viewing-release-history">release history</a></li>
 <li><a href="#releasing-app-updates">Release</a> updates to any of the app&rsquo;s deployments</li>
 <li><a href="#promoting-updates-across-deployments">Promote</a> an update between any of the app&rsquo;s deployments</li>
 <li><a href="#rolling-back-undesired-updates">Rollback</a> any of the app&rsquo;s deployments</li>
@@ -430,6 +504,7 @@ you can run the following command:</p>
 <li>Rename or delete the app</li>
 <li>Transfer ownership of the app</li>
 <li>Create, rename or delete new deployments within the app</li>
+<li>Clear a deployment&rsquo;s release history</li>
 <li>Add or remove collaborators from the app (*)</li>
 </ol>
 
@@ -450,7 +525,7 @@ you can run the following command:</p>
 
 <h2>Deployment management</h2>
 
-<p>From the CodePush perspective, an app is simply a named grouping for one or more things called &ldquo;deployments&rdquo;. While the app represents a conceptual &ldquo;namespace&rdquo; or &ldquo;scope&rdquo; for a platform-specific version of an app (e.g. the iOS port of Foo app), it&rsquo;s deployments represent the actual target for releasing updates (for developers) and synchronizing updates (for end-users). Deployments allow you to have multiple &ldquo;environments&rdquo; for each app in-flight at any given time, and help model the reality that apps typically move from a dev&rsquo;s personal environment to a testing/QA/staging environment, before finally making their way into production.</p>
+<p>From the CodePush perspective, an app is simply a named grouping for one or more things called &ldquo;deployments&rdquo;. While the app represents a conceptual &ldquo;namespace&rdquo; or &ldquo;scope&rdquo; for a platform-specific version of an app (e.g. the iOS port of Foo app), its deployments represent the actual target for releasing updates (for developers) and synchronizing updates (for end-users). Deployments allow you to have multiple &ldquo;environments&rdquo; for each app in-flight at any given time, and help model the reality that apps typically move from a dev&rsquo;s personal environment to a testing/QA/staging environment, before finally making their way into production.</p>
 
 <p><em>NOTE: As you&rsquo;ll see below, the <code>release</code>, <code>promote</code> and <code>rollback</code> commands require both an app name and a deployment name is order to work, because it is the combination of the two that uniquely identifies a point of distribution (e.g. I want to release an update of my iOS app to my beta testers).</em></p>
 
@@ -460,8 +535,8 @@ you can run the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment add &lt;appName&gt; &lt;deploymentName&gt;
 </code></pre></div>
 <p>Just like with apps, you can remove and rename deployments as well, using the following commands respectively:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploymentName&gt;
-code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
+code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploymentName&gt;
 </code></pre></div>
 <p>If at any time you&rsquo;d like to view the list of deployments that a specific app includes, you can simply run the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment ls &lt;appName&gt; [--displayKeys|-k]
@@ -478,10 +553,10 @@ code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 <li><p><strong>Active</strong> - The number of successful installs that are currently running this release. This number will increase and decrease as end-users upgrade to and away from this release, respectively.</p></li>
 <li><p><strong>Total</strong> - The total number of successful installations that this update has received overall. This number only ever increases as new users/devices install it, and therefore, this is always a superset of the active count.</p></li>
 <li><p><strong>Pending</strong> - The number of times this release has been downloaded, but not yet installed. This would only apply to updates that aren&rsquo;t installed immediately, and helps provide the broader picture of release adoption for apps that rely on app resume and restart to apply an update.</p></li>
-<li><p><strong>Rollbacks</strong> - The number of times that this release has been automatically rolled back on the client. Ideally this number should be zero, and in that case, this metric isn&rsquo;t even shown. However, if you released an update that includes a crash as part of the installation process, the CodePush plugin will roll the end-user back to the previous release, and report that issue back to the server. This allows your end-users to remain unblocked in the event of broken releases, and by being able to see this telemtry in the CLI, you can identify erroneous releases and respond to them by <a href="#rolling-back-undesired-updates">rolling it back</a> on the server.</p></li>
+<li><p><strong>Rollbacks</strong> - The number of times that this release has been automatically rolled back on the client. Ideally this number should be zero, and in that case, this metric isn&rsquo;t even shown. However, if you released an update that includes a crash as part of the installation process, the CodePush plugin will roll the end-user back to the previous release, and report that issue back to the server. This allows your end-users to remain unblocked in the event of broken releases, and by being able to see this telemetry in the CLI, you can identify erroneous releases and respond to them by <a href="#rolling-back-undesired-updates">rolling it back</a> on the server.</p></li>
 </ul>
 
-<p>When the metrics cell reports <code>No installs recorded</code>, that indicates that the server hasn&rsquo;t seen any activity for this release. This could either be because it precluded the plugin versions that included telemtry support, or no end-users have synchronized with the CodePush server yet. As soon as an install happens, you will begin to see metrics populate in the CLI for the release.</p>
+<p>When the metrics cell reports <code>No installs recorded</code>, that indicates that the server hasn&rsquo;t seen any activity for this release. This could either be because it precluded the plugin versions that included telemetry support, or no end-users have synchronized with the CodePush server yet. As soon as an install happens, you will begin to see metrics populate in the CLI for the release.</p>
 
 <h2>Releasing app updates</h2>
 
@@ -540,14 +615,55 @@ code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 
 <h3>Target binary version parameter</h3>
 
-<p>This specifies the semver-compliant (e.g. <code>1.0.0</code> not <code>1.0</code>) store/binary version of the application you are releasing the update for. Only users running this <strong>exact version</strong> will receive the update. Users running an older and/or newer version of the app binary will not receive this update, for the following reasons:</p>
+<p>This specifies the store/binary version of the application you are releasing the update for, so that only users running that version will receive the update, while users running an older and/or newer version of the app binary will not. This is useful for the following reasons:</p>
 
 <ol>
 <li><p>If a user is running an older binary version, it&rsquo;s possible that there are breaking changes in the CodePush update that wouldn&rsquo;t be compatible with what they&rsquo;re running.</p></li>
-<li><p>If a user is running a newer binary version, then it&rsquo;s presumed that what they are running is newer (and potentially imcompatible) with the CodePush update.  </p></li>
+<li><p>If a user is running a newer binary version, then it&rsquo;s presumed that what they are running is newer (and potentially incompatible) with the CodePush update.</p></li>
 </ol>
 
-<p>The following table outlines the value that CodePush expects you to provide for each respective app type:</p>
+<p>If you ever want an update to target multiple versions of the app store binary, we also allow you to specify the parameter as a <a href="https://github.com/npm/node-semver#advanced-range-syntax">semver range expression</a>. That way, any client device running a version of the binary that satisfies the range expression (i.e. <code>semver.satisfies(version, range)</code> returns <code>true</code>) will get the update. Examples of valid semver range expressions are as follows:</p>
+
+<table><thead>
+<tr>
+<th>Range Expression</th>
+<th>Who gets the update</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><code>1.2.3</code></td>
+<td>Only devices running the specific binary app store version <code>1.2.3</code> of your app</td>
+</tr>
+<tr>
+<td><code>*</code></td>
+<td>Any device configured to consume updates from your CodePush app</td>
+</tr>
+<tr>
+<td><code>1.2.x</code></td>
+<td>Devices running major version 1, minor version 2 and any patch version of your app</td>
+</tr>
+<tr>
+<td><code>1.2.3 - 1.2.7</code></td>
+<td>Devices running any binary version between <code>1.2.3</code> (inclusive) and <code>1.2.7</code> (inclusive)</td>
+</tr>
+<tr>
+<td><code>&gt;=1.2.3 &lt;1.2.7</code></td>
+<td>Devices running any binary version between <code>1.2.3</code> (inclusive) and <code>1.2.7</code> (exclusive)</td>
+</tr>
+<tr>
+<td><code>~1.2.3</code></td>
+<td>Equivalent to <code>&gt;=1.2.3 &lt;1.3.0</code></td>
+</tr>
+<tr>
+<td><code>^1.2.3</code></td>
+<td>Equivalent to <code>&gt;=1.2.3 &lt;2.0.0</code></td>
+</tr>
+</tbody></table>
+
+<p><em>NOTE: If your semver expression starts with a special shell character or operator such as <code>&gt;</code>, <code>^</code>, or *</em>
+<em>, the command may not execute correctly if you do not wrap the value in quotes as the shell will not supply the right values to our CLI process. Therefore, it is best to wrap your <code>targetBinaryVersion</code> parameter in double quotes when calling the <code>release</code> command, e.g. <code>code-push release MyApp updateContents &quot;&gt;1.2.3&quot;</code>.</em></p>
+
+<p>The following table outlines the version value that CodePush expects your update&rsquo;s semver range to satisfy for each respective app type:</p>
 
 <table><thead>
 <tr>
@@ -569,6 +685,8 @@ code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 </tr>
 </tbody></table>
 
+<p>*NOTE: If the app store version in the metadata files are missing a patch version, e.g. <code>2.0</code>, it will be treated as having a patch version of <code>0</code>, i.e. <code>2.0 -&gt; 2.0.0</code>.</p>
+
 <h3>Deployment name parameter</h3>
 
 <p>This specifies which deployment you want to release the update to. This defaults to <code>Staging</code>, but when you&rsquo;re ready to deploy to <code>Production</code>, or one of your own custom deployments, just explicitly set this argument.</p>
@@ -577,17 +695,17 @@ code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 
 <h3>Description parameter</h3>
 
-<p>This provides an optional &ldquo;change log&rdquo; for the deployment. The value is simply roundtripped to the client so that when the update is detected, your app can choose to display it to the end-user (e.g. via a &ldquo;What&rsquo;s new?&rdquo; dialog). This string accepts control characters such as <code>\n</code> and <code>\t</code> so that you can include whitespace formatting within your descriptions for improved readability.</p>
+<p>This provides an optional &ldquo;change log&rdquo; for the deployment. The value is simply round tripped to the client so that when the update is detected, your app can choose to display it to the end-user (e.g. via a &ldquo;What&rsquo;s new?&rdquo; dialog). This string accepts control characters such as <code>\n</code> and <code>\t</code> so that you can include whitespace formatting within your descriptions for improved readability.</p>
 
 <p><em>NOTE: This parameter can be set using either &ldquo;&ndash;description&rdquo; or &ldquo;-desc&rdquo;</em></p>
 
 <h3>Mandatory parameter</h3>
 
-<p>This specifies whether the update should be considered mandatory or not (e.g. it includes a critical security fix). This attribute is simply roundtripped to the client, who can then decide if and how they would like to enforce it.</p>
+<p>This specifies whether the update should be considered mandatory or not (e.g. it includes a critical security fix). This attribute is simply round tripped to the client, who can then decide if and how they would like to enforce it.</p>
 
-<p><em>NOTE: This parameter is simply a &ldquo;flag&rdquo;, and therefore, it&rsquo;s absence indicates that the release is optional, and it&rsquo;s presence indicates that it&rsquo;s mandatory. You can provide a value to it (e.g. <code>--mandatory true</code>), however, simply specifying <code>--mandatory</code> is sufficient for marking a release as mandatory.</em></p>
+<p><em>NOTE: This parameter is simply a &ldquo;flag&rdquo;, and therefore, its absence indicates that the release is optional, and its presence indicates that it&rsquo;s mandatory. You can provide a value to it (e.g. <code>--mandatory true</code>), however, simply specifying <code>--mandatory</code> is sufficient for marking a release as mandatory.</em></p>
 
-<p>The mandatory attribute is unique because the server will dynamically modify it as neccessary in order to ensure that the semantics of your releases are maintained for your end-users. For example, imagine that you released the following three updates to your app:</p>
+<p>The mandatory attribute is unique because the server will dynamically modify it as necessary in order to ensure that the semantics of your releases are maintained for your end-users. For example, imagine that you released the following three updates to your app:</p>
 
 <table><thead>
 <tr>
@@ -609,9 +727,9 @@ code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 </tr>
 </tbody></table>
 
-<p>If an end-user is currently running <code>v1</code>, and they query the server for an update, it wil respond with <code>v3</code> (since that is the latest), but it will dynamically convert the release to mandatory, since a mandatory update was released in between. This behavior is important since the code contained in <code>v3</code> is incremental to that included in <code>v2</code>, and therefore, whatever made <code>v2</code> mandatory, continues to make <code>v3</code> mandatory for anyone that didn&rsquo;t already acquire <code>v2</code>.</p>
+<p>If an end-user is currently running <code>v1</code>, and they query the server for an update, it will respond with <code>v3</code> (since that is the latest), but it will dynamically convert the release to mandatory, since a mandatory update was released in between. This behavior is important since the code contained in <code>v3</code> is incremental to that included in <code>v2</code>, and therefore, whatever made <code>v2</code> mandatory, continues to make <code>v3</code> mandatory for anyone that didn&rsquo;t already acquire <code>v2</code>.</p>
 
-<p>If an end-user is currently running <code>v2</code>, and they query the server for an update, it will respond with <code>v3</code>, but leave the release as optional. This is because they already received the mandatory update, and therefore, there isn&rsquo;t a need to modify the policy of <code>v3</code>. This behavior is why we say that the server will &ldquo;dynamically convert&rdquo; the mandatory flag, because as far as the release goes, it&rsquo;s mandatory attribute will always be stored using the value you specified when releasing it. It is only changed on-the-fly as neccesary when responding to an update check from an end-user.</p>
+<p>If an end-user is currently running <code>v2</code>, and they query the server for an update, it will respond with <code>v3</code>, but leave the release as optional. This is because they already received the mandatory update, and therefore, there isn&rsquo;t a need to modify the policy of <code>v3</code>. This behavior is why we say that the server will &ldquo;dynamically convert&rdquo; the mandatory flag, because as far as the release goes, its mandatory attribute will always be stored using the value you specified when releasing it. It is only changed on-the-fly as necessary when responding to an update check from an end-user.</p>
 
 <p>If you never release an update that is marked as mandatory, then the above behavior doesn&rsquo;t apply to you, since the server will never change an optional release to mandatory unless there were intermingled mandatory updates as illustrated above. Additionally, if a release is marked as mandatory, it will never be converted to optional, since that wouldn&rsquo;t make any sense. The server will only change an optional release to mandatory in order to respect the semantics described above.</p>
 
@@ -620,9 +738,11 @@ code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 <h2>Releasing updates to a React Native app</h2>
 
 <p>After configuring your React Native app to query for updates against the CodePush service&ndash;using your desired deployment&ndash;you can begin pushing updates to it using the following command:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push release-react &lt;appName&gt; &lt;platform&gt; 
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push release-react &lt;appName&gt; &lt;platform&gt;
+[--bundleName &lt;bundleName&gt;]
 [--deploymentName &lt;deploymentName&gt;]
 [--description &lt;description&gt;]
+[--development &lt;development&gt;]
 [--entryFile &lt;entryFile&gt;]
 [--mandatory]
 [--sourcemapOutput &lt;sourcemapOutput&gt;]
@@ -631,14 +751,18 @@ code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 
 <ol>
 <li>It runs the <a href="#update-contents-parameter"><code>react-native bundle</code> command</a> to generate the update contents in a temporary folder</li>
-<li>It infers the <a href="#target-binary-version-parameter"><code>targetBinaryVersion</code> of this release</a> by reading the contents of the project&rsquo;s metadata (<code>Info.plist</code> if this update is for iOS clients, and <code>build.gradle</code> for Android clients).</li>
+<li>It infers the <a href="#target-binary-range-parameter"><code>targetBinaryVersion</code> of this release</a> by reading the contents of the project&rsquo;s metadata (<code>Info.plist</code> if this update is for iOS clients, and <code>build.gradle</code> for Android clients), and defaults to target only the specified version in the metadata.</li>
 </ol>
 
-<p>It then calls the vanilla <code>release</code> command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the <code>react-native bundle</code> command and also avoid common pitfalls such as supplying a wrong <code>targetBinaryVersion</code> parameter.</p>
+<p>It then calls the vanilla <code>release</code> command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the <code>react-native bundle</code> command and also avoid common pitfalls such as supplying an invalid <code>targetBinaryVersion</code> parameter.</p>
 
 <h3>Platform parameter</h3>
 
 <p>This specifies which platform the current update is targeting, and can be either <code>ios</code> or <code>android</code> (case-insensitive).</p>
+
+<h3>Bundle name parameter</h3>
+
+<p>This specifies the name of the output JS bundle file. If left unspecified, the standard bundle name will be used for the specified platform: <code>main.jsbundle</code> (iOS) and <code>index.android.bundle</code> (Android).</p>
 
 <h3>Deployment name parameter</h3>
 
@@ -647,6 +771,10 @@ code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 <h3>Description parameter</h3>
 
 <p>This is the same parameter as the one described in the <a href="#description-parameter">above section</a>.</p>
+
+<h3>Development parameter</h3>
+
+<p>This specifies whether to generate a unminified, development JS bundle. If left unspecified, this defaults to <code>false</code> where warnings are disabled and the bundle is minified.</p>
 
 <h3>Entry file parameter</h3>
 
@@ -660,6 +788,10 @@ code-push deployment rm &lt;appName&gt; &lt;deploymentName&gt;
 
 <p>This specifies the relative path to where the sourcemap file for resulting update&rsquo;s JS bundle should be generated. If left unspecified, sourcemaps will not be generated.</p>
 
+<h3>Target binary version parameter</h3>
+
+<p>This is the same parameter as the one described in the <a href="#target-binary-version-parameter">above section</a>. If left unspecified, the command defaults to targeting only the specified version in the project&rsquo;s metadata (<code>Info.plist</code> if this update is for iOS clients, and <code>build.gradle</code> for Android clients).</p>
+
 <h2>Promoting updates across deployments</h2>
 
 <p>Once you&rsquo;ve tested an update against a specific deployment (e.g. <code>Staging</code>), and you want to promote it &ldquo;downstream&rdquo; (e.g. dev-&gt;staging, staging-&gt;production), you can simply use the following command to copy the release from one deployment to another:</p>
@@ -669,8 +801,8 @@ code-push promote MyApp Staging Production
 <p>The <code>promote</code> command will create a new release for the destination deployment, which includes the <strong>exact code and metadata</strong> (description, mandatory and app store version) from the latest release of the source deployment. While you could use the <code>release</code> command to &ldquo;manually&rdquo; migrate an update from one environment to another, the <code>promote</code> command has the following benefits:</p>
 
 <ol>
-<li><p>It&rsquo;s quicker, since you don&rsquo;t need to re-assemble the release assets you want to publish or remember the description/app store version that are associated with the source deployment&rsquo;s release.</p></li>
-<li><p>It&rsquo;s less error-prone, since the promote operartion ensures that the exact thing that you already tested in the source deployment (e.g. <code>Staging</code>) will become active in the destination deployment (e.g. <code>Production</code>). </p></li>
+<li><p>It&rsquo;s quicker, since you don&rsquo;t need to reassemble the release assets you want to publish or remember the description/app store version that are associated with the source deployment&rsquo;s release.</p></li>
+<li><p>It&rsquo;s less error-prone, since the promote operation ensures that the exact thing that you already tested in the source deployment (e.g. <code>Staging</code>) will become active in the destination deployment (e.g. <code>Production</code>).</p></li>
 </ol>
 
 <p>We recommend that all users take advantage of the automatically created <code>Staging</code> and <code>Production</code> environments, and do all releases directly to <code>Staging</code>, and then perform a <code>promote</code> from <code>Staging</code> to <code>Production</code> after performing the appropriate testing.</p>
@@ -709,7 +841,7 @@ code-push rollback MyApp Production
 </tr>
 </tbody></table>
 
-<p>If you ran the <code>rollback</code> command on that deployment, a new release (<code>v4</code>) would be created that included the contents of the <code>v2</code> release. </p>
+<p>If you ran the <code>rollback</code> command on that deployment, a new release (<code>v4</code>) would be created that included the contents of the <code>v2</code> release.</p>
 
 <table><thead>
 <tr>
@@ -761,6 +893,13 @@ code-push rollback MyApp Production
 <p>By default, the history doesn&rsquo;t display the author of each release, but if you are collaborating on an app with other developers, and want to view who released each update, you can pass the additional <code>--displayAuthor</code> (or <code>-a</code>) flag to the history command.</p>
 
 <p><em>NOTE: The history command can also be run using the &ldquo;h&rdquo; alias</em></p>
+
+<h2>Clearing release history</h2>
+
+<p>You can clear the release history associated with a deployment using the following command: </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment clear &lt;appName&gt; &lt;deploymentName&gt;
+</code></pre></div>
+<p>After running this command, client devices configured to receive updates using its associated deployment key will no longer receive the updates that have been cleared. This command is irreversible, and therefore should not be used in a production deployment.</p>
   
                 </article>
             </div>  
