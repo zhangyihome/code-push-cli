@@ -939,8 +939,7 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
         throw new Error("Platform must be either \"ios\" or \"android\".");
     }
 
-    try {
-        var tempPrepareContents = `
+    var prepareScript = `
         var path = require('path');
         var ConfigParser = require('cordova-common').ConfigParser;
         var Api = require('./Api');
@@ -955,9 +954,11 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
         preparer.prepare(project);
         `;
 
-        var prepareOptions: any = { cwd: platformCordova };
-        var prepareProcess = spawnSync("node", ["-e", tempPrepareContents], prepareOptions);
-        
+    var prepareOptions: { cwd: string } = { cwd: platformCordova };
+
+    try {
+        var prepareProcess: any = spawnSync("node", ["-e", prepareScript], prepareOptions);
+
         if (prepareProcess.error) {
             throw prepareProcess.error;
         }
@@ -973,22 +974,23 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
         releaseCommand.package = outputFolder;
         releaseCommand.type = cli.CommandType.release;
 
-        return configPromise.then((parsedConfig: any) => {
-            var config = parsedConfig.widget;
+        return configPromise
+            .then((parsedConfig: any) => {
+                var config: any = parsedConfig.widget;
 
-            var releaseTargetVersion: string;
-            if (command.appStoreVersion) {
-                releaseTargetVersion = command.appStoreVersion;
-            } else {
-                releaseTargetVersion = config["$"].version;
-            }
+                var releaseTargetVersion: string;
+                if (command.appStoreVersion) {
+                    releaseTargetVersion = command.appStoreVersion;
+                } else {
+                    releaseTargetVersion = config["$"].version;
+                }
 
-            throwForInvalidSemverRange(releaseTargetVersion);
-            releaseCommand.appStoreVersion = releaseTargetVersion;
+                throwForInvalidSemverRange(releaseTargetVersion);
+                releaseCommand.appStoreVersion = releaseTargetVersion;
 
-            log(chalk.cyan("\nReleasing update contents to CodePush:\n"));
-            return release(releaseCommand);
-        });
+                log(chalk.cyan("\nReleasing update contents to CodePush:\n"));
+                return release(releaseCommand);
+            });
     } catch (error) {
         throw new Error(`Unable to find or read "config.xml" in the CWD. The "release-cordova" command must be executed in a Cordova project folder.`);
     }

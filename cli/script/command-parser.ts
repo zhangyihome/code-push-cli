@@ -296,7 +296,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
     })
     .command("release-cordova", "Release a new version of your Cordova app to a specific deployment", (yargs: yargs.Argv) => {
         yargs.usage(USAGE_PREFIX + " release-cordova <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--mandatory] [--targetBinaryVersion <targetBinaryVersion>]")
-            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly two non-option arguments.
+            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
             .example("release-cordova MyApp ios", "Release the Cordova iOS project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
             .example("release-cordova MyApp android -d Production", "Release the Cordova Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
