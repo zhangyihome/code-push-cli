@@ -303,6 +303,18 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
         addCommonConfiguration(yargs);
     })
+    .command("release-cordova", "Release a new version of your Cordova app to a specific deployment", (yargs: yargs.Argv) => {
+        yargs.usage(USAGE_PREFIX + " release-cordova <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--mandatory] [--targetBinaryVersion <targetBinaryVersion>]")
+            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
+            .example("release-cordova MyApp ios", "Release the Cordova iOS project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
+            .example("release-cordova MyApp android -d Production", "Release the Cordova Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
+            .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
+            .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
+            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
+            .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "The semver range expression spanning all the binary app store versions that should get this update. If omitted, the update will default to target only the same version as the current binary version specified in config.xml", type: "string" });
+
+        addCommonConfiguration(yargs);
+    })
     .command("release-react", "Release a new version of your React Native app to a specific deployment", (yargs: yargs.Argv) => {
         yargs.usage(USAGE_PREFIX + " release-react <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--entryFile <entryFile>] [--mandatory] [--sourcemapOutput <sourcemapOutput>] [--targetBinaryVersion <targetBinaryVersion>]")
             .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
@@ -581,6 +593,22 @@ function createCommand(): cli.ICommand {
                     releaseCommand.deploymentName = argv["deploymentName"];
                     releaseCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseCommand.mandatory = argv["mandatory"];
+                }
+                break;
+                
+            case "release-cordova":
+                if (arg1 && arg2) {
+                    cmd = { type: cli.CommandType.releaseCordova };
+
+                    var releaseCordovaCommand = <cli.IReleaseCordovaCommand>cmd;
+
+                    releaseCordovaCommand.appName = arg1;
+                    releaseCordovaCommand.platform = arg2;
+
+                    releaseCordovaCommand.deploymentName = argv["deploymentName"];
+                    releaseCordovaCommand.description = argv["description"] ? backslash(argv["description"]) : "";
+                    releaseCordovaCommand.mandatory = argv["mandatory"];
+                    releaseCordovaCommand.appStoreVersion = argv["targetBinaryVersion"];
                 }
                 break;
 

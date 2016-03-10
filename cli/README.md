@@ -300,7 +300,7 @@ If you never release an update that is marked as mandatory, then the above behav
 
 After configuring your React Native app to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
 
-```
+```shell
 code-push release-react <appName> <platform>
 [--bundleName <bundleName>]
 [--deploymentName <deploymentName>]
@@ -309,9 +309,10 @@ code-push release-react <appName> <platform>
 [--entryFile <entryFile>]
 [--mandatory]
 [--sourcemapOutput <sourcemapOutput>]
+[--targetBinaryVersion <targetBinaryVersion>]
 ```
 
-This `release-react` command does two things in addition to running the vanilla `release` command described in the [previous section](#releasing-app-updates):
+The `release-react` command does two things in addition to running the vanilla `release` command described in the [previous section](#releasing-app-updates):
 
 1. It runs the [`react-native bundle` command](#update-contents-parameter) to generate the update contents in a temporary folder
 2. It infers the [`targetBinaryVersion` of this release](#target-binary-range-parameter) by reading the contents of the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients), and defaults to target only the specified version in the metadata.
@@ -349,6 +350,43 @@ This is the same parameter as the one described in the [above section](#mandator
 ### Sourcemap output parameter
 
 This specifies the relative path to where the sourcemap file for resulting update's JS bundle should be generated. If left unspecified, sourcemaps will not be generated.
+
+### Target binary version parameter
+
+This is the same parameter as the one described in the [above section](#target-binary-version-parameter). If left unspecified, the command defaults to targeting only the specified version in the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients).
+
+## Releasing updates to a Cordova app
+After configuring your Cordova app to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
+
+```shell
+code-push release-cordova <appName> <platform>
+[--deploymentName <deploymentName>]
+[--description <description>]
+[--mandatory]
+[--targetBinaryVersion <targetBinaryVersion>]
+```
+The `release-cordova` command does two things in addition to running the vanilla `release` command described in the [Releasing App Updates](#releasing-app-updates) section:
+
+1. It [updates the contents](#update-contents-parameter) of the package by calling `cordova prepare` for the specified platform
+2. It infers the [`targetBinaryVersion` of this release](#target-binary-range-parameter) by reading the version in the `<widget version>` in config.xml, and defaults to target only the specified version.
+
+It then calls the vanilla `release` command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the `cordova prepare` command and also avoid common pitfalls such as supplying an invalid `targetBinaryVersion` parameter.
+
+### Platform parameter
+
+This specifies which platform the current update is targeting, and can be either `ios` or `android` (case-insensitive).
+
+### Deployment name parameter
+
+This is the same parameter as the one described in the [above section](#deployment-name-parameter).
+
+### Description parameter
+
+This is the same parameter as the one described in the [above section](#description-parameter).
+
+### Mandatory parameter
+
+This is the same parameter as the one described in the [above section](#mandatory-parameter).
 
 ### Target binary version parameter
 

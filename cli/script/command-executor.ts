@@ -28,6 +28,7 @@ import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deplo
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var emailValidator = require("email-validator");
 var packageJson = require("../package.json");
+var parseXml = Q.denodeify(require("xml2js").parseString);
 var progress = require("progress");
 import Promise = Q.Promise;
 
@@ -68,6 +69,7 @@ export interface PackageWithMetrics {
 export var log = (message: string | Chalk.ChalkChain): void => console.log(message);
 export var sdk: AccountManager;
 export var spawn = childProcess.spawn;
+export var spawnSync = childProcess.spawnSync;
 
 var connectionInfo: ILoginConnectionInfo;
 
@@ -478,6 +480,9 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.release:
                     return release(<cli.IReleaseCommand>command);
+
+                case cli.CommandType.releaseCordova:
+                    return releaseCordova(<cli.IReleaseCordovaCommand>command);
 
                 case cli.CommandType.releaseReact:
                     return releaseReact(<cli.IReleaseReactCommand>command);
@@ -933,6 +938,69 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
                         fs.unlinkSync(filePath);
                     }
                 });
+        });
+}
+
+export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void> => {
+    var platform: string = command.platform.toLowerCase();
+    var projectRoot: string = process.cwd();
+    var platformFolder: string = path.join(projectRoot, "platforms", platform);
+    var platformCordova: string = path.join(platformFolder, "cordova");
+    var outputFolder: string;
+    var preparePromise: Promise<void>;
+
+    if (platform === "ios") {
+        outputFolder = path.join(platformFolder, "www");
+    } else if (platform === "android") {
+        outputFolder = path.join(platformFolder, "assets", "www");
+    } else {
+        throw new Error("Platform must be either \"ios\" or \"android\".");
+    }
+
+    try {
+        var prepareProcess: any = spawnSync("cordova", ["prepare", platform]);
+        if (prepareProcess.error) {
+            throw prepareProcess.error;
+        }
+    } catch (error) {
+        if (error.code == "ENOENT") {
+            throw new Error(`Failed to call "cordova prepare". Please ensure that the Cordova CLI is installed.`);
+        }
+
+        throw new Error(`Unable to prepare project. Please ensure that this is a Cordova project and that platform "${platform}" was added with "cordova platform add ${platform}"`);
+    }
+
+    try {
+        var configString: string = fs.readFileSync(path.join(projectRoot, "config.xml"), { encoding: "utf8" });
+    } catch (error) {
+        throw new Error(`Unable to find or read "config.xml" in the CWD. The "release-cordova" command must be executed in a Cordova project folder.`);
+    }
+
+    var configPromise: Promise<any> = parseXml(configString);
+    var releaseCommand: cli.IReleaseCommand = <any>command;
+
+    releaseCommand.package = outputFolder;
+    releaseCommand.type = cli.CommandType.release;
+
+    return configPromise
+        .catch((err: any) => {
+            throw new Error(`Unable to parse "config.xml" in the CWD. Ensure that the contents of "config.xml" is valid XML.`);
+        })
+        .then((parsedConfig: any) => {
+            var config: any = parsedConfig.widget;
+
+            var releaseTargetVersion: string;
+            if (command.appStoreVersion) {
+                releaseTargetVersion = command.appStoreVersion;
+            } else {
+                releaseTargetVersion = config["$"].version;
+            }
+
+            throwForInvalidSemverRange(releaseTargetVersion);
+            releaseCommand.appStoreVersion = releaseTargetVersion;
+
+            log(chalk.cyan("\nReleasing update contents to CodePush:\n"));
+            return release(releaseCommand);
         });
 }
 

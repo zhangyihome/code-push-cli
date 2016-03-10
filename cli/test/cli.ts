@@ -471,10 +471,10 @@ describe("CLI", () => {
                 var actual: string = log.args[0][0];
                 var expected = {
                     "collaborators":
-                        {
-                            "a@a.com": { permission: "Owner", isCurrentAccount: true },
-                            "b@b.com": { permission: "Collaborator", isCurrentAccount: false }
-                        }
+                    {
+                        "a@a.com": { permission: "Owner", isCurrentAccount: true },
+                        "b@b.com": { permission: "Collaborator", isCurrentAccount: false }
+                    }
                 };
 
                 assertJsonDescribesObject(actual, expected);
@@ -783,6 +783,178 @@ describe("CLI", () => {
         };
 
         releaseHelperFunction(command, done, INVALID_RELEASE_FILE_ERROR_MESSAGE);
+    });
+
+    it("release-cordova fails if Cordova project cannot be prepared", (done: MochaDone): void => {
+        var command: cli.IReleaseCordovaCommand = {
+            type: cli.CommandType.releaseCordova,
+            appName: "a",
+            appStoreVersion: null,
+            deploymentName: "Staging",
+            description: "Test invalid project",
+            mandatory: false,
+            platform: "ios"
+        };
+
+
+        var spawnSync: Sinon.SinonStub = sandbox.stub(cmdexec, "spawnSync", (command: string, commandArgs: string[], options: any) => { return { error: new Error("Failed Prepare") }; });
+        var release: Sinon.SinonSpy = sandbox.spy(cmdexec, "release");
+        var releaseCordova: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseCordova");
+
+        cmdexec.execute(command)
+            .then(() => {
+                done(new Error("Did not throw error."));
+            })
+            .catch((err) => {
+                assert.equal(err.message, `Unable to prepare project. Please ensure that this is a Cordova project and that platform "${command.platform}" was added with "cordova platform add ${command.platform}"`);
+                sinon.assert.notCalled(release);
+                sinon.assert.threw(releaseCordova, "Error");
+                done();
+            })
+            .done();
+    });
+
+    it("release-cordova fails if CWD does not contain config.xml", (done: MochaDone): void => {
+        var command: cli.IReleaseCordovaCommand = {
+            type: cli.CommandType.releaseCordova,
+            appName: "a",
+            appStoreVersion: null,
+            deploymentName: "Staging",
+            description: "Test missing config.xml",
+            mandatory: false,
+            platform: "ios"
+        };
+
+        var spawnSync: Sinon.SinonStub = sandbox.stub(cmdexec, "spawnSync", (command: string, commandArgs: string[], options: any) => { return {}; });
+        var release: Sinon.SinonSpy = sandbox.spy(cmdexec, "release");
+        var releaseCordova: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseCordova");
+
+        cmdexec.execute(command)
+            .then(() => {
+                done(new Error("Did not throw error."));
+            })
+            .catch((err) => {
+                assert.equal(err.message, `Unable to find or read "config.xml" in the CWD. The "release-cordova" command must be executed in a Cordova project folder.`);
+                sinon.assert.notCalled(release);
+                sinon.assert.threw(releaseCordova, "Error");
+                sinon.assert.calledOnce(spawnSync);
+                done();
+            })
+            .done();
+    });
+
+    it("release-cordova fails if platform is invalid", (done: MochaDone): void => {
+        var command: cli.IReleaseCordovaCommand = {
+            type: cli.CommandType.releaseCordova,
+            appName: "a",
+            appStoreVersion: null,
+            deploymentName: "Staging",
+            description: "Test invalid platform",
+            mandatory: false,
+            platform: "blackberry",
+        };
+
+        var release: Sinon.SinonSpy = sandbox.spy(cmdexec, "release");
+        var releaseCordova: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseCordova");
+
+        cmdexec.execute(command)
+            .then(() => {
+                done(new Error("Did not throw error."));
+            })
+            .catch((err) => {
+                assert.equal(err.message, "Platform must be either \"ios\" or \"android\".");
+                sinon.assert.notCalled(release);
+                sinon.assert.threw(releaseCordova, "Error");
+                sinon.assert.notCalled(spawn);
+                done();
+            })
+            .done();
+    });
+
+    it("release-cordova defaults appStoreVersion to value pulled from config.xml", (done: MochaDone): void => {
+        var command: cli.IReleaseCordovaCommand = {
+            type: cli.CommandType.releaseCordova,
+            appName: "a",
+            appStoreVersion: null,
+            deploymentName: "Staging",
+            description: "Test config.xml app version read",
+            mandatory: false,
+            platform: "ios"
+        };
+ 
+        var oldWd: string = process.cwd();
+        ensureInTestAppDirectory();
+
+        var expectedReleaseCommand: any = {
+            type: cli.CommandType.release,
+            appName: "a",
+            appStoreVersion: "0.0.1",
+            deploymentName: "Staging",
+            description: "Test config.xml app version read",
+            mandatory: false,
+            package: path.join(process.cwd(), "platforms", "ios", "www"),
+            platform: "ios"
+        }
+
+        var spawnSync: Sinon.SinonStub = sandbox.stub(cmdexec, "spawnSync", (command: string, commandArgs: string[], options: any) => { return {}; });
+        var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release");
+        var releaseCordova: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseCordova");
+
+        cmdexec.execute(command)
+            .then((compiledReleaseCommand: any) => {
+                sinon.assert.calledOnce(spawnSync);
+                sinon.assert.calledWith(release, expectedReleaseCommand);
+                done();
+            })
+            .catch((err) => {
+                done(new Error("Threw error. " + err.message));
+            })
+            .done(() => {
+                process.chdir(oldWd);
+            });
+    });
+    
+    it("release-cordova points 'package' to the built folder for android", (done: MochaDone): void => {
+        var command: cli.IReleaseCordovaCommand = {
+            type: cli.CommandType.releaseCordova,
+            appName: "a",
+            appStoreVersion: null,
+            deploymentName: "Staging",
+            description: "Test android package resolution",
+            mandatory: false,
+            platform: "android"
+        };
+ 
+        var oldWd: string = process.cwd();
+        ensureInTestAppDirectory();
+
+        var expectedReleaseCommand: any = {
+            type: cli.CommandType.release,
+            appName: "a",
+            appStoreVersion: "0.0.1",
+            deploymentName: "Staging",
+            description: "Test android package resolution",
+            mandatory: false,
+            package: path.join(process.cwd(), "platforms", "android", "assets", "www"),
+            platform: "android"
+        }
+
+        var spawnSync: Sinon.SinonStub = sandbox.stub(cmdexec, "spawnSync", (command: string, commandArgs: string[], options: any) => { return {}; });
+        var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release");
+        var releaseCordova: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseCordova");
+
+        cmdexec.execute(command)
+            .then((compiledReleaseCommand: any) => {
+                sinon.assert.calledOnce(spawnSync);
+                sinon.assert.calledWith(release, expectedReleaseCommand);
+                done();
+            })
+            .catch((err) => {
+                done(new Error("Threw error. " + err.message));
+            })
+            .done(() => {
+                process.chdir(oldWd);
+            });
     });
 
     it("release-react fails if CWD does not contain package.json", (done: MochaDone): void => {
@@ -1134,7 +1306,7 @@ describe("CLI", () => {
             .done((): void => {
                 throw "Error Expected";
             }, (error: any): void => {
-                assert (!!error);
+                assert(!!error);
                 assert.equal(error.message, expectedError);
                 done();
             });

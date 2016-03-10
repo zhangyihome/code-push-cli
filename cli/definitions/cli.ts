@@ -22,6 +22,7 @@
     promote,
     register,
     release,
+    releaseCordova,
     releaseReact,
     rollback
 }
@@ -138,6 +139,10 @@ export interface IReleaseBaseCommand extends ICommand {
 
 export interface IReleaseCommand extends IReleaseBaseCommand {
     package: string;
+}
+
+export interface IReleaseCordovaCommand extends IReleaseBaseCommand {
+    platform: string;
 }
 
 export interface IReleaseReactCommand extends IReleaseBaseCommand {
