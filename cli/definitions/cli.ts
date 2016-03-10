@@ -117,16 +117,19 @@ export interface ILogoutCommand extends ICommand {
     isLocal: boolean;
 }
 
-export interface IPatchCommand extends ICommand {
-    appName: string;
-    deploymentName: string;
+export interface IPackageInfo extends ICommand {
     description: string;
-    label: string;
     mandatory: boolean;
     rollout: string;
 }
 
-export interface IPromoteCommand extends ICommand {
+export interface IPatchCommand extends IPackageInfo {
+    appName: string;
+    deploymentName: string;
+    label: string;
+}
+
+export interface IPromoteCommand extends IPackageInfo {
     appName: string;
     sourceDeploymentName: string;
     destDeploymentName: string;

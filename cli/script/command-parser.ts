@@ -281,9 +281,13 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         addCommonConfiguration(yargs);
     })
     .command("promote", "Promote the package from one deployment of your app to another", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName>")
+        yargs.usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName> [--description <description>] [--mandatory] [--rollout <rolloutPercentage>]")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
-            .example("promote MyApp Staging Production", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\"");
+            .example("promote MyApp Staging Production", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\"")
+            .example("promote MyApp Staging Production --des \"Production rollout\" -r 25", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\" with the description rolled out to 25% of the users")
+            .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
+            .option("mandatory", { alias: "m", default: null, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to. This field can only be increased from the previous value.", type: "string" });
 
         addCommonConfiguration(yargs);
     })
@@ -570,6 +574,9 @@ function createCommand(): cli.ICommand {
                     deploymentPromoteCommand.appName = arg1;
                     deploymentPromoteCommand.sourceDeploymentName = arg2;
                     deploymentPromoteCommand.destDeploymentName = arg3;
+                    deploymentPromoteCommand.description = argv["description"] ? backslash(argv["description"]) : "";
+                    deploymentPromoteCommand.mandatory = argv["mandatory"];
+                    deploymentPromoteCommand.rollout = argv["rollout"];
                 }
                 break;
 

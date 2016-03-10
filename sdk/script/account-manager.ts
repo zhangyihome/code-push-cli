@@ -34,12 +34,12 @@ export interface CodePushError {
     statusCode?: number;
 }
 
-interface PackageInfo {
+export interface PackageInfo {
     appVersion?: string;
-    description: string;
-    isMandatory: boolean;
+    description?: string;
+    isMandatory?: boolean;
     label?: string;
-    rollout: number;
+    rollout?: number;
 }
 
 interface JsonResponse {
@@ -255,39 +255,15 @@ export class AccountManager {
         });
     }
 
-    public patchRelease(appName: string, deploymentName: string, label: string, description: string, isMandatory: boolean, rollout: number): Promise<void> {
-        return Promise<void>((resolve, reject, notify) => {
-            var packageInfo: PackageInfo = this.generatePackageInfo(description, /*appVersion*/ null, isMandatory, label, rollout);
-            var request: superagent.Request<any> = superagent.patch(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`);
-            this.attachCredentials(request);
-
-            request.field("packageInfo", JSON.stringify(packageInfo))
-                .end((err: any, res: superagent.Response) => {
-                    if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
-                        return;
-                    }
-
-                    if (res.ok) {
-                        resolve(<void>null);
-                    } else {
-                        try {
-                            var body = JSON.parse(res.text);
-                        } catch (err) {
-                        }
-
-                        if (body) {
-                            reject(<CodePushError>body);
-                        } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
-                        }
-                    }
-                });
-        });
+    public patchRelease(appName: string, deploymentName: string, packageInfo: PackageInfo): Promise<void> {
+        var requestBody: string = JSON.stringify({ packageInfo: packageInfo });
+        return this.patch(urlEncode `/apps/${appName}/deployments/${deploymentName}/release`, requestBody, /*expectResponseBody=*/ false)
+            .then(() => null);
     }
 
-    public promotePackage(appName: string, sourceDeploymentName: string, destDeploymentName: string): Promise<void> {
-        return this.post(urlEncode `/apps/${appName}/deployments/${sourceDeploymentName}/promote/${destDeploymentName}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
+    public promotePackage(appName: string, sourceDeploymentName: string, destDeploymentName: string, packageInfo: PackageInfo): Promise<void> {
+        var requestBody: string = JSON.stringify({ packageInfo: packageInfo });
+        return this.post(urlEncode `/apps/${appName}/deployments/${sourceDeploymentName}/promote/${destDeploymentName}`, requestBody, /*expectResponseBody=*/ false)
             .then(() => null);
     }
 

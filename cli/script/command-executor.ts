@@ -23,7 +23,7 @@ import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
 import { AcquisitionStatus } from "code-push/script/acquisition-sdk";
-import { AccessKey, Account, AccountManager, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Package, Permissions, UpdateMetrics } from "code-push";
+import { AccessKey, Account, AccountManager, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Package, PackageInfo, Permissions, UpdateMetrics } from "code-push";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var emailValidator = require("email-validator");
@@ -714,8 +714,8 @@ function getPackageString(packageObject: Package): string {
         chalk.green("App Version: ") + packageObject.appVersion + "\n" +
         chalk.green("Mandatory: ") + (packageObject.isMandatory ? "Yes" : "No") + "\n" +
         chalk.green("Release Time: ") + formatDate(packageObject.uploadTime) + "\n" +
-        chalk.green("Released By: ") + (packageObject.releasedBy ? packageObject.releasedBy : "") + "\n" +
-        chalk.green("Rolled Out To: ") + (packageObject.rollout ? packageObject.rollout + "%" : "100%") +
+        chalk.green("Released By: ") + (packageObject.releasedBy ? packageObject.releasedBy : "") +
+        (packageObject.rollout ? ("\n" + chalk.green("Rolled Out To: ") + packageObject.rollout + "%") : "") +
         (packageObject.description ? wordwrap(70)("\n" + chalk.green("Description: ") + packageObject.description) : "");
 }
 
@@ -842,21 +842,18 @@ function register(command: cli.IRegisterCommand): Promise<void> {
 }
 
 function promote(command: cli.IPromoteCommand): Promise<void> {
-    return sdk.promotePackage(command.appName, command.sourceDeploymentName, command.destDeploymentName)
+    var rollout: number = getRolloutValue(command.rollout);
+    var isMandatory: boolean = getIsMandatoryValue(command.mandatory);
+    var packageInfo: PackageInfo = {
+        description: command.description,
+        isMandatory: isMandatory,
+        rollout: rollout
+    };
+
+    return sdk.promotePackage(command.appName, command.sourceDeploymentName, command.destDeploymentName, packageInfo)
         .then((): void => {
             log("Successfully promoted the \"" + command.sourceDeploymentName + "\" deployment of the \"" + command.appName + "\" app to the \"" + command.destDeploymentName + "\" deployment.");
         });
-}
-
-function isMandatoryDefined(mandatory: any): boolean {
-    // Yargs treats a boolean argument with default value of null as an array.
-    return mandatory.length > 2;
-}
-
-function validateRollout(rollout: string): void {
-    if (rollout && !ROLLOUT_PERCENTAGE_REGEX.test(rollout)) {
-        throw new Error("Please specify rollout percentage as an integer number between 1 and 100 inclusive.");
-    }
 }
 
 function validateReleaseOptions(command: cli.IReleaseCommand) {
@@ -870,11 +867,16 @@ function validateReleaseOptions(command: cli.IReleaseCommand) {
 }
 
 function patch(command: cli.IPatchCommand): Promise<void> {
-    validateRollout(command.rollout);
+    var rollout: number = getRolloutValue(command.rollout);
+    var isMandatory: boolean = getIsMandatoryValue(command.mandatory);
+    var packageInfo: PackageInfo = {
+        label: command.label,
+        description: command.description,
+        isMandatory: isMandatory,
+        rollout: rollout
+    };
 
-    var rollout: number = command.rollout ? parseInt(command.rollout) : null;
-    var isMandatory: boolean = isMandatoryDefined(command.mandatory) ? (<any>command.mandatory)[2] : null;
-    return sdk.patchRelease(command.appName, command.deploymentName, command.label, command.description, isMandatory, rollout)
+    return sdk.patchRelease(command.appName, command.deploymentName, packageInfo)
         .then((): void => {
             log(`Successfully updated the ${ command.label ? command.label : "latest" } release of "${command.deploymentName}" deployment of "${command.appName}" app.`);
         });
@@ -1117,6 +1119,23 @@ function isBinaryOrZip(path: string): boolean {
         || path.search(/\.apk$/i) !== -1
         || path.search(/\.ipa$/i) !== -1;
 }
+
+function getIsMandatoryValue(mandatory: any): boolean {
+    // Yargs treats a boolean argument with default value of null as an array.
+    return mandatory.length > 2 ? mandatory[2] : null;
+}
+
+function getRolloutValue(arg: any): number {
+    validateRollout(arg);
+    return arg ? parseInt(arg) : null;
+}
+
+function validateRollout(rollout: string): void {
+    if (rollout && !ROLLOUT_PERCENTAGE_REGEX.test(rollout)) {
+        throw new Error("Please specify rollout percentage as an integer number between 1 and 100 inclusive.");
+    }
+}
+
 
 function throwForInvalidEmail(email: string): void {
     if (!emailValidator.validate(email)) {
