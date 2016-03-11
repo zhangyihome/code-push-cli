@@ -881,16 +881,6 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
         });
 }
 
-function validateReleaseOptions(command: cli.IReleaseCommand) {
-    if (isBinaryOrZip(command.package)) {
-        throw new Error("It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).");
-    } else if (semver.valid(command.appStoreVersion) === null) {
-        throw new Error("Please use a semver-compliant app store version, for example \"1.0.3\".");
-    } else if (command.rollout){
-        validateRollout(command.rollout);
-    } 
-}
-
 function patch(command: cli.IPatchCommand): Promise<void> {
     var rollout: number = getRolloutValue(command.rollout);
     var isMandatory: boolean = getIsMandatoryValue(command.mandatory);
@@ -908,9 +898,12 @@ function patch(command: cli.IPatchCommand): Promise<void> {
 }
 
 export var release = (command: cli.IReleaseCommand): Promise<void> => {
-    validateReleaseOptions(command);
+    if (isBinaryOrZip(command.package)) {
+        throw new Error("It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).");
+    }
 
     throwForInvalidSemverRange(command.appStoreVersion);
+    throwForInvalidRollout(command.rollout);
     var filePath: string = command.package;
     var getPackageFilePromise: Promise<IPackageFile>;
     var isSingleFilePackage: boolean = true;
@@ -1219,16 +1212,16 @@ function isBinaryOrZip(path: string): boolean {
 }
 
 function getIsMandatoryValue(mandatory: any): boolean {
-    // Yargs treats a boolean argument with default value of null as an array.
+    // Yargs treats a boolean argument with as an array of size 2 for null, third is the value of boolean.
     return mandatory.length > 2 ? mandatory[2] : null;
 }
 
 function getRolloutValue(arg: any): number {
-    validateRollout(arg);
+    throwForInvalidRollout(arg);
     return arg ? parseInt(arg) : null;
 }
 
-function validateRollout(rollout: string): void {
+function throwForInvalidRollout(rollout: string): void {
     if (rollout && !ROLLOUT_PERCENTAGE_REGEX.test(rollout)) {
         throw new Error("Please specify rollout percentage as an integer number between 1 and 100 inclusive.");
     }
