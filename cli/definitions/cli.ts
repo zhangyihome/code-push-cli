@@ -12,6 +12,7 @@
     collaboratorRemove,
     deploymentAdd,
     deploymentHistory,
+    deploymentHistoryClear,
     deploymentList,
     deploymentMetrics,
     deploymentRemove,
@@ -22,6 +23,7 @@
     promote,
     register,
     release,
+    releaseCordova,
     releaseReact,
     rollback
 }
@@ -84,6 +86,11 @@ export interface IDeploymentAddCommand extends ICommand {
     deploymentName: string;
 }
 
+export interface IDeploymentHistoryClearCommand extends ICommand {
+    appName: string;
+    deploymentName: string;
+}
+
 export interface IDeploymentHistoryCommand extends ICommand {
     appName: string;
     deploymentName: string;
@@ -141,6 +148,7 @@ export interface IRegisterCommand extends ICommand {
 
 export interface IReleaseBaseCommand extends ICommand {
     appName: string;
+    appStoreVersion: string;
     deploymentName: string;
     description: string;
     mandatory: boolean;
@@ -148,12 +156,16 @@ export interface IReleaseBaseCommand extends ICommand {
 }
 
 export interface IReleaseCommand extends IReleaseBaseCommand {
-    appStoreVersion: string;
     package: string;
+}
+
+export interface IReleaseCordovaCommand extends IReleaseBaseCommand {
+    platform: string;
 }
 
 export interface IReleaseReactCommand extends IReleaseBaseCommand {
     bundleName?: string;
+    development?: boolean;
     entryFile?: string;
     platform: string;
     sourcemapOutput?: string;

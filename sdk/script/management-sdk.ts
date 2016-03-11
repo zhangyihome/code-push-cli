@@ -1,10 +1,14 @@
 import * as base64 from "base-64";
-import Q = require("q");
 import crypto = require("crypto");
-import Promise = Q.Promise;
+import * as os from "os";
+import Q = require("q");
 import superagent = require("superagent");
 
-var packageJson = require("../../package.json");
+import Promise = Q.Promise;
+
+import { AccessKey, Account, App, CodePushError, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, UpdateMetrics } from "./types";
+
+var packageJson = require("../package.json");
 
 declare var fs: any;
 
@@ -18,32 +22,8 @@ if (typeof window === "undefined") {
     }
 }
 
-// Aliasing UpdateMetrics as IUpdateMetrics & CollaboratorProperties as ICollaboratorProperties to deal with TypeScript issue that removes unused imports.
-import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties as ICollaboratorProperties, Deployment, DeploymentMetrics, Package, UpdateMetrics as IUpdateMetrics } from "rest-definitions";
-export { AccessKey, Account, App, CollaboratorMap, Deployment, DeploymentMetrics, Package };
-export type UpdateMetrics = IUpdateMetrics;
-export type CollaboratorProperties = ICollaboratorProperties;
-
-export module Permissions {
-    export const Owner = "Owner";
-    export const Collaborator = "Collaborator";
-}
-
-export interface CodePushError {
-    message?: string;
-    statusCode?: number;
-}
-
-export interface PackageInfo {
-    appVersion?: string;
-    description?: string;
-    isMandatory?: boolean;
-    label?: string;
-    rollout?: number;
-}
-
 interface JsonResponse {
-    header: { [headerName: string]: string };
+    headers: Headers;
     body?: any;
 }
 
@@ -60,18 +40,24 @@ function urlEncode(strings: string[], ...values: string[]): string {
     return result;
 }
 
-export class AccountManager {
+class AccountManager {
+    public static AppPermission = {
+        OWNER: "Owner",
+        COLLABORATOR: "Collaborator"
+    };
     public static SERVER_URL = "https://codepush-management.azurewebsites.net";
 
     private static API_VERSION: number = 2;
 
     private _accessKey: string;
     private _serverUrl: string;
-    private _userAgent: string;
+    private _customHeaders: Headers;
 
-    constructor(accessKey: string, userAgent?: string, serverUrl?: string) {
+    constructor(accessKey: string, customHeaders?: Headers, serverUrl?: string) {
+        if (!accessKey) throw new Error("An access key must be specified.");
+
         this._accessKey = accessKey;
-        this._userAgent = userAgent;
+        this._customHeaders = customHeaders;
         this._serverUrl = serverUrl || AccountManager.SERVER_URL;
     }
 
@@ -98,8 +84,13 @@ export class AccountManager {
         });
     }
 
-    public addAccessKey(machine: string, description?: string): Promise<AccessKey> {
-        var accessKeyRequest: AccessKey = { createdBy: machine, description: description };
+    public addAccessKey(description: string): Promise<AccessKey> {
+        if (!description) {
+            throw new Error("A description must be specified when adding an access key.");
+        }
+
+        var hostname: string = os.hostname();
+        var accessKeyRequest: AccessKey = { createdBy: hostname, description: description };
         return this.post(urlEncode `/accessKeys/`, JSON.stringify(accessKeyRequest), /*expectResponseBody=*/ true)
             .then((response: JsonResponse) => response.body.accessKey);
     }
@@ -125,11 +116,6 @@ export class AccountManager {
             .then((res: JsonResponse) => res.body.account);
     }
 
-    public updateAccountInfo(accountInfoToChange: Account): Promise<void> {
-        return this.patch(urlEncode `/account`, JSON.stringify(accountInfoToChange))
-            .then(() => null);
-    }
-
     // Apps
     public getApps(): Promise<App[]> {
         return this.get(urlEncode `/apps`)
@@ -152,8 +138,8 @@ export class AccountManager {
             .then(() => null);
     }
 
-    public updateApp(appName: string, infoToChange: App): Promise<void> {
-        return this.patch(urlEncode `/apps/${appName}`, JSON.stringify(infoToChange))
+    public renameApp(oldAppName: string, newAppName: string): Promise<void> {
+        return this.patch(urlEncode `/apps/${oldAppName}`, JSON.stringify({ name: newAppName }))
             .then(() => null);
     }
 
@@ -163,7 +149,7 @@ export class AccountManager {
     }
 
     // Collaborators
-    public getCollaboratorsList(appName: string): Promise<CollaboratorMap> {
+    public getCollaborators(appName: string): Promise<CollaboratorMap> {
         return this.get(urlEncode `/apps/${appName}/collaborators`)
             .then((res: JsonResponse) => res.body.collaborators);
     }
@@ -184,6 +170,11 @@ export class AccountManager {
         return this.post(urlEncode `/apps/${appName}/deployments/`, JSON.stringify(deployment), /*expectResponseBody=*/ true)
             .then((res: JsonResponse) => res.body.deployment);
     }
+    
+    public clearDeploymentHistory(appName: string, deploymentName: string): Promise<void> {
+        return this.del(urlEncode `/apps/${appName}/deployments/${deploymentName}/history`)
+            .then(() => null);
+    }
 
     public getDeployments(appName: string): Promise<Deployment[]> {
         return this.get(urlEncode `/apps/${appName}/deployments/`)
@@ -195,13 +186,8 @@ export class AccountManager {
             .then((res: JsonResponse) => res.body.deployment);
     }
 
-    public getDeploymentMetrics(appName: string, deploymentName: string): Promise<DeploymentMetrics> {
-        return this.get(urlEncode `/apps/${appName}/deployments/${deploymentName}/metrics`)
-            .then((res: JsonResponse) => res.body.metrics);
-    }
-
-    public updateDeployment(appName: string, deploymentName: string, infoToChange: Deployment): Promise<void> {
-        return this.patch(urlEncode `/apps/${appName}/deployments/${deploymentName}`, JSON.stringify(infoToChange))
+    public renameDeployment(appName: string, oldDeploymentName: string, newDeploymentName: string): Promise<void> {
+        return this.patch(urlEncode `/apps/${appName}/deployments/${oldDeploymentName}`, JSON.stringify({ name: newDeploymentName }))
             .then(() => null);
     }
 
@@ -210,9 +196,19 @@ export class AccountManager {
             .then(() => null);
     }
 
-    public releasePackage(appName: string, deploymentName: string, fileOrPath: File | string, description: string, appVersion: string, rollout: number, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
+    public getDeploymentMetrics(appName: string, deploymentName: string): Promise<DeploymentMetrics> {
+        return this.get(urlEncode `/apps/${appName}/deployments/${deploymentName}/metrics`)
+            .then((res: JsonResponse) => res.body.metrics);
+    }
+
+    public getDeploymentHistory(appName: string, deploymentName: string): Promise<Package[]> {
+        return this.get(urlEncode `/apps/${appName}/deployments/${deploymentName}/history`)
+            .then((res: JsonResponse) => res.body.history);
+    }
+
+    public release(appName: string, deploymentName: string, fileOrPath: File | string, targetBinaryVersion: string, description?: string, rollout?: number, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var packageInfo: PackageInfo = this.generatePackageInfo(description, appVersion, isMandatory, /*label*/ null, rollout);
+            var packageInfo: PackageInfo = this.generatePackageInfo(description, targetBinaryVersion, isMandatory, /*label*/ null, rollout);
             var request: superagent.Request<any> = superagent.post(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`);
             this.attachCredentials(request);
 
@@ -261,20 +257,15 @@ export class AccountManager {
             .then(() => null);
     }
 
-    public promotePackage(appName: string, sourceDeploymentName: string, destDeploymentName: string, packageInfo: PackageInfo): Promise<void> {
+    public promote(appName: string, sourceDeploymentName: string, destDeploymentName: string, packageInfo: PackageInfo): Promise<void> {
         var requestBody: string = JSON.stringify({ packageInfo: packageInfo });
         return this.post(urlEncode `/apps/${appName}/deployments/${sourceDeploymentName}/promote/${destDeploymentName}`, requestBody, /*expectResponseBody=*/ false)
             .then(() => null);
     }
 
-    public rollbackPackage(appName: string, deploymentName: string, targetRelease?: string): Promise<void> {
+    public rollback(appName: string, deploymentName: string, targetRelease?: string): Promise<void> {
         return this.post(urlEncode `/apps/${appName}/deployments/${deploymentName}/rollback/${targetRelease || ``}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
             .then(() => null);
-    }
-
-    public getPackageHistory(appName: string, deploymentName: string): Promise<Package[]> {
-        return this.get(urlEncode `/apps/${appName}/deployments/${deploymentName}/packageHistory`)
-            .then((res: JsonResponse) => res.body.packageHistory);
     }
 
     private get(endpoint: string, expectResponseBody: boolean = true): Promise<JsonResponse> {
@@ -322,7 +313,7 @@ export class AccountManager {
                         reject(<CodePushError>{ message: `Could not parse response: ${res.text}`, statusCode: res.status });
                     } else {
                         resolve(<JsonResponse>{
-                            header: res.header,
+                            headers: res.header,
                             body: body
                         });
                     }
@@ -352,11 +343,16 @@ export class AccountManager {
     }
 
     private attachCredentials(request: superagent.Request<any>): void {
+        if (this._customHeaders) {
+            for (var headerName in this._customHeaders) {
+                request.set(headerName, this._customHeaders[headerName]);
+            }
+        }
+
         request.set("Accept", `application/vnd.code-push.v${AccountManager.API_VERSION}+json`);
         request.set("Authorization", `Bearer ${this._accessKey}`);
-        if (this._userAgent) {
-            request.set("User-Agent", this._userAgent);
-        }
         request.set("X-CodePush-SDK-Version", packageJson.version);
     }
 }
+
+export = AccountManager;

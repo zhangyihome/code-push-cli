@@ -1,5 +1,4 @@
-﻿import { AccountManager } from "code-push";
-import * as yargs from "yargs";
+﻿import * as yargs from "yargs";
 import * as cli from "../definitions/cli";
 import * as chalk from "chalk";
 import * as updateNotifier from "update-notifier";
@@ -110,6 +109,15 @@ function removeCollaborator(commandName: string, yargs: yargs.Argv): void {
     yargs.usage(USAGE_PREFIX + " collaborator " + commandName + " <appName> <email>")
         .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
         .example("collaborator " + commandName + " MyApp foo@bar.com", "Removes foo@bar.com from app \"MyApp\" as a collaborator");
+
+    addCommonConfiguration(yargs);
+}
+
+function deploymentHistoryClear(commandName: string, yargs: yargs.Argv): void {
+    isValidCommand = true;
+    yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> <deploymentName>")
+        .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
+        .example("deployment " + commandName + " MyApp MyDeployment", "Clears the release history associated with deployment \"MyDeployment\" from app \"MyApp\"");
 
     addCommonConfiguration(yargs);
 }
@@ -228,6 +236,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
                 addCommonConfiguration(yargs);
             })
+            .command("clear", "Clears the release history associated with a deployment", (yargs: yargs.Argv) => deploymentHistoryClear("clear", yargs))
             .command("remove", "Remove a deployment from an app", (yargs: yargs.Argv) => deploymentRemove("remove", yargs))
             .command("rm", "Remove a deployment from an app", (yargs: yargs.Argv) => deploymentRemove("rm", yargs))
             .command("rename", "Rename an existing deployment", (yargs: yargs.Argv) => {
@@ -261,11 +270,9 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
     .command("logout", "Log out of the current session", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         isValidCommand = true;
-        yargs.usage(USAGE_PREFIX + " logout [--local]")
+        yargs.usage(USAGE_PREFIX + " logout")
             .demand(/*count*/ 1, /*max*/ 1)  // Require exactly one non-option argument.
-            .example("logout", "Log out and also remove the access key used for the current session")
-            .example("logout --local", "Log out but allow the use of the same access key for future logins")
-            .option("local", { demand: false, description: "Whether to delete the current session's access key on the server", type: "boolean" });
+            .example("logout", "Log out and end your session");
         addCommonConfiguration(yargs);
     })
     .command("patch", "Update the metadata for an existing release", (yargs: yargs.Argv) => {
@@ -304,8 +311,8 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
     .command("release", "Release a new version of your app to a specific deployment", (yargs: yargs.Argv) => {
         yargs.usage(USAGE_PREFIX + " release <appName> <updateContentsPath> <targetBinaryVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory] [--rollout <rolloutPercentage>]")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
-            .example("release MyApp app.js 1.0.3", "Release the \"app.js\" file to the \"MyApp\" app's \"Staging\" deployment, targeting the 1.0.3 binary version")
-            .example("release MyApp ./platforms/ios/www 1.0.3 -d Production", "Release the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting the 1.0.3 binary version")
+            .example("release MyApp app.js \"*\"", "Release the \"app.js\" file to the \"MyApp\" app's \"Staging\" deployment, targeting any binary version using the \"*\" wildcard range syntax.")
+            .example("release MyApp ./platforms/ios/www 1.0.3 -d Production", "Release the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting only the 1.0.3 binary version")
             .example("release MyApp ./platforms/ios/www 1.0.3 -d Production -r 20", "Release the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting the 1.0.3 binary version and will be rolled out to about 20% of the users")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
@@ -314,17 +321,31 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
         addCommonConfiguration(yargs);
     })
+    .command("release-cordova", "Release a new version of your Cordova app to a specific deployment", (yargs: yargs.Argv) => {
+        yargs.usage(USAGE_PREFIX + " release-cordova <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--mandatory] [--targetBinaryVersion <targetBinaryVersion>]")
+            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
+            .example("release-cordova MyApp ios", "Release the Cordova iOS project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
+            .example("release-cordova MyApp android -d Production", "Release the Cordova Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
+            .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
+            .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
+            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
+            .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "The semver range expression spanning all the binary app store versions that should get this update. If omitted, the update will default to target only the same version as the current binary version specified in config.xml", type: "string" });
+
+        addCommonConfiguration(yargs);
+    })
     .command("release-react", "Release a new version of your React Native app to a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " release-react <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--entryFile <entryFile>] [--mandatory] [--sourcemapOutput <sourcemapOutput>]")
+        yargs.usage(USAGE_PREFIX + " release-react <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--entryFile <entryFile>] [--mandatory] [--sourcemapOutput <sourcemapOutput>] [--targetBinaryVersion <targetBinaryVersion>]")
             .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
             .example("release-react MyApp ios", "Release the React Native iOS project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
             .example("release-react MyApp android -d Production", "Release the React Native Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
             .option("bundleName", { alias: "b", default: null, demand: false, description: "The name of the output JS bundle. If omitted, the standard bundle name will be used for the specified platform: \"main.jsbundle\" (iOS) and \"index.android.bundle\" (Android)", type: "string" })
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
+            .option("development", { alias: "dev", default: false, demand: false, description: "Whether to generate a unminified, development JS bundle.", type: "boolean" })
             .option("entryFile", { alias: "e", default: null, demand: false, description: "The path to the root JS file. If unspecified, \"index.<platform>.js\" and then \"index.js\" will be tried and used if they exist.", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
-            .option("sourcemapOutput", { alias: "s", default: null, demand: false, description: "The path to where the sourcemap for the resulting bundle should be stored. If unspecified, sourcemaps will not be generated.", type: "string" });
+            .option("sourcemapOutput", { alias: "s", default: null, demand: false, description: "The path to where the sourcemap for the resulting bundle should be stored. If unspecified, sourcemaps will not be generated.", type: "string" })
+            .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "The semver range expression spanning all the binary app store versions that should get this update. If omitted, the update will default to target only the same version as the current binary version specified in \"Info.plist\" (iOS) or \"build.gradle\" (Android)", type: "string" });
 
         addCommonConfiguration(yargs);
     })
@@ -344,7 +365,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
     .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommandCategory)  // Report unrecognized, non-hyphenated command category.
     .fail((msg: string) => showHelp(/*showRootDescription*/ true))  // Suppress the default error message.
     .argv;
-
+    
 function createCommand(): cli.ICommand {
     var cmd: cli.ICommand;
 
@@ -480,6 +501,17 @@ function createCommand(): cli.ICommand {
                         }
                         break;
 
+                    case "clear":
+                        if (arg2 && arg3) {
+                            cmd = { type: cli.CommandType.deploymentHistoryClear };
+
+                            var deploymentHistoryClearCommand = <cli.IDeploymentHistoryClearCommand>cmd;
+
+                            deploymentHistoryClearCommand.appName = arg2;
+                            deploymentHistoryClearCommand.deploymentName = arg3;
+                        }
+                        break;
+
                     case "list":
                     case "ls":
                         if (arg2) {
@@ -544,10 +576,6 @@ function createCommand(): cli.ICommand {
 
             case "logout":
                 cmd = { type: cli.CommandType.logout };
-
-                var logoutCommand = <cli.ILogoutCommand>cmd;
-
-                logoutCommand.isLocal = argv["local"];
                 break;
 
             case "patch":
@@ -596,11 +624,28 @@ function createCommand(): cli.ICommand {
 
                     releaseCommand.appName = arg1;
                     releaseCommand.package = arg2;
-                    releaseCommand.appStoreVersion = arg3;
+                    // Floating points e.g. "1.2" gets parsed as a number by default, but semver requires strings.
+                    releaseCommand.appStoreVersion = arg3.toString();
                     releaseCommand.deploymentName = argv["deploymentName"];
                     releaseCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseCommand.mandatory = argv["mandatory"];
                     releaseCommand.rollout = argv["rollout"];
+                }
+                break;
+                
+            case "release-cordova":
+                if (arg1 && arg2) {
+                    cmd = { type: cli.CommandType.releaseCordova };
+
+                    var releaseCordovaCommand = <cli.IReleaseCordovaCommand>cmd;
+
+                    releaseCordovaCommand.appName = arg1;
+                    releaseCordovaCommand.platform = arg2;
+
+                    releaseCordovaCommand.deploymentName = argv["deploymentName"];
+                    releaseCordovaCommand.description = argv["description"] ? backslash(argv["description"]) : "";
+                    releaseCordovaCommand.mandatory = argv["mandatory"];
+                    releaseCordovaCommand.appStoreVersion = argv["targetBinaryVersion"];
                 }
                 break;
 
@@ -612,14 +657,16 @@ function createCommand(): cli.ICommand {
 
                     releaseReactCommand.appName = arg1;
                     releaseReactCommand.platform = arg2;
-                    
+
                     releaseReactCommand.bundleName = argv["bundleName"];
                     releaseReactCommand.deploymentName = argv["deploymentName"];
                     releaseReactCommand.description = argv["description"] ? backslash(argv["description"]) : "";
+                    releaseReactCommand.development = argv["development"];
                     releaseReactCommand.entryFile = argv["entryFile"];
                     releaseReactCommand.mandatory = argv["mandatory"];
                     releaseReactCommand.rollout = argv["rollout"];
                     releaseReactCommand.sourcemapOutput = argv["sourcemapOutput"];
+                    releaseReactCommand.appStoreVersion = argv["targetBinaryVersion"];
                 }
                 break;
 

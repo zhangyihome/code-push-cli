@@ -1,5 +1,6 @@
 ﻿/// <reference path="../../definitions/generated/code-push.d.ts" />
 
+import AccountManager = require("code-push");
 import * as base64 from "base-64";
 import * as chalk from "chalk";
 var childProcess = require("child_process");
@@ -22,17 +23,19 @@ import * as yazl from "yazl";
 import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
-import { AcquisitionStatus } from "code-push/script/acquisition-sdk";
-import { AccessKey, Account, AccountManager, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Package, PackageInfo, Permissions, UpdateMetrics } from "code-push";
+import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, UpdateMetrics } from "code-push/script/types";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var emailValidator = require("email-validator");
 var packageJson = require("../package.json");
+var parseXml = Q.denodeify(require("xml2js").parseString);
 var progress = require("progress");
 import Promise = Q.Promise;
-var userAgent: string = packageJson.name + "/" + packageJson.version;
 
 const ACTIVE_METRICS_KEY: string = "Active";
+const CLI_HEADERS: Headers = {
+    "X-CodePush-CLI-Version": packageJson.version
+};
 const DOWNLOADED_METRICS_KEY: string = "Downloaded";
 const ROLLOUT_PERCENTAGE_REGEX: RegExp = /^(100|[1-9][0-9]|[1-9])$/;
 
@@ -43,15 +46,12 @@ interface NameToCountMap {
 /** Deprecated */
 interface ILegacyLoginConnectionInfo {
     accessKeyName: string;
-    // The 'providerName' property has been obsoleted
-    // The 'providerUniqueId' property has been obsoleted
-    // The 'serverUrl' property has been obsoleted
 }
 
 interface ILoginConnectionInfo {
     accessKey: string;
-    // The 'serverUrl' property has been obsoleted
     customServerUrl?: string;   // A custom serverUrl for internal debugging purposes
+    preserveAccessKeyOnLogout?: boolean;
 }
 
 interface IPackageFile {
@@ -70,6 +70,9 @@ export interface PackageWithMetrics {
 export var log = (message: string | Chalk.ChalkChain): void => console.log(message);
 export var sdk: AccountManager;
 export var spawn = childProcess.spawn;
+export var spawnSync = childProcess.spawnSync;
+
+var connectionInfo: ILoginConnectionInfo;
 
 export var confirm = (): Promise<boolean> => {
     return Promise<boolean>((resolve, reject, notify): void => {
@@ -96,8 +99,7 @@ export var confirm = (): Promise<boolean> => {
 }
 
 function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
-    var hostname: string = os.hostname();
-    return sdk.addAccessKey(hostname, command.description)
+    return sdk.addAccessKey(command.description)
         .then((accessKey: AccessKey) => {
             log("Successfully created a new access key" + (command.description ? (" \"" + command.description + "\"") : "") + ": " + accessKey.name);
         });
@@ -184,7 +186,7 @@ function appRemove(command: cli.IAppRemoveCommand): Promise<void> {
 }
 
 function appRename(command: cli.IAppRenameCommand): Promise<void> {
-    return sdk.updateApp(command.currentAppName, { name: command.newAppName })
+    return sdk.renameApp(command.currentAppName, command.newAppName)
         .then((): void => {
             log("Successfully renamed the \"" + command.currentAppName + "\" app to \"" + command.newAppName + "\".");
         });
@@ -225,7 +227,7 @@ function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
 function listCollaborators(command: cli.ICollaboratorListCommand): Promise<void> {
     throwForInvalidOutputFormat(command.format);
 
-    return sdk.getCollaboratorsList(command.appName)
+    return sdk.getCollaborators(command.appName)
         .then((retrievedCollaborators: CollaboratorMap): void => {
             printCollaboratorsList(command.format, retrievedCollaborators);
         });
@@ -272,6 +274,20 @@ function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
     return sdk.addDeployment(command.appName, command.deploymentName)
         .then((deployment: Deployment): void => {
             log("Successfully added the \"" + command.deploymentName + "\" deployment with key \"" + deployment.key + "\" to the \"" + command.appName + "\" app.");
+        });
+}
+
+function deploymentHistoryClear(command: cli.IDeploymentHistoryClearCommand): Promise<void> {
+    return confirm()
+        .then((wasConfirmed: boolean): Promise<void> => {
+            if (wasConfirmed) {
+                return sdk.clearDeploymentHistory(command.appName, command.deploymentName)
+                    .then((): void => {
+                        log("Successfully cleared the release history associated with the \"" + command.deploymentName + "\" deployment from the \"" + command.appName + "\" app.");
+                    })
+            }
+
+            log("Clear deployment cancelled.");
         });
 }
 
@@ -326,7 +342,7 @@ function deploymentRemove(command: cli.IDeploymentRemoveCommand): Promise<void> 
 }
 
 function deploymentRename(command: cli.IDeploymentRenameCommand): Promise<void> {
-    return sdk.updateDeployment(command.appName, command.currentDeploymentName, { name: command.newDeploymentName })
+    return sdk.renameDeployment(command.appName, command.currentDeploymentName, command.newDeploymentName)
         .then((): void => {
             log("Successfully renamed the \"" + command.currentDeploymentName + "\" deployment to \"" + command.newDeploymentName + "\" for the \"" + command.appName + "\" app.");
         });
@@ -337,12 +353,12 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
 
     return Q.all<any>([
         sdk.getAccountInfo(),
-        sdk.getPackageHistory(command.appName, command.deploymentName),
+        sdk.getDeploymentHistory(command.appName, command.deploymentName),
         sdk.getDeploymentMetrics(command.appName, command.deploymentName)
     ])
-        .spread<void>((account: Account, packageHistory: Package[], metrics: DeploymentMetrics): void => {
+        .spread<void>((account: Account, deploymentHistory: Package[], metrics: DeploymentMetrics): void => {
             var totalActive: number = getTotalActiveFromDeploymentMetrics(metrics);
-            packageHistory.forEach((packageObject: Package) => {
+            deploymentHistory.forEach((packageObject: Package) => {
                 if (metrics[packageObject.label]) {
                     (<PackageWithMetrics>packageObject).metrics = {
                         active: metrics[packageObject.label].active,
@@ -353,7 +369,7 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
                     };
                 }
             });
-            printDeploymentHistory(command, <PackageWithMetrics[]>packageHistory, account.email);
+            printDeploymentHistory(command, <PackageWithMetrics[]>deploymentHistory, account.email);
         });
 }
 
@@ -376,7 +392,7 @@ function deserializeConnectionInfo(): ILoginConnectionInfo {
 }
 
 export function execute(command: cli.ICommand): Promise<void> {
-    var connectionInfo: ILoginConnectionInfo = deserializeConnectionInfo();
+    connectionInfo = deserializeConnectionInfo();
 
     return Q(<void>null)
         .then(() => {
@@ -395,7 +411,7 @@ export function execute(command: cli.ICommand): Promise<void> {
                         throw new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server.");
                     }
 
-                    sdk = new AccountManager(connectionInfo.accessKey, userAgent, connectionInfo.customServerUrl);
+                    sdk = new AccountManager(connectionInfo.accessKey, CLI_HEADERS, connectionInfo.customServerUrl);
                     break;
             }
 
@@ -436,6 +452,9 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.deploymentAdd:
                     return deploymentAdd(<cli.IDeploymentAddCommand>command);
 
+                case cli.CommandType.deploymentHistoryClear:
+                    return deploymentHistoryClear(<cli.IDeploymentHistoryClearCommand>command);
+
                 case cli.CommandType.deploymentHistory:
                     return deploymentHistory(<cli.IDeploymentHistoryCommand>command);
 
@@ -452,7 +471,7 @@ export function execute(command: cli.ICommand): Promise<void> {
                     return login(<cli.ILoginCommand>command);
 
                 case cli.CommandType.logout:
-                    return logout(<cli.ILogoutCommand>command);
+                    return logout(command);
 
                 case cli.CommandType.patch:
                     return patch(<cli.IPatchCommand>command);
@@ -465,6 +484,9 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.release:
                     return release(<cli.IReleaseCommand>command);
+
+                case cli.CommandType.releaseCordova:
+                    return releaseCordova(<cli.IReleaseCordovaCommand>command);
 
                 case cli.CommandType.releaseReact:
                     return releaseReact(<cli.IReleaseReactCommand>command);
@@ -520,11 +542,11 @@ function initiateExternalAuthenticationAsync(action: string, serverUrl?: string)
 function login(command: cli.ILoginCommand): Promise<void> {
     // Check if one of the flags were provided.
     if (command.accessKey) {
-        sdk = new AccountManager(command.accessKey, userAgent, command.serverUrl);
+        sdk = new AccountManager(command.accessKey, CLI_HEADERS, command.serverUrl);
         return sdk.isAuthenticated()
             .then((isAuthenticated: boolean): void => {
                 if (isAuthenticated) {
-                    serializeConnectionInfo(command.accessKey, command.serverUrl);
+                    serializeConnectionInfo(command.accessKey, /*preserveAccessKeyOnLogout*/ true, command.serverUrl);
                 } else {
                     throw new Error("Invalid access key.");
                 }
@@ -544,12 +566,12 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string): Pr
                 return;
             }
 
-            sdk = new AccountManager(accessKey, userAgent, serverUrl);
+            sdk = new AccountManager(accessKey, CLI_HEADERS, serverUrl);
 
             return sdk.isAuthenticated()
                 .then((isAuthenticated: boolean): void => {
                     if (isAuthenticated) {
-                        serializeConnectionInfo(accessKey, serverUrl);
+                        serializeConnectionInfo(accessKey, /*preserveAccessKeyOnLogout*/ false, serverUrl);
                     } else {
                         throw new Error("Invalid access key.");
                     }
@@ -557,18 +579,20 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string): Pr
         });
 }
 
-function logout(command: cli.ILogoutCommand): Promise<void> {
+function logout(command: cli.ICommand): Promise<void> {
     return Q(<void>null)
         .then((): Promise<void> => {
-            if (!command.isLocal) {
+            if (!connectionInfo.preserveAccessKeyOnLogout) {
                 return sdk.removeAccessKey(sdk.accessKey)
                     .then((): void => {
-                        log("Removed access key " + sdk.accessKey + ".");
-                        sdk = null;
+                        log(`Removed access key ${sdk.accessKey}.`);
                     });
             }
         })
-        .then((): void => deleteConnectionInfoCache(), (): void => deleteConnectionInfoCache());
+        .finally((): void => {
+            sdk = null;
+            deleteConnectionInfoCache();
+        });
 }
 
 function formatDate(unixOffset: number): string {
@@ -604,7 +628,7 @@ function printAppList(format: string, apps: App[], deploymentLists: string[][]):
 }
 
 function getCollaboratorDisplayName(email: string, collaboratorProperties: CollaboratorProperties): string {
-    return (collaboratorProperties.permission === Permissions.Owner) ? email + chalk.magenta(" (" + Permissions.Owner + ")") : email;
+    return (collaboratorProperties.permission === AccountManager.AppPermission.OWNER) ? email + chalk.magenta(" (Owner)") : email;
 }
 
 function printCollaboratorsList(format: string, collaborators: CollaboratorMap): void {
@@ -654,9 +678,9 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
     }
 }
 
-function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageHistory: PackageWithMetrics[], currentUserEmail: string): void {
+function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, deploymentHistory: PackageWithMetrics[], currentUserEmail: string): void {
     if (command.format === "json") {
-        printJson(packageHistory);
+        printJson(deploymentHistory);
     } else if (command.format === "table") {
         var headers = ["Label", "Release Time", "App Version", "Mandatory"];
         if (command.displayAuthor) {
@@ -666,7 +690,7 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, packageH
         headers.push("Description", "Install Metrics");
 
         printTable(headers, (dataSource: any[]) => {
-            packageHistory.forEach((packageObject: Package) => {
+            deploymentHistory.forEach((packageObject: Package) => {
                 var releaseTime: string = formatDate(packageObject.uploadTime);
                 var releaseSource: string;
                 if (packageObject.releaseMethod === "Promote") {
@@ -752,6 +776,7 @@ function getPackageMetricsString(packageObject: PackageWithMetrics): string {
 }
 
 function getReactNativeProjectAppVersion(platform: string, projectName: string): Promise<string> {
+    var missingPatchVersionRegex: RegExp = /^\d+\.\d+$/;
     if (platform === "ios") {
         try {
             var infoPlistContainingFolder: string = path.join("iOS", projectName);
@@ -772,10 +797,10 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
         }
 
         if (parsedInfoPlist && parsedInfoPlist.CFBundleShortVersionString) {
-            if (semver.valid(parsedInfoPlist.CFBundleShortVersionString) === null) {
-                throw new Error(`Please update "${infoPlistContainingFolder}/Info.plist" to use a semver-compliant \"CFBundleShortVersionString\", for example "1.0.3".`);
-            } else {
+            if (semver.valid(parsedInfoPlist.CFBundleShortVersionString) || missingPatchVersionRegex.test(parsedInfoPlist.CFBundleShortVersionString)) {
                 return Q(parsedInfoPlist.CFBundleShortVersionString);
+            } else {
+                throw new Error(`The "CFBundleShortVersionString" key in "${infoPlistContainingFolder}/Info.plist" needs to have at least a major and minor version, for example "2.0" or "1.0.3".`);
             }
         } else {
             throw new Error(`The "CFBundleShortVersionString" key does not exist in "${infoPlistContainingFolder}/Info.plist".`);
@@ -793,10 +818,10 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
             .then((buildGradle: any) => {
                 if (buildGradle.android && buildGradle.android.defaultConfig && buildGradle.android.defaultConfig.versionName) {
                     var appVersion: string = buildGradle.android.defaultConfig.versionName.replace(/"/g, "").trim();
-                    if (semver.valid(appVersion) === null) {
-                        throw new Error("Please update \"android/app/build.gradle\" to use a semver-compliant \"android.defaultConfig.versionName\", for example \"1.0.3\".");
-                    } else {
+                    if (semver.valid(appVersion) || missingPatchVersionRegex.test(appVersion)) {
                         return appVersion;
+                    } else {
+                        throw new Error("The \"android.defaultConfig.versionName\" property in \"android/app/build.gradle\" needs to have at least a major and minor version, for example \"2.0\" or \"1.0.3\".");
                     }
                 } else {
                     throw new Error("The \"android/app/build.gradle\" file does not include a value for android.defaultConfig.versionName.");
@@ -850,7 +875,7 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
         rollout: rollout
     };
 
-    return sdk.promotePackage(command.appName, command.sourceDeploymentName, command.destDeploymentName, packageInfo)
+    return sdk.promote(command.appName, command.sourceDeploymentName, command.destDeploymentName, packageInfo)
         .then((): void => {
             log("Successfully promoted the \"" + command.sourceDeploymentName + "\" deployment of the \"" + command.appName + "\" app to the \"" + command.destDeploymentName + "\" deployment.");
         });
@@ -885,6 +910,7 @@ function patch(command: cli.IPatchCommand): Promise<void> {
 export var release = (command: cli.IReleaseCommand): Promise<void> => {
     validateReleaseOptions(command);
 
+    throwForInvalidSemverRange(command.appStoreVersion);
     var filePath: string = command.package;
     var getPackageFilePromise: Promise<IPackageFile>;
     var isSingleFilePackage: boolean = true;
@@ -948,7 +974,7 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
     var rollout: number = command.rollout ? parseInt(command.rollout) : null;
     return getPackageFilePromise
         .then((file: IPackageFile): Promise<void> => {
-            return sdk.releasePackage(command.appName, command.deploymentName, file.path, command.description, command.appStoreVersion, rollout, command.mandatory, uploadProgress)
+            return sdk.release(command.appName, command.deploymentName, file.path, command.appStoreVersion, command.description, rollout, command.mandatory, uploadProgress)
                 .then((): void => {
                     log("Successfully released an update containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
 
@@ -956,6 +982,69 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
                         fs.unlinkSync(filePath);
                     }
                 });
+        });
+}
+
+export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void> => {
+    var platform: string = command.platform.toLowerCase();
+    var projectRoot: string = process.cwd();
+    var platformFolder: string = path.join(projectRoot, "platforms", platform);
+    var platformCordova: string = path.join(platformFolder, "cordova");
+    var outputFolder: string;
+    var preparePromise: Promise<void>;
+
+    if (platform === "ios") {
+        outputFolder = path.join(platformFolder, "www");
+    } else if (platform === "android") {
+        outputFolder = path.join(platformFolder, "assets", "www");
+    } else {
+        throw new Error("Platform must be either \"ios\" or \"android\".");
+    }
+
+    try {
+        var prepareProcess: any = spawnSync("cordova", ["prepare", platform]);
+        if (prepareProcess.error) {
+            throw prepareProcess.error;
+        }
+    } catch (error) {
+        if (error.code == "ENOENT") {
+            throw new Error(`Failed to call "cordova prepare". Please ensure that the Cordova CLI is installed.`);
+        }
+
+        throw new Error(`Unable to prepare project. Please ensure that this is a Cordova project and that platform "${platform}" was added with "cordova platform add ${platform}"`);
+    }
+
+    try {
+        var configString: string = fs.readFileSync(path.join(projectRoot, "config.xml"), { encoding: "utf8" });
+    } catch (error) {
+        throw new Error(`Unable to find or read "config.xml" in the CWD. The "release-cordova" command must be executed in a Cordova project folder.`);
+    }
+
+    var configPromise: Promise<any> = parseXml(configString);
+    var releaseCommand: cli.IReleaseCommand = <any>command;
+
+    releaseCommand.package = outputFolder;
+    releaseCommand.type = cli.CommandType.release;
+
+    return configPromise
+        .catch((err: any) => {
+            throw new Error(`Unable to parse "config.xml" in the CWD. Ensure that the contents of "config.xml" is valid XML.`);
+        })
+        .then((parsedConfig: any) => {
+            var config: any = parsedConfig.widget;
+
+            var releaseTargetVersion: string;
+            if (command.appStoreVersion) {
+                releaseTargetVersion = command.appStoreVersion;
+            } else {
+                releaseTargetVersion = config["$"].version;
+            }
+
+            throwForInvalidSemverRange(releaseTargetVersion);
+            releaseCommand.appStoreVersion = releaseTargetVersion;
+
+            log(chalk.cyan("\nReleasing update contents to CodePush:\n"));
+            return release(releaseCommand);
         });
 }
 
@@ -1008,7 +1097,15 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
         }
     }
 
-    return getReactNativeProjectAppVersion(platform, projectName)
+    if (command.appStoreVersion) {
+        throwForInvalidSemverRange(command.appStoreVersion);
+    }
+
+    var appVersionPromise: Promise<string> = command.appStoreVersion
+        ? Q(command.appStoreVersion)
+        : getReactNativeProjectAppVersion(platform, projectName);
+
+    return appVersionPromise
         .then((appVersion: string) => {
             releaseCommand.appStoreVersion = appVersion;
             return createEmptyTempReleaseFolder(outputFolder);
@@ -1016,7 +1113,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
         // This is needed to clear the react native bundler cache:
         // https://github.com/facebook/react-native/issues/4289
         .then(() => deleteFolder(`${os.tmpdir()}/react-*`))
-        .then(() => runReactNativeBundleCommand(bundleName, entryFile, outputFolder, platform, command.sourcemapOutput))
+        .then(() => runReactNativeBundleCommand(bundleName, command.development || false, entryFile, outputFolder, platform, command.sourcemapOutput))
         .then(() => {
             log(chalk.cyan("\nReleasing update contents to CodePush:\n"));
             return release(releaseCommand);
@@ -1036,7 +1133,7 @@ function rollback(command: cli.IRollbackCommand): Promise<void> {
                 return;
             }
 
-            return sdk.rollbackPackage(command.appName, command.deploymentName, command.targetRelease || undefined)
+            return sdk.rollback(command.appName, command.deploymentName, command.targetRelease || undefined)
                 .then((): void => {
                     log("Successfully performed a rollback on the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
                 });
@@ -1066,12 +1163,12 @@ function requestAccessKey(): Promise<string> {
     });
 }
 
-export var runReactNativeBundleCommand = (bundleName: string, entryFile: string, outputFolder: string, platform: string, sourcemapOutput: string): Promise<void> => {
+export var runReactNativeBundleCommand = (bundleName: string, development: boolean, entryFile: string, outputFolder: string, platform: string, sourcemapOutput: string): Promise<void> => {
     var reactNativeBundleArgs = [
         path.join("node_modules", "react-native", "local-cli", "cli.js"), "bundle",
         "--assets-dest", outputFolder,
         "--bundle-output", path.join(outputFolder, bundleName),
-        "--dev", false,
+        "--dev", development,
         "--entry-file", entryFile,
         "--platform", platform,
     ];
@@ -1103,11 +1200,12 @@ export var runReactNativeBundleCommand = (bundleName: string, entryFile: string,
     });
 }
 
-function serializeConnectionInfo(accessKey: string, serverUrl?: string): void {
-    var connectionInfo: ILoginConnectionInfo = { accessKey: accessKey };
-    if (serverUrl) {
-        connectionInfo.customServerUrl = serverUrl;
+function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: boolean, customServerUrl?: string): void {
+    var connectionInfo: ILoginConnectionInfo = { accessKey: accessKey, preserveAccessKeyOnLogout: preserveAccessKeyOnLogout };
+    if (customServerUrl) {
+        connectionInfo.customServerUrl = customServerUrl;
     }
+
     var json: string = JSON.stringify(connectionInfo);
     fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
 
@@ -1140,6 +1238,12 @@ function validateRollout(rollout: string): void {
 function throwForInvalidEmail(email: string): void {
     if (!emailValidator.validate(email)) {
         throw new Error("\"" + email + "\" is an invalid e-mail address.");
+    }
+}
+
+function throwForInvalidSemverRange(semverRange: string): void {
+    if (semver.validRange(semverRange) === null) {
+        throw new Error("Please use a semver-compliant target binary version range, for example \"1.0.0\", \"*\" or \"^1.2.3\".");
     }
 }
 

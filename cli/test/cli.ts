@@ -3,7 +3,7 @@ import * as sinon from "sinon";
 import Q = require("q");
 import * as path from "path";
 import Promise = Q.Promise;
-import * as codePush from "code-push";
+import * as codePush from "code-push/script/types";
 import * as cli from "../definitions/cli";
 import * as cmdexec from "../script/command-executor";
 import * as os from "os";
@@ -26,7 +26,7 @@ export class SdkStub {
         });
     }
 
-    public addAccessKey(machine: string, description?: string): Promise<codePush.AccessKey> {
+    public addAccessKey(description: string): Promise<codePush.AccessKey> {
         return Q(<codePush.AccessKey>{
             name: "key123",
             createdTime: new Date().getTime(),
@@ -50,6 +50,10 @@ export class SdkStub {
             name: name,
             key: "6"
         });
+    }
+
+    public clearDeploymentHistory(appId: string, deployment: string): Promise<void> {
+        return Q(<void>null);
     }
 
     public getAccessKeys(): Promise<codePush.AccessKey[]> {
@@ -91,7 +95,7 @@ export class SdkStub {
         }]);
     }
 
-    public getPackageHistory(appId: string, deploymentId: string): Promise<codePush.Package[]> {
+    public getDeploymentHistory(appId: string, deploymentId: string): Promise<codePush.Package[]> {
         return Q([
             <codePush.Package>{
                 description: null,
@@ -136,7 +140,7 @@ export class SdkStub {
         });
     }
 
-    public getCollaboratorsList(app: codePush.App): Promise<any> {
+    public getCollaborators(app: codePush.App): Promise<any> {
         return Q({
             "a@a.com": {
                 permission: "Owner",
@@ -169,7 +173,7 @@ export class SdkStub {
         return Q(<void>null);
     }
 
-    public updateApp(app: codePush.App): Promise<void> {
+    public renameApp(app: codePush.App): Promise<void> {
         return Q(<void>null);
     }
 
@@ -177,7 +181,7 @@ export class SdkStub {
         return Q(<void>null);
     }
 
-    public updateDeployment(appId: string, deployment: codePush.Deployment): Promise<void> {
+    public renameDeployment(appId: string, deployment: codePush.Deployment): Promise<void> {
         return Q(<void>null);
     }
 }
@@ -187,7 +191,7 @@ describe("CLI", () => {
     var sandbox: Sinon.SinonSandbox;
     var spawn: Sinon.SinonStub;
     var wasConfirmed = true;
-    const RELEASE_FAILED_ERROR_MESSAGE: string = "It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).";
+    const INVALID_RELEASE_FILE_ERROR_MESSAGE: string = "It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).";
 
     beforeEach((): void => {
         wasConfirmed = true;
@@ -402,11 +406,11 @@ describe("CLI", () => {
             newAppName: "c"
         };
 
-        var updateApp: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "updateApp");
+        var renameApp: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "renameApp");
 
         cmdexec.execute(command)
             .done((): void => {
-                sinon.assert.calledOnce(updateApp);
+                sinon.assert.calledOnce(renameApp);
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Successfully renamed the \"a\" app to \"c\".");
 
@@ -467,10 +471,10 @@ describe("CLI", () => {
                 var actual: string = log.args[0][0];
                 var expected = {
                     "collaborators":
-                        {
-                            "a@a.com": { permission: "Owner", isCurrentAccount: true },
-                            "b@b.com": { permission: "Collaborator", isCurrentAccount: false }
-                        }
+                    {
+                        "a@a.com": { permission: "Owner", isCurrentAccount: true },
+                        "b@b.com": { permission: "Collaborator", isCurrentAccount: false }
+                    }
                 };
 
                 assertJsonDescribesObject(actual, expected);
@@ -512,6 +516,47 @@ describe("CLI", () => {
                 sinon.assert.calledOnce(addDeployment);
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Successfully added the \"b\" deployment with key \"6\" to the \"a\" app.");
+                done();
+            });
+    });
+
+    it("deploymentHistoryClear clears deployment", (done: MochaDone): void => {
+        var command: cli.IDeploymentHistoryClearCommand = {
+            type: cli.CommandType.deploymentHistoryClear,
+            appName: "a",
+            deploymentName: "Staging"
+        };
+
+        var clearDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "clearDeploymentHistory");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(clearDeployment);
+                sinon.assert.calledWithExactly(clearDeployment, "a", "Staging");
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, "Successfully cleared the release history associated with the \"Staging\" deployment from the \"a\" app.");
+
+                done();
+            });
+    });
+
+    it("deploymentHistoryClear does not clear deployment if cancelled", (done: MochaDone): void => {
+        var command: cli.IDeploymentHistoryClearCommand = {
+            type: cli.CommandType.deploymentHistoryClear,
+            appName: "a",
+            deploymentName: "Staging"
+        };
+
+        var clearDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "clearDeploymentHistory");
+
+        wasConfirmed = false;
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.notCalled(clearDeployment);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, "Clear deployment cancelled.");
+
                 done();
             });
     });
@@ -612,11 +657,11 @@ describe("CLI", () => {
             newDeploymentName: "c"
         };
 
-        var updateDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "updateDeployment");
+        var renameDeployment: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "renameDeployment");
 
         cmdexec.execute(command)
             .done((): void => {
-                sinon.assert.calledOnce(updateDeployment);
+                sinon.assert.calledOnce(renameDeployment);
                 sinon.assert.calledOnce(log);
                 sinon.assert.calledWithExactly(log, "Successfully renamed the \"Staging\" deployment to \"c\" for the \"a\" app.");
 
@@ -633,11 +678,11 @@ describe("CLI", () => {
             displayAuthor: false
         };
 
-        var getPackageHistory: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getPackageHistory");
+        var getDeploymentHistory: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getDeploymentHistory");
 
         cmdexec.execute(command)
             .done((): void => {
-                sinon.assert.calledOnce(getPackageHistory);
+                sinon.assert.calledOnce(getDeploymentHistory);
                 sinon.assert.calledOnce(log);
                 assert.equal(log.args[0].length, 1);
 
@@ -684,6 +729,21 @@ describe("CLI", () => {
             });
     });
 
+    it("release doesn't allow non valid semver ranges", (done: MochaDone): void => {
+        var command: cli.IReleaseCommand = {
+            type: cli.CommandType.release,
+            appName: "a",
+            deploymentName: "Staging",
+            description: "test releasing zip file",
+            mandatory: false,
+            rollout: null,
+            appStoreVersion: "not semver",
+            package: "./resources"
+        };
+
+        releaseHelperFunction(command, done, "Please use a semver-compliant target binary version range, for example \"1.0.0\", \"*\" or \"^1.2.3\".");
+    });
+
     it("release doesn't allow releasing .zip file", (done: MochaDone): void => {
         var command: cli.IReleaseCommand = {
             type: cli.CommandType.release,
@@ -696,7 +756,7 @@ describe("CLI", () => {
             package: "/fake/path/test/file.zip"
         };
 
-        releaseHelperFunction(command, done);
+        releaseHelperFunction(command, done, INVALID_RELEASE_FILE_ERROR_MESSAGE);
     });
 
     it("release doesn't allow releasing .ipa file", (done: MochaDone): void => {
@@ -711,7 +771,7 @@ describe("CLI", () => {
             package: "/fake/path/test/file.ipa"
         };
 
-        releaseHelperFunction(command, done);
+        releaseHelperFunction(command, done, INVALID_RELEASE_FILE_ERROR_MESSAGE);
     });
 
     it("release doesn't allow releasing .apk file", (done: MochaDone): void => {
@@ -726,13 +786,193 @@ describe("CLI", () => {
             package: "/fake/path/test/file.apk"
         };
 
-        releaseHelperFunction(command, done);
+        releaseHelperFunction(command, done, INVALID_RELEASE_FILE_ERROR_MESSAGE);
+    });
+
+    it("release-cordova fails if Cordova project cannot be prepared", (done: MochaDone): void => {
+        var command: cli.IReleaseCordovaCommand = {
+            type: cli.CommandType.releaseCordova,
+            appName: "a",
+            appStoreVersion: null,
+            deploymentName: "Staging",
+            description: "Test invalid project",
+            mandatory: false,
+            rollout: null,
+            platform: "ios"
+        };
+
+
+        var spawnSync: Sinon.SinonStub = sandbox.stub(cmdexec, "spawnSync", (command: string, commandArgs: string[], options: any) => { return { error: new Error("Failed Prepare") }; });
+        var release: Sinon.SinonSpy = sandbox.spy(cmdexec, "release");
+        var releaseCordova: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseCordova");
+
+        cmdexec.execute(command)
+            .then(() => {
+                done(new Error("Did not throw error."));
+            })
+            .catch((err) => {
+                assert.equal(err.message, `Unable to prepare project. Please ensure that this is a Cordova project and that platform "${command.platform}" was added with "cordova platform add ${command.platform}"`);
+                sinon.assert.notCalled(release);
+                sinon.assert.threw(releaseCordova, "Error");
+                done();
+            })
+            .done();
+    });
+
+    it("release-cordova fails if CWD does not contain config.xml", (done: MochaDone): void => {
+        var command: cli.IReleaseCordovaCommand = {
+            type: cli.CommandType.releaseCordova,
+            appName: "a",
+            appStoreVersion: null,
+            deploymentName: "Staging",
+            description: "Test missing config.xml",
+            mandatory: false,
+            rollout: null,
+            platform: "ios"
+        };
+
+        var spawnSync: Sinon.SinonStub = sandbox.stub(cmdexec, "spawnSync", (command: string, commandArgs: string[], options: any) => { return {}; });
+        var release: Sinon.SinonSpy = sandbox.spy(cmdexec, "release");
+        var releaseCordova: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseCordova");
+
+        cmdexec.execute(command)
+            .then(() => {
+                done(new Error("Did not throw error."));
+            })
+            .catch((err) => {
+                assert.equal(err.message, `Unable to find or read "config.xml" in the CWD. The "release-cordova" command must be executed in a Cordova project folder.`);
+                sinon.assert.notCalled(release);
+                sinon.assert.threw(releaseCordova, "Error");
+                sinon.assert.calledOnce(spawnSync);
+                done();
+            })
+            .done();
+    });
+
+    it("release-cordova fails if platform is invalid", (done: MochaDone): void => {
+        var command: cli.IReleaseCordovaCommand = {
+            type: cli.CommandType.releaseCordova,
+            appName: "a",
+            appStoreVersion: null,
+            deploymentName: "Staging",
+            description: "Test invalid platform",
+            mandatory: false,
+            rollout: null,
+            platform: "blackberry",
+        };
+
+        var release: Sinon.SinonSpy = sandbox.spy(cmdexec, "release");
+        var releaseCordova: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseCordova");
+
+        cmdexec.execute(command)
+            .then(() => {
+                done(new Error("Did not throw error."));
+            })
+            .catch((err) => {
+                assert.equal(err.message, "Platform must be either \"ios\" or \"android\".");
+                sinon.assert.notCalled(release);
+                sinon.assert.threw(releaseCordova, "Error");
+                sinon.assert.notCalled(spawn);
+                done();
+            })
+            .done();
+    });
+
+    it("release-cordova defaults appStoreVersion to value pulled from config.xml", (done: MochaDone): void => {
+        var command: cli.IReleaseCordovaCommand = {
+            type: cli.CommandType.releaseCordova,
+            appName: "a",
+            appStoreVersion: null,
+            deploymentName: "Staging",
+            description: "Test config.xml app version read",
+            mandatory: false,
+            rollout: null,
+            platform: "ios"
+        };
+
+        var oldWd: string = process.cwd();
+        ensureInTestAppDirectory();
+
+        var expectedReleaseCommand: any = {
+            type: cli.CommandType.release,
+            appName: "a",
+            appStoreVersion: "0.0.1",
+            deploymentName: "Staging",
+            description: "Test config.xml app version read",
+            mandatory: false,
+            rollout: null,
+            package: path.join(process.cwd(), "platforms", "ios", "www"),
+            platform: "ios"
+        }
+
+        var spawnSync: Sinon.SinonStub = sandbox.stub(cmdexec, "spawnSync", (command: string, commandArgs: string[], options: any) => { return {}; });
+        var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release");
+        var releaseCordova: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseCordova");
+
+        cmdexec.execute(command)
+            .then((compiledReleaseCommand: any) => {
+                sinon.assert.calledOnce(spawnSync);
+                sinon.assert.calledWith(release, expectedReleaseCommand);
+                done();
+            })
+            .catch((err) => {
+                done(new Error("Threw error. " + err.message));
+            })
+            .done(() => {
+                process.chdir(oldWd);
+            });
+    });
+
+    it("release-cordova points 'package' to the built folder for android", (done: MochaDone): void => {
+        var command: cli.IReleaseCordovaCommand = {
+            type: cli.CommandType.releaseCordova,
+            appName: "a",
+            appStoreVersion: null,
+            deploymentName: "Staging",
+            description: "Test android package resolution",
+            mandatory: false,
+            rollout: null,
+            platform: "android"
+        };
+
+        var oldWd: string = process.cwd();
+        ensureInTestAppDirectory();
+
+        var expectedReleaseCommand: any = {
+            type: cli.CommandType.release,
+            appName: "a",
+            appStoreVersion: "0.0.1",
+            deploymentName: "Staging",
+            description: "Test android package resolution",
+            mandatory: false,
+            rollout: null,
+            package: path.join(process.cwd(), "platforms", "android", "assets", "www"),
+            platform: "android"
+        }
+
+        var spawnSync: Sinon.SinonStub = sandbox.stub(cmdexec, "spawnSync", (command: string, commandArgs: string[], options: any) => { return {}; });
+        var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release");
+        var releaseCordova: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseCordova");
+
+        cmdexec.execute(command)
+            .then((compiledReleaseCommand: any) => {
+                sinon.assert.calledOnce(spawnSync);
+                sinon.assert.calledWith(release, expectedReleaseCommand);
+                done();
+            })
+            .catch((err) => {
+                done(new Error("Threw error. " + err.message));
+            })
+            .done(() => {
+                process.chdir(oldWd);
+            });
     });
 
     it("release-react fails if CWD does not contain package.json", (done: MochaDone): void => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
+            appStoreVersion: null,
             deploymentName: "Staging",
             description: "Test invalid folder",
             mandatory: false,
@@ -761,6 +1001,7 @@ describe("CLI", () => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
+            appStoreVersion: null,
             deploymentName: "Staging",
             description: "Test invalid entryFile",
             entryFile: "doesntexist.js",
@@ -792,6 +1033,7 @@ describe("CLI", () => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
+            appStoreVersion: null,
             deploymentName: "Staging",
             description: "Test invalid platform",
             mandatory: false,
@@ -818,11 +1060,46 @@ describe("CLI", () => {
             .done();
     });
 
+    it("release-react fails if targetBinaryRange is not a valid semver range expression", (done: MochaDone): void => {
+        var bundleName = "bundle.js";
+        var command: cli.IReleaseReactCommand = {
+            type: cli.CommandType.releaseReact,
+            appName: "a",
+            appStoreVersion: "notsemver",
+            bundleName: bundleName,
+            deploymentName: "Staging",
+            description: "Test uses targetBinaryRange",
+            mandatory: false,
+            rollout: null,
+            platform: "android",
+            sourcemapOutput: "index.android.js.map"
+        };
+
+        ensureInTestAppDirectory();
+
+        var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release", () => { return Q(<void>null) });
+        var releaseReact: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseReact");
+
+        cmdexec.execute(command)
+            .then(() => {
+                done(new Error("Did not throw error."));
+            })
+            .catch((err) => {
+                assert.equal(err.message, "Please use a semver-compliant target binary version range, for example \"1.0.0\", \"*\" or \"^1.2.3\".");
+                sinon.assert.notCalled(release);
+                sinon.assert.threw(releaseReact, "Error");
+                sinon.assert.notCalled(spawn);
+                done();
+            })
+            .done();
+    });
+
     it("release-react defaults entry file to index.{platform}.js if not provided", (done: MochaDone): void => {
         var bundleName = "bundle.js";
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
+            appStoreVersion: null,
             bundleName: bundleName,
             deploymentName: "Staging",
             description: "Test default entry file",
@@ -859,6 +1136,7 @@ describe("CLI", () => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
+            appStoreVersion: null,
             deploymentName: "Staging",
             description: "Test default entry file",
             mandatory: false,
@@ -889,11 +1167,12 @@ describe("CLI", () => {
             })
             .done();
     });
-    
+
     it("release-react defaults bundle name to \"index.android.bundle\" if not provided and platform is \"android\"", (done: MochaDone): void => {
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
+            appStoreVersion: null,
             deploymentName: "Staging",
             description: "Test default entry file",
             mandatory: false,
@@ -924,12 +1203,53 @@ describe("CLI", () => {
             })
             .done();
     });
-    
+
+    it("release-react generates dev bundle", (done: MochaDone): void => {
+        var bundleName = "bundle.js";
+        var command: cli.IReleaseReactCommand = {
+            type: cli.CommandType.releaseReact,
+            appName: "a",
+            appStoreVersion: null,
+            bundleName: bundleName,
+            deploymentName: "Staging",
+            development: true,
+            description: "Test generates dev bundle",
+            mandatory: false,
+            rollout: null,
+            platform: "android",
+            sourcemapOutput: "index.android.js.map"
+        };
+
+        ensureInTestAppDirectory();
+
+        var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release", () => { return Q(<void>null) });
+
+        cmdexec.execute(command)
+            .then(() => {
+                var releaseCommand: cli.IReleaseCommand = <any>command;
+                releaseCommand.package = path.join(os.tmpdir(), "CodePush");
+                releaseCommand.appStoreVersion = "1.2.3";
+
+                sinon.assert.calledOnce(spawn);
+                var spawnCommand: string = spawn.args[0][0];
+                var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+                assert.equal(spawnCommand, "node");
+                assert.equal(
+                    spawnCommandArgs,
+                    `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)} --dev true --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
+                );
+                assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
+                done();
+            })
+            .done();
+    });
+
     it("release-react generates sourcemaps", (done: MochaDone): void => {
         var bundleName = "bundle.js";
         var command: cli.IReleaseReactCommand = {
             type: cli.CommandType.releaseReact,
             appName: "a",
+            appStoreVersion: null,
             bundleName: bundleName,
             deploymentName: "Staging",
             description: "Test generates sourcemaps",
@@ -963,14 +1283,52 @@ describe("CLI", () => {
             .done();
     });
 
-    function releaseHelperFunction(command: cli.IReleaseCommand, done: MochaDone): void {
+    it("release-react uses specified targetBinaryRange option", (done: MochaDone): void => {
+        var bundleName = "bundle.js";
+        var command: cli.IReleaseReactCommand = {
+            type: cli.CommandType.releaseReact,
+            appName: "a",
+            appStoreVersion: ">=1.0.0 <1.0.5",
+            bundleName: bundleName,
+            deploymentName: "Staging",
+            description: "Test uses targetBinaryRange",
+            mandatory: false,
+            rollout: null,
+            platform: "android",
+            sourcemapOutput: "index.android.js.map"
+        };
+
+        ensureInTestAppDirectory();
+
+        var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release", () => { return Q(<void>null) });
+
+        cmdexec.execute(command)
+            .then(() => {
+                var releaseCommand: cli.IReleaseCommand = <any>command;
+                releaseCommand.package = path.join(os.tmpdir(), "CodePush");
+
+                sinon.assert.calledOnce(spawn);
+                var spawnCommand: string = spawn.args[0][0];
+                var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+                assert.equal(spawnCommand, "node");
+                assert.equal(
+                    spawnCommandArgs,
+                    `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)} --dev false --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
+                );
+                assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
+                done();
+            })
+            .done();
+    });
+
+    function releaseHelperFunction(command: cli.IReleaseCommand, done: MochaDone, expectedError: string): void {
         var release: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "release");
         cmdexec.execute(command)
             .done((): void => {
                 throw "Error Expected";
             }, (error: any): void => {
-                assert (!!error);
-                assert.equal(error.message, RELEASE_FAILED_ERROR_MESSAGE);
+                assert(!!error);
+                assert.equal(error.message, expectedError);
                 done();
             });
     }

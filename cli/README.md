@@ -1,8 +1,8 @@
-# CodePush management CLI
+# CodePush Management CLI
 
 CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users' devices. It works by acting as a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using the provided client SDKs for [Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push)). This allows you to have a more deterministic and direct engagement model with your user base, when addressing bugs and/or adding small features that don't require you to re-build a binary and re-distribute it through the respective app stores.
 
-![CodePush CLI](https://cloud.githubusercontent.com/assets/8598682/13232100/9846bc28-d962-11e5-8212-0965f267119d.png)
+![CodePush CLI](https://cloud.githubusercontent.com/assets/116461/13588584/aa9f26f2-e485-11e5-8e15-43d4b266225a.png)
 
 ## Installation
 
@@ -59,17 +59,13 @@ If you need additional keys that can be used to authenticate against the CodePus
 code-push access-key add "VSTS Integration"
 ```
 
-After creating the new key, you can specify its value using the `--accessKey` flag of the `login` command, which allows you to perform the "headless" authentication, as opposed to launching a browser.
+After creating the new key, you can specify its value using the `--accessKey` flag of the `login` command, which allows you to perform "headless" authentication, as opposed to launching a browser.
 
 ```
 code-push login --accessKey <accessKey>
 ```
 
-If you want to log out of your current session, but still be able to reuse the same key for future logins, run the following command:
-
-```
-code-push logout --local
-```
+When logging in via this method, the access key will not be automatically invalidated on logout, and can be used in future sessions until it is explicitly removed from the CodePush server. However, it is still recommended to log out once your session is complete, in order to remove your credentials from disk.
 
 ## App management
 
@@ -133,6 +129,7 @@ Inversely, that means that an app collaborator cannot do any of the following:
 1. Rename or delete the app
 1. Transfer ownership of the app
 1. Create, rename or delete new deployments within the app
+1. Clear a deployment's release history
 1. Add or remove collaborators from the app (*)
 
 *NOTE: A developer can remove him/herself as a collaborator from an app that was shared with them.*
@@ -176,8 +173,8 @@ code-push deployment add <appName> <deploymentName>
 Just like with apps, you can remove and rename deployments as well, using the following commands respectively:
 
 ```
-code-push deployment rename <appName> <deploymentName> <newDeploymentName>
 code-push deployment rm <appName> <deploymentName>
+code-push deployment rename <appName> <deploymentName> <newDeploymentName>
 ```
 
 If at any time you'd like to view the list of deployments that a specific app includes, you can simply run the following command:
@@ -234,19 +231,36 @@ It's important that the path you specify refers to the platform-specific, prepar
 
 ### Target binary version parameter
 
-This specifies the semver-compliant (e.g. `1.0.0` not `1.0`) store/binary version of the application you are releasing the update for. Only users running this **exact version** will receive the update. Users running an older and/or newer version of the app binary will not receive this update, for the following reasons:
+This specifies the store/binary version of the application you are releasing the update for, so that only users running that version will receive the update, while users running an older and/or newer version of the app binary will not. This is useful for the following reasons:
 
 1. If a user is running an older binary version, it's possible that there are breaking changes in the CodePush update that wouldn't be compatible with what they're running.
 
 2. If a user is running a newer binary version, then it's presumed that what they are running is newer (and potentially incompatible) with the CodePush update.
 
-The following table outlines the value that CodePush expects you to provide for each respective app type:
+If you ever want an update to target multiple versions of the app store binary, we also allow you to specify the parameter as a [semver range expression](https://github.com/npm/node-semver#advanced-range-syntax). That way, any client device running a version of the binary that satisfies the range expression (i.e. `semver.satisfies(version, range)` returns `true`) will get the update. Examples of valid semver range expressions are as follows:
+
+| Range Expression | Who gets the update                                                                    |
+|------------------|----------------------------------------------------------------------------------------|
+| `1.2.3`          | Only devices running the specific binary app store version `1.2.3` of your app         |
+| `*`              | Any device configured to consume updates from your CodePush app                        |
+| `1.2.x`          | Devices running major version 1, minor version 2 and any patch version of your app     |
+| `1.2.3 - 1.2.7`  | Devices running any binary version between `1.2.3` (inclusive) and `1.2.7` (inclusive) |
+| `>=1.2.3 <1.2.7` | Devices running any binary version between `1.2.3` (inclusive) and `1.2.7` (exclusive) |
+| `~1.2.3`         | Equivalent to `>=1.2.3 <1.3.0`                                                         |
+| `^1.2.3`         | Equivalent to `>=1.2.3 <2.0.0`                                                         |
+
+*NOTE: If your semver expression starts with a special shell character or operator such as `>`, `^`, or **
+*, the command may not execute correctly if you do not wrap the value in quotes as the shell will not supply the right values to our CLI process. Therefore, it is best to wrap your `targetBinaryVersion` parameter in double quotes when calling the `release` command, e.g. `code-push release MyApp updateContents ">1.2.3"`.*
+
+The following table outlines the version value that CodePush expects your update's semver range to satisfy for each respective app type:
 
 | Platform               | Source of app store version                                                  |
 |------------------------|------------------------------------------------------------------------------|
 | Cordova                | The `<widget version>` attribute in the `config.xml` file                    |
 | React Native (Android) | The `android.defaultConfig.versionName` property in your `build.gradle` file |
 | React Native (iOS)     | The `CFBundleShortVersionString` key in the `Info.plist` file                |
+
+*NOTE: If the app store version in the metadata files are missing a patch version, e.g. `2.0`, it will be treated as having a patch version of `0`, i.e. `2.0 -> 2.0.0`.
 
 ### Deployment name parameter
 
@@ -286,22 +300,24 @@ If you never release an update that is marked as mandatory, then the above behav
 
 After configuring your React Native app to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
 
-```
+```shell
 code-push release-react <appName> <platform>
 [--bundleName <bundleName>]
 [--deploymentName <deploymentName>]
 [--description <description>]
+[--development <development>]
 [--entryFile <entryFile>]
 [--mandatory]
 [--sourcemapOutput <sourcemapOutput>]
+[--targetBinaryVersion <targetBinaryVersion>]
 ```
 
-This `release-react` command does two things in addition to running the vanilla `release` command described in the [previous section](#releasing-app-updates):
+The `release-react` command does two things in addition to running the vanilla `release` command described in the [previous section](#releasing-app-updates):
 
 1. It runs the [`react-native bundle` command](#update-contents-parameter) to generate the update contents in a temporary folder
-2. It infers the [`targetBinaryVersion` of this release](#target-binary-version-parameter) by reading the contents of the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients).
+2. It infers the [`targetBinaryVersion` of this release](#target-binary-range-parameter) by reading the contents of the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients), and defaults to target only the specified version in the metadata.
 
-It then calls the vanilla `release` command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the `react-native bundle` command and also avoid common pitfalls such as supplying a wrong `targetBinaryVersion` parameter.
+It then calls the vanilla `release` command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the `react-native bundle` command and also avoid common pitfalls such as supplying an invalid `targetBinaryVersion` parameter.
 
 ### Platform parameter
 
@@ -319,6 +335,10 @@ This is the same parameter as the one described in the [above section](#deployme
 
 This is the same parameter as the one described in the [above section](#description-parameter).
 
+### Development parameter
+
+This specifies whether to generate a unminified, development JS bundle. If left unspecified, this defaults to `false` where warnings are disabled and the bundle is minified.
+
 ### Entry file parameter
 
 This specifies the relative path to the root JavaScript file of the app. If left unspecified, the command will first assume the entry file to be `index.ios.js` or `index.android.js` depending on the `platform` parameter supplied, following which it will use `index.js` if the previous file does not exist.
@@ -330,6 +350,47 @@ This is the same parameter as the one described in the [above section](#mandator
 ### Sourcemap output parameter
 
 This specifies the relative path to where the sourcemap file for resulting update's JS bundle should be generated. If left unspecified, sourcemaps will not be generated.
+
+### Target binary version parameter
+
+This is the same parameter as the one described in the [above section](#target-binary-version-parameter). If left unspecified, the command defaults to targeting only the specified version in the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients).
+
+## Releasing updates to a Cordova app
+After configuring your Cordova app to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
+
+```shell
+code-push release-cordova <appName> <platform>
+[--deploymentName <deploymentName>]
+[--description <description>]
+[--mandatory]
+[--targetBinaryVersion <targetBinaryVersion>]
+```
+The `release-cordova` command does two things in addition to running the vanilla `release` command described in the [Releasing App Updates](#releasing-app-updates) section:
+
+1. It [updates the contents](#update-contents-parameter) of the package by calling `cordova prepare` for the specified platform
+2. It infers the [`targetBinaryVersion` of this release](#target-binary-range-parameter) by reading the version in the `<widget version>` in config.xml, and defaults to target only the specified version.
+
+It then calls the vanilla `release` command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the `cordova prepare` command and also avoid common pitfalls such as supplying an invalid `targetBinaryVersion` parameter.
+
+### Platform parameter
+
+This specifies which platform the current update is targeting, and can be either `ios` or `android` (case-insensitive).
+
+### Deployment name parameter
+
+This is the same parameter as the one described in the [above section](#deployment-name-parameter).
+
+### Description parameter
+
+This is the same parameter as the one described in the [above section](#description-parameter).
+
+### Mandatory parameter
+
+This is the same parameter as the one described in the [above section](#mandatory-parameter).
+
+### Target binary version parameter
+
+This is the same parameter as the one described in the [above section](#target-binary-version-parameter). If left unspecified, the command defaults to targeting only the specified version in the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients).
 
 ## Promoting updates across deployments
 
@@ -403,3 +464,13 @@ Additionally, the history displays the install metrics for each release. You can
 By default, the history doesn't display the author of each release, but if you are collaborating on an app with other developers, and want to view who released each update, you can pass the additional `--displayAuthor` (or `-a`) flag to the history command.
 
 *NOTE: The history command can also be run using the "h" alias*
+
+## Clearing release history
+
+You can clear the release history associated with a deployment using the following command: 
+
+```
+code-push deployment clear <appName> <deploymentName>
+```
+
+After running this command, client devices configured to receive updates using its associated deployment key will no longer receive the updates that have been cleared. This command is irreversible, and therefore should not be used in a production deployment.
