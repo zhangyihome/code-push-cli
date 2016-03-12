@@ -893,7 +893,7 @@ function patch(command: cli.IPatchCommand): Promise<void> {
 
     return sdk.patchRelease(command.appName, command.deploymentName, packageInfo)
         .then((): void => {
-            log(`Successfully updated the ${ command.label ? command.label : "latest" } release of "${command.deploymentName}" deployment of "${command.appName}" app.`);
+            log(`Successfully updated the "${ command.label ? command.label : `latest` }" release of "${command.appName}" app's "${command.deploymentName}" deployment.`);
         });
 }
 
