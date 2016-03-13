@@ -926,17 +926,28 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
     var uploadProgress = (currentProgress: number): void => {
         progressBar.tick(currentProgress - lastTotalProgress);
         lastTotalProgress = currentProgress;
-    }
+    };
 
+    var deleteFileIfTemporary = (file: IPackageFile): void => {
+        if (file.isTemporary) {
+            fs.unlinkSync(filePath);
+        }
+    };
+    
     return getPackageFilePromise
         .then((file: IPackageFile): Promise<void> => {
             return sdk.release(command.appName, command.deploymentName, file.path, command.appStoreVersion, command.description, command.mandatory, uploadProgress)
                 .then((): void => {
                     log("Successfully released an update containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
 
-                    if (file.isTemporary) {
-                        fs.unlinkSync(filePath);
-                    }
+                    deleteFileIfTemporary(file);
+                })
+                .catch((error): void => {
+                    deleteFileIfTemporary(file);
+                    
+                    // Rethrow the error so that the global error
+                    // handler can properly display it to the developer.
+                    throw error;
                 });
         });
 }
