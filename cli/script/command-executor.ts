@@ -926,14 +926,15 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
     var uploadProgress = (currentProgress: number): void => {
         progressBar.tick(currentProgress - lastTotalProgress);
         lastTotalProgress = currentProgress;
-    }
+    };
 
     return getPackageFilePromise
         .then((file: IPackageFile): Promise<void> => {
             return sdk.release(command.appName, command.deploymentName, file.path, command.appStoreVersion, command.description, command.mandatory, uploadProgress)
                 .then((): void => {
                     log("Successfully released an update containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
-
+                })
+                .finally((): void => {
                     if (file.isTemporary) {
                         fs.unlinkSync(filePath);
                     }
