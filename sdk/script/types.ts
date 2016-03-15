@@ -5,12 +5,4 @@ export interface CodePushError {
     statusCode?: number;
 }
 
-export interface PackageInfo {
-    appVersion?: string;
-    description?: string;
-    isMandatory?: boolean;
-    label?: string;
-    rollout?: number;
-}
-
 export type Headers = { [headerName: string]: string };
