@@ -669,7 +669,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
 
                 if (showPackage) {
                     row.push(getPackageString(deployment.package));
-                    row.push(getPackageMetricsString(<PackageWithMetrics>(deployment.package)));
+                    row.push(getPackageMetricsString(deployment.package));
                 }
 
                 dataSource.push(row);
@@ -705,12 +705,6 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, deployme
                     releaseTime += "\n" + chalk.magenta(`(${releaseSource})`).toString();
                 }
 
-                var rollout: string = (packageObject.rollout && packageObject.rollout !== 100) ? packageObject.rollout + "" : "";
-                if (rollout) {
-                    var rolloutString: string = `Rolled out to ${rollout}% of the users`;
-                    releaseTime += "\n" + chalk.magenta(`(${rolloutString})`).toString();
-                }
-
                 var row = [packageObject.label, releaseTime, packageObject.appVersion, packageObject.isMandatory ? "Yes" : "No"];
                 if (command.displayAuthor) {
                     var releasedBy: string = packageObject.releasedBy ? packageObject.releasedBy : "";
@@ -739,13 +733,15 @@ function getPackageString(packageObject: Package): string {
         chalk.green("Mandatory: ") + (packageObject.isMandatory ? "Yes" : "No") + "\n" +
         chalk.green("Release Time: ") + formatDate(packageObject.uploadTime) + "\n" +
         chalk.green("Released By: ") + (packageObject.releasedBy ? packageObject.releasedBy : "") +
-        (packageObject.rollout ? ("\n" + chalk.green("Rolled Out To: ") + chalk.magenta(packageObject.rollout + "%")) : "") +
         (packageObject.description ? wordwrap(70)("\n" + chalk.green("Description: ") + packageObject.description) : "");
 }
 
-function getPackageMetricsString(packageObject: PackageWithMetrics): string {
+function getPackageMetricsString(obj: Package): string {
+    var packageObject = <PackageWithMetrics>obj;
+    var rolloutString: string = (obj.rollout && obj.rollout !== 100) ? `\n${chalk.green(`Rollout:`)} ${obj.rollout.toLocaleString()}%` : "";
+
     if (!packageObject || !packageObject.metrics) {
-        return "" + chalk.magenta("No installs recorded");
+        return chalk.magenta("No installs recorded").toString() + (rolloutString ? rolloutString : "");
     }
 
     var activePercent: number = packageObject.metrics.totalActive
@@ -770,6 +766,10 @@ function getPackageMetricsString(packageObject: PackageWithMetrics): string {
 
     if (packageObject.metrics.failed) {
         returnString += "\n" + chalk.green("Rollbacks: ") + chalk.red(packageObject.metrics.failed.toLocaleString() + "");
+    }
+
+    if (rolloutString) {
+        returnString += rolloutString;
     }
 
     return returnString;
