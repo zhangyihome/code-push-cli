@@ -1212,7 +1212,7 @@ function isBinaryOrZip(path: string): boolean {
 }
 
 function getIsMandatoryValue(mandatory: any): boolean {
-    // Yargs treats a boolean argument with as an array of size 2 for null, third is the value of boolean.
+    // Yargs treats a boolean argument as an array of size 2 for null, third is the value of boolean.
     return mandatory.length > 2 ? mandatory[2] : null;
 }
 
@@ -1223,7 +1223,7 @@ function getRolloutValue(arg: any): number {
 
 function throwForInvalidRollout(rollout: string): void {
     if (rollout && !ROLLOUT_PERCENTAGE_REGEX.test(rollout)) {
-        throw new Error("Please specify rollout percentage as an integer number between 1 and 100 inclusive.");
+        throw new Error("Please specify rollout percentage as an integer between 1 and 100, inclusive.");
     }
 }
 
