@@ -120,10 +120,6 @@ export interface ILoginCommand extends ICommand {
     accessKey: string;
 }
 
-export interface ILogoutCommand extends ICommand {
-    isLocal: boolean;
-}
-
 export interface IPackageInfo extends ICommand {
     description: string;
     mandatory: boolean;
