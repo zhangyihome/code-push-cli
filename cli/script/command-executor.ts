@@ -739,7 +739,7 @@ function getPackageString(packageObject: Package): string {
         chalk.green("Mandatory: ") + (packageObject.isMandatory ? "Yes" : "No") + "\n" +
         chalk.green("Release Time: ") + formatDate(packageObject.uploadTime) + "\n" +
         chalk.green("Released By: ") + (packageObject.releasedBy ? packageObject.releasedBy : "") +
-        (packageObject.rollout ? ("\n" + chalk.green("Rolled Out To: ") + packageObject.rollout + "%") : "") +
+        (packageObject.rollout ? ("\n" + chalk.green("Rolled Out To: ") + chalk.magenta(packageObject.rollout + "%")) : "") +
         (packageObject.description ? wordwrap(70)("\n" + chalk.green("Description: ") + packageObject.description) : "");
 }
 
