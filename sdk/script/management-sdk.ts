@@ -251,15 +251,13 @@ class AccountManager {
         });
     }
 
-    public patchRelease(appName: string, deploymentName: string, label?: string, description?: string, rollout?: number, isMandatory?: boolean): Promise<void> {
-        var packageInfo: PackageInfo = this.generatePackageInfo(description, /*appVersion*/ null, isMandatory, label, rollout);
+    public patchRelease(appName: string, deploymentName: string, packageInfo: PackageInfo): Promise<void> {
         var requestBody: string = JSON.stringify({ packageInfo: packageInfo });
         return this.patch(urlEncode `/apps/${appName}/deployments/${deploymentName}/release`, requestBody, /*expectResponseBody=*/ false)
             .then(() => null);
     }
 
-    public promote(appName: string, sourceDeploymentName: string, destDeploymentName: string, description?: string, rollout?: number, isMandatory?: boolean): Promise<void> {
-        var packageInfo: PackageInfo = this.generatePackageInfo(description, /*appVersion*/ null, isMandatory, /*label*/ null, rollout);
+    public promote(appName: string, sourceDeploymentName: string, destDeploymentName: string, packageInfo: PackageInfo): Promise<void> {
         var requestBody: string = JSON.stringify({ packageInfo: packageInfo });
         return this.post(urlEncode `/apps/${appName}/deployments/${sourceDeploymentName}/promote/${destDeploymentName}`, requestBody, /*expectResponseBody=*/ false)
             .then(() => null);

@@ -23,7 +23,7 @@ import * as yazl from "yazl";
 import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
-import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, UpdateMetrics } from "code-push/script/types";
+import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, UpdateMetrics } from "code-push/script/types";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var emailValidator = require("email-validator");
@@ -869,8 +869,13 @@ function register(command: cli.IRegisterCommand): Promise<void> {
 function promote(command: cli.IPromoteCommand): Promise<void> {
     var rollout: number = getRolloutValue(command.rollout);
     var isMandatory: boolean = getIsMandatoryValue(command.mandatory);
+    var packageInfo: PackageInfo = {
+        description: command.description,
+        isMandatory: isMandatory,
+        rollout: rollout
+    };
 
-    return sdk.promote(command.appName, command.sourceDeploymentName, command.destDeploymentName, command.description, rollout, isMandatory)
+    return sdk.promote(command.appName, command.sourceDeploymentName, command.destDeploymentName, packageInfo)
         .then((): void => {
             log("Successfully promoted the \"" + command.sourceDeploymentName + "\" deployment of the \"" + command.appName + "\" app to the \"" + command.destDeploymentName + "\" deployment.");
         });
@@ -879,8 +884,14 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
 function patch(command: cli.IPatchCommand): Promise<void> {
     var rollout: number = getRolloutValue(command.rollout);
     var isMandatory: boolean = getIsMandatoryValue(command.mandatory);
+    var packageInfo: PackageInfo = {
+        label: command.label,
+        description: command.description,
+        isMandatory: isMandatory,
+        rollout: rollout
+    };
 
-    return sdk.patchRelease(command.appName, command.deploymentName, command.label, command.description, rollout, isMandatory)
+    return sdk.patchRelease(command.appName, command.deploymentName, packageInfo)
         .then((): void => {
             log(`Successfully updated the "${ command.label ? command.label : `latest` }" release of "${command.appName}" app's "${command.deploymentName}" deployment.`);
         });
