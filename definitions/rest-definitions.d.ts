@@ -38,7 +38,7 @@ declare module "rest-definitions" {
     }
 
     /*inout*/
-    interface PackageInfo {
+    export interface PackageInfo {
         appVersion?: string;
         description?: string;
         isMandatory?: boolean;
