@@ -206,9 +206,9 @@ class AccountManager {
             .then((res: JsonResponse) => res.body.history);
     }
 
-    public release(appName: string, deploymentName: string, fileOrPath: File | string, targetBinaryVersion: string, description?: string, rollout?: number, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
+    public release(appName: string, deploymentName: string, fileOrPath: File | string, targetBinaryVersion: string, updateMetadata: PackageInfo, uploadProgressCallback?: (progress: number) => void): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var packageInfo: PackageInfo = this.generatePackageInfo(description, targetBinaryVersion, isMandatory, /*label*/ null, rollout);
+            updateMetadata.appVersion = targetBinaryVersion;
             var request: superagent.Request<any> = superagent.post(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`);
             this.attachCredentials(request);
 
@@ -220,7 +220,7 @@ class AccountManager {
             }
 
             request.attach("package", file)
-                .field("packageInfo", JSON.stringify(packageInfo))
+                .field("packageInfo", JSON.stringify(updateMetadata))
                 .on("progress", (event: any) => {
                     if (uploadProgressCallback && event && event.total > 0) {
                         var currentProgress: number = event.loaded / event.total * 100;
@@ -251,15 +251,16 @@ class AccountManager {
         });
     }
 
-    public patchRelease(appName: string, deploymentName: string, packageInfo: PackageInfo): Promise<void> {
-        var requestBody: string = JSON.stringify({ packageInfo: packageInfo });
+    public patchRelease(appName: string, deploymentName: string, label: string, updateMetadata: PackageInfo): Promise<void> {
+        updateMetadata.label = label;
+        var requestBody: string = JSON.stringify({ packageInfo: updateMetadata });
         return this.patch(urlEncode `/apps/${appName}/deployments/${deploymentName}/release`, requestBody, /*expectResponseBody=*/ false)
             .then(() => null);
     }
 
-    public promote(appName: string, sourceDeploymentName: string, destDeploymentName: string, packageInfo: PackageInfo): Promise<void> {
-        var requestBody: string = JSON.stringify({ packageInfo: packageInfo });
-        return this.post(urlEncode `/apps/${appName}/deployments/${sourceDeploymentName}/promote/${destDeploymentName}`, requestBody, /*expectResponseBody=*/ false)
+    public promote(appName: string, sourceDeploymentName: string, destinationDeploymentName: string,  updateMetadata: PackageInfo): Promise<void> {
+        var requestBody: string = JSON.stringify({ packageInfo: updateMetadata });
+        return this.post(urlEncode `/apps/${appName}/deployments/${sourceDeploymentName}/promote/${destinationDeploymentName}`, requestBody, /*expectResponseBody=*/ false)
             .then(() => null);
     }
 
@@ -330,16 +331,6 @@ class AccountManager {
 
     private getErrorMessage(error: Error, response: superagent.Response): string {
         return response && response.text ? response.text : error.message;
-    }
-
-    private generatePackageInfo(description: string, appVersion: string, isMandatory: boolean, label: string, rollout: number): PackageInfo {
-        return {
-            appVersion: appVersion,
-            description: description,
-            isMandatory: isMandatory,
-            label: label,
-            rollout: rollout
-        };
     }
 
     private attachCredentials(request: superagent.Request<any>): void {

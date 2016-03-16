@@ -885,13 +885,12 @@ function patch(command: cli.IPatchCommand): Promise<void> {
     var rollout: number = getRolloutValue(command.rollout);
     var isMandatory: boolean = getIsMandatoryValue(command.mandatory);
     var packageInfo: PackageInfo = {
-        label: command.label,
         description: command.description,
         isMandatory: isMandatory,
         rollout: rollout
     };
 
-    return sdk.patchRelease(command.appName, command.deploymentName, packageInfo)
+    return sdk.patchRelease(command.appName, command.deploymentName, command.label, packageInfo)
         .then((): void => {
             log(`Successfully updated the "${ command.label ? command.label : `latest` }" release of "${command.appName}" app's "${command.deploymentName}" deployment.`);
         });
@@ -965,9 +964,15 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
     }
 
     var rollout: number = command.rollout ? parseInt(command.rollout) : null;
+    var updateMetadata: PackageInfo = {
+        description: command.description,
+        isMandatory: command.mandatory,
+        rollout: rollout
+    };
+
     return getPackageFilePromise
         .then((file: IPackageFile): Promise<void> => {
-            return sdk.release(command.appName, command.deploymentName, file.path, command.appStoreVersion, command.description, rollout, command.mandatory, uploadProgress)
+            return sdk.release(command.appName, command.deploymentName, file.path, command.appStoreVersion, updateMetadata, uploadProgress)
                 .then((): void => {
                     log("Successfully released an update containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
 
