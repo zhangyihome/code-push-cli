@@ -738,7 +738,7 @@ function getPackageString(packageObject: Package): string {
 
 function getPackageMetricsString(obj: Package): string {
     var packageObject = <PackageWithMetrics>obj;
-    var rolloutString: string = (obj.rollout && obj.rollout !== 100) ? `\n${chalk.green(`Rollout:`)} ${obj.rollout.toLocaleString()}%` : "";
+    var rolloutString: string = (obj && obj.rollout && obj.rollout !== 100) ? `\n${chalk.green(`Rollout:`)} ${obj.rollout.toLocaleString()}%` : "";
 
     if (!packageObject || !packageObject.metrics) {
         return chalk.magenta("No installs recorded").toString() + (rolloutString ? rolloutString : "");
