@@ -5,6 +5,7 @@ import * as updateNotifier from "update-notifier";
 import backslash = require("backslash");
 
 var packageJson = require("../package.json");
+const ROLLOUT_PERCENTAGE_REGEX: RegExp = /^(100|[1-9][0-9]|[1-9])$/;
 const USAGE_PREFIX = "Usage: code-push";
 
 // Command categories are:  access-key, app, release, deployment, deployment-key, login, logout, register
@@ -283,7 +284,8 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("label", { alias: "l", default: null, demand: false, description: "The label of the release to be updated, defaults to the latest release", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: null, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
-            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to. This field can only be increased from the previous value.", type: "string" });
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to. This field can only be increased from the previous value.", type: "number" })
+            .check((argv: any, aliases: { [aliases: string]: string }): any => { return validateRollout(argv); });
 
         addCommonConfiguration(yargs);
     })
@@ -294,7 +296,8 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .example("promote MyApp Staging Production --des \"Production rollout\" -r 25", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\" with the description rolled out to 25% of the users")
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: null, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
-            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to. This field can only be increased from the previous value.", type: "string" });
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to. This field can only be increased from the previous value.", type: "number" })
+            .check((argv: any, aliases: { [aliases: string]: string }): any => { return validateRollout(argv); });
 
         addCommonConfiguration(yargs);
     })
@@ -317,7 +320,8 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
-            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "string" });
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "number" })
+            .check((argv: any, aliases: { [aliases: string]: string }): any => { return validateRollout(argv); });
 
         addCommonConfiguration(yargs);
     })
@@ -359,7 +363,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         addCommonConfiguration(yargs);
     })
     .alias("v", "version")
-    .version(require("../package.json").version)
+    .version(packageJson.version)
     .wrap(/*columnLimit*/ null)
     .strict()  // Validate hyphenated (named) arguments.
     .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommandCategory)  // Report unrecognized, non-hyphenated command category.
@@ -685,6 +689,15 @@ function createCommand(): cli.ICommand {
 
         return cmd;
     }
+}
+
+function validateRollout(args: any): boolean {
+    var rollout: number = args["rollout"];
+    if (rollout && !ROLLOUT_PERCENTAGE_REGEX.test(rollout + "")) {
+        return false;
+    }
+
+    return true;
 }
 
 function getServerUrl(url: string): string {

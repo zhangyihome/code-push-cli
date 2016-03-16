@@ -120,19 +120,19 @@ export interface ILoginCommand extends ICommand {
     accessKey: string;
 }
 
-export interface IPackageInfo extends ICommand {
-    description: string;
-    mandatory: boolean;
-    rollout: string;
+export interface IPackageInfo {
+    description?: string;
+    mandatory?: boolean;
+    rollout?: number;
 }
 
-export interface IPatchCommand extends IPackageInfo {
+export interface IPatchCommand extends ICommand, IPackageInfo {
     appName: string;
     deploymentName: string;
     label: string;
 }
 
-export interface IPromoteCommand extends IPackageInfo {
+export interface IPromoteCommand extends ICommand, IPackageInfo {
     appName: string;
     sourceDeploymentName: string;
     destDeploymentName: string;
@@ -142,13 +142,10 @@ export interface IRegisterCommand extends ICommand {
     serverUrl?: string;
 }
 
-export interface IReleaseBaseCommand extends ICommand {
+export interface IReleaseBaseCommand extends ICommand, IPackageInfo {
     appName: string;
     appStoreVersion: string;
     deploymentName: string;
-    description: string;
-    mandatory: boolean;
-    rollout: string;
 }
 
 export interface IReleaseCommand extends IReleaseBaseCommand {

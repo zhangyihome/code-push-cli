@@ -37,7 +37,6 @@ const CLI_HEADERS: Headers = {
     "X-CodePush-CLI-Version": packageJson.version
 };
 const DOWNLOADED_METRICS_KEY: string = "Downloaded";
-const ROLLOUT_PERCENTAGE_REGEX: RegExp = /^(100|[1-9][0-9]|[1-9])$/;
 
 interface NameToCountMap {
     [name: string]: number;
@@ -738,10 +737,10 @@ function getPackageString(packageObject: Package): string {
 
 function getPackageMetricsString(obj: Package): string {
     var packageObject = <PackageWithMetrics>obj;
-    var rolloutString: string = (obj && obj.rollout && obj.rollout !== 100) ? `\n${chalk.green(`Rollout:`)} ${obj.rollout.toLocaleString()}%` : "";
+    var rolloutString: string = (obj && obj.rollout && obj.rollout !== 100) ? `\n${chalk.green("Rollout:")} ${obj.rollout.toLocaleString()}%` : "";
 
     if (!packageObject || !packageObject.metrics) {
-        return chalk.magenta("No installs recorded").toString() + (rolloutString ? rolloutString : "");
+        return chalk.magenta("No installs recorded").toString() + (rolloutString || "");
     }
 
     var activePercent: number = packageObject.metrics.totalActive
@@ -867,12 +866,11 @@ function register(command: cli.IRegisterCommand): Promise<void> {
 }
 
 function promote(command: cli.IPromoteCommand): Promise<void> {
-    var rollout: number = getRolloutValue(command.rollout);
     var isMandatory: boolean = getIsMandatoryValue(command.mandatory);
     var packageInfo: PackageInfo = {
         description: command.description,
         isMandatory: isMandatory,
-        rollout: rollout
+        rollout: command.rollout
     };
 
     return sdk.promote(command.appName, command.sourceDeploymentName, command.destDeploymentName, packageInfo)
@@ -882,12 +880,11 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
 }
 
 function patch(command: cli.IPatchCommand): Promise<void> {
-    var rollout: number = getRolloutValue(command.rollout);
     var isMandatory: boolean = getIsMandatoryValue(command.mandatory);
     var packageInfo: PackageInfo = {
         description: command.description,
         isMandatory: isMandatory,
-        rollout: rollout
+        rollout: command.rollout
     };
 
     return sdk.patchRelease(command.appName, command.deploymentName, command.label, packageInfo)
@@ -902,7 +899,6 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
     }
 
     throwForInvalidSemverRange(command.appStoreVersion);
-    throwForInvalidRollout(command.rollout);
     var filePath: string = command.package;
     var getPackageFilePromise: Promise<IPackageFile>;
     var isSingleFilePackage: boolean = true;
@@ -963,11 +959,10 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
         lastTotalProgress = currentProgress;
     }
 
-    var rollout: number = command.rollout ? parseInt(command.rollout) : null;
     var updateMetadata: PackageInfo = {
         description: command.description,
         isMandatory: command.mandatory,
-        rollout: rollout
+        rollout: command.rollout
     };
 
     return getPackageFilePromise
@@ -1220,18 +1215,6 @@ function getIsMandatoryValue(mandatory: any): boolean {
     // Yargs treats a boolean argument as an array of size 2 for null, third is the value of boolean.
     return mandatory.length > 2 ? mandatory[2] : null;
 }
-
-function getRolloutValue(arg: any): number {
-    throwForInvalidRollout(arg);
-    return arg ? parseInt(arg) : null;
-}
-
-function throwForInvalidRollout(rollout: string): void {
-    if (rollout && !ROLLOUT_PERCENTAGE_REGEX.test(rollout)) {
-        throw new Error("Please specify rollout percentage as an integer between 1 and 100, inclusive.");
-    }
-}
-
 
 function throwForInvalidEmail(email: string): void {
     if (!emailValidator.validate(email)) {
