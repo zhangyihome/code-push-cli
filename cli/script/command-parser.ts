@@ -281,10 +281,10 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
             .example("patch MyApp Production --des \"Updated description\" -r 50", "Update the description of latest release for \"MyApp\" app's \"Production\" deployment and update rollout value to 50")
             .example("patch MyApp Production -l v3 --des \"Updated description for v3\"", "Update the description of the release with label v3 for \"MyApp\" app's \"Production\" deployment")
-            .option("label", { alias: "l", default: null, demand: false, description: "The label of the release to be updated, defaults to the latest release", type: "string" })
+            .option("label", { alias: "l", default: null, demand: false, description: "The label of the release to be updated, which defaults to the latest release", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: null, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
-            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to. This field can only be increased from the previous value.", type: "number" })
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to. This value can only be increased from the previous value.", type: "number" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return validateRollout(argv); });
 
         addCommonConfiguration(yargs);
@@ -293,10 +293,10 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName> [--description <description>] [--mandatory] [--rollout <rolloutPercentage>]")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
             .example("promote MyApp Staging Production", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\"")
-            .example("promote MyApp Staging Production --des \"Production rollout\" -r 25", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\" with the description rolled out to 25% of the users")
+            .example("promote MyApp Staging Production --des \"Production rollout\" -r 25", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\" with the description, rolling out to 25% of the users")
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: null, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
-            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to. This field can only be increased from the previous value.", type: "number" })
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "number" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return validateRollout(argv); });
 
         addCommonConfiguration(yargs);
@@ -316,7 +316,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
             .example("release MyApp app.js \"*\"", "Release the \"app.js\" file to the \"MyApp\" app's \"Staging\" deployment, targeting any binary version using the \"*\" wildcard range syntax.")
             .example("release MyApp ./platforms/ios/www 1.0.3 -d Production", "Release the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting only the 1.0.3 binary version")
-            .example("release MyApp ./platforms/ios/www 1.0.3 -d Production -r 20", "Release the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting the 1.0.3 binary version and will be rolled out to about 20% of the users")
+            .example("release MyApp ./platforms/ios/www 1.0.3 -d Production -r 20", "Release the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting the 1.0.3 binary version and rolling out to about 20% of the users")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
