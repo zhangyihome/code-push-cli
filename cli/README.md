@@ -217,27 +217,23 @@ The install metrics have the following meaning:
 
 * **Rollbacks** - The number of times that this release has been automatically rolled back on the client. Ideally this number should be zero, and in that case, this metric isn't even shown. However, if you released an update that includes a crash as part of the installation process, the CodePush plugin will roll the end-user back to the previous release, and report that issue back to the server. This allows your end-users to remain unblocked in the event of broken releases, and by being able to see this telemetry in the CLI, you can identify erroneous releases and respond to them by [rolling it back](#rolling-back-undesired-updates) on the server.
 
-* **Rollout** - Indicates the percentage of users that are elligble to receive this update. This property will only be displayed for releases that have been tagged with a non-null rollout values, and can only ever be present on the latest release within each deployment.
+* **Rollout** - Indicates the percentage of users that are elligble to receive this update. This property will only be displayed for releases that have been tagged with a non-empty rollout value, and can only ever be present on the latest release within each deployment.
 
 When the metrics cell reports `No installs recorded`, that indicates that the server hasn't seen any activity for this release. This could either be because it precluded the plugin versions that included telemetry support, or no end-users have synchronized with the CodePush server yet. As soon as an install happens, you will begin to see metrics populate in the CLI for the release.
 
 ## Releasing Updates
 
-The CodePush CLI has three different commands for releasing updates:
+Once your app has been configured to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it. The CodePush CLI has three different commands for releasing updates, in order to accomodate different developer workflows, and keep the experience as simple yet flexible as possible:
 
-1. [General](#releasing-updates-general) - Which provides developers with the most control/flexibility, and simply handles the responsibility of uploading an update to the CodePush server.
+1. [General](#releasing-updates-general) - Simply uploads an update to the CodePush server, and therefore, provides the most flexibility in terms of how to generate the update in the first place (e.g. are you using a `gulp` task? running a custom shell script?).
 
 2. [React Native](#releasing-updates-react-native) - Performs the same functionality as the general release command, but also handles the work of generating the app update for you, instead of requiring you to run both `react-native bundle` and then `code-push release`.
 
-3. [Cordova](#releasing-updates-cordova) - Performs the same functionality as the general release command, but also handles the work of preparing the app udpate for you, instead of requiring you to run both `cordova prepare` and then `code-push release`.
+3. [Cordova](#releasing-updates-cordova) - Performs the same functionality as the general release command, but also handles the work of preparing the app update for you, instead of requiring you to run both `cordova prepare` and then `code-push release`.
 
-Whether you choose to use the platform-specific command that is relevant to your app is a matter of preference, but we recommend that developers use the platform-specific one to start, since it greatly simplifies the experience, and then use the general-purpose command as needed.
+Whether you choose to use the platform-specific command that is relevant to your app is mostly matter of preference, However, we recommend using the platform-specific one to start, since it greatly simplifies the experience, and then leverage the general-purpose command if/when greater control is needed.
 
 ### Releasing Updates (General)
-
-*NOTE: If your app is built using React Native, we have a different command that automates generating the update contents and inferring some of the parameters (e.g. `targetBinaryVersion`) from the project's metadata. Check out the section: [Releasing updates to a React Native app](#releasing-updates-to-a-react-native-app).*
-
-Once your app has been configured to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
 
 ```
 code-push release <appName> <updateContents> <targetBinaryVersion>
@@ -345,8 +341,6 @@ This specifies the percentage of users (as an integer between `1` and `100`) tha
 
 ### Releasing Updates (React Native)
 
-After configuring your React Native app to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
-
 ```shell
 code-push release-react <appName> <platform>
 [--bundleName <bundleName>]
@@ -408,8 +402,6 @@ This is the same parameter as the one described in the [above section](#target-b
 This is the same parameter as the one described in the [above section](#rollout-parameter). If left unspecified, the release will be made available to all users.
 
 ### Releasing Updates (Cordova)
-
-After configuring your Cordova app to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it using the following command:
 
 ```shell
 code-push release-cordova <appName> <platform>
