@@ -889,7 +889,7 @@ function patch(command: cli.IPatchCommand): Promise<void> {
 
     return sdk.patchRelease(command.appName, command.deploymentName, command.label, packageInfo)
         .then((): void => {
-            log(`Successfully updated the "${ command.label ? command.label : `latest` }" release of "${command.appName}" app's "${command.deploymentName}" deployment.`);
+            log(`Successfully updated the "${command.label ? command.label : `latest`}" release of "${command.appName}" app's "${command.deploymentName}" deployment.`);
         });
 }
 
@@ -995,8 +995,9 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
         throw new Error("Platform must be either \"ios\" or \"android\".");
     }
 
+    log(chalk.cyan("Running \"cordova prepare\" command:\n"));
     try {
-        var prepareProcess: any = spawnSync("cordova", ["prepare", platform]);
+        var prepareProcess: any = spawnSync("cordova", ["prepare", platform, "--verbose"], { stdio: [0, 1, 2] });
         if (prepareProcess.error) {
             throw prepareProcess.error;
         }
