@@ -6,7 +6,7 @@ import superagent = require("superagent");
 
 import Promise = Q.Promise;
 
-import { AccessKey, Account, App, CodePushError, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, UpdateMetrics } from "./types";
+import { AccessKey, Account, App, CodePushError, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, UpdateMetrics } from "./types";
 
 var packageJson = require("../package.json");
 
@@ -20,12 +20,6 @@ if (typeof window === "undefined") {
             throw new Error("Tried to call a node fs function from the browser.");
         }
     }
-}
-
-interface PackageToUpload {
-    description: string;
-    appVersion: string;
-    isMandatory: boolean;
 }
 
 interface JsonResponse {
@@ -212,9 +206,9 @@ class AccountManager {
             .then((res: JsonResponse) => res.body.history);
     }
 
-    public release(appName: string, deploymentName: string, fileOrPath: File | string, targetBinaryVersion: string, description?: string, isMandatory: boolean = false, uploadProgressCallback?: (progress: number) => void): Promise<void> {
+    public release(appName: string, deploymentName: string, fileOrPath: File | string, targetBinaryVersion: string, updateMetadata: PackageInfo, uploadProgressCallback?: (progress: number) => void): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
-            var packageInfo: PackageToUpload = this.generatePackageInfo(description, targetBinaryVersion, isMandatory);
+            updateMetadata.appVersion = targetBinaryVersion;
             var request: superagent.Request<any> = superagent.post(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`);
             this.attachCredentials(request);
 
@@ -226,7 +220,7 @@ class AccountManager {
             }
 
             request.attach("package", file)
-                .field("packageInfo", JSON.stringify(packageInfo))
+                .field("packageInfo", JSON.stringify(updateMetadata))
                 .on("progress", (event: any) => {
                     if (uploadProgressCallback && event && event.total > 0) {
                         var currentProgress: number = event.loaded / event.total * 100;
@@ -257,8 +251,16 @@ class AccountManager {
         });
     }
 
-    public promote(appName: string, sourceDeploymentName: string, destDeploymentName: string): Promise<void> {
-        return this.post(urlEncode `/apps/${appName}/deployments/${sourceDeploymentName}/promote/${destDeploymentName}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
+    public patchRelease(appName: string, deploymentName: string, label: string, updateMetadata: PackageInfo): Promise<void> {
+        updateMetadata.label = label;
+        var requestBody: string = JSON.stringify({ packageInfo: updateMetadata });
+        return this.patch(urlEncode `/apps/${appName}/deployments/${deploymentName}/release`, requestBody, /*expectResponseBody=*/ false)
+            .then(() => null);
+    }
+
+    public promote(appName: string, sourceDeploymentName: string, destinationDeploymentName: string,  updateMetadata: PackageInfo): Promise<void> {
+        var requestBody: string = JSON.stringify({ packageInfo: updateMetadata });
+        return this.post(urlEncode `/apps/${appName}/deployments/${sourceDeploymentName}/promote/${destinationDeploymentName}`, requestBody, /*expectResponseBody=*/ false)
             .then(() => null);
     }
 
@@ -329,14 +331,6 @@ class AccountManager {
 
     private getErrorMessage(error: Error, response: superagent.Response): string {
         return response && response.text ? response.text : error.message;
-    }
-
-    private generatePackageInfo(description: string, appVersion: string, isMandatory: boolean): PackageToUpload {
-        return {
-            description: description,
-            appVersion: appVersion,
-            isMandatory: isMandatory
-        };
     }
 
     private attachCredentials(request: superagent.Request<any>): void {

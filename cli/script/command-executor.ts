@@ -23,7 +23,7 @@ import * as yazl from "yazl";
 import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
-import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, UpdateMetrics } from "code-push/script/types";
+import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, UpdateMetrics } from "code-push/script/types";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var emailValidator = require("email-validator");
@@ -472,6 +472,9 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.logout:
                     return logout(command);
 
+                case cli.CommandType.patch:
+                    return patch(<cli.IPatchCommand>command);
+
                 case cli.CommandType.promote:
                     return promote(<cli.IPromoteCommand>command);
 
@@ -665,7 +668,7 @@ function printDeploymentList(command: cli.IDeploymentListCommand, deployments: D
 
                 if (showPackage) {
                     row.push(getPackageString(deployment.package));
-                    row.push(getPackageMetricsString(<PackageWithMetrics>(deployment.package)));
+                    row.push(getPackageMetricsString(deployment.package));
                 }
 
                 dataSource.push(row);
@@ -732,9 +735,12 @@ function getPackageString(packageObject: Package): string {
         (packageObject.description ? wordwrap(70)("\n" + chalk.green("Description: ") + packageObject.description) : "");
 }
 
-function getPackageMetricsString(packageObject: PackageWithMetrics): string {
+function getPackageMetricsString(obj: Package): string {
+    var packageObject = <PackageWithMetrics>obj;
+    var rolloutString: string = (obj && obj.rollout && obj.rollout !== 100) ? `\n${chalk.green("Rollout:")} ${obj.rollout.toLocaleString()}%` : "";
+
     if (!packageObject || !packageObject.metrics) {
-        return "" + chalk.magenta("No installs recorded");
+        return chalk.magenta("No installs recorded").toString() + (rolloutString || "");
     }
 
     var activePercent: number = packageObject.metrics.totalActive
@@ -759,6 +765,10 @@ function getPackageMetricsString(packageObject: PackageWithMetrics): string {
 
     if (packageObject.metrics.failed) {
         returnString += "\n" + chalk.green("Rollbacks: ") + chalk.red(packageObject.metrics.failed.toLocaleString() + "");
+    }
+
+    if (rolloutString) {
+        returnString += rolloutString;
     }
 
     return returnString;
@@ -856,9 +866,30 @@ function register(command: cli.IRegisterCommand): Promise<void> {
 }
 
 function promote(command: cli.IPromoteCommand): Promise<void> {
-    return sdk.promote(command.appName, command.sourceDeploymentName, command.destDeploymentName)
+    var isMandatory: boolean = getIsMandatoryValue(command.mandatory);
+    var packageInfo: PackageInfo = {
+        description: command.description,
+        isMandatory: isMandatory,
+        rollout: command.rollout
+    };
+
+    return sdk.promote(command.appName, command.sourceDeploymentName, command.destDeploymentName, packageInfo)
         .then((): void => {
             log("Successfully promoted the \"" + command.sourceDeploymentName + "\" deployment of the \"" + command.appName + "\" app to the \"" + command.destDeploymentName + "\" deployment.");
+        });
+}
+
+function patch(command: cli.IPatchCommand): Promise<void> {
+    var isMandatory: boolean = getIsMandatoryValue(command.mandatory);
+    var packageInfo: PackageInfo = {
+        description: command.description,
+        isMandatory: isMandatory,
+        rollout: command.rollout
+    };
+
+    return sdk.patchRelease(command.appName, command.deploymentName, command.label, packageInfo)
+        .then((): void => {
+            log(`Successfully updated the "${ command.label ? command.label : `latest` }" release of "${command.appName}" app's "${command.deploymentName}" deployment.`);
         });
 }
 
@@ -928,9 +959,15 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
         lastTotalProgress = currentProgress;
     };
 
+    var updateMetadata: PackageInfo = {
+        description: command.description,
+        isMandatory: command.mandatory,
+        rollout: command.rollout
+    };
+
     return getPackageFilePromise
         .then((file: IPackageFile): Promise<void> => {
-            return sdk.release(command.appName, command.deploymentName, file.path, command.appStoreVersion, command.description, command.mandatory, uploadProgress)
+            return sdk.release(command.appName, command.deploymentName, file.path, command.appStoreVersion, updateMetadata, uploadProgress)
                 .then((): void => {
                     log("Successfully released an update containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
                 })
@@ -1173,6 +1210,11 @@ function isBinaryOrZip(path: string): boolean {
     return path.search(/\.zip$/i) !== -1
         || path.search(/\.apk$/i) !== -1
         || path.search(/\.ipa$/i) !== -1;
+}
+
+function getIsMandatoryValue(mandatory: any): boolean {
+    // Yargs treats a boolean argument as an array of size 2 for null, third is the value of boolean.
+    return mandatory.length > 2 ? mandatory[2] : null;
 }
 
 function throwForInvalidEmail(email: string): void {

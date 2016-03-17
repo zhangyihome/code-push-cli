@@ -55,7 +55,7 @@ export class SdkStub {
     public clearDeploymentHistory(appId: string, deployment: string): Promise<void> {
         return Q(<void>null);
     }
-    
+
     public getAccessKeys(): Promise<codePush.AccessKey[]> {
         return Q([<codePush.AccessKey>{
             name: "8",
@@ -153,6 +153,14 @@ export class SdkStub {
         });
     }
 
+    public patchRelease(appName: string, deployment: string, label: string, updateMetaData: codePush.PackageInfo): Promise<void> {
+        return Q(<void>null);
+    }
+
+    public promote(appName: string, sourceDeployment: string, destinationDeployment: string, updateMetaData: codePush.PackageInfo): Promise<void> {
+        return Q(<void>null);
+    }
+
     public release(appId: string, deploymentId: string): Promise<string> {
         return Q("Successfully released");
     }
@@ -174,6 +182,10 @@ export class SdkStub {
     }
 
     public renameApp(app: codePush.App): Promise<void> {
+        return Q(<void>null);
+    }
+
+    public rollback(appName: string, deployment: string, targetRelease: string): Promise<void> {
         return Q(<void>null);
     }
 
@@ -729,6 +741,96 @@ describe("CLI", () => {
             });
     });
 
+    it("patch command successfully updates specific label", (done: MochaDone): void => {
+        var command: cli.IPatchCommand = {
+            type: cli.CommandType.patch,
+            appName: "a",
+            deploymentName: "Staging",
+            label: "v1",
+            description: "Patched",
+            mandatory: true,
+            rollout: 25
+        };
+
+        var patch: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(patch);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, `Successfully updated the "v1" release of "a" app's "Staging" deployment.`);
+
+                done();
+            });
+    });
+
+
+    it("patch command successfully updates latest release", (done: MochaDone): void => {
+        var command: cli.IPatchCommand = {
+            type: cli.CommandType.patch,
+            appName: "a",
+            deploymentName: "Staging",
+            label: null,
+            description: "Patched",
+            mandatory: true,
+            rollout: 25
+        };
+
+        var patch: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(patch);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, `Successfully updated the "latest" release of "a" app's "Staging" deployment.`);
+
+                done();
+            });
+    });
+
+    it("promote works successfully", (done: MochaDone): void => {
+        var command: cli.IPromoteCommand = {
+            type: cli.CommandType.promote,
+            appName: "a",
+            sourceDeploymentName: "Staging",
+            destDeploymentName: "Production",
+            description: "Promoted",
+            mandatory: true,
+            rollout: 25
+        };
+
+        var promote: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "promote");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(promote);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, `Successfully promoted the "Staging" deployment of the "a" app to the "Production" deployment.`);
+
+                done();
+            });
+    });
+
+    it("rollback works successfully", (done: MochaDone): void => {
+        var command: cli.IRollbackCommand = {
+            type: cli.CommandType.rollback,
+            appName: "a",
+            deploymentName: "Staging",
+            targetRelease: "v2"
+        };
+
+        var rollback: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "rollback");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(rollback);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, `Successfully performed a rollback on the "Staging" deployment of the "a" app.`);
+
+                done();
+            });
+    });
+
     it("release doesn't allow non valid semver ranges", (done: MochaDone): void => {
         var command: cli.IReleaseCommand = {
             type: cli.CommandType.release,
@@ -736,6 +838,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "test releasing zip file",
             mandatory: false,
+            rollout: null,
             appStoreVersion: "not semver",
             package: "./resources"
         };
@@ -750,6 +853,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "test releasing zip file",
             mandatory: false,
+            rollout: null,
             appStoreVersion: "1.0.0",
             package: "/fake/path/test/file.zip"
         };
@@ -764,6 +868,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "test releasing ipa file",
             mandatory: false,
+            rollout: null,
             appStoreVersion: "1.0.0",
             package: "/fake/path/test/file.ipa"
         };
@@ -778,6 +883,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "test releasing apk file",
             mandatory: false,
+            rollout: null,
             appStoreVersion: "1.0.0",
             package: "/fake/path/test/file.apk"
         };
@@ -793,6 +899,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test invalid project",
             mandatory: false,
+            rollout: null,
             platform: "ios"
         };
 
@@ -822,6 +929,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test missing config.xml",
             mandatory: false,
+            rollout: null,
             platform: "ios"
         };
 
@@ -851,6 +959,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test invalid platform",
             mandatory: false,
+            rollout: null,
             platform: "blackberry",
         };
 
@@ -879,9 +988,10 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test config.xml app version read",
             mandatory: false,
+            rollout: null,
             platform: "ios"
         };
- 
+
         var oldWd: string = process.cwd();
         ensureInTestAppDirectory();
 
@@ -892,6 +1002,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test config.xml app version read",
             mandatory: false,
+            rollout: null,
             package: path.join(process.cwd(), "platforms", "ios", "www"),
             platform: "ios"
         }
@@ -913,7 +1024,7 @@ describe("CLI", () => {
                 process.chdir(oldWd);
             });
     });
-    
+
     it("release-cordova points 'package' to the built folder for android", (done: MochaDone): void => {
         var command: cli.IReleaseCordovaCommand = {
             type: cli.CommandType.releaseCordova,
@@ -922,9 +1033,10 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test android package resolution",
             mandatory: false,
+            rollout: null,
             platform: "android"
         };
- 
+
         var oldWd: string = process.cwd();
         ensureInTestAppDirectory();
 
@@ -935,6 +1047,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test android package resolution",
             mandatory: false,
+            rollout: null,
             package: path.join(process.cwd(), "platforms", "android", "assets", "www"),
             platform: "android"
         }
@@ -965,6 +1078,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test invalid folder",
             mandatory: false,
+            rollout: null,
             platform: "ios"
         };
 
@@ -994,6 +1108,7 @@ describe("CLI", () => {
             description: "Test invalid entryFile",
             entryFile: "doesntexist.js",
             mandatory: false,
+            rollout: null,
             platform: "ios"
         };
 
@@ -1024,6 +1139,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test invalid platform",
             mandatory: false,
+            rollout: null,
             platform: "blackberry",
         };
 
@@ -1056,6 +1172,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test uses targetBinaryRange",
             mandatory: false,
+            rollout: null,
             platform: "android",
             sourcemapOutput: "index.android.js.map"
         };
@@ -1089,6 +1206,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test default entry file",
             mandatory: false,
+            rollout: null,
             platform: "ios"
         };
 
@@ -1124,6 +1242,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test default entry file",
             mandatory: false,
+            rollout: null,
             platform: "ios"
         };
 
@@ -1159,6 +1278,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test default entry file",
             mandatory: false,
+            rollout: null,
             platform: "android"
         };
 
@@ -1197,6 +1317,7 @@ describe("CLI", () => {
             development: true,
             description: "Test generates dev bundle",
             mandatory: false,
+            rollout: null,
             platform: "android",
             sourcemapOutput: "index.android.js.map"
         };
@@ -1235,6 +1356,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test generates sourcemaps",
             mandatory: false,
+            rollout: null,
             platform: "android",
             sourcemapOutput: "index.android.js.map"
         };
@@ -1273,6 +1395,7 @@ describe("CLI", () => {
             deploymentName: "Staging",
             description: "Test uses targetBinaryRange",
             mandatory: false,
+            rollout: null,
             platform: "android",
             sourcemapOutput: "index.android.js.map"
         };

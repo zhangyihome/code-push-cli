@@ -5,6 +5,7 @@ import * as updateNotifier from "update-notifier";
 import backslash = require("backslash");
 
 var packageJson = require("../package.json");
+const ROLLOUT_PERCENTAGE_REGEX: RegExp = /^(100|[1-9][0-9]|[1-9])$/;
 const USAGE_PREFIX = "Usage: code-push";
 
 // Command categories are:  access-key, app, release, deployment, deployment-key, login, logout, register
@@ -275,10 +276,28 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .example("logout", "Log out and end your session");
         addCommonConfiguration(yargs);
     })
+    .command("patch", "Update the metadata for an existing release", (yargs: yargs.Argv) => {
+        yargs.usage(USAGE_PREFIX + " patch <appName> <deploymentName> [--label <label>] [--description <description>] [--mandatory] [--rollout <rolloutPercentage>]")
+            .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
+            .example("patch MyApp Production --des \"Updated description\" -r 50", "Update the description of latest release for \"MyApp\" app's \"Production\" deployment and update rollout value to 50")
+            .example("patch MyApp Production -l v3 --des \"Updated description for v3\"", "Update the description of the release with label v3 for \"MyApp\" app's \"Production\" deployment")
+            .option("label", { alias: "l", default: null, demand: false, description: "The label of the release to be updated, which defaults to the latest release", type: "string" })
+            .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
+            .option("mandatory", { alias: "m", default: null, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to. This value can only be increased from the previous value.", type: "number" })
+            .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
+
+        addCommonConfiguration(yargs);
+    })
     .command("promote", "Promote the package from one deployment of your app to another", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName>")
+        yargs.usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName> [--description <description>] [--mandatory] [--rollout <rolloutPercentage>]")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
-            .example("promote MyApp Staging Production", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\"");
+            .example("promote MyApp Staging Production", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\"")
+            .example("promote MyApp Staging Production --des \"Production rollout\" -r 25", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\" with the description, rolling out to 25% of the users")
+            .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
+            .option("mandatory", { alias: "m", default: null, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "number" })
+            .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
 
         addCommonConfiguration(yargs);
     })
@@ -293,30 +312,35 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         addCommonConfiguration(yargs);
     })
     .command("release", "Release a new version of your app to a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " release <appName> <updateContentsPath> <targetBinaryVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory]")
+        yargs.usage(USAGE_PREFIX + " release <appName> <updateContentsPath> <targetBinaryVersion> [--deploymentName <deploymentName>] [--description <description>] [--mandatory] [--rollout <rolloutPercentage>]")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
             .example("release MyApp app.js \"*\"", "Release the \"app.js\" file to the \"MyApp\" app's \"Staging\" deployment, targeting any binary version using the \"*\" wildcard range syntax.")
             .example("release MyApp ./platforms/ios/www 1.0.3 -d Production", "Release the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting only the 1.0.3 binary version")
+            .example("release MyApp ./platforms/ios/www 1.0.3 -d Production -r 20", "Release the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting the 1.0.3 binary version and rolling out to about 20% of the users")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
-            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" });
+            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "number" })
+            .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
 
         addCommonConfiguration(yargs);
     })
     .command("release-cordova", "Release a new version of your Cordova app to a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " release-cordova <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--mandatory] [--targetBinaryVersion <targetBinaryVersion>]")
+        yargs.usage(USAGE_PREFIX + " release-cordova <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--mandatory] [--rollout <rolloutPercentage>] [--targetBinaryVersion <targetBinaryVersion>]")
             .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
             .example("release-cordova MyApp ios", "Release the Cordova iOS project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
             .example("release-cordova MyApp android -d Production", "Release the Cordova Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
-            .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "The semver range expression spanning all the binary app store versions that should get this update. If omitted, the update will default to target only the same version as the current binary version specified in config.xml", type: "string" });
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "number" })
+            .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "The semver range expression spanning all the binary app store versions that should get this update. If omitted, the update will default to target only the same version as the current binary version specified in config.xml", type: "string" })
+            .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
 
         addCommonConfiguration(yargs);
     })
     .command("release-react", "Release a new version of your React Native app to a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " release-react <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--entryFile <entryFile>] [--mandatory] [--sourcemapOutput <sourcemapOutput>] [--targetBinaryVersion <targetBinaryVersion>]")
+        yargs.usage(USAGE_PREFIX + " release-react <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--entryFile <entryFile>] [--mandatory] [--rollout <rolloutPercentage>] [--sourcemapOutput <sourcemapOutput>] [--targetBinaryVersion <targetBinaryVersion>]")
             .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
             .example("release-react MyApp ios", "Release the React Native iOS project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
             .example("release-react MyApp android -d Production", "Release the React Native Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
@@ -326,8 +350,10 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("development", { alias: "dev", default: false, demand: false, description: "Whether to generate a unminified, development JS bundle.", type: "boolean" })
             .option("entryFile", { alias: "e", default: null, demand: false, description: "The path to the root JS file. If unspecified, \"index.<platform>.js\" and then \"index.js\" will be tried and used if they exist.", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "number" })
             .option("sourcemapOutput", { alias: "s", default: null, demand: false, description: "The path to where the sourcemap for the resulting bundle should be stored. If unspecified, sourcemaps will not be generated.", type: "string" })
-            .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "The semver range expression spanning all the binary app store versions that should get this update. If omitted, the update will default to target only the same version as the current binary version specified in \"Info.plist\" (iOS) or \"build.gradle\" (Android)", type: "string" });
+            .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "The semver range expression spanning all the binary app store versions that should get this update. If omitted, the update will default to target only the same version as the current binary version specified in \"Info.plist\" (iOS) or \"build.gradle\" (Android)", type: "string" })
+            .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
 
         addCommonConfiguration(yargs);
     })
@@ -341,7 +367,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         addCommonConfiguration(yargs);
     })
     .alias("v", "version")
-    .version(require("../package.json").version)
+    .version(packageJson.version)
     .wrap(/*columnLimit*/ null)
     .strict()  // Validate hyphenated (named) arguments.
     .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommandCategory)  // Report unrecognized, non-hyphenated command category.
@@ -560,6 +586,21 @@ function createCommand(): cli.ICommand {
                 cmd = { type: cli.CommandType.logout };
                 break;
 
+            case "patch":
+                if (arg1 && arg2) {
+                    cmd = { type: cli.CommandType.patch };
+
+                    var patchCommand = <cli.IPatchCommand>cmd;
+
+                    patchCommand.appName = arg1;
+                    patchCommand.deploymentName = arg2;
+                    patchCommand.label = argv["label"];
+                    patchCommand.description = argv["description"] ? backslash(argv["description"]) : "";
+                    patchCommand.mandatory = argv["mandatory"];
+                    patchCommand.rollout = argv["rollout"];
+                }
+                break;
+
             case "promote":
                 if (arg1 && arg2 && arg3) {
                     cmd = { type: cli.CommandType.promote };
@@ -569,6 +610,9 @@ function createCommand(): cli.ICommand {
                     deploymentPromoteCommand.appName = arg1;
                     deploymentPromoteCommand.sourceDeploymentName = arg2;
                     deploymentPromoteCommand.destDeploymentName = arg3;
+                    deploymentPromoteCommand.description = argv["description"] ? backslash(argv["description"]) : "";
+                    deploymentPromoteCommand.mandatory = argv["mandatory"];
+                    deploymentPromoteCommand.rollout = argv["rollout"];
                 }
                 break;
 
@@ -593,6 +637,7 @@ function createCommand(): cli.ICommand {
                     releaseCommand.deploymentName = argv["deploymentName"];
                     releaseCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseCommand.mandatory = argv["mandatory"];
+                    releaseCommand.rollout = argv["rollout"];
                 }
                 break;
                 
@@ -608,6 +653,7 @@ function createCommand(): cli.ICommand {
                     releaseCordovaCommand.deploymentName = argv["deploymentName"];
                     releaseCordovaCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseCordovaCommand.mandatory = argv["mandatory"];
+                    releaseCordovaCommand.rollout = argv["rollout"];
                     releaseCordovaCommand.appStoreVersion = argv["targetBinaryVersion"];
                 }
                 break;
@@ -627,6 +673,7 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.development = argv["development"];
                     releaseReactCommand.entryFile = argv["entryFile"];
                     releaseReactCommand.mandatory = argv["mandatory"];
+                    releaseReactCommand.rollout = argv["rollout"];
                     releaseReactCommand.sourcemapOutput = argv["sourcemapOutput"];
                     releaseReactCommand.appStoreVersion = argv["targetBinaryVersion"];
                 }
@@ -647,6 +694,15 @@ function createCommand(): cli.ICommand {
 
         return cmd;
     }
+}
+
+function isValidRollout(args: any): boolean {
+    var rollout: number = args["rollout"];
+    if (rollout && !ROLLOUT_PERCENTAGE_REGEX.test(rollout + "")) {
+        return false;
+    }
+
+    return true;
 }
 
 function getServerUrl(url: string): string {

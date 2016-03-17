@@ -90,7 +90,8 @@ export class AcquisitionManager {
             appVersion: currentPackage.appVersion,
             packageHash: currentPackage.packageHash,
             isCompanion: this._ignoreAppVersion,
-            label: currentPackage.label
+            label: currentPackage.label,
+            clientUniqueId: this._clientUniqueId
         };
 
         var requestUrl: string = this._serverUrl + "updateCheck?" + queryStringify(updateRequest);

@@ -38,10 +38,11 @@ declare module "rest-definitions" {
     }
 
     /*inout*/
-    interface PackageInfo {
+    export interface PackageInfo {
         appVersion?: string;
         description?: string;
         isMandatory?: boolean;
+        rollout?: number;
         /*generated*/ label?: string;
         /*generated*/ packageHash?: string;
     }
@@ -57,6 +58,7 @@ declare module "rest-definitions" {
     /*in*/
     export interface UpdateCheckRequest {
         appVersion: string;
+        clientUniqueId?: string;
         deploymentKey: string;
         isCompanion?: boolean;
         label?: string;
