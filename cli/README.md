@@ -335,7 +335,7 @@ This specifies the percentage of users (as an integer between `1` and `100`) tha
 
 2. If you rollback a deployment whose latest release is an "active" rollout, the rollout value will be cleared, effectively "deactivating" the rollout behavior
 
-3. Unlike the `mandatory` and `description` fields, when you promote a release from one deployment to another, it will not propogate the `rollout` property, and therefore, if you want to new release, in the target deployment, to have a rollout value, you need to explicitly set it when you call the `promote` command.
+3. Unlike the `mandatory` and `description` fields, when you promote a release from one deployment to another, it will not propagate the `rollout` property, and therefore, if you want to do a new release, in the target deployment, to have a rollout value, you need to explicitly set it when you call the `promote` command.
 
 *NOTE: This parameter can be set using either `--rollout` or `-r`* 
 
@@ -451,11 +451,12 @@ After releasing an update, there may be scenarios where you need to modify one o
 code-push patch <appName> <deploymentName>
 [--label <releaseLabel>]
 [--mandatory <isMandatory>]
-[--description <descriptio>]
+[--description <description>]
 [--rollout <rolloutPercentage>]
 ```
 
-Aside from the `appName` and `deploymentName`, all parameters all optional, and therefore, you can use this command to update just a single attribute or all of them at once. Calling the `patch` command without specifying any attribute flag will result in a no-op.
+Aside from the `appName` and `deploymentName`, all parameters are optional, and therefore, you can use this command to update just a single attribute or all of them at once. Calling the `patch` command without specifying any attribute flag will result in a no-op.
+
 #### Label Parameter
 
 Indicates which release (e.g. `v23`) you want to update within the specified deployment. If ommitted, the requested changes will be applied to the latest release in the specified deployment.
