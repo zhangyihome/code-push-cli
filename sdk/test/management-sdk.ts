@@ -376,10 +376,10 @@ function rejectHandler(val: any): void {
 }
 
 // Wrapper for superagent-mock that abstracts away information not needed for SDK tests
-function mockReturn(bodyText: string, statusCode: number, header = {}) {
+function mockReturn(bodyText: string, statusCode: number, header = {}): void {
     require("superagent-mock")(request, [{
         pattern: "http://localhost/(\\w+)/?",
-        fixtures: function(match: any, params: any) {
+        fixtures: function(match: any, params: any): any {
             var isOk = statusCode >= 200 && statusCode < 300;
             if (!isOk) {
                 var err: any = new Error(bodyText);
@@ -388,6 +388,6 @@ function mockReturn(bodyText: string, statusCode: number, header = {}) {
             }
             return { text: bodyText, status: statusCode, ok: isOk, header: header, headers: {} };
         },
-        callback: function(match: any, data: any) { return data; }
+        callback: function(match: any, data: any): any { return data; }
     }]);
 }
