@@ -706,7 +706,7 @@ function isValidRollout(args: any): boolean {
 }
 
 function getRolloutValue(input: string): number {
-    return parseInt(input.replace("%", ""));
+    return input ? parseInt(input.replace("%", "")) : null;
 }
 
 function getServerUrl(url: string): string {
