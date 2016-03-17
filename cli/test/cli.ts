@@ -198,7 +198,7 @@ export class SdkStub {
     }
 }
 
-describe.only("CLI", () => {
+describe("CLI", () => {
     var log: Sinon.SinonStub;
     var sandbox: Sinon.SinonSandbox;
     var spawn: Sinon.SinonStub;
