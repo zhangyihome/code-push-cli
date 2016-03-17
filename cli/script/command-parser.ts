@@ -326,19 +326,21 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         addCommonConfiguration(yargs);
     })
     .command("release-cordova", "Release a new version of your Cordova app to a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " release-cordova <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--mandatory] [--targetBinaryVersion <targetBinaryVersion>]")
+        yargs.usage(USAGE_PREFIX + " release-cordova <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--mandatory] [--rollout <rolloutPercentage>] [--targetBinaryVersion <targetBinaryVersion>]")
             .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
             .example("release-cordova MyApp ios", "Release the Cordova iOS project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
             .example("release-cordova MyApp android -d Production", "Release the Cordova Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
-            .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "The semver range expression spanning all the binary app store versions that should get this update. If omitted, the update will default to target only the same version as the current binary version specified in config.xml", type: "string" });
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "number" })
+            .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "The semver range expression spanning all the binary app store versions that should get this update. If omitted, the update will default to target only the same version as the current binary version specified in config.xml", type: "string" })
+            .check((argv: any, aliases: { [aliases: string]: string }): any => { return validateRollout(argv); });
 
         addCommonConfiguration(yargs);
     })
     .command("release-react", "Release a new version of your React Native app to a specific deployment", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " release-react <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--entryFile <entryFile>] [--mandatory] [--sourcemapOutput <sourcemapOutput>] [--targetBinaryVersion <targetBinaryVersion>]")
+        yargs.usage(USAGE_PREFIX + " release-react <appName> <platform> [--deploymentName <deploymentName>] [--description <description>] [--entryFile <entryFile>] [--mandatory] [--rollout <rolloutPercentage>] [--sourcemapOutput <sourcemapOutput>] [--targetBinaryVersion <targetBinaryVersion>]")
             .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
             .example("release-react MyApp ios", "Release the React Native iOS project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
             .example("release-react MyApp android -d Production", "Release the React Native Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
@@ -348,8 +350,10 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("development", { alias: "dev", default: false, demand: false, description: "Whether to generate a unminified, development JS bundle.", type: "boolean" })
             .option("entryFile", { alias: "e", default: null, demand: false, description: "The path to the root JS file. If unspecified, \"index.<platform>.js\" and then \"index.js\" will be tried and used if they exist.", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "number" })
             .option("sourcemapOutput", { alias: "s", default: null, demand: false, description: "The path to where the sourcemap for the resulting bundle should be stored. If unspecified, sourcemaps will not be generated.", type: "string" })
-            .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "The semver range expression spanning all the binary app store versions that should get this update. If omitted, the update will default to target only the same version as the current binary version specified in \"Info.plist\" (iOS) or \"build.gradle\" (Android)", type: "string" });
+            .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "The semver range expression spanning all the binary app store versions that should get this update. If omitted, the update will default to target only the same version as the current binary version specified in \"Info.plist\" (iOS) or \"build.gradle\" (Android)", type: "string" })
+            .check((argv: any, aliases: { [aliases: string]: string }): any => { return validateRollout(argv); });
 
         addCommonConfiguration(yargs);
     })
@@ -649,6 +653,7 @@ function createCommand(): cli.ICommand {
                     releaseCordovaCommand.deploymentName = argv["deploymentName"];
                     releaseCordovaCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseCordovaCommand.mandatory = argv["mandatory"];
+                    releaseCordovaCommand.rollout = argv["rollout"];
                     releaseCordovaCommand.appStoreVersion = argv["targetBinaryVersion"];
                 }
                 break;
