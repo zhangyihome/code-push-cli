@@ -5,7 +5,7 @@ import * as updateNotifier from "update-notifier";
 import backslash = require("backslash");
 
 var packageJson = require("../package.json");
-const ROLLOUT_PERCENTAGE_REGEX: RegExp = /^(100|[1-9][0-9]|[1-9])$/;
+const ROLLOUT_PERCENTAGE_REGEX: RegExp = /^(100|[1-9][0-9]|[1-9])%?$/;
 const USAGE_PREFIX = "Usage: code-push";
 
 // Command categories are:  access-key, app, release, deployment, deployment-key, login, logout, register
@@ -284,7 +284,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("label", { alias: "l", default: null, demand: false, description: "The label of the release to be updated, which defaults to the latest release", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: null, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
-            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to. This value can only be increased from the previous value.", type: "number" })
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to. This value can only be increased from the previous value.", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
 
         addCommonConfiguration(yargs);
@@ -296,7 +296,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .example("promote MyApp Staging Production --des \"Production rollout\" -r 25", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\" with the description, rolling out to 25% of the users")
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: null, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
-            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "number" })
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
 
         addCommonConfiguration(yargs);
@@ -320,7 +320,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
-            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "number" })
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
 
         addCommonConfiguration(yargs);
@@ -333,7 +333,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
-            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "number" })
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "string" })
             .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "The semver range expression spanning all the binary app store versions that should get this update. If omitted, the update will default to target only the same version as the current binary version specified in config.xml", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
 
@@ -350,7 +350,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("development", { alias: "dev", default: false, demand: false, description: "Whether to generate a unminified, development JS bundle.", type: "boolean" })
             .option("entryFile", { alias: "e", default: null, demand: false, description: "The path to the root JS file. If unspecified, \"index.<platform>.js\" and then \"index.js\" will be tried and used if they exist.", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
-            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "number" })
+            .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "string" })
             .option("sourcemapOutput", { alias: "s", default: null, demand: false, description: "The path to where the sourcemap for the resulting bundle should be stored. If unspecified, sourcemaps will not be generated.", type: "string" })
             .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "The semver range expression spanning all the binary app store versions that should get this update. If omitted, the update will default to target only the same version as the current binary version specified in \"Info.plist\" (iOS) or \"build.gradle\" (Android)", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
@@ -597,7 +597,7 @@ function createCommand(): cli.ICommand {
                     patchCommand.label = argv["label"];
                     patchCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     patchCommand.mandatory = argv["mandatory"];
-                    patchCommand.rollout = argv["rollout"];
+                    patchCommand.rollout = getRolloutValue(argv["rollout"]);
                 }
                 break;
 
@@ -612,7 +612,7 @@ function createCommand(): cli.ICommand {
                     deploymentPromoteCommand.destDeploymentName = arg3;
                     deploymentPromoteCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     deploymentPromoteCommand.mandatory = argv["mandatory"];
-                    deploymentPromoteCommand.rollout = argv["rollout"];
+                    deploymentPromoteCommand.rollout = getRolloutValue(argv["rollout"]);
                 }
                 break;
 
@@ -637,7 +637,7 @@ function createCommand(): cli.ICommand {
                     releaseCommand.deploymentName = argv["deploymentName"];
                     releaseCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseCommand.mandatory = argv["mandatory"];
-                    releaseCommand.rollout = argv["rollout"];
+                    releaseCommand.rollout = getRolloutValue(argv["rollout"]);
                 }
                 break;
                 
@@ -653,7 +653,7 @@ function createCommand(): cli.ICommand {
                     releaseCordovaCommand.deploymentName = argv["deploymentName"];
                     releaseCordovaCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseCordovaCommand.mandatory = argv["mandatory"];
-                    releaseCordovaCommand.rollout = argv["rollout"];
+                    releaseCordovaCommand.rollout = getRolloutValue(argv["rollout"]);
                     releaseCordovaCommand.appStoreVersion = argv["targetBinaryVersion"];
                 }
                 break;
@@ -673,7 +673,7 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.development = argv["development"];
                     releaseReactCommand.entryFile = argv["entryFile"];
                     releaseReactCommand.mandatory = argv["mandatory"];
-                    releaseReactCommand.rollout = argv["rollout"];
+                    releaseReactCommand.rollout = getRolloutValue(argv["rollout"]);
                     releaseReactCommand.sourcemapOutput = argv["sourcemapOutput"];
                     releaseReactCommand.appStoreVersion = argv["targetBinaryVersion"];
                 }
@@ -697,12 +697,16 @@ function createCommand(): cli.ICommand {
 }
 
 function isValidRollout(args: any): boolean {
-    var rollout: number = args["rollout"];
-    if (rollout && !ROLLOUT_PERCENTAGE_REGEX.test(rollout + "")) {
+    var rollout: string = args["rollout"];
+    if (rollout && !ROLLOUT_PERCENTAGE_REGEX.test(rollout)) {
         return false;
     }
 
     return true;
+}
+
+function getRolloutValue(input: string): number {
+    return parseInt(input.replace("%", ""));
 }
 
 function getServerUrl(url: string): string {
