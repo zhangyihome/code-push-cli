@@ -67,9 +67,11 @@ The `code-push` module exports a single class (typically referred to as `CodePus
 
 - __getDeployments(appName: string): Promose&lt;Deployment[]&gt;__ - Retrieves the list of deployments associated with the specified app.
 
-- __promote(appName: string, sourceDeploymentName: string, destDeploymentName: string): Promise&lt;void&gt;__ - Promotes the latest release from one deployment to another for the specified app.
+- __patchRelease(appName: string, deploymentName: string, label: string, updateMetadata: PackageInfo): Promise&lt;void&gt;__ - Updates the specified release's metadata with the given information.
 
-- __release(appName: string, deploymentName: string, updateContentsPath: string, targetBinaryVersion: string, description?: string, isMandatory: boolean = false): Promise&lt;void&gt;__ - Releases a new update to the specified deployment.
+- __promote(appName: string, sourceDeploymentName: string, destinationDeploymentName: string, updateMetadata: PackageInfo): Promise&lt;void&gt;__ - Promotes the latest release from one deployment to another for the specified app and updates the release with the given metadata.
+
+- __release(appName: string, deploymentName: string, updateContentsPath: string, targetBinaryVersion: string, updateMetadata: PackageInfo): Promise&lt;void&gt;__ - Releases a new update to the specified deployment with the given metadata.
 
 - __removeAccessKey(accessKey: string): Promise&lt;void&gt;__ - Removes the specified access key from your CodePush account.
 
