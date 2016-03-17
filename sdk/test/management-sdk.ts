@@ -286,12 +286,12 @@ describe("Management SDK", () => {
     });
 
     it("getCollaborators handles success response with multiple collaborators", (done: MochaDone) => {
-        var mockCollaboratorMap: any = {
-            "email1": { permission: "Owner", isCurrentAccount: true },
-            "email2": { permission: "Collaborator", isCurrentAccount: false }
-        };
-
-        mockReturn(JSON.stringify({ collaborators: mockCollaboratorMap }), 200);
+        mockReturn(JSON.stringify({
+            collaborators: {
+                "email1": { permission: "Owner", isCurrentAccount: true },
+                "email2": { permission: "Collaborator", isCurrentAccount: false }
+            }
+        }), 200);
 
         manager.getCollaborators("appName")
             .done((obj: any) => {
