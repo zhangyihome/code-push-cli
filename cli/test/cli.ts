@@ -153,6 +153,14 @@ export class SdkStub {
         });
     }
 
+    public patchRelease(appName: string, deployment: string, label: string, updateMetaData: codePush.PackageInfo): Promise<void> {
+        return Q(<void>null);
+    }
+
+    public promote(appName: string, sourceDeployment: string, destinationDeployment: string, updateMetaData: codePush.PackageInfo): Promise<void> {
+        return Q(<void>null);
+    }
+
     public release(appId: string, deploymentId: string): Promise<string> {
         return Q("Successfully released");
     }
@@ -177,6 +185,10 @@ export class SdkStub {
         return Q(<void>null);
     }
 
+    public rollback(appName: string, deployment: string, targetRelease: string): Promise<void> {
+        return Q(<void>null);
+    }
+
     public transferApp(app: codePush.App): Promise<void> {
         return Q(<void>null);
     }
@@ -186,7 +198,7 @@ export class SdkStub {
     }
 }
 
-describe("CLI", () => {
+describe.only("CLI", () => {
     var log: Sinon.SinonStub;
     var sandbox: Sinon.SinonSandbox;
     var spawn: Sinon.SinonStub;
@@ -725,6 +737,96 @@ describe("CLI", () => {
                 ];
 
                 assertJsonDescribesObject(actual, expected);
+                done();
+            });
+    });
+
+    it("patch command successfully updates specific label", (done: MochaDone): void => {
+        var command: cli.IPatchCommand = {
+            type: cli.CommandType.patch,
+            appName: "a",
+            deploymentName: "Staging",
+            label: "v1",
+            description: "Patched",
+            mandatory: true,
+            rollout: 25
+        };
+
+        var patch: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(patch);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, `Successfully updated the "v1" release of "a" app's "Staging" deployment.`);
+
+                done();
+            });
+    });
+
+
+    it("patch command successfully updates latest release", (done: MochaDone): void => {
+        var command: cli.IPatchCommand = {
+            type: cli.CommandType.patch,
+            appName: "a",
+            deploymentName: "Staging",
+            label: null,
+            description: "Patched",
+            mandatory: true,
+            rollout: 25
+        };
+
+        var patch: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(patch);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, `Successfully updated the "latest" release of "a" app's "Staging" deployment.`);
+
+                done();
+            });
+    });
+
+    it("promote works successfully", (done: MochaDone): void => {
+        var command: cli.IPromoteCommand = {
+            type: cli.CommandType.promote,
+            appName: "a",
+            sourceDeploymentName: "Staging",
+            destDeploymentName: "Production",
+            description: "Promoted",
+            mandatory: true,
+            rollout: 25
+        };
+
+        var promote: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "promote");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(promote);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, `Successfully promoted the "Staging" deployment of the "a" app to the "Production" deployment.`);
+
+                done();
+            });
+    });
+
+    it("rollback works successfully", (done: MochaDone): void => {
+        var command: cli.IRollbackCommand = {
+            type: cli.CommandType.rollback,
+            appName: "a",
+            deploymentName: "Staging",
+            targetRelease: "v2"
+        };
+
+        var rollback: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "rollback");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(rollback);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, `Successfully performed a rollback on the "Staging" deployment of the "a" app.`);
+
                 done();
             });
     });
