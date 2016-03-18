@@ -129,6 +129,7 @@ export interface IPackageInfo {
 export interface IPatchCommand extends ICommand, IPackageInfo {
     appName: string;
     deploymentName: string;
+    disabled: boolean;
     label: string;
 }
 

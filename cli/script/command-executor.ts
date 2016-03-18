@@ -703,8 +703,8 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, deployme
                 if (releaseSource) {
                     releaseTime += "\n" + chalk.magenta(`(${releaseSource})`).toString();
                 }
-
-                var row = [packageObject.label, releaseTime, packageObject.appVersion, packageObject.isMandatory ? "Yes" : "No"];
+                
+                var row: string[] = [packageObject.label, releaseTime, packageObject.appVersion, packageObject.isMandatory ? "Yes" : "No"];
                 if (command.displayAuthor) {
                     var releasedBy: string = packageObject.releasedBy ? packageObject.releasedBy : "";
                     if (currentUserEmail && releasedBy === currentUserEmail) {
@@ -714,12 +714,26 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, deployme
                     row.push(releasedBy);
                 }
 
-                row.push(packageObject.description ? wordwrap(30)(packageObject.description) : "", getPackageMetricsString(packageObject));
+                row.push(packageObject.description ? wordwrap(30)(packageObject.description) : "");
+                row.push(getPackageMetricsString(packageObject) + (packageObject.isDisabled ? `\n${chalk.green("Disabled:")} Yes` : ""));
+                if (packageObject.isDisabled) {
+                    // "dim" does not exist as a style in DefinitelyTyped.
+                    row = row.map((cellContents: string) => applyChalkSkippingLineBreaks(cellContents, (<any>chalk).dim));
+                }
 
                 dataSource.push(row);
             });
         });
     }
+}
+
+function applyChalkSkippingLineBreaks(applyString: string, chalkMethod: (string: string) => Chalk.ChalkChain): string {
+    // Used to prevent "chalk" from applying styles to linebreaks which
+    // causes table border chars to have the style applied as well.
+    return applyString
+        .split("\n")
+        .map((token: string) => chalkMethod(token))
+        .join("\n");
 }
 
 function getPackageString(packageObject: Package): string {
@@ -866,7 +880,7 @@ function register(command: cli.IRegisterCommand): Promise<void> {
 }
 
 function promote(command: cli.IPromoteCommand): Promise<void> {
-    var isMandatory: boolean = getIsMandatoryValue(command.mandatory);
+    var isMandatory: boolean = getYargsBooleanOrNull(command.mandatory);
     var packageInfo: PackageInfo = {
         description: command.description,
         isMandatory: isMandatory,
@@ -880,17 +894,23 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
 }
 
 function patch(command: cli.IPatchCommand): Promise<void> {
-    var isMandatory: boolean = getIsMandatoryValue(command.mandatory);
     var packageInfo: PackageInfo = {
         description: command.description,
-        isMandatory: isMandatory,
+        isMandatory: getYargsBooleanOrNull(command.mandatory),
+        isDisabled: getYargsBooleanOrNull(command.disabled),
         rollout: command.rollout
     };
 
-    return sdk.patchRelease(command.appName, command.deploymentName, command.label, packageInfo)
-        .then((): void => {
-            log(`Successfully updated the "${command.label ? command.label : `latest`}" release of "${command.appName}" app's "${command.deploymentName}" deployment.`);
-        });
+    for (var updateProperty in packageInfo) {
+        if ((<any>packageInfo)[updateProperty] !== null) {
+            return sdk.patchRelease(command.appName, command.deploymentName, command.label, packageInfo)
+                .then((): void => {
+                    log(`Successfully updated the "${command.label ? command.label : `latest`}" release of "${command.appName}" app's "${command.deploymentName}" deployment.`);
+                });
+        }
+    }
+
+    throw new Error("At least one property must be specified to patch a release.");
 }
 
 export var release = (command: cli.IReleaseCommand): Promise<void> => {
@@ -1213,9 +1233,9 @@ function isBinaryOrZip(path: string): boolean {
         || path.search(/\.ipa$/i) !== -1;
 }
 
-function getIsMandatoryValue(mandatory: any): boolean {
+function getYargsBooleanOrNull(value: any): boolean {
     // Yargs treats a boolean argument as an array of size 2 for null, third is the value of boolean.
-    return mandatory.length > 2 ? mandatory[2] : null;
+    return value && value.length > 2 ? value[2] : null;
 }
 
 function throwForInvalidEmail(email: string): void {
