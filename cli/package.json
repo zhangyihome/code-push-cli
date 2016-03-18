@@ -30,7 +30,7 @@
     "cli-table": "^0.3.1",
     "code-push": "1.8.0-beta",
     "email-validator": "^1.0.3",
-    "gradle-to-js": "github:geof90/gradle-to-js",
+    "gradle-to-js": "geof90/gradle-to-js",
     "moment": "^2.10.6",
     "opener": "^1.4.1",
     "plist": "1.2.0",
