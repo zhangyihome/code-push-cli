@@ -808,7 +808,7 @@ describe("CLI", () => {
                 done(new Error("Did not throw error."));
             })
             .catch((err) => {
-                assert.equal(err.message, "At least one property must be specified.");
+                assert.equal(err.message, "At least one property must be specified to patch a release.");
                 sinon.assert.notCalled(patch);
                 done();
             })

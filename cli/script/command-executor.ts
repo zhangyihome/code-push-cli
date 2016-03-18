@@ -910,7 +910,7 @@ function patch(command: cli.IPatchCommand): Promise<void> {
         }
     }
 
-    throw new Error("At least one property must be specified.");
+    throw new Error("At least one property must be specified to patch a release.");
 }
 
 export var release = (command: cli.IReleaseCommand): Promise<void> => {

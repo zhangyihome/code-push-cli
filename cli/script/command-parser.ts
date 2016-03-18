@@ -283,7 +283,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .example("patch MyApp Production -l v3 --des \"Updated description for v3\"", "Update the description of the release with label v3 for \"MyApp\" app's \"Production\" deployment")
             .option("label", { alias: "l", default: null, demand: false, description: "The label of the release to be updated, which defaults to the latest release", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
-            .option("disabled", { alias: "d", default: null, demand: false, description: "Whether to disable this update", type: "boolean" })
+            .option("disabled", { alias: "d", default: null, demand: false, description: "Whether to disable this release", type: "boolean" })
             .option("mandatory", { alias: "m", default: null, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
             .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to. This value can only be increased from the previous value.", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
@@ -596,7 +596,8 @@ function createCommand(): cli.ICommand {
                     patchCommand.appName = arg1;
                     patchCommand.deploymentName = arg2;
                     patchCommand.label = argv["label"];
-                    patchCommand.description = argv["description"] ? backslash(argv["description"]) : argv["description"];
+                    // Description must be set to null to indicate that it is not being patched.
+                    patchCommand.description = argv["description"] ? backslash(argv["description"]) : null;
                     patchCommand.disabled = argv["disabled"];
                     patchCommand.mandatory = argv["mandatory"];
                     patchCommand.rollout = getRolloutValue(argv["rollout"]);
