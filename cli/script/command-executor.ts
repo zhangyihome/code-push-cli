@@ -704,12 +704,7 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, deployme
                     releaseTime += "\n" + chalk.magenta(`(${releaseSource})`).toString();
                 }
                 
-                var displayLabel: string | Chalk.ChalkChain = packageObject.label;
-                if (packageObject.isDisabled) {
-                    displayLabel = chalk.red("(x)") + packageObject.label;
-                }
-                
-                var row = [displayLabel, releaseTime, packageObject.appVersion, packageObject.isMandatory ? "Yes" : "No"];
+                var row: string[] = [packageObject.label, releaseTime, packageObject.appVersion, packageObject.isMandatory ? "Yes" : "No"];
                 if (command.displayAuthor) {
                     var releasedBy: string = packageObject.releasedBy ? packageObject.releasedBy : "";
                     if (currentUserEmail && releasedBy === currentUserEmail) {
@@ -719,12 +714,26 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, deployme
                     row.push(releasedBy);
                 }
 
-                row.push(packageObject.description ? wordwrap(30)(packageObject.description) : "", getPackageMetricsString(packageObject));
+                row.push(packageObject.description ? wordwrap(30)(packageObject.description) : "");
+                row.push(getPackageMetricsString(packageObject) + (packageObject.isDisabled ? `\n${chalk.green("Disabled:")} Yes` : ""));
+                if (packageObject.isDisabled) {
+                    // "dim" does not exist as a style in DefinitelyTyped.
+                    row = row.map((cellContents: string) => applyChalkSkippingLineBreaks(cellContents, (<any>chalk).dim));
+                }
 
                 dataSource.push(row);
             });
         });
     }
+}
+
+function applyChalkSkippingLineBreaks(applyString: string, chalkMethod: (string: string) => Chalk.ChalkChain): string {
+    // Used to prevent "chalk" from applying styles to linebreaks which
+    // causes table border chars to have the style applied as well.
+    return applyString
+        .split("\n")
+        .map((token: string) => chalkMethod(token))
+        .join("\n");
 }
 
 function getPackageString(packageObject: Package): string {
