@@ -747,6 +747,7 @@ describe("CLI", () => {
             appName: "a",
             deploymentName: "Staging",
             label: "v1",
+            disabled: false,
             description: "Patched",
             mandatory: true,
             rollout: 25
@@ -764,13 +765,13 @@ describe("CLI", () => {
             });
     });
 
-
     it("patch command successfully updates latest release", (done: MochaDone): void => {
         var command: cli.IPatchCommand = {
             type: cli.CommandType.patch,
             appName: "a",
             deploymentName: "Staging",
             label: null,
+            disabled: false,
             description: "Patched",
             mandatory: true,
             rollout: 25
@@ -788,6 +789,32 @@ describe("CLI", () => {
             });
     });
 
+    it("patch command fails if no properties were specified for update", (done: MochaDone): void => {
+        var command: cli.IPatchCommand = {
+            type: cli.CommandType.patch,
+            appName: "a",
+            deploymentName: "Staging",
+            label: null,
+            disabled: null,
+            description: null,
+            mandatory: null,
+            rollout: null
+        };
+
+        var patch: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
+
+        cmdexec.execute(command)
+            .then(() => {
+                done(new Error("Did not throw error."));
+            })
+            .catch((err) => {
+                assert.equal(err.message, "At least one property must be specified.");
+                sinon.assert.notCalled(patch);
+                done();
+            })
+            .done();
+    });
+    
     it("promote works successfully", (done: MochaDone): void => {
         var command: cli.IPromoteCommand = {
             type: cli.CommandType.promote,

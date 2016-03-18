@@ -38,13 +38,14 @@ declare module "rest-definitions" {
     }
 
     /*inout*/
-    export interface PackageInfo {
+    interface PackageInfo {
         appVersion?: string;
         description?: string;
+        isDisabled?: boolean;
         isMandatory?: boolean;
-        rollout?: number;
         /*generated*/ label?: string;
         /*generated*/ packageHash?: string;
+        rollout?: number;
     }
 
     /*out*/
@@ -52,7 +53,15 @@ declare module "rest-definitions" {
         downloadURL?: string;
         isAvailable: boolean;
         packageSize?: number;
+        shouldRunBinaryVersion?: boolean;
         updateAppVersion?: boolean;
+    }
+
+    /*out*/
+    export interface UpdateCheckCacheResponse {
+        originalPackage: UpdateCheckResponse;
+        rollout?: number;
+        rolloutPackage?: UpdateCheckResponse;
     }
 
     /*in*/
@@ -94,6 +103,11 @@ declare module "rest-definitions" {
     export interface App {
         /*generated*/ collaborators?: CollaboratorMap;
         /*key*/ name: string;
+    }
+
+    /*in*/
+    export interface AppCreationRequest extends App {
+        manuallyProvisionDeployments?: boolean;
     }
 
     /*inout*/
