@@ -337,7 +337,7 @@ This specifies the percentage of users (as an integer between `1` and `100`) tha
 
 2. If you rollback a deployment whose latest release is an "active" rollout, the rollout value will be cleared, effectively "deactivating" the rollout behavior
 
-3. Unlike the `mandatory` and `description` fields, when you promote a release from one deployment to another, it will not propagate the `rollout` property, and therefore, if you want to do a new release, in the target deployment, to have a rollout value, you need to explicitly set it when you call the `promote` command.
+3. Unlike the `mandatory` and `description` fields, when you promote a release from one deployment to another, it will not propagate the `rollout` property, and therefore, if you want the new release (in the target deployment) to have a rollout value, you need to explicitly set it when you call the `promote` command.
 
 *NOTE: This parameter can be set using either `--rollout` or `-r`* 
 
