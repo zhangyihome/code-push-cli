@@ -306,7 +306,7 @@ This provides an optional "change log" for the deployment. The value is simply r
 
 #### Disabled parameter
 
-This specifies whether an update should be disabled. A disabled update is one that is not acquirable by clients. If left unspecified, the update will not be disabled, i.e. clients configured to receive updates from the particular deployment will receive the update [if it applies to them](#(#target-binary-version-parameter).
+This specifies whether an update should be disabled. A disabled update is one that is not acquirable by clients. If left unspecified, the update will not be disabled, i.e. clients configured to receive updates from the particular deployment will receive the update [if it applies to them](#target-binary-version-parameter).
 
 *NOTE: This parameter can be set using either "--disabled" or "-x"*
 
