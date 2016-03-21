@@ -239,6 +239,7 @@ Whether you choose to use the platform-specific command that is relevant to your
 code-push release <appName> <updateContents> <targetBinaryVersion>
 [--deploymentName <deploymentName>]
 [--description <description>]
+[--disabled <disabled>]
 [--mandatory]
 [--rollout <rolloutPercentage>]
 ```
@@ -303,6 +304,12 @@ This provides an optional "change log" for the deployment. The value is simply r
 
 *NOTE: This parameter can be set using either "--description" or "-desc"*
 
+#### Disabled parameter
+
+This specifies whether an update should be disabled. A disabled update is one that is not acquirable by clients. If left unspecified, the update will not be disabled, i.e. clients configured to receive updates from the particular deployment will receive the update [if it applies to them](#target-binary-version-parameter).
+
+*NOTE: This parameter can be set using either "--disabled" or "-x"*
+
 #### Mandatory parameter
 
 This specifies whether the update should be considered mandatory or not (e.g. it includes a critical security fix). This attribute is simply round tripped to the client, who can then decide if and how they would like to enforce it.
@@ -349,6 +356,7 @@ code-push release-react <appName> <platform>
 [--deploymentName <deploymentName>]
 [--description <description>]
 [--development <development>]
+[--disabled <disabled>]
 [--entryFile <entryFile>]
 [--mandatory]
 [--sourcemapOutput <sourcemapOutput>]
@@ -359,7 +367,7 @@ code-push release-react <appName> <platform>
 The `release-react` command does two things in addition to running the vanilla `release` command described in the [previous section](#releasing-app-updates):
 
 1. It runs the [`react-native bundle` command](#update-contents-parameter) to generate the update contents in a temporary folder
-2. It infers the [`targetBinaryVersion` of this release](#target-binary-range-parameter) by reading the contents of the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients), and defaults to target only the specified version in the metadata.
+2. It infers the [`targetBinaryVersion` of this release](#target-binary-version-parameter) by reading the contents of the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients), and defaults to target only the specified version in the metadata.
 
 It then calls the vanilla `release` command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the `react-native bundle` command and also avoid common pitfalls such as supplying an invalid `targetBinaryVersion` parameter.
 
@@ -382,6 +390,10 @@ This is the same parameter as the one described in the [above section](#descript
 #### Development parameter
 
 This specifies whether to generate a unminified, development JS bundle. If left unspecified, this defaults to `false` where warnings are disabled and the bundle is minified.
+
+#### Disabled parameter
+
+This is the same parameter as the one described in the [above section](#disabled-parameter).
 
 #### Entry file parameter
 
@@ -417,7 +429,7 @@ code-push release-cordova <appName> <platform>
 The `release-cordova` command does two things in addition to running the vanilla `release` command described in the [Releasing App Updates](#releasing-app-updates) section:
 
 1. It [updates the contents](#update-contents-parameter) of the package by calling `cordova prepare` for the specified platform
-2. It infers the [`targetBinaryVersion` of this release](#target-binary-range-parameter) by reading the version in the `<widget version>` in config.xml, and defaults to target only the specified version.
+2. It infers the [`targetBinaryVersion` of this release](#target-binary-version-parameter) by reading the version in the `<widget version>` in config.xml, and defaults to target only the specified version.
 
 It then calls the vanilla `release` command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the `cordova prepare` command and also avoid common pitfalls such as supplying an invalid `targetBinaryVersion` parameter.
 
@@ -432,6 +444,10 @@ This is the same parameter as the one described in the [above section](#deployme
 #### Description parameter
 
 This is the same parameter as the one described in the [above section](#description-parameter).
+
+#### Disabled parameter
+
+This is the same parameter as the one described in the [above section](#disabled-parameter).
 
 #### Mandatory parameter
 
@@ -473,6 +489,10 @@ This is the same parameter as the one described in the [above section](#mandator
 
 This is the same parameter as the one described in the [above section](#description-parameter), and simply allows you to update the description associated with the release (e.g. you made a typo when releasing, or you forgot to add a description at all). If this parameter is ommitted, no change will be made to the value of the target release's description property. 
 
+#### Disabled parameter
+
+This is the same parameter as the one described in the [above section](#disabled-parameter), and simply allows you to update whether the release should be disabled or not. Note that `--disabled` and `--disabled true` are equivalent, but the absence of this flag is not equivalent to `--disabled false`. Therefore, if the paremeter is ommitted, no change will be made to the value of the target release's disabled property. You need to set this to `--disabled false` to explicity make a release acquirable if it was previously disabled.
+
 #### Rollout Parameter
 
 This is the same parameter as the one described in the [above section](#rollout-parameter), and simply allows you to increase the rollout percentage of the target release. This parameter can only be set to an integer whose value is greater than the current rollout value. Additionally, if you want to "complete" the rollout, and therefore, make the release available to everyone, you can simply set this parameter to `--rollout 100`. If this parameter is ommitted, no change will be made to the value of the target release's rollout parameter.
@@ -486,6 +506,7 @@ Once you've tested an update against a specific deployment (e.g. `Staging`), and
 ```
 code-push promote <appName> <sourceDeploymentName> <destDeploymentName>
 [--description <description>]
+[--disabled <disabled>]
 [--mandatory]
 [--rollout <rolloutPercentage>]
 ```
@@ -501,6 +522,10 @@ We recommend that all users take advantage of the automatically created `Staging
 ### Description parameter
 
 This is the same parameter as the one described in the [above section](#description-parameter), and simply allows you to override the description that will be used for the promoted release. If unspecified, the new release will inherit the description from the release being promoted.
+
+#### Disabled parameter
+
+This is the same parameter as the one described in the [above section](#disabled-parameter), and simply allows you to override the value of the disabled flag that will be used for the promoted release. If unspecified, the new release will inherit the disabled property from the release being promoted.
 
 ### Mandatory parameter
 

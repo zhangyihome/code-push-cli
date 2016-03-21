@@ -122,6 +122,7 @@ export interface ILoginCommand extends ICommand {
 
 export interface IPackageInfo {
     description?: string;
+    disabled?: boolean;
     mandatory?: boolean;
     rollout?: number;
 }
@@ -129,7 +130,6 @@ export interface IPackageInfo {
 export interface IPatchCommand extends ICommand, IPackageInfo {
     appName: string;
     deploymentName: string;
-    disabled: boolean;
     label: string;
 }
 
