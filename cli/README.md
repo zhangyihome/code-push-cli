@@ -219,6 +219,8 @@ The install metrics have the following meaning:
 
 * **Rollout** - Indicates the percentage of users that are elligble to receive this update. This property will only be displayed for releases that have been tagged with a non-empty rollout value, and can only ever be present on the latest release within each deployment.
 
+* **Disabled** - Indicates whether the release has been marked as disabled or not, and therefore, is acquirable by end users. This property will only be displayed for releases that are actually disabled.
+
 When the metrics cell reports `No installs recorded`, that indicates that the server hasn't seen any activity for this release. This could either be because it precluded the plugin versions that included telemetry support, or no end-users have synchronized with the CodePush server yet. As soon as an install happens, you will begin to see metrics populate in the CLI for the release.
 
 ## Releasing Updates
