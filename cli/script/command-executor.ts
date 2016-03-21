@@ -741,12 +741,18 @@ function getPackageString(packageObject: Package): string {
         return chalk.magenta("No updates released").toString();
     }
 
-    return chalk.green("Label: ") + packageObject.label + "\n" +
+    var packageString: string = chalk.green("Label: ") + packageObject.label + "\n" +
         chalk.green("App Version: ") + packageObject.appVersion + "\n" +
         chalk.green("Mandatory: ") + (packageObject.isMandatory ? "Yes" : "No") + "\n" +
         chalk.green("Release Time: ") + formatDate(packageObject.uploadTime) + "\n" +
         chalk.green("Released By: ") + (packageObject.releasedBy ? packageObject.releasedBy : "") +
         (packageObject.description ? wordwrap(70)("\n" + chalk.green("Description: ") + packageObject.description) : "");
+        
+    if (packageObject.isDisabled) {
+        packageString += `\n${chalk.green("Disabled:")} Yes`;
+    }
+    
+    return packageString;
 }
 
 function getPackageMetricsString(obj: Package): string {
@@ -880,10 +886,10 @@ function register(command: cli.IRegisterCommand): Promise<void> {
 }
 
 function promote(command: cli.IPromoteCommand): Promise<void> {
-    var isMandatory: boolean = getYargsBooleanOrNull(command.mandatory);
     var packageInfo: PackageInfo = {
         description: command.description,
-        isMandatory: isMandatory,
+        isDisabled: getYargsBooleanOrNull(command.disabled),
+        isMandatory: getYargsBooleanOrNull(command.mandatory),
         rollout: command.rollout
     };
 
@@ -981,6 +987,7 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
 
     var updateMetadata: PackageInfo = {
         description: command.description,
+        isDisabled: command.disabled,
         isMandatory: command.mandatory,
         rollout: command.rollout
     };

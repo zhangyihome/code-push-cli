@@ -283,7 +283,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .example("patch MyApp Production -l v3 --des \"Updated description for v3\"", "Update the description of the release with label v3 for \"MyApp\" app's \"Production\" deployment")
             .option("label", { alias: "l", default: null, demand: false, description: "The label of the release to be updated, which defaults to the latest release", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
-            .option("disabled", { alias: "d", default: null, demand: false, description: "Whether to disable this release", type: "boolean" })
+            .option("disabled", { alias: "x", default: null, demand: false, description: "Whether to make this release not acquirable by clients", type: "boolean" })
             .option("mandatory", { alias: "m", default: null, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
             .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to. This value can only be increased from the previous value.", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
@@ -296,6 +296,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .example("promote MyApp Staging Production", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\"")
             .example("promote MyApp Staging Production --des \"Production rollout\" -r 25", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\" with the description, rolling out to 25% of the users")
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
+            .option("disabled", { alias: "x", default: null, demand: false, description: "Whether the promoted update should be made not acquirable by clients", type: "boolean" })
             .option("mandatory", { alias: "m", default: null, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
             .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
@@ -320,6 +321,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .example("release MyApp ./platforms/ios/www 1.0.3 -d Production -r 20", "Release the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting the 1.0.3 binary version and rolling out to about 20% of the users")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
+            .option("disabled", { alias: "x", default: false, demand: false, description: "Whether this release should be made not acquirable by clients", type: "boolean" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
             .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
@@ -333,6 +335,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .example("release-cordova MyApp android -d Production", "Release the Cordova Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
+            .option("disabled", { alias: "x", default: false, demand: false, description: "Whether this release should be made not acquirable by clients", type: "boolean" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
             .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "string" })
             .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "The semver range expression spanning all the binary app store versions that should get this update. If omitted, the update will default to target only the same version as the current binary version specified in config.xml", type: "string" })
@@ -349,6 +352,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "The deployment to publish the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "The description of changes made to the app with this update", type: "string" })
             .option("development", { alias: "dev", default: false, demand: false, description: "Whether to generate a unminified, development JS bundle.", type: "boolean" })
+            .option("disabled", { alias: "x", default: false, demand: false, description: "Whether this release should be made not acquirable by clients", type: "boolean" })
             .option("entryFile", { alias: "e", default: null, demand: false, description: "The path to the root JS file. If unspecified, \"index.<platform>.js\" and then \"index.js\" will be tried and used if they exist.", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this update should be considered mandatory to the client", type: "boolean" })
             .option("rollout", { alias: "r", default: null, demand: false, description: "The percentage of users this update should be rolled out to", type: "string" })
@@ -614,6 +618,7 @@ function createCommand(): cli.ICommand {
                     deploymentPromoteCommand.sourceDeploymentName = arg2;
                     deploymentPromoteCommand.destDeploymentName = arg3;
                     deploymentPromoteCommand.description = argv["description"] ? backslash(argv["description"]) : "";
+                    deploymentPromoteCommand.disabled = argv["disabled"];
                     deploymentPromoteCommand.mandatory = argv["mandatory"];
                     deploymentPromoteCommand.rollout = getRolloutValue(argv["rollout"]);
                 }
@@ -639,6 +644,7 @@ function createCommand(): cli.ICommand {
                     releaseCommand.appStoreVersion = arg3.toString();
                     releaseCommand.deploymentName = argv["deploymentName"];
                     releaseCommand.description = argv["description"] ? backslash(argv["description"]) : "";
+                    releaseCommand.disabled = argv["disabled"];
                     releaseCommand.mandatory = argv["mandatory"];
                     releaseCommand.rollout = getRolloutValue(argv["rollout"]);
                 }
@@ -655,6 +661,7 @@ function createCommand(): cli.ICommand {
 
                     releaseCordovaCommand.deploymentName = argv["deploymentName"];
                     releaseCordovaCommand.description = argv["description"] ? backslash(argv["description"]) : "";
+                    releaseCordovaCommand.disabled = argv["disabled"];
                     releaseCordovaCommand.mandatory = argv["mandatory"];
                     releaseCordovaCommand.rollout = getRolloutValue(argv["rollout"]);
                     releaseCordovaCommand.appStoreVersion = argv["targetBinaryVersion"];
@@ -672,6 +679,7 @@ function createCommand(): cli.ICommand {
 
                     releaseReactCommand.bundleName = argv["bundleName"];
                     releaseReactCommand.deploymentName = argv["deploymentName"];
+                    releaseReactCommand.disabled = argv["disabled"];
                     releaseReactCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseReactCommand.development = argv["development"];
                     releaseReactCommand.entryFile = argv["entryFile"];
