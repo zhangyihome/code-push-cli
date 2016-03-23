@@ -69,7 +69,7 @@ export interface PackageWithMetrics {
 export var log = (message: string | Chalk.ChalkChain): void => console.log(message);
 export var sdk: AccountManager;
 export var spawn = childProcess.spawn;
-export var spawnSync = childProcess.spawnSync;
+export var execSync = childProcess.execSync;
 
 var connectionInfo: ILoginConnectionInfo;
 
@@ -1024,10 +1024,7 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
 
     log(chalk.cyan("Running \"cordova prepare\" command:\n"));
     try {
-        var prepareProcess: any = spawnSync("cordova", ["prepare", platform, "--verbose"], { stdio: [0, 1, 2] /* Inherit all io streams */ });
-        if (prepareProcess.error) {
-            throw prepareProcess.error;
-        }
+        execSync(["cordova", "prepare", platform, "--verbose"].join(" "), { stdio: "inherit" });
     } catch (error) {
         if (error.code == "ENOENT") {
             throw new Error(`Failed to call "cordova prepare". Please ensure that the Cordova CLI is installed.`);
