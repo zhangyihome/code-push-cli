@@ -390,13 +390,13 @@ react-native bundle --entry-file index.ios.js \
 code-push release MyApp ./CodePush 1.0.0
 ```
 
-Achieving the equivalent behavior with the `release-react` command would simply require the following command, which is generally less erorr-prone:
+Achieving the equivalent behavior with the `release-react` command would simply require the following command, which is generally less error-prone:
 
 ```shell
 code-push release-react MyApp ios
 ```
 
-*NOTE: We believe that the `release-react` command should be valuable for most React Native developers, so if you're finding that it isn't flexible enough or missing a key featue, please don't hesistate to [let us know](mailto:codepushfeed@microsoft.com), so that we can improve it.*
+*NOTE: We believe that the `release-react` command should be valuable for most React Native developers, so if you're finding that it isn't flexible enough or missing a key feature, please don't hesistate to [let us know](mailto:codepushfeed@microsoft.com), so that we can improve it.*
 
 #### App name parameter
 
@@ -440,7 +440,7 @@ This specifies the relative path to where the generated JS bundle's sourcemap fi
 
 #### Target binary version parameter
 
-This is the same parameter as the one described in the [above section](#target-binary-version-parameter). If left unspecified, this defaults to targeting the exact version specified in the app's `Info.plst` (for iOS) and `build.gradle` (for Android) files.
+This is the same parameter as the one described in the [above section](#target-binary-version-parameter). If left unspecified, this defaults to targeting the exact version specified in the app's `Info.plist` (for iOS) and `build.gradle` (for Android) files.
 
 #### Rollout parameter
 
@@ -470,13 +470,13 @@ cordova prepare ios
 code-push release MyApp ./platforms/ios/www 1.0.0
 ```
 
-Achieving the equivalent behavior with the `release-cordova` command, would simply require the following command, which is generally less erorr-prone:
+Achieving the equivalent behavior with the `release-cordova` command would simply require the following command, which is generally less error-prone:
 
 ```shell
 code-push release-cordova MyApp ios
 ```
 
-*NOTE: We believe that the `release-cordova` command should be valuable for most Cordova developers, so if you're finding that it isn't flexible enough or missing a key featue, please don't hesistate to [let us know](mailto:codepushfeed@microsoft.com), so that we can improve it.*
+*NOTE: We believe that the `release-cordova` command should be valuable for most Cordova developers, so if you're finding that it isn't flexible enough or missing a key feature, please don't hesistate to [let us know](mailto:codepushfeed@microsoft.com), so that we can improve it.*
 
 #### App name parameter
 
