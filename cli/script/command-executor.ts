@@ -997,10 +997,7 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
 
     log(chalk.cyan("Running \"cordova prepare\" command:\n"));
     try {
-        var prepareProcess: any = spawnSync("cordova", ["prepare", platform, "--verbose"], { stdio: [0, 1, 2] /* Inherit all io streams */ });
-        if (prepareProcess.error) {
-            throw prepareProcess.error;
-        }
+        execSync(["cordova", "prepare", platform, "--verbose"].join(" "), { stdio: "inherit" });
     } catch (error) {
         if (error.code == "ENOENT") {
             throw new Error(`Failed to call "cordova prepare". Please ensure that the Cordova CLI is installed.`);
