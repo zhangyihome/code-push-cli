@@ -378,7 +378,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
     .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommandCategory)  // Report unrecognized, non-hyphenated command category.
     .fail((msg: string) => showHelp(/*showRootDescription*/ true))  // Suppress the default error message.
     .argv;
-    
+
 function createCommand(): cli.ICommand {
     var cmd: cli.ICommand;
 
@@ -649,7 +649,7 @@ function createCommand(): cli.ICommand {
                     releaseCommand.rollout = getRolloutValue(argv["rollout"]);
                 }
                 break;
-                
+
             case "release-cordova":
                 if (arg1 && arg2) {
                     cmd = { type: cli.CommandType.releaseCordova };
@@ -728,6 +728,8 @@ function getServerUrl(url: string): string {
     if (url[url.length - 1] === "/") {
         url = url.substring(0, url.length - 1);
     }
+
+    url = url.replace(/^(https?):\\/, "$1://");     // Replace 'http(s):\' with 'http(s)://' for Windows Git Bash
 
     return url;
 }
