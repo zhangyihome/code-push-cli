@@ -382,7 +382,8 @@ To illustrate the difference that the `release-react` command can make, the foll
 ```shell
 mkdir ./CodePush
 
-react-native bundle --entry-file index.ios.js \
+react-native bundle --platform ios \
+--entry-file index.ios.js \
 --bundle-output ./CodePush/main.jsbundle \
 --assets-dest ./CodePush \
 --dev false
