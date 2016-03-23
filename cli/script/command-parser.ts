@@ -729,7 +729,7 @@ function getServerUrl(url: string): string {
         url = url.substring(0, url.length - 1);
     }
 
-    url = url.replace(/^(https?):\\/, "$1://");     // Replace 'http:\' with 'http://' for Windows Git Bash
+    url = url.replace(/^(https?):\\/, "$1://");     // Replace 'http(s):\' with 'http(s)://' for Windows Git Bash
 
     return url;
 }
