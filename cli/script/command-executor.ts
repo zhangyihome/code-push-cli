@@ -69,7 +69,7 @@ export interface PackageWithMetrics {
 export var log = (message: string | Chalk.ChalkChain): void => console.log(message);
 export var sdk: AccountManager;
 export var spawn = childProcess.spawn;
-export var spawnSync = childProcess.spawnSync;
+export var execSync = childProcess.execSync;
 
 var connectionInfo: ILoginConnectionInfo;
 
