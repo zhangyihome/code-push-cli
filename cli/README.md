@@ -29,9 +29,9 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
 ## Getting Started
 
 1. Create a [CodePush account](#account-creation) push using the CodePush CLI
-2. Register your [app](#app-management) with the service, and optionally create any additional [deployments](#deployment-management)
+2. Register your [app](#app-management) with CodePush, and optionally [share it](#app-collaboration) with other developers on your team
 3. CodePush-ify your app and point it at the deployment you wish to use ([Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push))
-4. [Deploy](#releasing-app-updates) an update for your registered app
+4. [Release](#releasing-app-updates) an update for your app
 5. Live long and prosper! ([details](https://en.wikipedia.org/wiki/Vulcan_salute))
 
 ## Account creation
