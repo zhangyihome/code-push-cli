@@ -225,15 +225,15 @@ When the metrics cell reports `No installs recorded`, that indicates that the se
 
 ## Releasing Updates
 
-Once your app has been configured to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it. The CodePush CLI has three different commands for releasing updates, in order to accomodate different developer workflows, and keep the experience as simple yet flexible as possible:
+Once your app has been configured to query for updates against the CodePush server, you can begin releasing updates to it. In order to provide both simplicity and flexibility, the CodePush CLI includes three different commands for releasing updates:
 
-1. [General](#releasing-updates-general) - Simply uploads an update to the CodePush server, and therefore, provides the most flexibility in terms of how to generate the update in the first place (e.g. are you using a `gulp` task? running a custom shell script?).
+1. [General](#releasing-updates-general) - Simply uploads an update to the CodePush server, and therefore, provides the most flexibility in terms of how to generate the update in the first place (e.g. are you using a `gulp` task? running a custom shell script?), since it doesn't apply any opinion about it.
 
-2. [React Native](#releasing-updates-react-native) - Performs the same functionality as the general release command, but also handles the work of generating the app update for you, instead of requiring you to run both `react-native bundle` and then `code-push release`.
+2. [React Native](#releasing-updates-react-native) - Performs the same functionality as the general release command, but also handles the work of generating the updated contents for you (JS bundle and assets), instead of requiring you to run both `react-native bundle` and then `code-push release`.
 
 3. [Cordova](#releasing-updates-cordova) - Performs the same functionality as the general release command, but also handles the work of preparing the app update for you, instead of requiring you to run both `cordova prepare` and then `code-push release`.
 
-Whether you choose to use the platform-specific command that is relevant to your app is mostly matter of preference, However, we recommend using the platform-specific one to start, since it greatly simplifies the experience, and then leverage the general-purpose command if/when greater control is needed.
+Which of these commands you should use is mostly a matter of requirements and/or preference. However, we generally recommend using the relevant platform-specific command to start (since it greatly simplifies the experience), and then leverage the general-purpose `release` command if/when greater control is needed.
 
 ### Releasing Updates (General)
 
