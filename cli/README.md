@@ -29,9 +29,9 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
 ## Getting Started
 
 1. Create a [CodePush account](#account-creation) push using the CodePush CLI
-2. Register your [app](#app-management) with the service, and optionally create any additional [deployments](#deployment-management)
+2. Register your [app](#app-management) with CodePush, and optionally [share it](#app-collaboration) with other developers on your team
 3. CodePush-ify your app and point it at the deployment you wish to use ([Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push))
-4. [Deploy](#releasing-app-updates) an update for your registered app
+4. [Release](#releasing-updates) an update for your app
 5. Live long and prosper! ([details](https://en.wikipedia.org/wiki/Vulcan_salute))
 
 ## Account creation
@@ -225,15 +225,15 @@ When the metrics cell reports `No installs recorded`, that indicates that the se
 
 ## Releasing Updates
 
-Once your app has been configured to query for updates against the CodePush service--using your desired deployment--you can begin pushing updates to it. The CodePush CLI has three different commands for releasing updates, in order to accomodate different developer workflows, and keep the experience as simple yet flexible as possible:
+Once your app has been configured to query for updates against the CodePush server, you can begin releasing updates to it. In order to provide both simplicity and flexibility, the CodePush CLI includes three different commands for releasing updates:
 
-1. [General](#releasing-updates-general) - Simply uploads an update to the CodePush server, and therefore, provides the most flexibility in terms of how to generate the update in the first place (e.g. are you using a `gulp` task? running a custom shell script?).
+1. [General](#releasing-updates-general) - Simply uploads an update to the CodePush server, and therefore, provides the most flexibility in terms of how to generate the update in the first place (e.g. are you using a `gulp` task? running a custom shell script?), since it doesn't apply any opinion about it.
 
-2. [React Native](#releasing-updates-react-native) - Performs the same functionality as the general release command, but also handles the work of generating the app update for you, instead of requiring you to run both `react-native bundle` and then `code-push release`.
+2. [React Native](#releasing-updates-react-native) - Performs the same functionality as the general release command, but also handles the work of generating the updated contents for you (JS bundle and assets), instead of requiring you to run both `react-native bundle` and then `code-push release`.
 
 3. [Cordova](#releasing-updates-cordova) - Performs the same functionality as the general release command, but also handles the work of preparing the app update for you, instead of requiring you to run both `cordova prepare` and then `code-push release`.
 
-Whether you choose to use the platform-specific command that is relevant to your app is mostly matter of preference, However, we recommend using the platform-specific one to start, since it greatly simplifies the experience, and then leverage the general-purpose command if/when greater control is needed.
+Which of these commands you should use is mostly a matter of requirements and/or preference. However, we generally recommend using the relevant platform-specific command to start (since it greatly simplifies the experience), and then leverage the general-purpose `release` command if/when greater control is needed.
 
 ### Releasing Updates (General)
 
@@ -245,6 +245,10 @@ code-push release <appName> <updateContents> <targetBinaryVersion>
 [--mandatory]
 [--rollout <rolloutPercentage>]
 ```
+
+#### App name parameter
+
+This specifies the name of the CodePush app that this update is being released for.
 
 #### Update contents parameter
 
@@ -366,12 +370,37 @@ code-push release-react <appName> <platform>
 [--rollout <rolloutPercentage>]
 ```
 
-The `release-react` command does two things in addition to running the vanilla `release` command described in the [previous section](#releasing-app-updates):
+The `release-react` command is a React Native-specific version of the "vanilla" [`release`](#releasing-app-updates) command, which supports all of the same parameters (e.g. `--mandatory`, `--description`), yet simplifies the process of releasing updates by performing the following additional behavior: 
 
-1. It runs the [`react-native bundle` command](#update-contents-parameter) to generate the update contents in a temporary folder
-2. It infers the [`targetBinaryVersion` of this release](#target-binary-version-parameter) by reading the contents of the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients), and defaults to target only the specified version in the metadata.
+1. Running the `react-native bundle` command in order to generate the [update contents](#update-contents-parameter) (JS bundle and assets) that will be released to the CodePush server. It uses sensible defaults as much as possible (e.g. creating a non-dev build, assuming an iOS entry file is named `index.ios.js`), but also exposes the relevant `react-native bundle` parameters to enable flexibility (e.g. `--sourcemapOutput`).
 
-It then calls the vanilla `release` command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the `react-native bundle` command and also avoid common pitfalls such as supplying an invalid `targetBinaryVersion` parameter.
+2. Inferring the [`targetBinaryVersion`](#target-binary-version-parameter) of this release by using the version name that is specified in your project's `Info.plist` (for iOS) and `build.gradle` (for Android) files.
+    
+
+To illustrate the difference that the `release-react` command can make, the following is an example of how you might generate and release an update for a React Native app using the "vanilla" `release` command:
+
+```shell
+mkdir ./CodePush
+
+react-native bundle --entry-file index.ios.js \
+--bundle-output ./CodePush/main.jsbundle \
+--assets-dest ./CodePush \
+--dev false
+
+code-push release MyApp ./CodePush 1.0.0
+```
+
+Achieving the equivalent behavior with the `release-react` command would simply require the following command, which is generally less error-prone:
+
+```shell
+code-push release-react MyApp ios
+```
+
+*NOTE: We believe that the `release-react` command should be valuable for most React Native developers, so if you're finding that it isn't flexible enough or missing a key feature, please don't hesistate to [let us know](mailto:codepushfeed@microsoft.com), so that we can improve it.*
+
+#### App name parameter
+
+This is the same parameter as the one described in the [above section](#app-name-parameter).
 
 #### Platform parameter
 
@@ -379,7 +408,7 @@ This specifies which platform the current update is targeting, and can be either
 
 #### Bundle name parameter
 
-This specifies the name of the output JS bundle file. If left unspecified, the standard bundle name will be used for the specified platform: `main.jsbundle` (iOS) and `index.android.bundle` (Android).
+This specifies the file name that should be used for the generated JS bundle. If left unspecified, the standard bundle name will be used for the specified platform: `main.jsbundle` (iOS) and `index.android.bundle` (Android).
 
 #### Deployment name parameter
 
@@ -399,7 +428,7 @@ This is the same parameter as the one described in the [above section](#disabled
 
 #### Entry file parameter
 
-This specifies the relative path to the root JavaScript file of the app. If left unspecified, the command will first assume the entry file to be `index.ios.js` or `index.android.js` depending on the `platform` parameter supplied, following which it will use `index.js` if the previous file does not exist.
+This specifies the relative path to app's root/entry JavaScript file. If left unspecified, this defaults to `index.ios.js` (for iOS) or `index.android.js` (for Android) if that file exists, or `index.js` otherwise.
 
 #### Mandatory parameter
 
@@ -407,11 +436,11 @@ This is the same parameter as the one described in the [above section](#mandator
 
 #### Sourcemap output parameter
 
-This specifies the relative path to where the sourcemap file for resulting update's JS bundle should be generated. If left unspecified, sourcemaps will not be generated.
+This specifies the relative path to where the generated JS bundle's sourcemap file should be written. If left unspecified, sourcemaps will not be generated.
 
 #### Target binary version parameter
 
-This is the same parameter as the one described in the [above section](#target-binary-version-parameter). If left unspecified, the command defaults to targeting only the specified version in the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients).
+This is the same parameter as the one described in the [above section](#target-binary-version-parameter). If left unspecified, this defaults to targeting the exact version specified in the app's `Info.plist` (for iOS) and `build.gradle` (for Android) files.
 
 #### Rollout parameter
 
@@ -428,12 +457,30 @@ code-push release-cordova <appName> <platform>
 [--rollout <rolloutPercentage>]
 ```
 
-The `release-cordova` command does two things in addition to running the vanilla `release` command described in the [Releasing App Updates](#releasing-app-updates) section:
+The `release-cordova` command is a Cordova-specific version of the "vanilla" [`release`](#releasing-app-updates) command, which supports all of the same parameters (e.g. `--mandatory`, `--description`), yet simplifies the process of releasing updates by performing the following additional behavior: 
 
-1. It [updates the contents](#update-contents-parameter) of the package by calling `cordova prepare` for the specified platform
-2. It infers the [`targetBinaryVersion` of this release](#target-binary-version-parameter) by reading the version in the `<widget version>` in config.xml, and defaults to target only the specified version.
+1. Running the `cordova prepare` command in order to generate the [update contents](#update-contents-parameter) (`www` folder) that will be released to the CodePush server.
 
-It then calls the vanilla `release` command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the `cordova prepare` command and also avoid common pitfalls such as supplying an invalid `targetBinaryVersion` parameter.
+2. Inferring the [`targetBinaryVersion`](#target-binary-version-parameter) of this release by using the version name that is specified in your project's `config.xml` file.
+
+To illustrate the difference that the `release-cordova` command can make, the following is an example of how you might generate and release an update for a Cordova app using the "vanilla" `release` command:
+
+```shell
+cordova prepare ios
+code-push release MyApp ./platforms/ios/www 1.0.0
+```
+
+Achieving the equivalent behavior with the `release-cordova` command would simply require the following command, which is generally less error-prone:
+
+```shell
+code-push release-cordova MyApp ios
+```
+
+*NOTE: We believe that the `release-cordova` command should be valuable for most Cordova developers, so if you're finding that it isn't flexible enough or missing a key feature, please don't hesistate to [let us know](mailto:codepushfeed@microsoft.com), so that we can improve it.*
+
+#### App name parameter
+
+This is the same parameter as the one described in the [above section](#app-name-parameter).
 
 #### Platform parameter
 
