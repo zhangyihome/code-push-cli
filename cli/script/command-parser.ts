@@ -256,7 +256,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
         addCommonConfiguration(yargs);
     })
-    .command("link", "Link a new authentication provider to an account with the CodePush server", (yargs: yargs.Argv) => {
+    .command("link", "Link an additional authentication provider (e.g. GitHub) to an existing CodePush account", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         isValidCommand = true;
         yargs.usage(USAGE_PREFIX + " link")
