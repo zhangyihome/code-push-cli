@@ -350,7 +350,7 @@ This specifies the percentage of users (as an integer between `1` and `100`) tha
 
 #### Disabled parameter
 
-This specifies whether an update should be acquirable by end users or not. If left unspecified, the update will not be disabled (i.e. users will download it the moment the call `sync`).
+This specifies whether an update should be acquirable by end users or not. If left unspecified, the update will not be disabled (i.e. users will download it the moment the call `sync`). This parameter can be valuable if you want to release an update that isn't immediately available, until you expicitly [patch it](#patching-releases) when you want end users to be able to download it.
 
 *NOTE: This parameter can be set using either "--disabled" or "-x"*
 
@@ -419,21 +419,21 @@ This is the same parameter as the one described in the [above section](#descript
 
 This is the same parameter as the one described in the [above section](#mandatory-parameter).
 
-#### Target binary version parameter
-
-This is the same parameter as the one described in the [above section](#target-binary-version-parameter). If left unspecified, this defaults to targeting the exact version specified in the app's `Info.plist` (for iOS) and `build.gradle` (for Android) files.
-
 #### Rollout parameter
 
 This is the same parameter as the one described in the [above section](#rollout-parameter). If left unspecified, the release will be made available to all users.
 
-#### Development parameter
+#### Target binary version parameter
 
-This specifies whether to generate a unminified, development JS bundle. If left unspecified, this defaults to `false` where warnings are disabled and the bundle is minified.
+This is the same parameter as the one described in the [above section](#target-binary-version-parameter). If left unspecified, this defaults to targeting the exact version specified in the app's `Info.plist` (for iOS) and `build.gradle` (for Android) files.
 
 #### Disabled parameter
 
 This is the same parameter as the one described in the [above section](#disabled-parameter).
+
+#### Development parameter
+
+This specifies whether to generate a unminified, development JS bundle. If left unspecified, this defaults to `false` where warnings are disabled and the bundle is minified.
 
 #### Entry file parameter
 
@@ -499,13 +499,13 @@ This is the same parameter as the one described in the [above section](#descript
 
 This is the same parameter as the one described in the [above section](#mandatory-parameter).
 
-#### Target binary version parameter
-
-This is the same parameter as the one described in the [above section](#target-binary-version-parameter). If left unspecified, the command defaults to targeting only the specified version in the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients).
-
 #### Rollout parameter
 
 This is the same parameter as the one described in the [above section](#rollout-parameter). If left unspecified, the release will be made available to all users.
+
+#### Target binary version parameter
+
+This is the same parameter as the one described in the [above section](#target-binary-version-parameter). If left unspecified, the command defaults to targeting only the specified version in the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients).
 
 #### Disabled parameter
 
