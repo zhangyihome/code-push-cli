@@ -2,7 +2,7 @@
 
 CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users' devices. It works by acting as a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using the provided client SDKs for [Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push)). This allows you to have a more deterministic and direct engagement model with your user base, when addressing bugs and/or adding small features that don't require you to re-build a binary and re-distribute it through the respective app stores.
 
-![CodePush CLI](https://cloud.githubusercontent.com/assets/116461/13863792/b68a6ff4-ec59-11e5-9674-05e2a85f71a9.png)
+![CodePush CLI](https://cloud.githubusercontent.com/assets/696206/14033280/7f296d58-f1d6-11e5-98b1-3629c89a9c0d.PNG)
 
 * [Installation](#installation)
 * [Getting Started](#getting-started)
@@ -45,6 +45,14 @@ code-push register
 This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. Once authenticated, it will create a CodePush account "linked" to your GitHub/MSA identity, and generate an access key you can copy/paste into the CLI in order to login.
 
 *Note: After registering, you are automatically logged-in with the CLI, so until you explicitly log out, you don't need to login again from the same machine.*
+
+If you have an existing account, you may also link your account to another identity provider by running:
+
+```
+code-push link
+```
+
+Note that in order to do this, the email address used on the provider must match the one on your existing account.
 
 ## Authentication
 
