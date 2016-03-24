@@ -396,6 +396,7 @@ export function execute(command: cli.ICommand): Promise<void> {
     return Q(<void>null)
         .then(() => {
             switch (command.type) {
+                // Must not be logged in
                 case cli.CommandType.login:
                 case cli.CommandType.register:
                     if (connectionInfo) {
@@ -403,6 +404,11 @@ export function execute(command: cli.ICommand): Promise<void> {
                     }
                     break;
 
+                // It does not matter whether you are logged in or not
+                case cli.CommandType.link:
+                    break;
+
+                // Must be logged in
                 default:
                     if (!!sdk) break; // Used by unit tests to skip authentication
 
@@ -465,6 +471,9 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.deploymentRename:
                     return deploymentRename(<cli.IDeploymentRenameCommand>command);
+
+                case cli.CommandType.link:
+                    return link(<cli.ILinkCommand>command);
 
                 case cli.CommandType.login:
                     return login(<cli.ILoginCommand>command);
@@ -530,12 +539,17 @@ function getTotalActiveFromDeploymentMetrics(metrics: DeploymentMetrics): number
 
 function initiateExternalAuthenticationAsync(action: string, serverUrl?: string): void {
     var message: string = `A browser is being launched to authenticate your account. Follow the instructions ` +
-        `it displays to complete your ${action === "register" ? "registration" : "login"}.\r\n`;
+        `it displays to complete your ${action === "register" ? "registration" : action}.`;
 
     log(message);
     var hostname: string = os.hostname();
     var url: string = `${serverUrl || AccountManager.SERVER_URL}/auth/${action}?hostname=${hostname}`;
     opener(url);
+}
+
+function link(command: cli.ILinkCommand): Promise<void> {
+    initiateExternalAuthenticationAsync("link", command.serverUrl);
+    return Q(<void>null);
 }
 
 function login(command: cli.ILoginCommand): Promise<void> {
@@ -557,6 +571,7 @@ function login(command: cli.ILoginCommand): Promise<void> {
 
 function loginWithExternalAuthentication(action: string, serverUrl?: string): Promise<void> {
     initiateExternalAuthenticationAsync(action, serverUrl);
+    log("");    // Insert newline
 
     return requestAccessKey()
         .then((accessKey: string): Promise<void> => {
@@ -703,7 +718,7 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, deployme
                 if (releaseSource) {
                     releaseTime += "\n" + chalk.magenta(`(${releaseSource})`).toString();
                 }
-                
+
                 var row: string[] = [packageObject.label, releaseTime, packageObject.appVersion, packageObject.isMandatory ? "Yes" : "No"];
                 if (command.displayAuthor) {
                     var releasedBy: string = packageObject.releasedBy ? packageObject.releasedBy : "";
@@ -747,11 +762,11 @@ function getPackageString(packageObject: Package): string {
         chalk.green("Release Time: ") + formatDate(packageObject.uploadTime) + "\n" +
         chalk.green("Released By: ") + (packageObject.releasedBy ? packageObject.releasedBy : "") +
         (packageObject.description ? wordwrap(70)("\n" + chalk.green("Description: ") + packageObject.description) : "");
-        
+
     if (packageObject.isDisabled) {
         packageString += `\n${chalk.green("Disabled:")} Yes`;
     }
-    
+
     return packageString;
 }
 

@@ -256,6 +256,16 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
         addCommonConfiguration(yargs);
     })
+    .command("link", "Link a new authentication provider to an account with the CodePush server", (yargs: yargs.Argv) => {
+        isValidCommandCategory = true;
+        isValidCommand = true;
+        yargs.usage(USAGE_PREFIX + " link")
+            .demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
+            .example("link", "Links an account on the CodePush server")
+            .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
+
+        addCommonConfiguration(yargs);
+    })
     .command("login", "Authenticate with the CodePush server in order to begin managing your apps", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         isValidCommand = true;
@@ -576,6 +586,10 @@ function createCommand(): cli.ICommand {
                         }
                         break;
                 }
+                break;
+
+            case "link":
+                cmd = <cli.ILinkCommand>{ type: cli.CommandType.link, serverUrl: getServerUrl(arg1) };
                 break;
 
             case "login":

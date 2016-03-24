@@ -17,6 +17,7 @@
     deploymentMetrics,
     deploymentRemove,
     deploymentRename,
+    link,
     login,
     logout,
     patch,
@@ -113,6 +114,10 @@ export interface IDeploymentRenameCommand extends ICommand {
     appName: string;
     currentDeploymentName: string;
     newDeploymentName: string;
+}
+
+export interface ILinkCommand extends ICommand {
+    serverUrl?: string;
 }
 
 export interface ILoginCommand extends ICommand {
