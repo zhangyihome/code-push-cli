@@ -350,7 +350,7 @@ This specifies the percentage of users (as an integer between `1` and `100`) tha
 
 #### Disabled parameter
 
-This specifies whether an update should be acquirable by end users or not. If left unspecified, the update will not be disabled (i.e. users will download it the moment the call `sync`). This parameter can be valuable if you want to release an update that isn't immediately available, until you expicitly [patch it](#patching-releases) when you want end users to be able to download it.
+This specifies whether an update should be acquirable by end users or not. If left unspecified, the update will not be disabled (i.e. users will download it the moment your app calls `sync`). This parameter can be valuable if you want to release an update that isn't immediately available, until you expicitly [patch it](#patching-releases) when you want end users to be able to download it (e.g. an announcement blog post went live).
 
 *NOTE: This parameter can be set using either "--disabled" or "-x"*
 
