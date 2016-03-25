@@ -64,7 +64,7 @@ code-push login
 
 This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. This will generate an access key that you need to copy/paste into the CLI (it will prompt you for it). You are now successfully authenticated and can safely close your browser window.
 
-If at anytime you want to determine if you're already logged in, and if so, with which account, you can run the following command to display the e-mail address associated with your current authentication session, and which identity providers your account is linked to (e.g. GitHub):
+If at anytime you want to determine if you're already logged in, you can run the following command to display the e-mail address associated with your current authentication session, and which identity providers your account is linked to (e.g. GitHub):
 
 ```shell
 code-push whoami
