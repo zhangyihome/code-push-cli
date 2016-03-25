@@ -56,13 +56,19 @@ Note that in order to do this, the email address used on the provider must match
 
 ## Authentication
 
-Every command within the CodePush CLI requires authentication, and therefore, before you can begin managing your account, you need to login using the GitHub or Microsoft account you used when registering. You can do this by running the following command:
+Most commands within the CodePush CLI require authentication, and therefore, before you can begin managing your account, you need to login using the GitHub or Microsoft account you used when registering. You can do this by running the following command:
 
 ```
 code-push login
 ```
 
 This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. This will generate an access key that you need to copy/paste into the CLI (it will prompt you for it). You are now successfully authenticated and can safely close your browser window.
+
+If at anytime you want to determine if you're already logged in, and if so, with which account, you can run the following command to display the e-mail address associated with your current authentication session:
+
+```shell
+code-push whoami
+```
 
 When you login from the CLI, your access key is persisted to disk for the duration of your session so that you don't have to login every time you attempt to access your account. In order to end your session and delete this access key, simply run the following command:
 

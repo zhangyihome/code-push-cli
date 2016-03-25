@@ -26,7 +26,8 @@
     release,
     releaseCordova,
     releaseReact,
-    rollback
+    rollback,
+    whoami
 }
 
 export interface ICommand {

@@ -502,6 +502,9 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.rollback:
                     return rollback(<cli.IRollbackCommand>command);
 
+                case cli.CommandType.whoami:
+                    return whoami(command);
+                    
                 default:
                     // We should never see this message as invalid commands should be caught by the argument parser.
                     throw new Error("Invalid command:  " + JSON.stringify(command));
@@ -1278,4 +1281,11 @@ function throwForInvalidOutputFormat(format: string): void {
         default:
             throw new Error("Invalid format:  " + format + ".");
     }
+}
+
+function whoami(command: cli.ICommand): Promise<void> {
+    return sdk.getAccountInfo()
+            .then((account): void => {
+                log(account.email);
+            });
 }

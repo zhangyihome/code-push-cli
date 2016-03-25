@@ -381,6 +381,14 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
         addCommonConfiguration(yargs);
     })
+    .command("whoami", "Displays the e-mail address you are currently logged in with", (yargs: yargs.Argv) => {
+        isValidCommandCategory = true;
+        isValidCommand = true;
+        yargs.usage(USAGE_PREFIX + " whoami")
+            .demand(/*count*/ 1, /*max*/ 1)  // Require exactly one non-option argument.
+            .example("whoami", "Displays the e-mail address you are currently logged in with");
+        addCommonConfiguration(yargs);
+    })
     .alias("v", "version")
     .version(packageJson.version)
     .wrap(/*columnLimit*/ null)
@@ -714,6 +722,10 @@ function createCommand(): cli.ICommand {
                     rollbackCommand.deploymentName = arg2;
                     rollbackCommand.targetRelease = argv["targetRelease"];
                 }
+                break;
+                
+            case "whoami":
+                cmd = { type: cli.CommandType.whoami };
                 break;
         }
 
