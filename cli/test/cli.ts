@@ -931,7 +931,7 @@ describe("CLI", () => {
         };
 
 
-        var spawnSync: Sinon.SinonStub = sandbox.stub(cmdexec, "spawnSync", (command: string, commandArgs: string[], options: any) => { return { error: new Error("Failed Prepare") }; });
+        var execSync: Sinon.SinonStub = sandbox.stub(cmdexec, "execSync", (command: string, options: any) => { throw "Failed Prepare"; });
         var release: Sinon.SinonSpy = sandbox.spy(cmdexec, "release");
         var releaseCordova: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseCordova");
 
@@ -960,7 +960,7 @@ describe("CLI", () => {
             platform: "ios"
         };
 
-        var spawnSync: Sinon.SinonStub = sandbox.stub(cmdexec, "spawnSync", (command: string, commandArgs: string[], options: any) => { return {}; });
+        var execSync: Sinon.SinonStub = sandbox.stub(cmdexec, "execSync", (command: string, options: any) => { });
         var release: Sinon.SinonSpy = sandbox.spy(cmdexec, "release");
         var releaseCordova: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseCordova");
 
@@ -972,7 +972,7 @@ describe("CLI", () => {
                 assert.equal(err.message, `Unable to find or read "config.xml" in the CWD. The "release-cordova" command must be executed in a Cordova project folder.`);
                 sinon.assert.notCalled(release);
                 sinon.assert.threw(releaseCordova, "Error");
-                sinon.assert.calledOnce(spawnSync);
+                sinon.assert.calledOnce(execSync);
                 done();
             })
             .done();
@@ -1034,13 +1034,13 @@ describe("CLI", () => {
             platform: "ios"
         }
 
-        var spawnSync: Sinon.SinonStub = sandbox.stub(cmdexec, "spawnSync", (command: string, commandArgs: string[], options: any) => { return {}; });
+        var execSync: Sinon.SinonStub = sandbox.stub(cmdexec, "execSync", (command: string, options: any) => { });
         var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release");
         var releaseCordova: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseCordova");
 
         cmdexec.execute(command)
             .then((compiledReleaseCommand: any) => {
-                sinon.assert.calledOnce(spawnSync);
+                sinon.assert.calledOnce(execSync);
                 sinon.assert.calledWith(release, expectedReleaseCommand);
                 done();
             })
@@ -1079,13 +1079,13 @@ describe("CLI", () => {
             platform: "android"
         }
 
-        var spawnSync: Sinon.SinonStub = sandbox.stub(cmdexec, "spawnSync", (command: string, commandArgs: string[], options: any) => { return {}; });
+        var execSync: Sinon.SinonStub = sandbox.stub(cmdexec, "execSync", (command: string, options: any) => { });
         var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release");
         var releaseCordova: Sinon.SinonSpy = sandbox.spy(cmdexec, "releaseCordova");
 
         cmdexec.execute(command)
             .then((compiledReleaseCommand: any) => {
-                sinon.assert.calledOnce(spawnSync);
+                sinon.assert.calledOnce(execSync);
                 sinon.assert.calledWith(release, expectedReleaseCommand);
                 done();
             })
