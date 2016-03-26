@@ -1286,6 +1286,6 @@ function throwForInvalidOutputFormat(format: string): void {
 function whoami(command: cli.ICommand): Promise<void> {
     return sdk.getAccountInfo()
         .then((account): void => {
-            log(account.email);
+            log(`${account.email} (${account.linkedProviders.join(", ")})`);
         });
 }

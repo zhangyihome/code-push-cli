@@ -86,6 +86,7 @@ declare module "rest-definitions" {
     export interface Account {
         /*key*/ email: string;
         name: string;
+        linkedProviders: string[];
     }
 
     /*out*/
