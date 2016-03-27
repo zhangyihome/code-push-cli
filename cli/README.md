@@ -231,7 +231,7 @@ The install metrics have the following meaning:
 
 * **Rollbacks** - The number of times that this release has been automatically rolled back on the client. Ideally this number should be zero, and in that case, this metric isn't even shown. However, if you released an update that includes a crash as part of the installation process, the CodePush plugin will roll the end-user back to the previous release, and report that issue back to the server. This allows your end-users to remain unblocked in the event of broken releases, and by being able to see this telemetry in the CLI, you can identify erroneous releases and respond to them by [rolling it back](#rolling-back-undesired-updates) on the server.
 
-* **Rollout** - Indicates the percentage of users that are elligble to receive this update. This property will only be displayed for releases that have been tagged with a non-empty rollout value, and can only ever be present on the latest release within each deployment.
+* **Rollout** - Indicates the percentage of users that are elligble to receive this update. This property will only be displayed for releases that represent an "active" rollout, and therefore, have a rollout percentage that is less than 100%. Additionally, since a deployment can only have one active rollout at any given time, this label would only be present on the latest release within a deployment. 
 
 * **Disabled** - Indicates whether the release has been marked as disabled or not, and therefore, is acquirable by end users. This property will only be displayed for releases that are actually disabled.
 
@@ -350,7 +350,7 @@ If you never release an update that is marked as mandatory, then the above behav
 
 **IMPORTANT: In order for this parameter to actually take affect, your end users need to be running version `1.6.0-beta+` (for Cordova) or `1.9.0-beta+` (for React Native) of the CodePush plugin. If you release an update that specifies a rollout property, no end user running an older version of the Cordova or React Native plugins will be eligible for the update. Therefore, until you have adopted the neccessary version of the CodePush SDK, we would advise not setting a rollout value on your releases, since no one would end up receiving it.**
 
-This specifies the percentage of users (as an integer between `1` and `100`) that should be eligible to receive this update. It can be helpful if you want to "flight" new releases with a portion of your audience (e.g. 25%), and get feedback and/or watch for exceptions/crashes, before making it broadly available for everyone. If this parameter isn't set, it is treated equivalently to `100`, and therefore, you only need to set it if you want to actually limit how many users will receive it.
+This specifies the percentage of users (as an integer between `1` and `100`) that should be eligible to receive this update. It can be helpful if you want to "flight" new releases with a portion of your audience (e.g. 25%), and get feedback and/or watch for exceptions/crashes, before making it broadly available for everyone. If this parameter isn't set, it is set to `100%`, and therefore, you only need to set it if you want to actually limit how many users will receive it.
 
  When leveraging the rollout capability, there are a few additional considerations to keep in mind:
 
