@@ -449,17 +449,25 @@ This is the same parameter as the one described in the [above section](#disabled
 
 This specifies whether to generate a unminified, development JS bundle. If left unspecified, this defaults to `false` where warnings are disabled and the bundle is minified.
 
+*NOTE: This parameter can be set using either --develoment or --dev*
+
 #### Entry file parameter
 
 This specifies the relative path to app's root/entry JavaScript file. If left unspecified, this defaults to `index.ios.js` (for iOS) or `index.android.js` (for Android) if that file exists, or `index.js` otherwise.
+
+*NOTE: This parameter can be set using either --entryFile or -e*
 
 #### Bundle name parameter
 
 This specifies the file name that should be used for the generated JS bundle. If left unspecified, the standard bundle name will be used for the specified platform: `main.jsbundle` (iOS) and `index.android.bundle` (Android).
 
+*NOTE: This parameter can be set using either --bundleName or -b*
+
 #### Sourcemap output parameter
 
 This specifies the relative path to where the generated JS bundle's sourcemap file should be written. If left unspecified, sourcemaps will not be generated.
+
+*NOTE: This parameter can be set using either --sourcemapOutput or -s*
 
 ### Releasing Updates (Cordova)
 
