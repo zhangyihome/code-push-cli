@@ -233,7 +233,7 @@ The install metrics have the following meaning:
 
 * **Rollout** - Indicates the percentage of users that are elligble to receive this update. This property will only be displayed for releases that represent an "active" rollout, and therefore, have a rollout percentage that is less than 100%. Additionally, since a deployment can only have one active rollout at any given time, this label would only be present on the latest release within a deployment. 
 
-* **Disabled** - Indicates whether the release has been marked as disabled or not, and therefore, is acquirable by end users. This property will only be displayed for releases that are actually disabled.
+* **Disabled** - Indicates whether the release has been marked as disabled or not, and therefore, is downloadable by end users. This property will only be displayed for releases that are actually disabled.
 
 When the metrics cell reports `No installs recorded`, that indicates that the server hasn't seen any activity for this release. This could either be because it precluded the plugin versions that included telemetry support, or no end-users have synchronized with the CodePush server yet. As soon as an install happens, you will begin to see metrics populate in the CLI for the release.
 
@@ -364,7 +364,7 @@ This specifies the percentage of users (as an integer between `1` and `100`) tha
 
 #### Disabled parameter
 
-This specifies whether an update should be acquirable by end users or not. If left unspecified, the update will not be disabled (i.e. users will download it the moment your app calls `sync`). This parameter can be valuable if you want to release an update that isn't immediately available, until you expicitly [patch it](#patching-releases) when you want end users to be able to download it (e.g. an announcement blog post went live).
+This specifies whether an update should be downloadable by end users or not. If left unspecified, the update will not be disabled (i.e. users will download it the moment your app calls `sync`). This parameter can be valuable if you want to release an update that isn't immediately available, until you expicitly [patch it](#patching-releases) when you want end users to be able to download it (e.g. an announcement blog post went live).
 
 *NOTE: This parameter can be set using either "--disabled" or "-x"*
 
