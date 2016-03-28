@@ -43,7 +43,7 @@ function accessKeyAdd(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
     yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <description>")
         .demand(/*count*/ 3, /*max*/ 3)  // Require exactly two non-option arguments.
-        .example("access-key " + commandName + " \"VSO Integration\"", "Generates a new access key with the description \"VSO Integration\"");
+        .example("access-key " + commandName + " \"VSO Integration\"", "Creates a new access key with the description \"VSO Integration\"");
 
     addCommonConfiguration(yargs);
 }
@@ -52,8 +52,8 @@ function accessKeyList(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
     yargs.usage(USAGE_PREFIX + " access-key " + commandName + " [options]")
         .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
-        .example("access-key " + commandName, "List your access keys in tabular format")
-        .example("access-key " + commandName + " --format json", "List your access keys in JSON format")
+        .example("access-key " + commandName, "Lists your access keys in tabular format")
+        .example("access-key " + commandName + " --format json", "Lists your access keys in JSON format")
         .option("format", { default: "table", demand: false, description: "Output format to display your access keys with (\"json\" or \"table\")", type: "string" });
 
     addCommonConfiguration(yargs);
