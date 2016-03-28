@@ -130,7 +130,7 @@ function deploymentList(commandName: string, yargs: yargs.Argv): void {
         .example("deployment " + commandName + " MyApp", "Lists the deployments for app \"MyApp\" in tabular format")
         .example("deployment " + commandName + " MyApp --format json", "Lists the deployments for app \"MyApp\" in JSON format")
         .option("format", { default: "table", demand: false, description: "Output format to display your deployments with (\"json\" or \"table\")", type: "string" })
-        .option("displayKeys", { alias: "k", default: false, demand: false, description: "Whether to display the deployment keys", type: "boolean" });
+        .option("displayKeys", { alias: "k", default: false, demand: false, description: "Specifies whether to display the deployment keys", type: "boolean" });
     addCommonConfiguration(yargs);
 }
 
@@ -150,7 +150,7 @@ function deploymentHistory(commandName: string, yargs: yargs.Argv): void {
         .example("deployment " + commandName + " MyApp MyDeployment", "Displays the release history for deployment \"MyDeployment\" from app \"MyApp\" in tabular format")
         .example("deployment " + commandName + " MyApp MyDeployment --format json", "Displays the release history for deployment \"MyDeployment\" from app \"MyApp\" in JSON format")
         .option("format", { default: "table", demand: false, description: "Output format to display the release history with (\"json\" or \"table\")", type: "string" })
-        .option("displayAuthor", { alias: "a", default: false, demand: false, description: "Whether to display the release author", type: "boolean" });
+        .option("displayAuthor", { alias: "a", default: false, demand: false, description: "Specifies whether to display the release author", type: "boolean" });
 
     addCommonConfiguration(yargs);
 }
@@ -293,8 +293,8 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .example("patch MyApp Production -l v3 --des \"Updated description for v3\"", "Updates the description of the release with label v3 for \"MyApp\" app's \"Production\" deployment")
             .option("label", { alias: "l", default: null, demand: false, description: "Label of the release to update. Defaults to the latest release within the specified deployment", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "Description of the changes made to the app with this release", type: "string" })
-            .option("disabled", { alias: "x", default: null, demand: false, description: "Whether this release should be immediately downloadable", type: "boolean" })
-            .option("mandatory", { alias: "m", default: null, demand: false, description: "Whether this release should be considered mandatory", type: "boolean" })
+            .option("disabled", { alias: "x", default: null, demand: false, description: "Specifies whether this release should be immediately downloadable", type: "boolean" })
+            .option("mandatory", { alias: "m", default: null, demand: false, description: "Specifies whether this release should be considered mandatory", type: "boolean" })
             .option("rollout", { alias: "r", default: null, demand: false, description: "Percentage of users this release should be immediately available to. This attribute can only be increased from the current value.", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
 
@@ -306,8 +306,8 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .example("promote MyApp Staging Production", "Promotes the latest release within the \"Staging\" deployment of \"MyApp\" to \"Production\"")
             .example("promote MyApp Staging Production --des \"Production rollout\" -r 25", "Promotes the latest release within the \"Staging\" deployment of \"MyApp\" to \"Production\", with an updated description, and targeting only 25% of the users")
             .option("description", { alias: "des", default: null, demand: false, description: "Description of the changes made to the app with this release. If omitted, the description from the release being promoted will be used.", type: "string" })
-            .option("disabled", { alias: "x", default: null, demand: false, description: "Whether this release should be immediately downloadable. If omitted, the disabled attribute from the release being promoted will be used.", type: "boolean" })
-            .option("mandatory", { alias: "m", default: null, demand: false, description: "Whether this release should be considered mandatory. If omitted, the mandatory property from the release being promoted will be used.", type: "boolean" })
+            .option("disabled", { alias: "x", default: null, demand: false, description: "Specifies whether this release should be immediately downloadable. If omitted, the disabled attribute from the release being promoted will be used.", type: "boolean" })
+            .option("mandatory", { alias: "m", default: null, demand: false, description: "Specifies whether this release should be considered mandatory. If omitted, the mandatory property from the release being promoted will be used.", type: "boolean" })
             .option("rollout", { alias: "r", default: "100%", demand: false, description: "Percentage of users this update should be immediately available to", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
 
@@ -331,8 +331,8 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .example("release MyApp ./platforms/ios/www 1.0.3 -d Production -r 20", "Releases the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting the 1.0.3 binary version and rolling out to about 20% of the users")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "Deployment to release the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "Description of the changes made to the app in this release", type: "string" })
-            .option("disabled", { alias: "x", default: false, demand: false, description: "Whether this release should be immediately downloadable", type: "boolean" })
-            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this release should be considered mandatory", type: "boolean" })
+            .option("disabled", { alias: "x", default: false, demand: false, description: "Specifies whether this release should be immediately downloadable", type: "boolean" })
+            .option("mandatory", { alias: "m", default: false, demand: false, description: "Specifies hether this release should be considered mandatory", type: "boolean" })
             .option("rollout", { alias: "r", default: "100%", demand: false, description: "Percentage of users this release should be available to", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
 
@@ -345,8 +345,8 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .example("release-cordova MyApp android -d Production", "Releases the Cordova Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "Deployment to release the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "Description of the changes made to the app in this release", type: "string" })
-            .option("disabled", { alias: "x", default: false, demand: false, description: "Whether this release should be immediately downloadable", type: "boolean" })
-            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this release should be considered mandatory", type: "boolean" })
+            .option("disabled", { alias: "x", default: false, demand: false, description: "Specifies whether this release should be immediately downloadable", type: "boolean" })
+            .option("mandatory", { alias: "m", default: false, demand: false, description: "Specifies whether this release should be considered mandatory", type: "boolean" })
             .option("rollout", { alias: "r", default: "100%", demand: false, description: "Percentage of users this release should be immediately available to", type: "string" })
             .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "Semver expression that specifies the binary app version(s) this release is targetting (e.g. 1.1.0, ~1.2.3). If omitted, the release will target the exact version specified in the config.xml file.", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
@@ -361,10 +361,10 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("bundleName", { alias: "b", default: null, demand: false, description: "Name of the generated JS bundle file. If unspecified, the standard bundle name will be used, depending on the specified platform: \"main.jsbundle\" (iOS) and \"index.android.bundle\" (Android)", type: "string" })
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "Deployment to release the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "Description of the changes made to the app with this release", type: "string" })
-            .option("development", { alias: "dev", default: false, demand: false, description: "Whether to generate a dev or release build", type: "boolean" })
-            .option("disabled", { alias: "x", default: false, demand: false, description: "Whether this release should be immediately downloadable", type: "boolean" })
+            .option("development", { alias: "dev", default: false, demand: false, description: "Specifies whether to generate a dev or release build", type: "boolean" })
+            .option("disabled", { alias: "x", default: false, demand: false, description: "Specifies whether this release should be immediately downloadable", type: "boolean" })
             .option("entryFile", { alias: "e", default: null, demand: false, description: "Path to the app's entry Javascript file. If omitted, \"index.<platform>.js\" and then \"index.js\" will be used (if they exist)", type: "string" })
-            .option("mandatory", { alias: "m", default: false, demand: false, description: "Whether this release should be considered mandatory", type: "boolean" })
+            .option("mandatory", { alias: "m", default: false, demand: false, description: "Specifies whether this release should be considered mandatory", type: "boolean" })
             .option("rollout", { alias: "r", default: "100%", demand: false, description: "Percentage of users this release should be immediately available to", type: "string" })
             .option("sourcemapOutput", { alias: "s", default: null, demand: false, description: "Path to where the sourcemap for the resulting bundle should be written. If omitted, a sourcemap will not be generated.", type: "string" })
             .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "Semver expression that specifies the binary app version(s) this release is targetting (e.g. 1.1.0, ~1.2.3). If omitted, the release will target the exact version specified in the \"Info.plist\" (iOS) or \"build.gradle\" (Android) files.", type: "string" })
