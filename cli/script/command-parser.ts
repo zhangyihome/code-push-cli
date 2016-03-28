@@ -323,7 +323,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
         addCommonConfiguration(yargs);
     })
-    .command("release", "Release an update to a app deployment", (yargs: yargs.Argv) => {
+    .command("release", "Release an update to an app deployment", (yargs: yargs.Argv) => {
         yargs.usage(USAGE_PREFIX + " release <appName> <updateContentsPath> <targetBinaryVersion> [options]")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
             .example("release MyApp app.js \"*\"", "Releases the \"app.js\" file to the \"MyApp\" app's \"Staging\" deployment, targeting any binary version using the \"*\" wildcard range syntax.")
@@ -332,7 +332,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "Deployment to release the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "Description of the changes made to the app in this release", type: "string" })
             .option("disabled", { alias: "x", default: false, demand: false, description: "Specifies whether this release should be immediately downloadable", type: "boolean" })
-            .option("mandatory", { alias: "m", default: false, demand: false, description: "Specifies hether this release should be considered mandatory", type: "boolean" })
+            .option("mandatory", { alias: "m", default: false, demand: false, description: "Specifies whether this release should be considered mandatory", type: "boolean" })
             .option("rollout", { alias: "r", default: "100%", demand: false, description: "Percentage of users this release should be available to", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
 
