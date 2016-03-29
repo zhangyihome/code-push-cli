@@ -887,6 +887,7 @@ function register(command: cli.IRegisterCommand): Promise<void> {
 
 function promote(command: cli.IPromoteCommand): Promise<void> {
     var packageInfo: PackageInfo = {
+        appVersion: command.appStoreVersion,
         description: command.description,
         isDisabled: getYargsBooleanOrNull(command.disabled),
         isMandatory: getYargsBooleanOrNull(command.mandatory),
@@ -901,6 +902,7 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
 
 function patch(command: cli.IPatchCommand): Promise<void> {
     var packageInfo: PackageInfo = {
+        appVersion: command.appStoreVersion,
         description: command.description,
         isMandatory: getYargsBooleanOrNull(command.mandatory),
         isDisabled: getYargsBooleanOrNull(command.disabled),
