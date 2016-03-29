@@ -750,7 +750,8 @@ describe("CLI", () => {
             disabled: false,
             description: "Patched",
             mandatory: true,
-            rollout: 25
+            rollout: 25,
+            appStoreVersion: "1.0.1"
         };
 
         var patch: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
@@ -774,7 +775,8 @@ describe("CLI", () => {
             disabled: false,
             description: "Patched",
             mandatory: true,
-            rollout: 25
+            rollout: 25,
+            appStoreVersion: "1.0.1"
         };
 
         var patch: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
@@ -798,7 +800,8 @@ describe("CLI", () => {
             disabled: null,
             description: null,
             mandatory: null,
-            rollout: null
+            rollout: null,
+            appStoreVersion: null
         };
 
         var patch: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
@@ -823,7 +826,8 @@ describe("CLI", () => {
             destDeploymentName: "Production",
             description: "Promoted",
             mandatory: true,
-            rollout: 25
+            rollout: 25,
+            appStoreVersion: "1.0.1"
         };
 
         var promote: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "promote");
