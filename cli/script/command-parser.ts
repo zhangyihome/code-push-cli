@@ -277,7 +277,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         addCommonConfiguration(yargs);
     })
     .command("patch", "Update the metadata for an existing release", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " patch <appName> <deploymentName> [--label <label>] [--description <description>] [--disabled] [--mandatory] [--rollout <rolloutPercentage>]")
+        yargs.usage(USAGE_PREFIX + " patch <appName> <deploymentName> [--label <label>] [--description <description>] [--disabled] [--mandatory] [--rollout <rolloutPercentage>] [--targetBinaryVersion <targetBinaryVersion>]")
             .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
             .example("patch MyApp Production --des \"Updated description\" -r 50", "Update the description of latest release for \"MyApp\" app's \"Production\" deployment and update rollout value to 50")
             .example("patch MyApp Production -l v3 --des \"Updated description for v3\"", "Update the description of the release with label v3 for \"MyApp\" app's \"Production\" deployment")
@@ -291,7 +291,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         addCommonConfiguration(yargs);
     })
     .command("promote", "Promote the package from one deployment of your app to another", (yargs: yargs.Argv) => {
-        yargs.usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName> [--description <description>] [--mandatory] [--rollout <rolloutPercentage>]")
+        yargs.usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName> [--description <description>] [--mandatory] [--rollout <rolloutPercentage>] [--targetBinaryVersion <targetBinaryVersion>]")
             .demand(/*count*/ 4, /*max*/ 4)  // Require exactly four non-option arguments.
             .example("promote MyApp Staging Production", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\"")
             .example("promote MyApp Staging Production --des \"Production rollout\" -r 25", "Promote the latest \"Staging\" package of \"MyApp\" to \"Production\" with the description, rolling out to 25% of the users")
@@ -605,6 +605,7 @@ function createCommand(): cli.ICommand {
                     patchCommand.disabled = argv["disabled"];
                     patchCommand.mandatory = argv["mandatory"];
                     patchCommand.rollout = getRolloutValue(argv["rollout"]);
+                    patchCommand.appStoreVersion = argv["targetBinaryVersion"];
                 }
                 break;
 
@@ -621,6 +622,7 @@ function createCommand(): cli.ICommand {
                     deploymentPromoteCommand.disabled = argv["disabled"];
                     deploymentPromoteCommand.mandatory = argv["mandatory"];
                     deploymentPromoteCommand.rollout = getRolloutValue(argv["rollout"]);
+                    deploymentPromoteCommand.appStoreVersion = argv["targetBinaryVersion"];
                 }
                 break;
 

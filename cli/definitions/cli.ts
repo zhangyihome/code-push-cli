@@ -131,12 +131,14 @@ export interface IPatchCommand extends ICommand, IPackageInfo {
     appName: string;
     deploymentName: string;
     label: string;
+    appStoreVersion: string;
 }
 
 export interface IPromoteCommand extends ICommand, IPackageInfo {
     appName: string;
     sourceDeploymentName: string;
     destDeploymentName: string;
+    appStoreVersion: string;
 }
 
 export interface IRegisterCommand extends ICommand {
