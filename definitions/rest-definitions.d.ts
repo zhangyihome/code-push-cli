@@ -118,12 +118,21 @@ declare module "rest-definitions" {
         /*generated*/ package?: Package
     }
 
+    /*out*/
+    export interface BlobInfo {
+        size: number;
+        url: string;
+    }
+
+    /*out*/
+    export interface PackageHashToBlobInfoMap {
+        [packageHash: string]: BlobInfo;
+    }
+
     /*inout*/
     export interface Package extends PackageInfo {
         /*generated*/ blobUrl: string;
-        /*generated*/ diffAgainstPackageHash?: string;
-        /*generated*/ diffBlobUrl?: string;
-        /*generated*/ diffSize?: number;
+        /*generated*/ diffPackageMap?: PackageHashToBlobInfoMap;
         /*generated*/ originalLabel?: string;       // Set on "Promote" and "Rollback"
         /*generated*/ originalDeployment?: string;  // Set on "Promote"
         /*generated*/ releasedBy?: string;          // Set by commitPackage
