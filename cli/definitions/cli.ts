@@ -135,12 +135,14 @@ export interface IPackageInfo {
 
 export interface IPatchCommand extends ICommand, IPackageInfo {
     appName: string;
+    appStoreVersion?: string;
     deploymentName: string;
     label: string;
 }
 
 export interface IPromoteCommand extends ICommand, IPackageInfo {
     appName: string;
+    appStoreVersion?: string;
     sourceDeploymentName: string;
     destDeploymentName: string;
 }

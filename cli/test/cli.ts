@@ -750,7 +750,8 @@ describe("CLI", () => {
             disabled: false,
             description: "Patched",
             mandatory: true,
-            rollout: 25
+            rollout: 25,
+            appStoreVersion: "1.0.1"
         };
 
         var patch: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
@@ -774,7 +775,33 @@ describe("CLI", () => {
             disabled: false,
             description: "Patched",
             mandatory: true,
-            rollout: 25
+            rollout: 25,
+            appStoreVersion: "1.0.1"
+        };
+
+        var patch: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(patch);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, `Successfully updated the "latest" release of "a" app's "Staging" deployment.`);
+
+                done();
+            });
+    });
+
+    it("patch command successfully updates without appStoreVersion", (done: MochaDone): void => {
+        var command: cli.IPatchCommand = {
+            type: cli.CommandType.patch,
+            appName: "a",
+            deploymentName: "Staging",
+            label: null,
+            disabled: false,
+            description: "Patched",
+            mandatory: true,
+            rollout: 25,
+            appStoreVersion: null
         };
 
         var patch: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
@@ -798,7 +825,8 @@ describe("CLI", () => {
             disabled: null,
             description: null,
             mandatory: null,
-            rollout: null
+            rollout: null,
+            appStoreVersion: null
         };
 
         var patch: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
@@ -823,7 +851,32 @@ describe("CLI", () => {
             destDeploymentName: "Production",
             description: "Promoted",
             mandatory: true,
-            rollout: 25
+            rollout: 25,
+            appStoreVersion: "1.0.1"
+        };
+
+        var promote: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "promote");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(promote);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, `Successfully promoted the "Staging" deployment of the "a" app to the "Production" deployment.`);
+
+                done();
+            });
+    });
+    
+    it("promote works successfully without appStoreVersion", (done: MochaDone): void => {
+        var command: cli.IPromoteCommand = {
+            type: cli.CommandType.promote,
+            appName: "a",
+            sourceDeploymentName: "Staging",
+            destDeploymentName: "Production",
+            description: "Promoted",
+            mandatory: true,
+            rollout: 25,
+            appStoreVersion: null
         };
 
         var promote: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "promote");
