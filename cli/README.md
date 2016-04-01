@@ -543,7 +543,7 @@ code-push patch <appName> <deploymentName>
 [--mandatory <isMandatory>]
 [--description <description>]
 [--rollout <rolloutPercentage>]
-[--tarbetBinaryVersion <targetBinaryVersion>]
+[--targetBinaryVersion <targetBinaryVersion>]
 ```
 
 Aside from the `appName` and `deploymentName`, all parameters are optional, and therefore, you can use this command to update just a single attribute or all of them at once. Calling the `patch` command without specifying any attribute flag will result in a no-op.
@@ -591,7 +591,7 @@ code-push promote <appName> <sourceDeploymentName> <destDeploymentName>
 [--disabled <disabled>]
 [--mandatory]
 [--rollout <rolloutPercentage>]
-[--targetBinaryVersion <targetBinaryVdersion]
+[--targetBinaryVersion <targetBinaryVersion]
 ```
 
 The `promote` command will create a new release for the destination deployment, which includes the **exact code and metadata** (description, mandatory and target binary version) from the latest release of the source deployment. While you could use the `release` command to "manually" migrate an update from one environment to another, the `promote` command has the following benefits:
