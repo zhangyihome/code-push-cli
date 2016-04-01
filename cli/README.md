@@ -581,6 +581,12 @@ Additionally, as mentioned above, when you release an update without a rollout v
 
 This is the same parameter as the one described in the [above section](#target-binary-version-parameter), and simply allows you to update the semver range that indicates which binary version(s) a release is compatible with. This can be useful if you made a mistake when originally releasing an update (e.g. you specified `1.0.0` but meant `1.1.0`) or you want to increase or decrease the version range that a release supports (e.g. you discovered that a release doesn't work with `1.1.2` after all). If this paremeter is ommitted, no change will be made to the value of the target release's version property.
 
+```shell
+# Add a "max binary version" to an existing release
+# by scoping its eligibility to users running >= 1.0.5
+code-push patch MyApp Staging -t "1.0.0 - 1.0.5"
+```
+
 ## Promoting Updates
 
 Once you've tested an update against a specific deployment (e.g. `Staging`), and you want to promote it "downstream" (e.g. dev->staging, staging->production), you can simply use the following command to copy the release from one deployment to another:
@@ -621,6 +627,12 @@ This is the same parameter as the one described in the [above section](#rollout-
 ### Target binary version parameter
 
 This is the same parameter as the one described in the [above section](#target-binary-version-parameter), and simply allows you to override the target binary version that will be used for the promoted release. If unspecified, the new release will inherit the target binary version property from the release being promoted.
+
+```shell
+# Promote the release to production and make it 
+# available to all versions using that deployment
+code-push promote MyApp Staging Production -t "*"
+```
 
 ## Rolling Back Updates
 
