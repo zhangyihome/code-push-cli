@@ -549,7 +549,10 @@ code-push patch <appName> <deploymentName>
 Aside from the `appName` and `deploymentName`, all parameters are optional, and therefore, you can use this command to update just a single attribute or all of them at once. Calling the `patch` command without specifying any attribute flag will result in a no-op.
 
 ```shell
+# Mark the latest production release as mandatory
 code-push patch MyApp Production -m
+
+# Increase the rollout for v23 to 50%
 code-push patch MyApp Production -l v23 -rollout 50%
 ```
 
@@ -622,7 +625,7 @@ This is the same parameter as the one described in the [above section](#mandator
 
 ### Rollout parameter
 
-This is the same parameter as the one described in the [above section](#rollout-parameter), and allows you to specify whether the newly created release should only be made available to a portion of your users. Unlike the `mandatory` and `description` parameters, the `rollout` of a release is not carried over as part of a promote, and so you need to explicitly set this if you don't want the new release to be available to all of your users.
+This is the same parameter as the one described in the [above section](#rollout-parameter), and allows you to specify whether the newly created release should only be made available to a portion of your users. Unlike the other release metadata parameters (e.g. `description`), the `rollout` of a release is not carried over/inherited as part of a promote, and therefore, you need to explicitly set this if you don't want the newly created release to be available to all of your users.
 
 ### Target binary version parameter
 
