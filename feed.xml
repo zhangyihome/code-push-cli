@@ -3,8 +3,8 @@
 	<channel>
 		<title>CodePush</title>
 		<description>CodePush Blog</description>		
-		<link>http://microsoft.github.io/code-push/blog</link>
-		<atom:link href="http://microsoft.github.io/code-push/blog/feed.xml" rel="self" type="application/rss+xml" />
+		<link></link>
+		<atom:link href="/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
 				<title>Web-like release agility for React Native Apps</title>
@@ -16,8 +16,8 @@
 </description>
 				
 				<pubDate>Mon, 22 Feb 2016 00:00:00 -0800</pubDate>
-				<link>http://microsoft.github.io/code-push/blog/articles/DevOpsExp.html</link>
-				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/DevOpsExp.html</guid>
+				<link>/articles/DevOpsExp.html</link>
+				<guid isPermaLink="true">/articles/DevOpsExp.html</guid>
 			</item>
 		
 			<item>
@@ -30,8 +30,8 @@
 </description>
 				
 				<pubDate>Wed, 18 Nov 2015 00:00:00 -0800</pubDate>
-				<link>http://microsoft.github.io/code-push/blog/articles/OpenBeta.html</link>
-				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/OpenBeta.html</guid>
+				<link>/articles/OpenBeta.html</link>
+				<guid isPermaLink="true">/articles/OpenBeta.html</guid>
 			</item>
 		
 			<item>
@@ -44,8 +44,8 @@
 </description>
 				
 				<pubDate>Wed, 18 Nov 2015 00:00:00 -0800</pubDate>
-				<link>http://microsoft.github.io/code-push/blog/articles/CDWithCodePushAndVSTS.html</link>
-				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/CDWithCodePushAndVSTS.html</guid>
+				<link>/articles/CDWithCodePushAndVSTS.html</link>
+				<guid isPermaLink="true">/articles/CDWithCodePushAndVSTS.html</guid>
 			</item>
 		
 			<item>
@@ -58,8 +58,8 @@
 </description>
 				
 				<pubDate>Wed, 04 Nov 2015 00:00:00 -0800</pubDate>
-				<link>http://microsoft.github.io/code-push/blog/articles/CodePush1.1.html</link>
-				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/CodePush1.1.html</guid>
+				<link>/articles/CodePush1.1.html</link>
+				<guid isPermaLink="true">/articles/CodePush1.1.html</guid>
 			</item>
 		
 	</channel>
