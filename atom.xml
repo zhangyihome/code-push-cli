@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
  <title>CodePush</title>
- <link href="http://microsoft.github.io/code-push/blog/atom.xml" rel="self"/>
- <link href="http://microsoft.github.io/code-push/blog/"/>
- <updated>2016-04-06T13:54:32-07:00</updated>
- <id>http://microsoft.github.io/code-push/blog</id>
+ <link href="/atom.xml" rel="self"/>
+ <link href="/"/>
+ <updated>2016-04-07T17:12:58-07:00</updated>
+ <id></id>
  <author>
    <name></name>
    <email></email>
@@ -14,9 +14,9 @@
  
  <entry>
    <title>Web-like release agility for React Native Apps</title>
-   <link href="http://microsoft.github.io/code-push/blog/articles/DevOpsExp.html"/>
+   <link href="/articles/DevOpsExp.html"/>
    <updated>2016-02-22T00:00:00-08:00</updated>
-   <id>http://microsoft.github.io/code-push/blog/articles/DevOpsExp</id>
+   <id>/articles/DevOpsExp</id>
    <content type="html">&lt;p&gt;It’s been a few months since we opened up our beta program and we couldn’t be happier about all the support and excitement we&amp;rsquo;ve seen from the community! Thanks to your feedback we have made tons of fixes and added features to enable new scenarios that aim to make your React Native development cycle that much better. &lt;/p&gt;
 
 &lt;p&gt;In lieu of the ReactJS Conf 2016, we want to emphasize how much we care about this community and making your DevOps experience as seamless as possible. For those of you who were not able to attend our session, we covered the integration between three products that enable you to provide Continuous Integration (CI) and Continuous Deployment (CD) for your React Native apps: VSTS, HockeyApp and CodePush. &lt;/p&gt;
@@ -42,9 +42,9 @@
  
  <entry>
    <title>CodePush enters "open beta"</title>
-   <link href="http://microsoft.github.io/code-push/blog/articles/OpenBeta.html"/>
+   <link href="/articles/OpenBeta.html"/>
    <updated>2015-11-18T00:00:00-08:00</updated>
-   <id>http://microsoft.github.io/code-push/blog/articles/OpenBeta</id>
+   <id>/articles/OpenBeta</id>
    <content type="html">&lt;p&gt;It&amp;rsquo;s been roughly a month since we first released the CodePush &amp;ldquo;closed beta&amp;rdquo;, and we&amp;rsquo;ve received an unbelievable amount of support from the community in evaluating the service, filing bugs, giving feedback and helping improve overall quality. However, the amount of interest in the service far outweighed our expectations, and unfortunately, our ability to keep up with approving (and reaching out to) the incoming requests quickly became slower than we would have liked. Sorry to everyone that had to wait a while to get access!&lt;/p&gt;
 
 &lt;p&gt;In order to improve our ability to engage with the community, and provide devs with a fully self-service experience for using CodePush, we are opening the beta program today so that anyone can get started immediately, without needing to explicitly request access from us! We&amp;rsquo;ve enabled this by simply adding a new &lt;code&gt;register&lt;/code&gt; command to the CLI, which provides the exact same experience as the existing &lt;code&gt;login&lt;/code&gt; command, but in addition to authenticating you, it creates a CodePush account that is linked to your GitHub or Microsoft account. Make sure you have the latest version of the CLI from NPM (&lt;code&gt;npm i -g code-push-cli@latest&lt;/code&gt;) and then check out the &lt;a href=&quot;http://microsoft.github.io/code-push/docs/getting-started.html&quot;&gt;docs&lt;/a&gt; for more details on getting started.&lt;/p&gt;
@@ -55,9 +55,9 @@
  
  <entry>
    <title>Continuous Delivery with CodePush and VSTS</title>
-   <link href="http://microsoft.github.io/code-push/blog/articles/CDWithCodePushAndVSTS.html"/>
+   <link href="/articles/CDWithCodePushAndVSTS.html"/>
    <updated>2015-11-18T00:00:00-08:00</updated>
-   <id>http://microsoft.github.io/code-push/blog/articles/CDWithCodePushAndVSTS</id>
+   <id>/articles/CDWithCodePushAndVSTS</id>
    <content type="html">&lt;p&gt;While the &lt;a href=&quot;http://microsoft.github.io/code-push/docs/cli.html&quot;&gt;CodePush CLI&lt;/a&gt; provides a simple experience for managing your account, it could become pretty tedious doing manual deployments every time you need to release an update, particularly if you want to keep your dev/staging/etc. deployments always current. To better enable scripting a custom continuous delivery solution from your CI environment (e.g. Travis), we enhanced the CLI in the &lt;a href=&quot;http://microsoft.github.io/code-push/articles/CodePush1.1.html&quot;&gt;1.1 release&lt;/a&gt; with the ability to create access keys and authenticate with them &amp;ldquo;headlessly&amp;rdquo;, but we wanted to make it even simpler to automated this process E2E.&lt;/p&gt;
 
 &lt;p&gt;To take advantage of the new &lt;a href=&quot;https://marketplace.visualstudio.com/#VSTS&quot;&gt;marketplace&lt;/a&gt; for Visual Studio Team Services (formally &amp;ldquo;Visual Studio Online&amp;rdquo;), we created a &lt;a href=&quot;http://marketplace.visualstudio.com/items/ms-vsclient.code-push&quot;&gt;CodePush extension&lt;/a&gt; which makes adding a deployment step to your CI build pipeline pretty easy, and composes really well with the &lt;a href=&quot;http://marketplace.visualstudio.com/items/ms-vsclient.cordova-extension&quot;&gt;Cordova Build&lt;/a&gt; extension and existing &lt;a href=&quot;https://github.com/Microsoft/vso-agent-tasks&quot;&gt;core support&lt;/a&gt; for JavaScript apps (e.g. Running Gulp scripts, installing NPM dependencies). If you&amp;rsquo;re already using VSTS/VSO, then install the extension now and give it a shot! Otherwise, we encourage you to check it out if you&amp;rsquo;re in the market for a simple and great CI/ALM solution.&lt;/p&gt;
@@ -114,9 +114,9 @@
  
  <entry>
    <title>CodePush 1.1 (beta) released</title>
-   <link href="http://microsoft.github.io/code-push/blog/articles/CodePush1.1.html"/>
+   <link href="/articles/CodePush1.1.html"/>
    <updated>2015-11-04T00:00:00-08:00</updated>
-   <id>http://microsoft.github.io/code-push/blog/articles/CodePush1.1</id>
+   <id>/articles/CodePush1.1</id>
    <content type="html">&lt;p&gt;As part of our commitment to respond quickly to all of the great developer feedback we&amp;rsquo;ve been getting, we&amp;rsquo;ve released an update to the CodePush service, management CLI and client SDKs for both Cordova and React Native. You can update any of these components immediately via NPM, and then refer to the docs, which have been updated to account for the changes.&lt;/p&gt;
 
 &lt;p&gt;The 1.1 update includes a handful of bug fixes (thanks for everyone who helped report issues!) that we hope will improve reliability. Additionally, we also addressed the following feature requests that should help enable some important/common scenarios.&lt;/p&gt;

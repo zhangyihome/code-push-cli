@@ -246,19 +246,43 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-8 getting-started-text">
+        <div class="col-md-12 getting-started-text">
             <div class="number_circle hidden-xs hidden-sm">5</div>
             <h2><span class="number_circle visible-xs visible-sm">5</span>Release an app update</h2>
-            <p>After making changes to your app's code or assets, push the update to your staging environment via the following command: <code>code-push release MyApp &lt;updateContents&gt; &lt;targetBinaryVersion&gt;</code></p>
+            <p>Once your app has been configured and distributed to your users, and you’ve made some changes, it’s time to instantly release them!</p>      
+        </div>
+        <div class="col-md-8 getting-started-text">
+            </br>
+            <h3>React Native</h3>
+            <p>The simplest (and recommended) way to do this is to use the <code>release-react</code> comand in the CodePush CLI, which will handle bundling your JavaScript and asset files and releasing the update to the CodePush server.</p>
+            <p>The <code>release-react</code> command provides many sensible defaults (e.g. generating a release bundle, assuming your app’s entry file on iOS is either index.ios.js or index.js). However, all of these defaults can be customized to allow incremental flexibility as neccessary, which makes it a good fit for most scenarios.</p>            
         </div>
         <div class="col-md-4">
             <div class="well_code">
                 <div>
                 <button type="button" data-clipboard-text="code-push release MyApp <updateContents> <targetBinaryVersion>" class="btn btn-primary pull-right zeroClipBtn">Copy</button>
                 </div>
-                <p>code-push release &lt;appName&gt; &lt;updateContents&gt; &lt;targetBinaryVersion&gt;</p>
+                <p>code-push release-react  <appName> <platform></p>
+                <p>code-push release-react  MyApp-ios ios</p>
+                <p>code-push release-react  MyApp-Android android</p>
             </div>
         </div>
+        <div class="col-md-8 getting-started-text">
+            </br>
+            <h3>Cordova</h3>
+            <p>The simplest (and recommended) way to do this is to use the <code>release-cordova</code> comand in the CodePush CLI, which will handle bundling your JavaScript and asset files and releasing the update to the CodePush server.</p>
+            <p>The <code>release-cordova</code> command enables such a simple workflow because it understands the standard layout of a Cordova app, and therefore, can generate your update and know exactly which files to upload</p>            
+        </div>
+        <div class="col-md-4">
+            <div class="well_code">
+                <div>
+                <button type="button" data-clipboard-text="code-push release MyApp <updateContents> <targetBinaryVersion>" class="btn btn-primary pull-right zeroClipBtn">Copy</button>
+                </div>
+                <p>code-push release-cordova <appName> <platform></p>
+                <p>code-push release-cordova MyApp-ios ios</p>
+                <p>code-push release-cordova MyApp-Android android</p>
+            </div>
+        </div>        
     </div>
     <div class="row">
         <div class="col-md-12 getting-started-text">
