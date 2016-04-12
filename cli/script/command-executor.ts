@@ -842,7 +842,7 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
         } else {
             throw new Error(`The "CFBundleShortVersionString" key does not exist in "${infoPlistContainingFolder}/Info.plist".`);
         }
-    } else {
+    } else if (platform === "android") {
         var buildGradlePath: string = path.join("android", "app", "build.gradle");
         if (fileDoesNotExistOrIsDirectory(buildGradlePath)) {
             throw new Error("Unable to find or read \"build.gradle\" in the \"android/app\" folder.");
@@ -862,6 +862,26 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
                     }
                 } else {
                     throw new Error("The \"android/app/build.gradle\" file does not include a value for android.defaultConfig.versionName.");
+                }
+            });
+    } else {
+        var appxManifestFileName: string = "Package.appxmanifest";
+        try {
+            var appxManifestContainingFolder: string = path.join("windows", projectName);
+            var appxManifestContents: string = fs.readFileSync(path.join(appxManifestContainingFolder, "Package.appxmanifest")).toString();
+        } catch (err) {
+            throw new Error(`Unable to find or read "${appxManifestFileName}" in the "${path.join("windows", projectName)}" folder.`);
+        }
+            
+        return parseXml(appxManifestContents)
+            .catch((err: any) => {
+                throw new Error(`Unable to parse the "${path.join(appxManifestContainingFolder, appxManifestFileName)}" file, it could be malformed.`);
+            })
+            .then((parsedAppxManifest: any) => {
+                try {
+                    return parsedAppxManifest.Package.Identity[0]["$"].Version.match(/^\d+\.\d+\.\d+/)[0];
+                } catch (e) {
+                    throw new Error(`Unable to parse the package version from the "${path.join(appxManifestContainingFolder, appxManifestFileName)}" file.`);
                 }
             });
     }
@@ -1096,16 +1116,19 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
     var releaseCommand: cli.IReleaseCommand = <any>command;
     releaseCommand.package = outputFolder;
 
-    if (platform === "ios") {
-        if (!bundleName) {
-            bundleName = "main.jsbundle";
-        }
-    } else if (platform === "android") {
-        if (!bundleName) {
-            bundleName = "index.android.bundle";
-        }
-    } else {
-        throw new Error("Platform must be either \"ios\" or \"android\".");
+    switch (platform) {
+        case "android":
+        case "ios":
+        case "windows":
+            if (!bundleName) {
+                bundleName = platform === "ios"
+                    ? "main.jsbundle"
+                    : `index.${platform}.bundle`;
+            }
+            
+            break;
+        default:
+            throw new Error("Platform must be either \"ios\" or \"android\".");
     }
 
     try {

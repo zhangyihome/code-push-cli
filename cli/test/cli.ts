@@ -13,6 +13,10 @@ function assertJsonDescribesObject(json: string, object: Object): void {
     assert.equal(json, JSON.stringify(object, /*replacer=*/ null, /*spacing=*/ 2));
 }
 
+function clone(obj: any): any {
+    return JSON.parse(JSON.stringify(obj));
+}
+
 function ensureInTestAppDirectory(): void {
     if (!~__dirname.indexOf("/resources/TestApp")) {
         process.chdir(__dirname + "/resources/TestApp");
@@ -1347,7 +1351,7 @@ describe("CLI", () => {
 
         cmdexec.execute(command)
             .then(() => {
-                var releaseCommand: cli.IReleaseCommand = <any>command;
+                var releaseCommand: cli.IReleaseCommand = clone(command);
                 releaseCommand.package = path.join(os.tmpdir(), "CodePush");
                 releaseCommand.appStoreVersion = "1.2.3";
 
@@ -1383,9 +1387,9 @@ describe("CLI", () => {
 
         cmdexec.execute(command)
             .then(() => {
-                var releaseCommand: cli.IReleaseCommand = <any>command;
+                var releaseCommand: cli.IReleaseCommand = clone(command);
                 releaseCommand.package = path.join(os.tmpdir(), "CodePush");
-                releaseCommand.appStoreVersion = "1.2.3";
+                releaseCommand.appStoreVersion = "1.0.0";
 
                 sinon.assert.calledOnce(spawn);
                 var spawnCommand: string = spawn.args[0][0];
@@ -1394,6 +1398,42 @@ describe("CLI", () => {
                 assert.equal(
                     spawnCommandArgs,
                     `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", "index.android.bundle")} --dev false --entry-file index.android.js --platform android`
+                );
+                assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
+                done();
+            })
+            .done();
+    });
+
+    it("release-react defaults bundle name to \"index.windows.bundle\" if not provided and platform is \"windows\"", (done: MochaDone): void => {
+        var command: cli.IReleaseReactCommand = {
+            type: cli.CommandType.releaseReact,
+            appName: "a",
+            appStoreVersion: null,
+            deploymentName: "Staging",
+            description: "Test default entry file",
+            mandatory: false,
+            rollout: null,
+            platform: "windows"
+        };
+
+        ensureInTestAppDirectory();
+
+        var release: Sinon.SinonSpy = sandbox.stub(cmdexec, "release", () => { return Q(<void>null) });
+
+        cmdexec.execute(command)
+            .then(() => {
+                var releaseCommand: cli.IReleaseCommand = clone(command);
+                releaseCommand.package = path.join(os.tmpdir(), "CodePush");
+                releaseCommand.appStoreVersion = "1.0.0";
+
+                sinon.assert.calledOnce(spawn);
+                var spawnCommand: string = spawn.args[0][0];
+                var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+                assert.equal(spawnCommand, "node");
+                assert.equal(
+                    spawnCommandArgs,
+                    `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", "index.windows.bundle")} --dev false --entry-file index.windows.js --platform windows`
                 );
                 assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
                 done();
