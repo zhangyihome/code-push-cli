@@ -1252,7 +1252,7 @@ describe("CLI", () => {
                 done(new Error("Did not throw error."));
             })
             .catch((err) => {
-                assert.equal(err.message, "Platform must be either \"ios\" or \"android\".");
+                assert.equal(err.message, "Platform must be either \"android\", \"ios\" or \"windows\".");
                 sinon.assert.notCalled(release);
                 sinon.assert.threw(releaseReact, "Error");
                 sinon.assert.notCalled(spawn);
