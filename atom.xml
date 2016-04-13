@@ -4,13 +4,38 @@
  <title>CodePush</title>
  <link href="http://microsoft.github.io/code-push/blog/atom.xml" rel="self"/>
  <link href="http://microsoft.github.io/code-push/blog/"/>
- <updated>2016-04-12T10:52:16-07:00</updated>
+ <updated>2016-04-13T10:25:07-07:00</updated>
  <id>http://microsoft.github.io/code-push/blog</id>
  <author>
    <name></name>
    <email></email>
  </author>
 
+ 
+ <entry>
+   <title>React Native for Windows + CodePush</title>
+   <link href="http://microsoft.github.io/code-push/blog/articles/ReactNativeWindows.html"/>
+   <updated>2016-04-13T00:00:00-07:00</updated>
+   <id>http://microsoft.github.io/code-push/blog/articles/ReactNativeWindows</id>
+   <content type="html">&lt;p&gt;We&amp;rsquo;re very excited about today&amp;rsquo;s announcement at &lt;a href=&quot;https://www.fbf8.com&quot;&gt;F8 2016&lt;/a&gt; that &lt;a href=&quot;https://blogs.windows.com/buildingapps/2016/04/13/react-native-on-the-universal-windows-platform&quot;&gt;Universal Windows Platform support is coming to React Native&lt;/a&gt;! The CodePush team has been fortunate enough to work with thousands of developers in the React Native community, and the ability to target your app(s) at any Windows 10 device is an awesome opportunity that we look forward to seeing folks begin to take advantage of.&lt;/p&gt;
+
+&lt;p&gt;Along with this announcement, we have also published a &lt;strong&gt;very early&lt;/strong&gt; version of Windows support for the React Native CodePush module, which will allow releasing updates to your React Native apps running on a Windows 10 PC, phone, Xbox One and even HoloLens (!), using the same developement workflow as iOS and Android: &lt;code&gt;code-push release-react MyApp windows&lt;/code&gt;. We want to make it as simple as possible to practice continuous delivery with React Native, and this support will extend that capability to millions of new devices.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/116461/14446152/b1e1b766-0007-11e6-96a0-fa5d6beb37a7.PNG&quot; width=&quot;220&quot;  /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/116461/14477041/49cd7b60-00c0-11e6-8b12-d3825339d6ba.PNG&quot; width=&quot;630&quot;  /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;NOTE: While the production F8 app uses CodePush, it doesn&amp;rsquo;t display an update prompt. We just added that for the sake of illustrating the concept more easily.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h3&gt;Current Support&lt;/h3&gt;
+
+&lt;p&gt;The Windows implementation of CodePush currently has ~80% parity with the existing iOS and Android platforms, including all of the most commonly used features (e.g. updating assets, pivoting the install mode based on whether an update is mandatory or not). We were able to re-use 100% of our existing JavaScript code, and because React Native for Windows was architected to be conceptually similar to React Native for Android, it was a pretty straight forward port for our native code. We expect to implement the few remaining features in the next couple weeks, and will then maintain 100% parity across all three platforms moving forward.&lt;/p&gt;
+
+&lt;p&gt;We haven&amp;rsquo;t published the Windows support to NPM yet, but if you want to check it out, you can view the source and/or install the bits from our &lt;a href=&quot;https://github.com/Microsoft/react-native-code-push/tree/windows-support&quot;&gt;Windows branch&lt;/a&gt;, which includes an updated readme with setup instructions. Additionally, if you want to check out a sample app that uses React Native for Windows and CodePush, the beautiful and open-sourced &lt;a href=&quot;https://github.com/fbsamples/f8app&quot;&gt;F8 App&lt;/a&gt; is a great example to play around with. The production version of the app already uses CodePush for iOS and Android, and we implemented a &lt;a href=&quot;https://github.com/CatalystCode/f8app/tree/CodePushWindows/windows&quot;&gt;fork of it&lt;/a&gt; which includes CodePush support on Windows. Clone the fork, run the setup instructions, and try it out! The above screenshots were taken using it, so feel free to have fun with running the app on the various device emulators.&lt;/p&gt;
+
+&lt;h3&gt;Moving Forward&lt;/h3&gt;
+
+&lt;p&gt;As the Windows support for React Native continues to evolve and mature, we&amp;rsquo;ll be improving the CodePush support as well, and will look forward to seeing the community response and contributions. In the meantime, please continue to &lt;a href=&quot;mailto:codepushfeed@microsoft.com&quot;&gt;send us feedback&lt;/a&gt;, ping us in the &lt;a href=&quot;https://discord.gg/0ZcbPKXt5bWxFdFu&quot;&gt;#code-push&lt;/a&gt; chanel on Reactiflux, and stay tuned for future feature investments!&lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>Web-like release agility for React Native Apps</title>

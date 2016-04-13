@@ -10,14 +10,15 @@ $(document).ready(function () {
 
 
 	function setFooterPosition() {
-	
-		if ($(window).width() <= 767) {
-			$('footer').css('position', 'relative').css("width", "100%");
-		} else if ($(document).height() <= $(window).height()) {
-			$('footer').css('position', 'absolute').css("bottom", 0).css("width", "100%");
-		} else {
-			$('footer').css('position', 'relative').css("width", "100%");
-		}
+        
+        var footerPos = $("footer").position().top;
+        var pageNoFooter = $(document).height() - $("footer").height() - 1;
+                       
+		if(footerPos < pageNoFooter ){
+		    $('footer').css('position','absolute').css("bottom",0).css("width","100%");
+			}else {
+			$('footer').css('position','relative').css("z-index",100);
+	    }        
 	}
 
 	setFooterPosition();

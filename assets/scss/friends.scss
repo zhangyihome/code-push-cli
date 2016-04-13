@@ -42,22 +42,18 @@
     }
     
     .friend-item {
-        padding: 2em;
-        height: 100%;
-        margin-top: 10px;
+        padding: 1.5em;
+        height: 175px;
+        width: 175px;        
         text-align: center;
-        color: black;
-        margin: 10px;
-        line-height: 140px;        
+        margin: 1.5em;        
         background-color: rgba(0, 0, 0, 0.03);
-        border-radius: 2.9em;                
+        border-radius: 3em;                
     }
     
     .friend-logo {
         width: auto;
         height: auto;
-        max-width: 150px;
-        max-height: 225px;
         border-radius: 3.8em;        
     }
     
