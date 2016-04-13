@@ -390,7 +390,6 @@ The `release-react` command is a React Native-specific version of the "vanilla" 
 
 2. Inferring the [`targetBinaryVersion`](#target-binary-version-parameter) of this release by using the version name that is specified in your project's `Info.plist` (for iOS) and `build.gradle` (for Android) files.
 
-
 To illustrate the difference that the `release-react` command can make, the following is an example of how you might generate and release an update for a React Native app using the "vanilla" `release` command:
 
 ```shell
@@ -419,7 +418,7 @@ This is the same parameter as the one described in the [above section](#app-name
 
 #### Platform parameter
 
-This specifies which platform the current update is targeting, and can be either `ios` or `android` (case-insensitive).
+This specifies which platform the current update is targeting, and can be either `android, `ios` or `windows` (case-insensitive).
 
 #### Deployment name parameter
 
@@ -453,13 +452,13 @@ This specifies whether to generate a unminified, development JS bundle. If left 
 
 #### Entry file parameter
 
-This specifies the relative path to app's root/entry JavaScript file. If left unspecified, this defaults to `index.ios.js` (for iOS) or `index.android.js` (for Android) if that file exists, or `index.js` otherwise.
+This specifies the relative path to app's root/entry JavaScript file. If left unspecified, this defaults to `index.ios.js` (for iOS),  `index.android.js` (for Android) or `index.windows.bundle` (for Windows) if that file exists, or `index.js` otherwise.
 
 *NOTE: This parameter can be set using either --entryFile or -e*
 
 #### Bundle name parameter
 
-This specifies the file name that should be used for the generated JS bundle. If left unspecified, the standard bundle name will be used for the specified platform: `main.jsbundle` (iOS) and `index.android.bundle` (Android).
+This specifies the file name that should be used for the generated JS bundle. If left unspecified, the standard bundle name will be used for the specified platform: `main.jsbundle` (iOS), `index.android.bundle` (Android) and `index.windows.bundle` (Windows).
 
 *NOTE: This parameter can be set using either --bundleName or -b*
 
@@ -478,6 +477,7 @@ code-push release-cordova <appName> <platform>
 [--mandatory]
 [--targetBinaryVersion <targetBinaryVersion>]
 [--rollout <rolloutPercentage>]
+[--build]
 ```
 
 The `release-cordova` command is a Cordova-specific version of the "vanilla" [`release`](#releasing-app-updates) command, which supports all of the same parameters (e.g. `--mandatory`, `--description`), yet simplifies the process of releasing updates by performing the following additional behavior:
@@ -532,6 +532,12 @@ This is the same parameter as the one described in the [above section](#target-b
 #### Disabled parameter
 
 This is the same parameter as the one described in the [above section](#disabled-parameter).
+
+#### Build parameter
+
+Specifies whether you want to run `cordova build` instead of `cordova prepare` (which is the default behavior), when generating your updated web assets. This is valuable if your project includes before and/or after build hooks (e.g. to transpile TypeScript), and therefore, having CodePush simply run `cordova prepare` isn't sufficient to create and release an update. If left unspecified, this defaults to `false`.
+
+*NOTE: This parameter can be set using either --build or -b*
 
 ## Patching Updates
 
