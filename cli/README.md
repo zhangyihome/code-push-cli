@@ -309,6 +309,7 @@ The following table outlines the version value that CodePush expects your update
 | Cordova                | The `<widget version>` attribute in the `config.xml` file                    |
 | React Native (Android) | The `android.defaultConfig.versionName` property in your `build.gradle` file |
 | React Native (iOS)     | The `CFBundleShortVersionString` key in the `Info.plist` file                |
+| React Native (Windows) | The `<Identity Version>` key in the `Package.appxmanifest` file                                |
 
 *NOTE: If the app store version in the metadata files are missing a patch version, e.g. `2.0`, it will be treated as having a patch version of `0`, i.e. `2.0 -> 2.0.0`.*
 
@@ -418,7 +419,7 @@ This is the same parameter as the one described in the [above section](#app-name
 
 #### Platform parameter
 
-This specifies which platform the current update is targeting, and can be either `android, `ios` or `windows` (case-insensitive).
+This specifies which platform the current update is targeting, and can be either `android`, `ios` or `windows` (case-insensitive).
 
 #### Deployment name parameter
 
@@ -452,7 +453,7 @@ This specifies whether to generate a unminified, development JS bundle. If left 
 
 #### Entry file parameter
 
-This specifies the relative path to app's root/entry JavaScript file. If left unspecified, this defaults to `index.ios.js` (for iOS),  `index.android.js` (for Android) or `index.windows.bundle` (for Windows) if that file exists, or `index.js` otherwise.
+This specifies the relative path to the app's root/entry JavaScript file. If left unspecified, this defaults to `index.ios.js` (for iOS),  `index.android.js` (for Android) or `index.windows.bundle` (for Windows) if that file exists, or `index.js` otherwise.
 
 *NOTE: This parameter can be set using either --entryFile or -e*
 
