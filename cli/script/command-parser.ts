@@ -371,7 +371,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Specifies whether this release should be considered mandatory", type: "boolean" })
             .option("rollout", { alias: "r", default: "100%", demand: false, description: "Percentage of users this release should be immediately available to", type: "string" })
             .option("sourcemapOutput", { alias: "s", default: null, demand: false, description: "Path to where the sourcemap for the resulting bundle should be written. If omitted, a sourcemap will not be generated.", type: "string" })
-            .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "Semver expression that specifies the binary app version(s) this release is targeting (e.g. 1.1.0, ~1.2.3). If omitted, the release will target the exact version specified in the \"Info.plist\" (iOS) or \"build.gradle\" (Android) files.", type: "string" })
+            .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "Semver expression that specifies the binary app version(s) this release is targeting (e.g. 1.1.0, ~1.2.3). If omitted, the release will target the exact version specified in the \"Info.plist\" (iOS), \"build.gradle\" (Android) or \"Package.appxmanifest\" (Windows) files.", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
 
         addCommonConfiguration(yargs);
