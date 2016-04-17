@@ -10,7 +10,7 @@ import { AccessKey, Account, App, CodePushError, CollaboratorMap, CollaboratorPr
 
 var superproxy = require("superagent-proxy");
 superproxy(superagent);
-var proxy = process.env.http_proxy;
+var proxy = process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
 
 var packageJson = require("../package.json");
 
@@ -71,7 +71,8 @@ class AccountManager {
 
     public isAuthenticated(): Promise<boolean> {
         return Promise<boolean>((resolve, reject, notify) => {
-            var request: superagent.Request<any> = (<any>superagent.get(this._serverUrl + urlEncode `/authenticated`)).proxy(proxy);
+            var request: superagent.Request<any> = superagent.get(this._serverUrl + urlEncode `/authenticated`);
+            if(proxy) (<any>request).proxy(proxy);
             this.attachCredentials(request);
 
             request.end((err: any, res: superagent.Response) => {
@@ -213,7 +214,8 @@ class AccountManager {
     public release(appName: string, deploymentName: string, fileOrPath: File | string, targetBinaryVersion: string, updateMetadata: PackageInfo, uploadProgressCallback?: (progress: number) => void): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             updateMetadata.appVersion = targetBinaryVersion;
-            var request: superagent.Request<any> = (<any>superagent.post(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`)).proxy(proxy);
+            var request: superagent.Request<any> = superagent.post(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`)
+            if(proxy) (<any>request).proxy(proxy);
             this.attachCredentials(request);
 
             var file: any;
@@ -291,7 +293,8 @@ class AccountManager {
 
     private makeApiRequest(method: string, endpoint: string, requestBody: string, expectResponseBody: boolean, contentType: string): Promise<JsonResponse> {
         return Promise<JsonResponse>((resolve, reject, notify) => {
-            var request: superagent.Request<any> = (<any>superagent)[method](this._serverUrl + endpoint).proxy(proxy);
+            var request: superagent.Request<any> = (<any>superagent)[method](this._serverUrl + endpoint)
+            if(proxy) (<any>request).proxy(proxy);
             this.attachCredentials(request);
 
             if (requestBody) {
