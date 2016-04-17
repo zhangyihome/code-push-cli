@@ -214,7 +214,7 @@ class AccountManager {
     public release(appName: string, deploymentName: string, fileOrPath: File | string, targetBinaryVersion: string, updateMetadata: PackageInfo, uploadProgressCallback?: (progress: number) => void): Promise<void> {
         return Promise<void>((resolve, reject, notify) => {
             updateMetadata.appVersion = targetBinaryVersion;
-            var request: superagent.Request<any> = superagent.post(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`)
+            var request: superagent.Request<any> = superagent.post(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`);
             if(proxy) (<any>request).proxy(proxy);
             this.attachCredentials(request);
 
@@ -293,7 +293,7 @@ class AccountManager {
 
     private makeApiRequest(method: string, endpoint: string, requestBody: string, expectResponseBody: boolean, contentType: string): Promise<JsonResponse> {
         return Promise<JsonResponse>((resolve, reject, notify) => {
-            var request: superagent.Request<any> = (<any>superagent)[method](this._serverUrl + endpoint)
+            var request: superagent.Request<any> = (<any>superagent)[method](this._serverUrl + endpoint);
             if(proxy) (<any>request).proxy(proxy);
             this.attachCredentials(request);
 
