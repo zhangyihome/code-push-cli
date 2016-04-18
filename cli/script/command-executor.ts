@@ -1296,6 +1296,11 @@ function whoami(command: cli.ICommand): Promise<void> {
     return sdk.getAccountInfo()
         .then((account): void => {
             log(`${account.email} (${account.linkedProviders.join(", ")})`);
+
+            var connectionInfo = deserializeConnectionInfo();
+            if (!connectionInfo.noProxy && connectionInfo.proxy) {
+                log(`Proxy: ${connectionInfo.proxy}`);
+            }
         });
 }
 
