@@ -590,7 +590,6 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string, pro
                 return;
             }
 
-            console.log('proxy', proxy, noProxy)
             sdk = new AccountManager(accessKey, CLI_HEADERS, serverUrl, getProxy(proxy, noProxy));
 
             return sdk.isAuthenticated()
