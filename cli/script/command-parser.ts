@@ -273,11 +273,10 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
             .example("login", "Logs in to the CodePush server")
             .example("login --accessKey mykey", "Logs in on behalf of the user who owns and created the access key \"mykey\"")
-            .example("login --proxy proxyURL", "Logs in with the specified proxy url")
-            .example("login --noProxy", "Logs in without any proxy set in session file or environment vars")
+            .example("login --proxy http://someproxy.com:455", "Logs in with the specified proxy url")
             .option("accessKey", { alias: "key", default: null, demand: false, description: " Access key to authenticate against the CodePush server with, instead of providing your username and password credentials", type: "string" })
-            .option("proxy", { default: null, demand: false, description: " Proxy url", type: "string" })
-            .option("noProxy", { default: false, demand: false, description: " Suppress any proxy set in session file or environment vars", type: "boolean" })
+            .option("proxy", { default: null, demand: false, description: "URL of the proxy server to use", type: "string" })
+            .option("noProxy", { default: false, demand: false, description: "Bypass the system-wide proxy settings", type: "boolean" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
         addCommonConfiguration(yargs);
@@ -325,10 +324,9 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " register")
             .demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
             .example("register", "Registers a new CodePush account")
-            .example("register --proxy proxyURL", "Registers with the specified proxy url")
-            .example("register --noProxy", "Registers without any proxy set in environment vars")
-            .option("proxy", { default: null, demand: false, description: " Proxy url", type: "string" })
-            .option("noProxy", { default: false, demand: false, description: " Suppress any proxy set in environment vars", type: "boolean" })
+            .example("register --proxy http://someproxy.com:455", "Registers with the specified proxy url")
+            .option("proxy", { default: null, demand: false, description: "URL of the proxy server to use", type: "string" })
+            .option("noProxy", { default: false, demand: false, description: "Bypass the system-wide proxy settings", type: "boolean" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
         addCommonConfiguration(yargs);

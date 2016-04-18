@@ -1299,7 +1299,7 @@ function whoami(command: cli.ICommand): Promise<void> {
         });
 }
 
-function getProxy(proxy: string, noProxy?: boolean): string {
+function getProxy(proxy?: string, noProxy?: boolean): string {
     if (noProxy) return null;
     if (!proxy) return process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
     else return proxy;
