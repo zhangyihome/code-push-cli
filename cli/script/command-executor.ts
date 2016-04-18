@@ -51,6 +51,8 @@ interface ILoginConnectionInfo {
     accessKey: string;
     customServerUrl?: string;   // A custom serverUrl for internal debugging purposes
     preserveAccessKeyOnLogout?: boolean;
+    proxy?: string; // To specify the proxy url explicitly, other than the environment var (HTTP_PROXY)
+    noProxy?: boolean; // To suppress the environment proxy setting, like HTTP_PROXY
 }
 
 interface IPackageFile {
@@ -384,7 +386,11 @@ function deserializeConnectionInfo(): ILoginConnectionInfo {
             };
         }
 
-        return <ILoginConnectionInfo>connectionInfo;
+        var connInfo = <ILoginConnectionInfo>connectionInfo;
+
+        connInfo.proxy = getProxy(connInfo.proxy, connInfo.noProxy);
+
+        return connInfo;
     } catch (ex) {
         return;
     }
@@ -416,7 +422,7 @@ export function execute(command: cli.ICommand): Promise<void> {
                         throw new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server.");
                     }
 
-                    sdk = new AccountManager(connectionInfo.accessKey, CLI_HEADERS, connectionInfo.customServerUrl);
+                    sdk = new AccountManager(connectionInfo.accessKey, CLI_HEADERS, connectionInfo.customServerUrl, connectionInfo.proxy);
                     break;
             }
 
@@ -558,21 +564,22 @@ function link(command: cli.ILinkCommand): Promise<void> {
 function login(command: cli.ILoginCommand): Promise<void> {
     // Check if one of the flags were provided.
     if (command.accessKey) {
-        sdk = new AccountManager(command.accessKey, CLI_HEADERS, command.serverUrl);
+        var proxy = getProxy(command.proxy, command.noProxy);
+        sdk = new AccountManager(command.accessKey, CLI_HEADERS, command.serverUrl, proxy);
         return sdk.isAuthenticated()
             .then((isAuthenticated: boolean): void => {
                 if (isAuthenticated) {
-                    serializeConnectionInfo(command.accessKey, /*preserveAccessKeyOnLogout*/ true, command.serverUrl);
+                    serializeConnectionInfo(command.accessKey, /*preserveAccessKeyOnLogout*/ true, command.serverUrl, command.proxy, command.noProxy);
                 } else {
                     throw new Error("Invalid access key.");
                 }
             });
     } else {
-        return loginWithExternalAuthentication("login", command.serverUrl);
+        return loginWithExternalAuthentication("login", command.serverUrl, command.proxy, command.noProxy);
     }
 }
 
-function loginWithExternalAuthentication(action: string, serverUrl?: string): Promise<void> {
+function loginWithExternalAuthentication(action: string, serverUrl?: string, proxy?: string, noProxy?: boolean): Promise<void> {
     initiateExternalAuthenticationAsync(action, serverUrl);
     log("");    // Insert newline
 
@@ -583,12 +590,13 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string): Pr
                 return;
             }
 
-            sdk = new AccountManager(accessKey, CLI_HEADERS, serverUrl);
+            console.log('proxy', proxy, noProxy)
+            sdk = new AccountManager(accessKey, CLI_HEADERS, serverUrl, getProxy(proxy, noProxy));
 
             return sdk.isAuthenticated()
                 .then((isAuthenticated: boolean): void => {
                     if (isAuthenticated) {
-                        serializeConnectionInfo(accessKey, /*preserveAccessKeyOnLogout*/ false, serverUrl);
+                        serializeConnectionInfo(accessKey, /*preserveAccessKeyOnLogout*/ false, serverUrl, proxy, noProxy);
                     } else {
                         throw new Error("Invalid access key.");
                     }
@@ -900,7 +908,7 @@ function printTable(columnNames: string[], readData: (dataSource: any[]) => void
 }
 
 function register(command: cli.IRegisterCommand): Promise<void> {
-    return loginWithExternalAuthentication("register", command.serverUrl);
+    return loginWithExternalAuthentication("register", command.serverUrl, command.proxy, command.noProxy);
 }
 
 function promote(command: cli.IPromoteCommand): Promise<void> {
@@ -1239,8 +1247,8 @@ export var runReactNativeBundleCommand = (bundleName: string, development: boole
     });
 }
 
-function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: boolean, customServerUrl?: string): void {
-    var connectionInfo: ILoginConnectionInfo = { accessKey: accessKey, preserveAccessKeyOnLogout: preserveAccessKeyOnLogout };
+function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: boolean, customServerUrl?: string, proxy?: string, noProxy?: boolean): void {
+    var connectionInfo: ILoginConnectionInfo = { accessKey: accessKey, preserveAccessKeyOnLogout: preserveAccessKeyOnLogout, proxy: proxy, noProxy: noProxy };
     if (customServerUrl) {
         connectionInfo.customServerUrl = customServerUrl;
     }
@@ -1290,4 +1298,10 @@ function whoami(command: cli.ICommand): Promise<void> {
         .then((account): void => {
             log(`${account.email} (${account.linkedProviders.join(", ")})`);
         });
+}
+
+function getProxy(proxy: string, noProxy?: boolean): string {
+    if (noProxy) return null;
+    if (!proxy) return process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
+    else return proxy;
 }
