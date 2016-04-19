@@ -22,7 +22,7 @@
 
   <title>
     
-      Management SDK &middot; CodePush
+      Tutorials &middot; CodePush
     
   </title>
   
@@ -163,9 +163,11 @@
           
           
           <li>
-            <a class="" href="/code-push/docs/tutorials.html">
+            <a class="this-page" href="/code-push/docs/tutorials.html">
                 Tutorials
             </a>
+            
+                <div id="page-toc" class="page-toc"></div>
             
           </li>
           
@@ -229,11 +231,9 @@
           
           
           <li>
-            <a class="this-page" href="/code-push/docs/node.html">
+            <a class="" href="/code-push/docs/node.html">
                 Management SDK
             </a>
-            
-                <div id="page-toc" class="page-toc"></div>
             
           </li>
           
@@ -489,68 +489,115 @@
             </div>
             <div class="row">  
                 <header class="doc-header">
-                    <h1 class="doc-title">Management SDK</h1>
-                    <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/node.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
+                    <h1 class="doc-title">Tutorials</h1>
+                    <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/Tutorials.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
                 </header>  
                 <article class="doc-content">               
-                    <p>A JavaScript library for programmatically managing your CodePush account (e.g. creating apps, promoting releases), which allows authoring Node.js-based build and/or deployment scripts, without needing to shell out to the <a href="https://github.com/Microsoft/code-push/blob/master/cli/README.md">CLI</a>.</p>
+                    <h2>Update experience configuration</h2>
 
-<h2>Getting Started</h2>
+<p>CodePush provides Cordova and React Native developers with multiple options to configure the end users update experience.</p>
 
-<ol>
-<li><p>Create an access key to authenticate with the CodePush server using the following CodePush CLI command:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push access-key add &quot;DESCRIPTION_OF_THE_KEY&quot;
+<p>This tutorial covers three potential &ldquo;update modes&rdquo; or deployment strategies for CodePush updates: Silent, Active and Custom. Leveraging these options allow developers to control when (and how often) to check for updates as well as how to present any update notifications to end users.</p>
+
+<p><em>Note: This tutorial does not cover how to enable CodePush on an app. If you need help setting up CodePush, visit the <a href="http://microsoft.github.io/code-push/docs/cordova.html#link-2">Cordova</a> or <a href="http://microsoft.github.io/code-push/docs/react-native.html#link-3">React Native</a> &ldquo;Getting Started&rdquo; sections.</em></p>
+
+<h3>1.   Silent mode</h3>
+
+<p>Silent mode updates are the simplest way to update an app and the least invasive experience for the end users.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.sync();
 </code></pre></div>
-<p>If you already created a key that you want to use here, then you can retrieve it by running <code>code-push access-key ls</code> and using the value of the <code>Key</code> column for the key you wish to use.</p></li>
-<li><p>Install the management SDK by running <code>npm install code-push --save</code></p></li>
-<li><p>Import it using the following statement (using ES6 syntax as applicable):</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var CodePush = require(&quot;code-push&quot;);    
-</code></pre></div></li>
-<li><p>Create an instance of the <code>CodePush</code> class, passing it the access key you created or retrieved in step #1:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var codePush = new CodePush(&quot;YOUR_ACCESS_KEY&quot;);
-</code></pre></div></li>
-<li><p>Begin automating the management of your account! For more details on what you can do with this <code>codePush</code> object, refer to the API reference section below.</p></li>
-</ol>
-
-<h2>API Reference</h2>
-
-<p>The <code>code-push</code> module exports a single class (typically referred to as <code>CodePush</code>), which represents a proxy to the CodePush account management REST API. This class has a single constructor for authenticating with the CodePush service, and a collection of instance methods that correspond to the commands in the management <a href="https://github.com/Microsoft/code-push/blob/master/cli/README.md">CLI</a>, which allow you to programmatically control every aspect of your CodePush account.</p>
-
-<h3>Constructors</h3>
+<p>If an update is available, it will be silently downloaded, and installed the next time the app is restarted (either explicitly by the end user or by the OS). However, developers can modify the install behavior if they so choose, by leveraging the <code>installMode</code> parameter:</p>
 
 <ul>
-<li><strong>CodePush(accessKey: string)</strong> - Creates a new instance of the CodePush management SDK, using the specified access key to authenticated with the server.</li>
+<li><strong>IMMEDIATE</strong>: The update will be applied to the running application immediately. The application will be reloaded with the new content immediately.</li>
+<li><strong>ON_NEXT_RESTART</strong>: The update is downloaded but not installed immediately. The new content will be available the next time the application is started.</li>
+<li><strong>ON_NEXT_RESUME</strong>: The update is downloaded but not installed immediately. The new content will be available the next time the application is resumed or restarted, whichever event happens first.</li>
 </ul>
 
-<h3>Methods</h3>
+<p>For example, to download and install an update immediately, developers can use the <code>installMode</code> parameter as follows: </p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.sync({installMode: InstallMode.IMMEDIATE});
+</code></pre></div>
+<h4>Recommendation</h4>
 
-<ul>
-<li><p><strong>addAccessKey(description: string): Promise&lt;AccessKey&gt;</strong> - Creates a new access key with the specified description (e.g. &ldquo;VSTS CI&rdquo;).</p></li>
-<li><p><strong>addApp(appName: string): Promise&lt;App&gt;</strong> - Creates a new CodePush app with the specified name.</p></li>
-<li><p><strong>addCollaborator(appName: string, email: string): Promise&lt;void&gt;</strong> - Adds the specified CodePush user as a collaborator to the specified CodePush app.</p></li>
-<li><p><strong>addDeployment(appName: string, deploymentName: string): Promise&lt;Deployment&gt;</strong> - Creates a new deployment with the specified name, and associated with the specified app.</p></li>
-<li><p><strong>clearDeploymentHistory(appName: string, deploymentName: string): Promise&lt;void&gt;</strong> - Clears the release history associated with the specified app deployment.</p></li>
-<li><p><strong>getAccessKey(accessKey: string): Promise&lt;AccessKey&gt;</strong> - Retrieves the metadata about the specific access key.</p></li>
-<li><p><strong>getAccessKeys(): Promise&lt;AccessKey[]&gt;</strong> - Retrieves the list of access keys associated with your CodePush account.</p></li>
-<li><p><strong>getApp(appName: string): Promise&lt;App&gt;</strong> - Retrieves the metadata about the specified app.</p></li>
-<li><p><strong>getApps(): Promise&lt;App[]&gt;</strong> - Retrieves the list of apps associated with your CodePush account.</p></li>
-<li><p><strong>getCollaborators(appName: string): Promise&lt;CollaboratorMap&gt;</strong> - Retrieves the list of collaborators associated with the specified app.</p></li>
-<li><p><strong>getDeployment(appName: string, deploymentName: string): Promise&lt;Deployment&gt;</strong> - Retrieves the metadata for the specified app deployment.</p></li>
-<li><p><strong>getDeploymentHistory(appName: string, deploymentName: string): Promise&lt;Package[]&gt;</strong> - Retrieves the list of releases that have been made to the specified app deployment.</p></li>
-<li><p><strong>getDeploymentMetrics(appName: string, deploymentName): Promise&lt;DeploymentMetrics&gt;</strong> - Retrieves the installation metrics for the specified app deployment. </p></li>
-<li><p><strong>getDeployments(appName: string): Promose&lt;Deployment[]&gt;</strong> - Retrieves the list of deployments associated with the specified app.</p></li>
-<li><p><strong>promote(appName: string, sourceDeploymentName: string, destDeploymentName: string): Promise&lt;void&gt;</strong> - Promotes the latest release from one deployment to another for the specified app.</p></li>
-<li><p><strong>release(appName: string, deploymentName: string, updateContentsPath: string, targetBinaryVersion: string, description?: string, isMandatory: boolean = false): Promise&lt;void&gt;</strong> - Releases a new update to the specified deployment.</p></li>
-<li><p><strong>removeAccessKey(accessKey: string): Promise&lt;void&gt;</strong> - Removes the specified access key from your CodePush account.</p></li>
-<li><p><strong>removeApp(appName: string): Promise&lt;void&gt;</strong> - Deletes the specified CodePush app from your account.</p></li>
-<li><p><strong>removeCollaborator(appName: string, email: string): Promise&lt;void&gt;</strong> - Removes the specified account as a collaborator from the specified app.</p></li>
-<li><p><strong>removeDeployment(appName: string, deploymentName: string): Promise&lt;void&gt;</strong> - Removes the specified deployment from the specified app.</p></li>
-<li><p><strong>renameApp(oldAppName: string, newAppName: string): Promise&lt;void&gt;</strong> - Renames an existing app.</p></li>
-<li><p><strong>renameDeployment(appName: string, oldDeploymentName: string, newDeploymentName: string): Promise&lt;void&gt;</strong> - Renames an existing deployment within the specified app.</p></li>
-<li><p><strong>rollback(appName: string, deploymentName: string, targetRelease?: string): Promise&lt;void&gt;</strong> - Rolls back the latest release within the specified deployment. Optionally allows you to target a specific release in the deployment&rsquo;s history, as opposed to rolling to the previous release.</p></li>
-<li><p><strong>transferApp(appName: string, email: string): Promise&lt;void&gt;</strong> - Transfers the ownership of the specified app to the specified account.</p></li>
-</ul>
-  
+<p>Depending on the complexity of the app, pushing an update immediately might be a jarring experience for end users (e.g. changing the UI or losing the current state can be frustrating and confusing).  Because of this, we recommend updates are installed only after a certain period of app inactivity has been reached. To achieve this experience, developers can use the InstallMode.ON_NEXT_RESUME and minimumBackgroundDuration parameters as follows: </p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">// Download the update silently, but install on next
+// resume and after 10 minutes of app inactivity 
+codePush.sync({ installMode: InstallMode.ON_NEXT_RESUME, minimumBackgroundDuration: 60 * 10 });
+</code></pre></div>
+<h3>2.   Active mode</h3>
+
+<p>In contrast to the silent mode updates, active mode updates prompt end users about available updates and thus require user interaction. </p>
+
+<p>The difference is introduced by the usage of the <code>updateDialog</code> parameter.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">    codePush.sync({ updateDialog: true });
+</code></pre></div>
+<p>If an update is available, the app automatically launches a native prompt asking end users for permission to download and install the update. Once the user accepts, the update is silently downloaded and inmmediatly applied., and installed the next time the app is restarted (either explicitly by the end user or by the OS).</p>
+
+<h4>Update dialog customization</h4>
+
+<p>To customize the update dialog, developers can create an updateDialogOption object and pass it to the <code>codePush.sync()</code> call as follows:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">
+    var updateDialogOptions = {
+        updateTitle: &quot;You have an update&quot;,
+        optionalUpdateMessage: &quot;Update available. Install?&quot;,
+        optionalIgnoreButtonLabel: &quot;Nop&quot;,
+        optionalInstallButtonLabel: &quot;Yep&quot;,
+    };
+
+    codePush.sync({ updateDialog: updateDialogOptions};
+
+</code></pre></div>
+<p>Visit the  <a href="http://microsoft.github.io/code-push/docs/cordova.html#link-5">Cordova</a> or <a href="http://microsoft.github.io/code-push/docs/react-native.html#link-8">React Native</a> API Reference pages for a full description of all the avaiable UpdateDialogOptions options.</p>
+
+<p><em>Note: While Apple’s developer agreement fully allows performing over-the-air updates of JavaScript and assets (which is what enables CodePush!), it is against their policy for an app to display an update prompt. Because of this, we recommend that App Store-distributed apps don’t enable the updateDialog option when calling sync, whereas Google Play and internally distributed apps (e.g. Enterprise, Fabric, HockeyApp) can choose to enable/customize it.</em></p>
+
+<h3>3.   Custom mode</h3>
+
+<p>Custom mode provides the flexibility to customize any stage of the update experience such as providing a custom &ldquo;checking for updates&rdquo; or &ldquo;downloading&rdquo; notification.</p>
+
+<h4>Update cycle notifications</h4>
+
+<p>The <code>codePush.sync()</code> method allows the use of a call back to hook into the overall update process and thus provide a custom experience on each stage of the update process as follows. </p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var onSyncStatusChange = function(SyncStatus) {
+    switch (SyncStatus) {
+        case SyncStatus.CHECKING_FOR_UPDATE:
+            // Show &quot;Checking for update&quot; notification
+            break;
+        case SyncStatus.AWAITING_USER_ACTION:
+            // Show &quot;Checking for update&quot; notification
+            break;                
+        case SyncStatus.DOWNLOADING_PACKAGE:
+            // Show &quot;downloading&quot; notification
+            break;
+        case SyncStatus.INSTALLING_UPDATE:
+            // Show &quot;installing&quot; notification
+            break;
+    }
+}
+
+// Prompt the user when an update is available and display a &quot;downloading&quot; modal 
+codePush.sync({ updateDialog: true }, onSyncStatusChange);
+
+</code></pre></div>
+<p>Visit the  <a href="http://microsoft.github.io/code-push/docs/cordova.html#syncstatus">Cordova</a> or <a href="http://microsoft.github.io/code-push/docs/react-native.html#syncstatus">React Native</a> SyncStatus enum for a full description of all the available enum values.</p>
+
+<h4>Adding a &ldquo;downloading&rdquo; progress indicator</h4>
+
+<p>To provide an enhanced experience, developers can choose to provide a download progress indicator. The <code>codePush.sync()</code> method provides a different call back to make this possible.</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">
+var onError = function (error) {
+    console.log(&quot;An error occurred. &quot; + error);
+};
+
+var onDownloadProgress = function (downloadProgress) {
+    if (downloadProgress) {        
+        console.log(&quot;Downloading &quot; + downloadProgress.receivedBytes + &quot; of &quot; + downloadProgress
+    }
+};
+
+codePush.sync({ updateDialog: true }, onSyncStatusChange, onDownloadProgress, onError);
+
+</code></pre></div>  
                 </article>
             </div>  
         </div>           
