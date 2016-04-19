@@ -1295,13 +1295,16 @@ function throwForInvalidOutputFormat(format: string): void {
 function whoami(command: cli.ICommand): Promise<void> {
     return sdk.getAccountInfo()
         .then((account): void => {
-            log(`Account: ${account.email} (${account.linkedProviders.join(", ")})`);
+            var accountInfo = `${account.email} (${account.linkedProviders.join(", ")})`;
 
             var connectionInfo = deserializeConnectionInfo();
-            if (connectionInfo.noProxy) {
-                log(`Proxy: Ignored`);
-            } else if (connectionInfo.proxy) {
-                log(`Proxy: ${connectionInfo.proxy}`);
+            if (connectionInfo.noProxy || connectionInfo.proxy) {
+                log(chalk.green('Account: ') + accountInfo);
+
+                var proxyInfo = chalk.green('Proxy: ') + (connectionInfo.noProxy ? 'Ignored' : connectionInfo.proxy);
+                log(proxyInfo);
+            } else {
+                log(accountInfo);
             }
         });
 }
