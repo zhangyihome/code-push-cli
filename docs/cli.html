@@ -493,7 +493,7 @@
                     <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/CLI.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
                 </header>  
                 <article class="doc-content">               
-                    <p><img src="https://cloud.githubusercontent.com/assets/116461/13863792/b68a6ff4-ec59-11e5-9674-05e2a85f71a9.png" alt="CodePush CLI"></p>
+                    <p><img src="https://cloud.githubusercontent.com/assets/116461/14505396/c97bdc78-016d-11e6-89da-3f3557f8b33d.png" alt="CodePush CLI"></p>
 
 <h2>Installation</h2>
 
@@ -506,9 +506,9 @@
 
 <ol>
 <li>Create a <a href="#account-creation">CodePush account</a> push using the CodePush CLI</li>
-<li>Register your <a href="#app-management">app</a> with the service, and optionally create any additional <a href="#deployment-management">deployments</a></li>
+<li>Register your <a href="#app-management">app</a> with CodePush, and optionally <a href="#app-collaboration">share it</a> with other developers on your team</li>
 <li>CodePush-ify your app and point it at the deployment you wish to use (<a href="http://github.com/Microsoft/cordova-plugin-code-push">Cordova</a> and <a href="http://github.com/Microsoft/react-native-code-push">React Native</a>)</li>
-<li><a href="#releasing-app-updates">Deploy</a> an update for your registered app</li>
+<li><a href="#releasing-updates">Release</a> an update for your app</li>
 <li>Live long and prosper! (<a href="https://en.wikipedia.org/wiki/Vulcan_salute">details</a>)</li>
 </ol>
 
@@ -521,13 +521,21 @@
 
 <p><em>Note: After registering, you are automatically logged-in with the CLI, so until you explicitly log out, you don&rsquo;t need to login again from the same machine.</em></p>
 
+<p>If you have an existing account, you may also link your account to another identity provider by running:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push link
+</code></pre></div>
+<p>Note that in order to do this, the email address used on the provider must match the one on your existing account.</p>
+
 <h2>Authentication</h2>
 
-<p>Every command within the CodePush CLI requires authentication, and therefore, before you can begin managing your account, you need to login using the GitHub or Microsoft account you used when registering. You can do this by running the following command:</p>
+<p>Most commands within the CodePush CLI require authentication, and therefore, before you can begin managing your account, you need to login using the GitHub or Microsoft account you used when registering. You can do this by running the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push login
 </code></pre></div>
 <p>This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. This will generate an access key that you need to copy/paste into the CLI (it will prompt you for it). You are now successfully authenticated and can safely close your browser window.</p>
 
+<p>If at anytime you want to determine if you&rsquo;re already logged in, you can run the following command to display the e-mail address associated with your current authentication session, and which identity providers your account is linked to (e.g. GitHub):</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push whoami
+</code></pre></div>
 <p>When you login from the CLI, your access key is persisted to disk for the duration of your session so that you don&rsquo;t have to login every time you attempt to access your account. In order to end your session and delete this access key, simply run the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push logout
 </code></pre></div>
@@ -642,23 +650,23 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 <li><p><strong>Total</strong> - The total number of successful installations that this update has received overall. This number only ever increases as new users/devices install it, and therefore, this is always a superset of the active count.</p></li>
 <li><p><strong>Pending</strong> - The number of times this release has been downloaded, but not yet installed. This would only apply to updates that aren&rsquo;t installed immediately, and helps provide the broader picture of release adoption for apps that rely on app resume and restart to apply an update.</p></li>
 <li><p><strong>Rollbacks</strong> - The number of times that this release has been automatically rolled back on the client. Ideally this number should be zero, and in that case, this metric isn&rsquo;t even shown. However, if you released an update that includes a crash as part of the installation process, the CodePush plugin will roll the end-user back to the previous release, and report that issue back to the server. This allows your end-users to remain unblocked in the event of broken releases, and by being able to see this telemetry in the CLI, you can identify erroneous releases and respond to them by <a href="#rolling-back-undesired-updates">rolling it back</a> on the server.</p></li>
-<li><p><strong>Rollout</strong> - Indicates the percentage of users that are elligble to receive this update. This property will only be displayed for releases that have been tagged with a non-empty rollout value, and can only ever be present on the latest release within each deployment.</p></li>
-<li><p><strong>Disabled</strong> - Indicates whether the release has been marked as disabled or not, and therefore, is acquirable by end users. This property will only be displayed for releases that are actually disabled.</p></li>
+<li><p><strong>Rollout</strong> - Indicates the percentage of users that are elligble to receive this update. This property will only be displayed for releases that represent an &ldquo;active&rdquo; rollout, and therefore, have a rollout percentage that is less than 100%. Additionally, since a deployment can only have one active rollout at any given time, this label would only be present on the latest release within a deployment. </p></li>
+<li><p><strong>Disabled</strong> - Indicates whether the release has been marked as disabled or not, and therefore, is downloadable by end users. This property will only be displayed for releases that are actually disabled.</p></li>
 </ul>
 
 <p>When the metrics cell reports <code>No installs recorded</code>, that indicates that the server hasn&rsquo;t seen any activity for this release. This could either be because it precluded the plugin versions that included telemetry support, or no end-users have synchronized with the CodePush server yet. As soon as an install happens, you will begin to see metrics populate in the CLI for the release.</p>
 
 <h2>Releasing Updates</h2>
 
-<p>Once your app has been configured to query for updates against the CodePush service&ndash;using your desired deployment&ndash;you can begin pushing updates to it. The CodePush CLI has three different commands for releasing updates, in order to accomodate different developer workflows, and keep the experience as simple yet flexible as possible:</p>
+<p>Once your app has been configured to query for updates against the CodePush server, you can begin releasing updates to it. In order to provide both simplicity and flexibility, the CodePush CLI includes three different commands for releasing updates:</p>
 
 <ol>
-<li><p><a href="#releasing-updates-general">General</a> - Simply uploads an update to the CodePush server, and therefore, provides the most flexibility in terms of how to generate the update in the first place (e.g. are you using a <code>gulp</code> task? running a custom shell script?).</p></li>
-<li><p><a href="#releasing-updates-react-native">React Native</a> - Performs the same functionality as the general release command, but also handles the work of generating the app update for you, instead of requiring you to run both <code>react-native bundle</code> and then <code>code-push release</code>.</p></li>
-<li><p><a href="#releasing-updates-cordova">Cordova</a> - Performs the same functionality as the general release command, but also handles the work of preparing the app update for you, instead of requiring you to run both <code>cordova prepare</code> and then <code>code-push release</code>.</p></li>
+<li><p><a href="#releasing-updates-general">General</a> - Releases an update to the CodePush server that was generated by an external tool or build script (e.g. a Gulp task, the <code>react-native bundle</code> command). This provides the most flexibility in terms of fitting into existing workflows, since it strictly deals with CodePush-specific step, and leaves the app-specific compilation process to you.</p></li>
+<li><p><a href="#releasing-updates-react-native">React Native</a> - Performs the same functionality as the general release command, but also handles the task of generating the updated app contents for you (JS bundle and assets), instead of requiring you to run both <code>react-native bundle</code> and then <code>code-push release</code>.</p></li>
+<li><p><a href="#releasing-updates-cordova">Cordova</a> - Performs the same functionality as the general release command, but also handles the task of preparing the app update for you, instead of requiring you to run both <code>cordova prepare</code> and then <code>code-push release</code>.</p></li>
 </ol>
 
-<p>Whether you choose to use the platform-specific command that is relevant to your app is mostly matter of preference, However, we recommend using the platform-specific one to start, since it greatly simplifies the experience, and then leverage the general-purpose command if/when greater control is needed.</p>
+<p>Which of these commands you should use is mostly a matter of requirements and/or preference. However, we generally recommend using the relevant platform-specific command to start (since it greatly simplifies the experience), and then leverage the general-purpose <code>release</code> command if/when greater control is needed.</p>
 
 <h3>Releasing Updates (General)</h3>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push release &lt;appName&gt; &lt;updateContents&gt; &lt;targetBinaryVersion&gt;
@@ -668,11 +676,15 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 [--mandatory]
 [--rollout &lt;rolloutPercentage&gt;]
 </code></pre></div>
+<h4>App name parameter</h4>
+
+<p>This specifies the name of the CodePush app that this update is being released for. This value corresponds to the friendly name that you specified when originally calling <code>code-push app add</code> (e.g. &ldquo;MyApp-Android&rdquo;). If you need to look it up, you can run the <code>code-push app ls</code> command to see your list of apps.</p>
+
 <h4>Update contents parameter</h4>
 
-<p>This specifies the location of the code and assets you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the <code>/platforms/ios/www</code> folder for a Cordova app). You don&rsquo;t need to zip up multiple files or directories in order to deploy those changes, since the CLI will automatically zip them for you.</p>
+<p>This specifies the location of the updated app code and assets you want to release. You can provide either a single file (e.g. a JS bundle for a React Native app), or a path to a directory (e.g. the <code>/platforms/ios/www</code> folder for a Cordova app). Note that you don&rsquo;t need to ZIP up multiple files or directories in order to deploy those changes, since the CLI will automatically ZIP them for you.</p>
 
-<p>It&rsquo;s important that the path you specify refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you should run before releasing, as well as the location you can subsequently point at using the <code>updateContents</code> parameter:</p>
+<p>It&rsquo;s important that the path you specify refers to the platform-specific, prepared/bundled version of your app. The following table outlines which command you should run before releasing, as well as the location you can subsequently refer to using the <code>updateContents</code> parameter:</p>
 
 <table><thead>
 <tr>
@@ -783,9 +795,13 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 <td>React Native (iOS)</td>
 <td>The <code>CFBundleShortVersionString</code> key in the <code>Info.plist</code> file</td>
 </tr>
+<tr>
+<td>React Native (Windows)</td>
+<td>The <code>&lt;Identity Version&gt;</code> key in the <code>Package.appxmanifest</code> file</td>
+</tr>
 </tbody></table>
 
-<p>*NOTE: If the app store version in the metadata files are missing a patch version, e.g. <code>2.0</code>, it will be treated as having a patch version of <code>0</code>, i.e. <code>2.0 -&gt; 2.0.0</code>.</p>
+<p><em>NOTE: If the app store version in the metadata files are missing a patch version, e.g. <code>2.0</code>, it will be treated as having a patch version of <code>0</code>, i.e. <code>2.0 -&gt; 2.0.0</code>.</em></p>
 
 <h4>Deployment name parameter</h4>
 
@@ -798,12 +814,6 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 <p>This provides an optional &ldquo;change log&rdquo; for the deployment. The value is simply round tripped to the client so that when the update is detected, your app can choose to display it to the end-user (e.g. via a &ldquo;What&rsquo;s new?&rdquo; dialog). This string accepts control characters such as <code>\n</code> and <code>\t</code> so that you can include whitespace formatting within your descriptions for improved readability.</p>
 
 <p><em>NOTE: This parameter can be set using either &ldquo;&ndash;description&rdquo; or &ldquo;-desc&rdquo;</em></p>
-
-<h4>Disabled parameter</h4>
-
-<p>This specifies whether an update should be disabled. A disabled update is one that is not acquirable by clients. If left unspecified, the update will not be disabled, i.e. clients configured to receive updates from the particular deployment will receive the update <a href="#target-binary-version-parameter">if it applies to them</a>.</p>
-
-<p><em>NOTE: This parameter can be set using either &ldquo;&ndash;disabled&rdquo; or &ldquo;-x&rdquo;</em></p>
 
 <h4>Mandatory parameter</h4>
 
@@ -845,7 +855,7 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 
 <p><strong>IMPORTANT: In order for this parameter to actually take affect, your end users need to be running version <code>1.6.0-beta+</code> (for Cordova) or <code>1.9.0-beta+</code> (for React Native) of the CodePush plugin. If you release an update that specifies a rollout property, no end user running an older version of the Cordova or React Native plugins will be eligible for the update. Therefore, until you have adopted the neccessary version of the CodePush SDK, we would advise not setting a rollout value on your releases, since no one would end up receiving it.</strong></p>
 
-<p>This specifies the percentage of users (as an integer between <code>1</code> and <code>100</code>) that should be eligible to receive this update. It can be helpful if you want to &ldquo;flight&rdquo; new releases with a portion of your audience (e.g. 25%), and get feedback and/or watch for exceptions/crashes, before making it broadly available for everyone. If this parameter isn&rsquo;t set, it is treated equivalently to <code>100</code>, and therefore, you only need to set it if you want to actually limit how many users will receive it.</p>
+<p>This specifies the percentage of users (as an integer between <code>1</code> and <code>100</code>) that should be eligible to receive this update. It can be helpful if you want to &ldquo;flight&rdquo; new releases with a portion of your audience (e.g. 25%), and get feedback and/or watch for exceptions/crashes, before making it broadly available for everyone. If this parameter isn&rsquo;t set, it is set to <code>100%</code>, and therefore, you only need to set it if you want to actually limit how many users will receive it.</p>
 
 <p>When leveraging the rollout capability, there are a few additional considerations to keep in mind:</p>
 
@@ -855,7 +865,13 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 <li><p>Unlike the <code>mandatory</code> and <code>description</code> fields, when you promote a release from one deployment to another, it will not propagate the <code>rollout</code> property, and therefore, if you want the new release (in the target deployment) to have a rollout value, you need to explicitly set it when you call the <code>promote</code> command.</p></li>
 </ol>
 
-<p><em>NOTE: This parameter can be set using either <code>--rollout</code> or <code>-r</code></em> </p>
+<p><em>NOTE: This parameter can be set using either <code>--rollout</code> or <code>-r</code></em></p>
+
+<h4>Disabled parameter</h4>
+
+<p>This specifies whether an update should be downloadable by end users or not. If left unspecified, the update will not be disabled (i.e. users will download it the moment your app calls <code>sync</code>). This parameter can be valuable if you want to release an update that isn&rsquo;t immediately available, until you expicitly <a href="#patching-releases">patch it</a> when you want end users to be able to download it (e.g. an announcement blog post went live).</p>
+
+<p><em>NOTE: This parameter can be set using either &ldquo;&ndash;disabled&rdquo; or &ldquo;-x&rdquo;</em></p>
 
 <h3>Releasing Updates (React Native)</h3>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-react &lt;appName&gt; &lt;platform&gt;
@@ -870,22 +886,36 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 [--targetBinaryVersion &lt;targetBinaryVersion&gt;]
 [--rollout &lt;rolloutPercentage&gt;]
 </code></pre></div>
-<p>The <code>release-react</code> command does two things in addition to running the vanilla <code>release</code> command described in the <a href="#releasing-app-updates">previous section</a>:</p>
+<p>The <code>release-react</code> command is a React Native-specific version of the &ldquo;vanilla&rdquo; <a href="#releasing-app-updates"><code>release</code></a> command, which supports all of the same parameters (e.g. <code>--mandatory</code>, <code>--description</code>), yet simplifies the process of releasing updates by performing the following additional behavior:</p>
 
 <ol>
-<li>It runs the <a href="#update-contents-parameter"><code>react-native bundle</code> command</a> to generate the update contents in a temporary folder</li>
-<li>It infers the <a href="#target-binary-version-parameter"><code>targetBinaryVersion</code> of this release</a> by reading the contents of the project&rsquo;s metadata (<code>Info.plist</code> if this update is for iOS clients, and <code>build.gradle</code> for Android clients), and defaults to target only the specified version in the metadata.</li>
+<li><p>Running the <code>react-native bundle</code> command in order to generate the <a href="#update-contents-parameter">update contents</a> (JS bundle and assets) that will be released to the CodePush server. It uses sensible defaults as much as possible (e.g. creating a non-dev build, assuming an iOS entry file is named <code>index.ios.js</code>), but also exposes the relevant <code>react-native bundle</code> parameters to enable flexibility (e.g. <code>--sourcemapOutput</code>).</p></li>
+<li><p>Inferring the <a href="#target-binary-version-parameter"><code>targetBinaryVersion</code></a> of this release by using the version name that is specified in your project&rsquo;s <code>Info.plist</code> (for iOS) and <code>build.gradle</code> (for Android) files.</p></li>
 </ol>
 
-<p>It then calls the vanilla <code>release</code> command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the <code>react-native bundle</code> command and also avoid common pitfalls such as supplying an invalid <code>targetBinaryVersion</code> parameter.</p>
+<p>To illustrate the difference that the <code>release-react</code> command can make, the following is an example of how you might generate and release an update for a React Native app using the &ldquo;vanilla&rdquo; <code>release</code> command:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">mkdir ./CodePush
+
+react-native bundle --platform ios \
+--entry-file index.ios.js \
+--bundle-output ./CodePush/main.jsbundle \
+--assets-dest ./CodePush \
+--dev false
+
+code-push release MyApp ./CodePush 1.0.0
+</code></pre></div>
+<p>Achieving the equivalent behavior with the <code>release-react</code> command would simply require the following command, which is generally less error-prone:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-react MyApp ios
+</code></pre></div>
+<p><em>NOTE: We believe that the <code>release-react</code> command should be valuable for most React Native developers, so if you&rsquo;re finding that it isn&rsquo;t flexible enough or missing a key feature, please don&rsquo;t hesistate to <a href="mailto:codepushfeed@microsoft.com">let us know</a>, so that we can improve it.</em></p>
+
+<h4>App name parameter</h4>
+
+<p>This is the same parameter as the one described in the <a href="#app-name-parameter">above section</a>.</p>
 
 <h4>Platform parameter</h4>
 
-<p>This specifies which platform the current update is targeting, and can be either <code>ios</code> or <code>android</code> (case-insensitive).</p>
-
-<h4>Bundle name parameter</h4>
-
-<p>This specifies the name of the output JS bundle file. If left unspecified, the standard bundle name will be used for the specified platform: <code>main.jsbundle</code> (iOS) and <code>index.android.bundle</code> (Android).</p>
+<p>This specifies which platform the current update is targeting, and can be either <code>android</code>, <code>ios</code> or <code>windows</code> (case-insensitive).</p>
 
 <h4>Deployment name parameter</h4>
 
@@ -895,33 +925,45 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 
 <p>This is the same parameter as the one described in the <a href="#description-parameter">above section</a>.</p>
 
-<h4>Development parameter</h4>
+<h4>Mandatory parameter</h4>
 
-<p>This specifies whether to generate a unminified, development JS bundle. If left unspecified, this defaults to <code>false</code> where warnings are disabled and the bundle is minified.</p>
+<p>This is the same parameter as the one described in the <a href="#mandatory-parameter">above section</a>.</p>
+
+<h4>Rollout parameter</h4>
+
+<p>This is the same parameter as the one described in the <a href="#rollout-parameter">above section</a>. If left unspecified, the release will be made available to all users.</p>
+
+<h4>Target binary version parameter</h4>
+
+<p>This is the same parameter as the one described in the <a href="#target-binary-version-parameter">above section</a>. If left unspecified, this defaults to targeting the exact version specified in the app&rsquo;s <code>Info.plist</code> (for iOS) and <code>build.gradle</code> (for Android) files.</p>
 
 <h4>Disabled parameter</h4>
 
 <p>This is the same parameter as the one described in the <a href="#disabled-parameter">above section</a>.</p>
 
+<h4>Development parameter</h4>
+
+<p>This specifies whether to generate a unminified, development JS bundle. If left unspecified, this defaults to <code>false</code> where warnings are disabled and the bundle is minified.</p>
+
+<p><em>NOTE: This parameter can be set using either &ndash;develoment or &ndash;dev</em></p>
+
 <h4>Entry file parameter</h4>
 
-<p>This specifies the relative path to the root JavaScript file of the app. If left unspecified, the command will first assume the entry file to be <code>index.ios.js</code> or <code>index.android.js</code> depending on the <code>platform</code> parameter supplied, following which it will use <code>index.js</code> if the previous file does not exist.</p>
+<p>This specifies the relative path to the app&rsquo;s root/entry JavaScript file. If left unspecified, this defaults to <code>index.ios.js</code> (for iOS),  <code>index.android.js</code> (for Android) or <code>index.windows.bundle</code> (for Windows) if that file exists, or <code>index.js</code> otherwise.</p>
 
-<h4>Mandatory parameter</h4>
+<p><em>NOTE: This parameter can be set using either &ndash;entryFile or -e</em></p>
 
-<p>This is the same parameter as the one described in the <a href="#mandatory-parameter">above section</a>.</p>
+<h4>Bundle name parameter</h4>
+
+<p>This specifies the file name that should be used for the generated JS bundle. If left unspecified, the standard bundle name will be used for the specified platform: <code>main.jsbundle</code> (iOS), <code>index.android.bundle</code> (Android) and <code>index.windows.bundle</code> (Windows).</p>
+
+<p><em>NOTE: This parameter can be set using either &ndash;bundleName or -b</em></p>
 
 <h4>Sourcemap output parameter</h4>
 
-<p>This specifies the relative path to where the sourcemap file for resulting update&rsquo;s JS bundle should be generated. If left unspecified, sourcemaps will not be generated.</p>
+<p>This specifies the relative path to where the generated JS bundle&rsquo;s sourcemap file should be written. If left unspecified, sourcemaps will not be generated.</p>
 
-<h4>Target binary version parameter</h4>
-
-<p>This is the same parameter as the one described in the <a href="#target-binary-version-parameter">above section</a>. If left unspecified, the command defaults to targeting only the specified version in the project&rsquo;s metadata (<code>Info.plist</code> if this update is for iOS clients, and <code>build.gradle</code> for Android clients).</p>
-
-<h4>Rollout parameter</h4>
-
-<p>This is the same parameter as the one described in the <a href="#rollout-parameter">above section</a>. If left unspecified, the release will be made available to all users.</p>
+<p><em>NOTE: This parameter can be set using either &ndash;sourcemapOutput or -s</em></p>
 
 <h3>Releasing Updates (Cordova)</h3>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-cordova &lt;appName&gt; &lt;platform&gt;
@@ -930,15 +972,27 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 [--mandatory]
 [--targetBinaryVersion &lt;targetBinaryVersion&gt;]
 [--rollout &lt;rolloutPercentage&gt;]
+[--build]
 </code></pre></div>
-<p>The <code>release-cordova</code> command does two things in addition to running the vanilla <code>release</code> command described in the <a href="#releasing-app-updates">Releasing App Updates</a> section:</p>
+<p>The <code>release-cordova</code> command is a Cordova-specific version of the &ldquo;vanilla&rdquo; <a href="#releasing-app-updates"><code>release</code></a> command, which supports all of the same parameters (e.g. <code>--mandatory</code>, <code>--description</code>), yet simplifies the process of releasing updates by performing the following additional behavior:</p>
 
 <ol>
-<li>It <a href="#update-contents-parameter">updates the contents</a> of the package by calling <code>cordova prepare</code> for the specified platform</li>
-<li>It infers the <a href="#target-binary-version-parameter"><code>targetBinaryVersion</code> of this release</a> by reading the version in the <code>&lt;widget version&gt;</code> in config.xml, and defaults to target only the specified version.</li>
+<li><p>Running the <code>cordova prepare</code> command in order to generate the <a href="#update-contents-parameter">update contents</a> (<code>www</code> folder) that will be released to the CodePush server.</p></li>
+<li><p>Inferring the <a href="#target-binary-version-parameter"><code>targetBinaryVersion</code></a> of this release by using the version name that is specified in your project&rsquo;s <code>config.xml</code> file.</p></li>
 </ol>
 
-<p>It then calls the vanilla <code>release</code> command by supplying the values for the required parameters using the above information. Doing this helps you avoid the manual step of generating the update contents yourself using the <code>cordova prepare</code> command and also avoid common pitfalls such as supplying an invalid <code>targetBinaryVersion</code> parameter.</p>
+<p>To illustrate the difference that the <code>release-cordova</code> command can make, the following is an example of how you might generate and release an update for a Cordova app using the &ldquo;vanilla&rdquo; <code>release</code> command:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">cordova prepare ios
+code-push release MyApp ./platforms/ios/www 1.0.0
+</code></pre></div>
+<p>Achieving the equivalent behavior with the <code>release-cordova</code> command would simply require the following command, which is generally less error-prone:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-cordova MyApp ios
+</code></pre></div>
+<p><em>NOTE: We believe that the <code>release-cordova</code> command should be valuable for most Cordova developers, so if you&rsquo;re finding that it isn&rsquo;t flexible enough or missing a key feature, please don&rsquo;t hesistate to <a href="mailto:codepushfeed@microsoft.com">let us know</a>, so that we can improve it.</em></p>
+
+<h4>App name parameter</h4>
+
+<p>This is the same parameter as the one described in the <a href="#app-name-parameter">above section</a>.</p>
 
 <h4>Platform parameter</h4>
 
@@ -952,57 +1006,76 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 
 <p>This is the same parameter as the one described in the <a href="#description-parameter">above section</a>.</p>
 
-<h4>Disabled parameter</h4>
-
-<p>This is the same parameter as the one described in the <a href="#disabled-parameter">above section</a>.</p>
-
 <h4>Mandatory parameter</h4>
 
 <p>This is the same parameter as the one described in the <a href="#mandatory-parameter">above section</a>.</p>
-
-<h4>Target binary version parameter</h4>
-
-<p>This is the same parameter as the one described in the <a href="#target-binary-version-parameter">above section</a>. If left unspecified, the command defaults to targeting only the specified version in the project&rsquo;s metadata (<code>Info.plist</code> if this update is for iOS clients, and <code>build.gradle</code> for Android clients).</p>
 
 <h4>Rollout parameter</h4>
 
 <p>This is the same parameter as the one described in the <a href="#rollout-parameter">above section</a>. If left unspecified, the release will be made available to all users.</p>
 
+<h4>Target binary version parameter</h4>
+
+<p>This is the same parameter as the one described in the <a href="#target-binary-version-parameter">above section</a>. If left unspecified, the command defaults to targeting only the specified version in the project&rsquo;s metadata (<code>Info.plist</code> if this update is for iOS clients, and <code>build.gradle</code> for Android clients).</p>
+
+<h4>Disabled parameter</h4>
+
+<p>This is the same parameter as the one described in the <a href="#disabled-parameter">above section</a>.</p>
+
+<h4>Build parameter</h4>
+
+<p>Specifies whether you want to run <code>cordova build</code> instead of <code>cordova prepare</code> (which is the default behavior), when generating your updated web assets. This is valuable if your project includes before and/or after build hooks (e.g. to transpile TypeScript), and therefore, having CodePush simply run <code>cordova prepare</code> isn&rsquo;t sufficient to create and release an update. If left unspecified, this defaults to <code>false</code>.</p>
+
+<p><em>NOTE: This parameter can be set using either &ndash;build or -b</em></p>
+
 <h2>Patching Updates</h2>
 
-<p>After releasing an update, there may be scenarios where you need to modify one or more of the attributes associated with the release (e.g. you forgot to mark a critical bug fix as mandatory, you want to increase the rollout percentage of an update). You can easily do this by running the following command:</p>
+<p>After releasing an update, there may be scenarios where you need to modify one or more of the attributes associated with it (e.g. you forgot to mark a critical bug fix as mandatory, you want to increase the rollout percentage of an update). You can easily do this by running the following command:</p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push patch &lt;appName&gt; &lt;deploymentName&gt;
 [--label &lt;releaseLabel&gt;]
 [--mandatory &lt;isMandatory&gt;]
 [--description &lt;description&gt;]
 [--rollout &lt;rolloutPercentage&gt;]
+[--targetBinaryVersion &lt;targetBinaryVersion&gt;]
 </code></pre></div>
 <p>Aside from the <code>appName</code> and <code>deploymentName</code>, all parameters are optional, and therefore, you can use this command to update just a single attribute or all of them at once. Calling the <code>patch</code> command without specifying any attribute flag will result in a no-op.</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell"># Mark the latest production release as mandatory
+code-push patch MyApp Production -m
 
-<h4>Label Parameter</h4>
+# Increase the rollout for v23 to 50%
+code-push patch MyApp Production -l v23 -rollout 50%
+</code></pre></div>
+<h3>Label parameter</h3>
 
-<p>Indicates which release (e.g. <code>v23</code>) you want to update within the specified deployment. If ommitted, the requested changes will be applied to the latest release in the specified deployment.</p>
+<p>Indicates which release (e.g. <code>v23</code>) you want to update within the specified deployment. If ommitted, the requested changes will be applied to the latest release in the specified deployment. In order to look up the label for the release you want to update, you can run the <code>code-push deployment history</code> command and refer to the <code>Label</code> column.</p>
 
-<p><em>NOTE: This parameter can be set using either <code>--label</code> or <code>-l</code></em> </p>
+<p><em>NOTE: This parameter can be set using either <code>--label</code> or <code>-l</code></em></p>
 
-<h4>Mandatory Parameter</h4>
+<h3>Mandatory parameter</h3>
 
 <p>This is the same parameter as the one described in the <a href="#mandatory-parameter">above section</a>, and simply allows you to update whether the release should be considered mandatory or not. Note that <code>--mandatory</code> and <code>--mandatory true</code> are equivalent, but the absence of this flag is not equivalent to <code>--mandatory false</code>. Therefore, if the parameter is ommitted, no change will be made to the value of the target release&rsquo;s mandatory property. You need to set this to <code>--mandatory false</code> to explicitly make a release optional.</p>
 
-<h4>Description Parameter</h4>
+<h3>Description parameter</h3>
 
-<p>This is the same parameter as the one described in the <a href="#description-parameter">above section</a>, and simply allows you to update the description associated with the release (e.g. you made a typo when releasing, or you forgot to add a description at all). If this parameter is ommitted, no change will be made to the value of the target release&rsquo;s description property. </p>
+<p>This is the same parameter as the one described in the <a href="#description-parameter">above section</a>, and simply allows you to update the description associated with the release (e.g. you made a typo when releasing, or you forgot to add a description at all). If this parameter is ommitted, no change will be made to the value of the target release&rsquo;s description property.</p>
 
-<h4>Disabled parameter</h4>
+<h3>Disabled parameter</h3>
 
 <p>This is the same parameter as the one described in the <a href="#disabled-parameter">above section</a>, and simply allows you to update whether the release should be disabled or not. Note that <code>--disabled</code> and <code>--disabled true</code> are equivalent, but the absence of this flag is not equivalent to <code>--disabled false</code>. Therefore, if the paremeter is ommitted, no change will be made to the value of the target release&rsquo;s disabled property. You need to set this to <code>--disabled false</code> to explicity make a release acquirable if it was previously disabled.</p>
 
-<h4>Rollout Parameter</h4>
+<h3>Rollout parameter</h3>
 
 <p>This is the same parameter as the one described in the <a href="#rollout-parameter">above section</a>, and simply allows you to increase the rollout percentage of the target release. This parameter can only be set to an integer whose value is greater than the current rollout value. Additionally, if you want to &ldquo;complete&rdquo; the rollout, and therefore, make the release available to everyone, you can simply set this parameter to <code>--rollout 100</code>. If this parameter is ommitted, no change will be made to the value of the target release&rsquo;s rollout parameter.</p>
 
 <p>Additionally, as mentioned above, when you release an update without a rollout value, it is treated equivalently to setting the rollout to <code>100</code>. Therefore, if you released an update without a rollout, you cannot change the rollout property of it via the <code>patch</code> command since that would be considered lowering the rollout percentage.</p>
 
+<h3>Target binary version parameter</h3>
+
+<p>This is the same parameter as the one described in the <a href="#target-binary-version-parameter">above section</a>, and simply allows you to update the semver range that indicates which binary version(s) a release is compatible with. This can be useful if you made a mistake when originally releasing an update (e.g. you specified <code>1.0.0</code> but meant <code>1.1.0</code>) or you want to increase or decrease the version range that a release supports (e.g. you discovered that a release doesn&rsquo;t work with <code>1.1.2</code> after all). If this paremeter is ommitted, no change will be made to the value of the target release&rsquo;s version property.</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell"># Add a &quot;max binary version&quot; to an existing release
+# by scoping its eligibility to users running &gt;= 1.0.5
+code-push patch MyApp Staging -t &quot;1.0.0 - 1.0.5&quot;
+</code></pre></div>
 <h2>Promoting Updates</h2>
 
 <p>Once you&rsquo;ve tested an update against a specific deployment (e.g. <code>Staging</code>), and you want to promote it &ldquo;downstream&rdquo; (e.g. dev-&gt;staging, staging-&gt;production), you can simply use the following command to copy the release from one deployment to another:</p>
@@ -1011,6 +1084,7 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 [--disabled &lt;disabled&gt;]
 [--mandatory]
 [--rollout &lt;rolloutPercentage&gt;]
+[--targetBinaryVersion &lt;targetBinaryVersion]
 </code></pre></div>
 <p>The <code>promote</code> command will create a new release for the destination deployment, which includes the <strong>exact code and metadata</strong> (description, mandatory and target binary version) from the latest release of the source deployment. While you could use the <code>release</code> command to &ldquo;manually&rdquo; migrate an update from one environment to another, the <code>promote</code> command has the following benefits:</p>
 
@@ -1035,8 +1109,15 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 
 <h3>Rollout parameter</h3>
 
-<p>This is the same parameter as the one described in the <a href="#rollout-parameter">above section</a>, and allows you to specify whether the newly created release should only be made available to a portion of your users. Unlike the <code>mandatory</code> and <code>description</code> parameters, the <code>rollout</code> of a release is not carried over as part of a promote, and so you need to explicitly set this if you don&rsquo;t want the new release to be available to all of your users.</p>
+<p>This is the same parameter as the one described in the <a href="#rollout-parameter">above section</a>, and allows you to specify whether the newly created release should only be made available to a portion of your users. Unlike the other release metadata parameters (e.g. <code>description</code>), the <code>rollout</code> of a release is not carried over/inherited as part of a promote, and therefore, you need to explicitly set this if you don&rsquo;t want the newly created release to be available to all of your users.</p>
 
+<h3>Target binary version parameter</h3>
+
+<p>This is the same parameter as the one described in the <a href="#target-binary-version-parameter">above section</a>, and simply allows you to override the target binary version that will be used for the promoted release. If unspecified, the new release will inherit the target binary version property from the release being promoted.</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell"># Promote the release to production and make it 
+# available to all versions using that deployment
+code-push promote MyApp Staging Production -t &quot;*&quot;
+</code></pre></div>
 <h2>Rolling Back Updates</h2>
 
 <p>A deployment&rsquo;s release history is immutable, so you cannot delete or remove an update once it has been released. However, if you release an update that is broken or contains unintended features, it is easy to roll it back using the <code>rollback</code> command:</p>
@@ -1124,7 +1205,7 @@ code-push rollback MyApp Production
 
 <h2>Clearing Release History</h2>
 
-<p>You can clear the release history associated with a deployment using the following command: </p>
+<p>You can clear the release history associated with a deployment using the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push deployment clear &lt;appName&gt; &lt;deploymentName&gt;
 </code></pre></div>
 <p>After running this command, client devices configured to receive updates using its associated deployment key will no longer receive the updates that have been cleared. This command is irreversible, and therefore should not be used in a production deployment.</p>
@@ -1169,7 +1250,7 @@ code-push rollback MyApp Production
                 </div>
                 <div class="col-sm-3">
                     <h3><i class="fa fa-comment"></i> Talk to us!</h3>
-                    <p>If you have any feedback or suggestions on how we can make CodePush more awesome, please <a href=mailto:codepushfeed@microsoft.com>email us</a> or ping us in the <a href="https://discord.gg/0ZcbPKXt5bWxFdFu">#code-push</a> channel on Reactiflux (for React Native).</p>
+                    <p>If you have any feedback or suggestions on how we can make CodePush more awesome, please contact via Twitter <a href="https://twitter.com/mscodepush">@mscodepush, <a href=mailto:codepush@microsoft.com>email us</a> or ping us in the <a href="https://discord.gg/0ZcbPKXt5bWxFdFu">#code-push</a> channel on Reactiflux (for React Native).</p>
                 </div>
             </div>
         </div>
@@ -1186,7 +1267,6 @@ code-push rollback MyApp Production
         </div>        
     </div>
 </footer>
-
 	<script>
     
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
