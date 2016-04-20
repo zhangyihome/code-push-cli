@@ -859,7 +859,7 @@ code-push release-react MyApp-Android android --targetBinaryVersion &quot;~1.1.0
 <li><p><a href="#codepushcheckforupdate">checkForUpdate</a>: Asks the CodePush service whether the configured app deployment has an update available. </p></li>
 <li><p><a href="#codepushgetcurrentpackage">getCurrentPackage</a>: Retrieves the metadata about the currently installed update (e.g. description, installation time, size). <em>NOTE: As of <code>v1.10.3-beta</code> of the CodePush module, this method is deprecated in favor of <a href="#codepushgetupdatemetadata"><code>getUpdateMetadata</code></a></em>.</p></li>
 <li><p><a href="#codepushgetupdatemetadata">getUpdateMetadata</a>: Retrieves the metadata for an installed update (e.g. description, mandatory).</p></li>
-<li><p><a href="#codepushnotifyapplicationready">notifyApplicationReady</a>: Notifies the CodePush runtime that an installed update is considered successful. If you are manually checking for and installing updates (i.e. not using the <a href="#codepushsync">sync</a> method to handle it all for you), then this method <strong>MUST</strong> be called; otherwise CodePush will treat the update as failed and rollback to the previous version when the app next restarts.</p></li>
+<li><p><a href="#codepushnotifyappready">notifyAppReady</a>: Notifies the CodePush runtime that an installed update is considered successful. If you are manually checking for and installing updates (i.e. not using the <a href="#codepushsync">sync</a> method to handle it all for you), then this method <strong>MUST</strong> be called; otherwise CodePush will treat the update as failed and rollback to the previous version when the app next restarts.</p></li>
 <li><p><a href="#codepushrestartapp">restartApp</a>: Immediately restarts the app. If there is an update pending, it will be immediately displayed to the end user. Otherwise, calling this method simply has the same behavior as the end user killing and restarting the process.</p></li>
 <li><p><a href="#codepushsync">sync</a>: Allows checking for an update, downloading it and installing it, all with a single call. Unless you need custom UI and/or behavior, we recommend most developers to use this method when integrating CodePush into their apps</p></li>
 </ul>
@@ -1063,24 +1063,29 @@ codePush.sync({
 <li><p><strong>downloadProgressCallback</strong> <em>((progress: DownloadProgress) =&gt; void)</em> - Called periodically when an available update is being downloaded from the CodePush server. The method is called with a <code>DownloadProgress</code> object, which contains the following two properties:</p>
 
 <ul>
-<li><strong>totalBytes</strong> <em>(Number)</em> - The total number of bytes expected to be received for this update package</li>
-<li><strong>receivedBytes</strong> <em>(Number)</em> - The number of bytes downloaded thus far.</li>
+<li><strong>totalBytes</strong> <em>(Number)</em> - The total number of bytes expected to be received for this update (i.e. the size of the set of files which changed from the previous release).</li>
+<li><strong>receivedBytes</strong> <em>(Number)</em> - The number of bytes downloaded thus far, which can be used to track download progress.</li>
 </ul></li>
 </ul>
 
 <p>Example Usage:</p>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">// Prompt the user when an update is available
 // and then display a &quot;downloading&quot; modal 
-codePush.sync({ updateDialog: true }, (status) =&gt; {
-    switch (status) {
-        case codePush.SyncStatus.DOWNLOADING_PACKAGE:
-            // Show &quot;downloading&quot; modal
-            break;
-        case codePush.SyncStatus.INSTALLING_UPDATE:
-            // Hide &quot;downloading&quot; modal
-            break;
-    }
-});
+codePush.sync({ updateDialog: true }, 
+  (status) =&gt; {
+      switch (status) {
+          case codePush.SyncStatus.DOWNLOADING_PACKAGE:
+              // Show &quot;downloading&quot; modal
+              break;
+          case codePush.SyncStatus.INSTALLING_UPDATE:
+              // Hide &quot;downloading&quot; modal
+              break;
+      }
+  },
+  (totalBytes, receivedBytes) =&gt; { 
+    /* Update download modal progress */ 
+  }
+);
 </code></pre></div>
 <p>This method returns a <code>Promise</code> which is resolved to a <code>SyncStatus</code> code that indicates why the <code>sync</code> call succeeded. This code can be one of the following <code>SyncStatus</code> values:</p>
 
