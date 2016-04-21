@@ -273,7 +273,10 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
             .example("login", "Logs in to the CodePush server")
             .example("login --accessKey mykey", "Logs in on behalf of the user who owns and created the access key \"mykey\"")
-            .option("accessKey", { alias: "key", default: null, demand: false, description: " Access key to authenticate against the CodePush server with, instead of providing your username and password credentials", type: "string" })
+            .example("login --proxy http://someproxy.com:455", "Logs in with the specified proxy url")
+            .option("accessKey", { alias: "key", default: null, demand: false, description: "Access key to authenticate against the CodePush server with, instead of providing your username and password credentials", type: "string" })
+            .option("proxy", { default: null, demand: false, description: "URL of the proxy server to use", type: "string" })
+            .option("noProxy", { default: false, demand: false, description: "Bypass the system-wide proxy settings", type: "boolean" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
         addCommonConfiguration(yargs);
@@ -321,6 +324,9 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " register")
             .demand(/*count*/ 1, /*max*/ 2)  // Require one non-optional and one optional argument.
             .example("register", "Registers a new CodePush account")
+            .example("register --proxy http://someproxy.com:455", "Registers with the specified proxy url")
+            .option("proxy", { default: null, demand: false, description: "URL of the proxy server to use", type: "string" })
+            .option("noProxy", { default: false, demand: false, description: "Bypass the system-wide proxy settings", type: "boolean" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
 
         addCommonConfiguration(yargs);
@@ -611,6 +617,8 @@ function createCommand(): cli.ICommand {
 
                 loginCommand.serverUrl = getServerUrl(arg1);
                 loginCommand.accessKey = argv["accessKey"];
+                loginCommand.proxy = argv["proxy"];
+                loginCommand.noProxy = argv["noProxy"];
                 break;
 
             case "logout":
@@ -658,6 +666,8 @@ function createCommand(): cli.ICommand {
                 var registerCommand = <cli.IRegisterCommand>cmd;
 
                 registerCommand.serverUrl = getServerUrl(arg1);
+                registerCommand.proxy = argv["proxy"];
+                registerCommand.noProxy = argv["noProxy"];
                 break;
 
             case "release":
