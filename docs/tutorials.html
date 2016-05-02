@@ -521,9 +521,12 @@
 
 <p>Depending on the complexity of the app, pushing an update immediately might be a jarring experience for end users (e.g. changing the UI or losing the current state can be frustrating and confusing).  Because of this, we recommend updates are installed only after a certain period of app inactivity has been reached. To achieve this experience, developers can use the InstallMode.ON_NEXT_RESUME and minimumBackgroundDuration parameters as follows: </p>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">// Download the update silently, but install on next
-// resume and after 10 minutes of app inactivity 
+// app resume and after 10 minutes of app inactivity
+// We recommend doing this call on app start (e.g. `componentDidMount` event on React Native or `deviceready` on Cordova)
 codePush.sync({ installMode: InstallMode.ON_NEXT_RESUME, minimumBackgroundDuration: 60 * 10 });
 </code></pre></div>
+<p><em>Note: If <code>codePush.sync()</code> is not called on app start (e.g. <code>componentDidMount</code> event on React Native or <code>deviceready</code> on Cordova), developers will need to notify the update was sucessfully installed by calling the <code>codePush.notifyApplicationReady()</code> method. Otherwise  the CodePush runtime will assume the installed update has failed and roll back to the previous version.</em></p>
+
 <h3>2.   Active mode</h3>
 
 <p>In contrast to the silent mode updates, active mode updates prompt end users about available updates and thus require user interaction. </p>
