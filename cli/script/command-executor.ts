@@ -824,14 +824,14 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
     var missingPatchVersionRegex: RegExp = /^\d+\.\d+$/;
     if (platform === "ios") {
         try {
-            var infoPlistContainingFolder: string = path.join("iOS", projectName);
+            var infoPlistContainingFolder: string = path.join("ios", projectName);
             var infoPlistContents: string = fs.readFileSync(path.join(infoPlistContainingFolder, "Info.plist")).toString();
         } catch (err) {
             try {
-                infoPlistContainingFolder = "iOS";
+                infoPlistContainingFolder = "ios";
                 infoPlistContents = fs.readFileSync(path.join(infoPlistContainingFolder, "Info.plist")).toString();
             } catch (err) {
-                throw new Error(`Unable to find or read "Info.plist" in the "iOS/${projectName}" or "iOS" folders.`);
+                throw new Error(`Unable to find or read "Info.plist" in the "ios/${projectName}" or "ios" folders.`);
             }
         }
 
