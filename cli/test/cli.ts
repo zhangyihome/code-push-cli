@@ -1006,7 +1006,7 @@ describe("CLI", () => {
                 done(new Error("Did not throw error."));
             })
             .catch((err) => {
-                assert.equal(err.message, `Unable to ${cordovaCommand} project. Please ensure that this is a Cordova project and that platform "${command.platform}" was added with "cordova platform add ${command.platform}"`);
+                assert.equal(err.message, `Unable to ${cordovaCommand} project. Please ensure that the CWD represents a Cordova project and that the "${command.platform}" platform was added by running "cordova platform add ${command.platform}".`);
                 sinon.assert.notCalled(release);
                 sinon.assert.threw(releaseCordova, "Error");
                 done();
