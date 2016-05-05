@@ -20,6 +20,7 @@ import * as semver from "semver";
 import slash = require("slash");
 var Table = require("cli-table");
 import * as yazl from "yazl";
+var which = require("which");
 import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
@@ -1067,18 +1068,28 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
     } else {
         throw new Error("Platform must be either \"ios\" or \"android\".");
     }
-
+    
     var cordovaCommand: string = command.build ? "build" : "prepare";
-
-    log(chalk.cyan(`Running "cordova ${cordovaCommand}" command:\n`));
-    try {
-        execSync(["cordova", cordovaCommand, platform, "--verbose"].join(" "), { stdio: "inherit" });
-    } catch (error) {
-        if (error.code == "ENOENT") {
-            throw new Error(`Failed to call "cordova ${cordovaCommand}". Please ensure that the Cordova CLI is installed.`);
+    var cordovaCLI: string = "cordova";
+    
+    // Check whether the Cordova or PhoneGap CLIs are 
+    // installed, and if not, fail early
+    try { 
+        which.sync(cordovaCLI);
+    } catch (e) {
+        try {
+            cordovaCLI = "phonegap";            
+            which.sync(cordovaCLI);
+        } catch (e) {
+            throw new Error(`Unable to ${cordovaCommand} project. Please ensure that either the Cordova or PhoneGap CLI is installed.`);
         }
+    }
 
-        throw new Error(`Unable to ${cordovaCommand} project. Please ensure that this is a Cordova project and that platform "${platform}" was added with "cordova platform add ${platform}"`);
+    log(chalk.cyan(`Running "${cordovaCLI} ${cordovaCommand}" command:\n`));
+    try {
+        execSync([cordovaCLI, cordovaCommand, platform, "--verbose"].join(" "), { stdio: "inherit" });
+    } catch (error) {
+        throw new Error(`Unable to ${cordovaCommand} project. Please ensure that the CWD represents a Cordova project and that the "${platform}" platform was added by running "${cordovaCLI} platform add ${platform}".`);
     }
 
     try {
