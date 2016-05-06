@@ -751,7 +751,6 @@ function createCommand(): cli.ICommand {
 }
 
 function isValidRollout(args: any): boolean {
-    var deploymentName: string = args["deploymentName"];
     var rollout: string = args["rollout"];
     if (rollout && !ROLLOUT_PERCENTAGE_REGEX.test(rollout)) {
         return false;
