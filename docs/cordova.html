@@ -836,8 +836,8 @@ function syncStatus(status) {
 
 function downloadProgress(downloadProgress) {
     if (downloadProgress) {
-    	// Update &quot;downloading&quot; modal with current download %
-        //console.log("Downloading " + downloadProgress.receivedBytes + " of " + downloadProgress);
+        // Update &quot;downloading&quot; modal with current download %
+        //console.log(&quot;Downloading &quot; + downloadProgress.receivedBytes + &quot; of &quot; + downloadProgress);
     }
 }
 </code></pre></div>
@@ -1023,7 +1023,12 @@ window.codePush.checkForUpdate(onUpdateCheck, onError);
 <li><p><strong>DOWNLOADING_PACKAGE</strong>: An available update is being downloaded from the CodePush server.</p></li>
 <li><p><strong>INSTALLING_UPDATE</strong>: An available update was downloaded and is about to be installed.</p></li>
 </ul>
-  
+
+<h2>PhoneGap Build</h2>
+
+<p>This plugin is compatible with <a href="https://build.phonegap.com">PhoneGap Build</a>, and supports creating Android and iOS builds out-of-the-box. However, in order for CodePush to calculate the hash of your binary contents on Android, PhoneGap Build needs to use Gradle to build your app, which isn&rsquo;t its default behavior (it uses Ant). To resolve this, simply add the following element to your app&rsquo;s <code>config.xml</code> file, as a child of the <code>&lt;platform name=&quot;android&quot;&gt;</code> element:</p>
+<div class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;preference name=&quot;android-build-tool&quot; value=&quot;gradle&quot; /&gt;
+</code></pre></div>  
                 </article>
             </div>  
         </div>           

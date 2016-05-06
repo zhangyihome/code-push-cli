@@ -501,15 +501,15 @@
 
 <p>The CodePush plugin helps get product improvements in front of your end users instantly, by keeping your JavaScript and images synchronized with updates you release to the CodePush server. This way, your app gets the benefits of an offline mobile experience, as well as the &ldquo;web-like&rdquo; agility of side-loading updates as soon as they are available. It&rsquo;s a win-win!</p>
 
-<p>In order to ensure that your end users always have a functioning version of your app, the CodePush plugin maintains a copy of the previous update, so that in the event that you accidentally push an update which includes a crash, it can automatically roll back. This way, you can rest assured that your newfound release agility won&rsquo;t result in users becoming blocked before you have a chance to <a href="http://microsoft.github.io/code-push/docs/cli.html#link-8">roll back</a> on the server. It&rsquo;s a win-win-win! </p>
+<p>In order to ensure that your end users always have a functioning version of your app, the CodePush plugin maintains a copy of the previous update, so that in the event that you accidentally push an update which includes a crash, it can automatically roll back. This way, you can rest assured that your newfound release agility won&rsquo;t result in users becoming blocked before you have a chance to <a href="http://microsoft.github.io/code-push/docs/cli.html#link-10">roll back</a> on the server. It&rsquo;s a win-win-win! </p>
 
 <p><em>Note: Any product changes which touch native code (e.g. modifying your <code>AppDelegate.m</code>/<code>MainActivity.java</code> file, adding a new plugin) cannot be distributed via CodePush, and therefore, must be updated via the appropriate store(s).</em></p>
 
 <h2>Supported React Native platforms</h2>
 
 <ul>
-<li>iOS</li>
-<li>Android</li>
+<li>iOS (8+)</li>
+<li>Android (4.1+)</li>
 </ul>
 
 <p>We try our best to maintain backwards compatability of our plugin with previous versions of React Native, but due to the nature of the platform, and the existence of breaking changes between releases, it is possible that you need to use a specific version of the CodePush plugin in order to support the exact version of React Native you are using. The following table outlines which CodePush plugin versions officially support the respective React Native versions:</p>
@@ -533,18 +533,18 @@
 <td>v1.4.0-v1.6.0 <em>(introduced iOS asset support)</em></td>
 </tr>
 <tr>
-<td>v0.19.0-v0.25.0</td>
+<td>v0.19.0-v0.26.0</td>
 <td>v1.7.0+ <em>(introduced Android asset support)</em></td>
 </tr>
 <tr>
-<td>v0.26.0+</td>
+<td>v0.27.0+</td>
 <td>TBD :) We work hard to respond to new RN releases, but they do occasionally break us. We will update this chart with each RN release, so that users can check to see what our &ldquo;official&rdquo; support is.</td>
 </tr>
 </tbody></table>
 
 <h2>Supported Components</h2>
 
-<p>When using the React Native assets sytem (i.e. using the <code>require(&quot;./foo.png&quot;)</code> syntax), the following list represents the set of components (and props) that support having their referenced images updated via CodePush:</p>
+<p>When using the React Native assets sytem (i.e. using the <code>require(&quot;./foo.png&quot;)</code> syntax), the following list represents the set of core components (and props) that support having their referenced images updated via CodePush:</p>
 
 <table><thead>
 <tr>
@@ -555,6 +555,10 @@
 <tr>
 <td><code>Image</code></td>
 <td><code>source</code></td>
+</tr>
+<tr>
+<td><code>MapView.Marker</code> <br /><em>(Requires <a href="https://github.com/lelandrichardson/react-native-maps">react-native-maps</a> <code>&gt;=O.3.2</code>)</em></td>
+<td><code>image</code></td>
 </tr>
 <tr>
 <td><code>ProgressViewIOS</code></td>
@@ -581,6 +585,10 @@
 <tr>
 <td><code>SliderIOS</code></td>
 <td><code>maximumTrackImage</code>, <code>minimumTrackImage</code>, <code>thumbImage</code>, <code>trackImage</code></td>
+</tr>
+<tr>
+<td><code>Video</code></td>
+<td><code>source</code></td>
 </tr>
 </tbody></table>
 
@@ -631,9 +639,12 @@
 <ol>
 <li><p>Add the CodePush plugin dependency to your <code>Podfile</code>, pointing at the path where NPM installed it</p>
 <div class="highlight"><pre><code class="language-ruby" data-lang="ruby">pod &#39;CodePush&#39;, :path =&gt; &#39;./node_modules/react-native-code-push&#39;
-</code></pre></div></li>
+</code></pre></div>
+<p><em>NOTE: The above path needs to be relative to your app&rsquo;s <code>Podfile</code>, so adjust it as neccessary.</em></p></li>
 <li><p>Run <code>pod install</code></p></li>
 </ol>
+
+<p><em>NOTE: The CodePush <code>.podspec</code> depends on the <code>React</code> pod, and so in order to ensure that it can correctly use the version of React Native that your app is built with, please make sure to define the <code>React</code> dependency in your app&rsquo;s <code>Podfile</code> as explained <a href="http://facebook.github.io/react-native/docs/embedded-app-ios.html#install-react-native-using-cocoapods">here</a>.</em></p>
 
 <h4>Plugin Installation (iOS - Manual)</h4>
 
@@ -1082,7 +1093,7 @@ codePush.sync({ updateDialog: true },
               break;
       }
   },
-  (totalBytes, receivedBytes) =&gt; { 
+  ({ receivedBytes, totalBytes, }) =&gt; { 
     /* Update download modal progress */ 
   }
 );
