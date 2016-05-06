@@ -834,8 +834,11 @@ function syncStatus(status) {
     }
 }
 
-function downloadProgress(totalBytes, receivedBytes) {
-    // Update &quot;downloading&quot; modal with current download %
+function downloadProgress(downloadProgress) {
+    if (downloadProgress) {
+    	// Update &quot;downloading&quot; modal with current download %
+        //console.log("Downloading " + downloadProgress.receivedBytes + " of " + downloadProgress);
+    }
 }
 </code></pre></div>
 <p>The <code>sync</code> method can be called anywhere you&rsquo;d like to check for an update. That could be in the <code>deviceready</code> event handler, the <code>click</code> event of a button, in the callback of a periodic timer, or whatever else makes sense for your needs. Just like the <code>checkForUpdate</code> method, it will perform the network request to check for an update in the background, so it won&rsquo;t impact your UI thread and/or JavaScript thread&rsquo;s responsiveness.</p>
