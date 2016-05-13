@@ -449,7 +449,7 @@ This is the same parameter as the one described in the [above section](#disabled
 
 This specifies whether to generate a unminified, development JS bundle. If left unspecified, this defaults to `false` where warnings are disabled and the bundle is minified.
 
-*NOTE: This parameter can be set using either --develoment or --dev*
+*NOTE: This parameter can be set using either --development or --dev*
 
 #### Entry file parameter
 
