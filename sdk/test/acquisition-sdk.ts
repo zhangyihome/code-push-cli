@@ -93,17 +93,6 @@ describe("Acquisition SDK", () => {
         });
     });
 
-    it("SDK forwards shouldRunBinaryVersion notification", (done: MochaDone) => {
-        mockApi.latestPackage.shouldRunBinaryVersion = true;
-        
-        var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
-        acquisition.queryUpdateWithCurrentPackage(clone(templateCurrentPackage), (error: Error, returnPackage: acquisitionSdk.RemotePackage | acquisitionSdk.NativeUpdateNotification) => {
-            assert.equal(null, error);
-            assert.deepEqual({ shouldRunBinaryVersion: true }, returnPackage);
-            done();
-        });
-    });
-
     it("Package with lower native version gives update notification together with shouldRunBinaryVersion notification", (done: MochaDone) => {
         mockApi.latestPackage.shouldRunBinaryVersion = true;
         var lowerAppVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
@@ -236,7 +225,7 @@ describe("Acquisition SDK", () => {
             done();
         }));
     });
-    
+
     it("reportStatusDownload(...) signals completion", (done: MochaDone): void => {
         var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
 

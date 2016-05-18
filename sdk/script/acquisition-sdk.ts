@@ -118,18 +118,8 @@ export class AcquisitionManager {
             if (!updateInfo) {
                 callback(error, /*remotePackage=*/ null);
                 return;
-            } else if (updateInfo.updateAppVersion || updateInfo.shouldRunBinaryVersion) {
-                var returnUpdateInfo: any = {};
-                if (updateInfo.shouldRunBinaryVersion) {
-                    returnUpdateInfo.shouldRunBinaryVersion = true;
-                }
-                
-                if (updateInfo.updateAppVersion) {
-                    returnUpdateInfo.updateAppVersion = true;
-                    returnUpdateInfo.appVersion = updateInfo.appVersion;
-                }
-                
-                callback(/*error=*/ null, returnUpdateInfo);
+            } else if (updateInfo.updateAppVersion) {
+                callback(/*error=*/ null, { updateAppVersion: true, appVersion: updateInfo.appVersion });
                 return;
             } else if (!updateInfo.isAvailable) {
                 callback(/*error=*/ null, /*remotePackage=*/ null);
@@ -150,22 +140,22 @@ export class AcquisitionManager {
             callback(/*error=*/ null, remotePackage);
         });
     }
-    
+
     public reportStatusDeploy(deployedPackage?: Package, status?: string, previousLabelOrAppVersion?: string, previousDeploymentKey?: string, callback?: Callback<void>): void {
         var url: string = this._serverUrl + "reportStatus/deploy";
         var body: DeploymentStatusReport = {
             appVersion: this._appVersion,
             deploymentKey: this._deploymentKey
         };
-        
+
         if (this._clientUniqueId) {
             body.clientUniqueId = this._clientUniqueId;
         }
-        
+
         if (deployedPackage) {
             body.label = deployedPackage.label;
             body.appVersion = deployedPackage.appVersion;
-            
+
             switch (status) {
                 case AcquisitionStatus.DeploymentSucceeded:
                 case AcquisitionStatus.DeploymentFailed:
@@ -183,17 +173,17 @@ export class AcquisitionManager {
                     return;
             }
         }
-        
+
         if (previousLabelOrAppVersion) {
             body.previousLabelOrAppVersion = previousLabelOrAppVersion;
         }
-        
+
         if (previousDeploymentKey) {
             body.previousDeploymentKey = previousDeploymentKey;
         }
-        
+
         callback = typeof arguments[arguments.length - 1] === "function" && arguments[arguments.length - 1];
-        
+
         this._httpRequester.request(Http.Verb.POST, url, JSON.stringify(body), (error: Error, response: Http.Response): void => {
             if (callback) {
                 if (error) {
@@ -210,7 +200,7 @@ export class AcquisitionManager {
             }
         });
     }
-    
+
     public reportStatusDownload(downloadedPackage: Package, callback?: Callback<void>): void {
         var url: string = this._serverUrl + "reportStatus/download";
         var body: DownloadReport = {
@@ -218,7 +208,7 @@ export class AcquisitionManager {
             deploymentKey: this._deploymentKey,
             label: downloadedPackage.label
         };
-        
+
         this._httpRequester.request(Http.Verb.POST, url, JSON.stringify(body), (error: Error, response: Http.Response): void => {
             if (callback) {
                 if (error) {
