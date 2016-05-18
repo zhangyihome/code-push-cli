@@ -93,19 +93,6 @@ describe("Acquisition SDK", () => {
         });
     });
 
-    it("Package with lower native version gives update notification together with shouldRunBinaryVersion notification", (done: MochaDone) => {
-        mockApi.latestPackage.shouldRunBinaryVersion = true;
-        var lowerAppVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
-        lowerAppVersionPackage.appVersion = "0.0.1";
-
-        var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
-        acquisition.queryUpdateWithCurrentPackage(lowerAppVersionPackage, (error: Error, returnPackage: acquisitionSdk.RemotePackage | acquisitionSdk.NativeUpdateNotification) => {
-            assert.equal(null, error);
-            assert.deepEqual(nativeUpdateResult, returnPackage);
-            done();
-        });
-    });
-
     it("Package with higher native version gives no update", (done: MochaDone) => {
         var higherAppVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
         higherAppVersionPackage.appVersion = "9.9.0";
