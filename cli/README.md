@@ -64,7 +64,22 @@ code-push login
 
 This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. This will generate an access key that you need to copy/paste into the CLI (it will prompt you for it). You are now successfully authenticated and can safely close your browser window.
 
-If at anytime you want to determine if you're already logged in, you can run the following command to display the e-mail address associated with your current authentication session, and which identity providers your account is linked to (e.g. GitHub):
+By default, the login command supports proxies and will look for system environment variables (`HTTPS_PROXY` or `HTTP_PROXY` for HTTPS or HTTP traffic respectively) to establish proxy connections.
+
+CodePush specific proxy settings are also supported and can be set using the `--proxy` flag:
+
+```
+code-push login --proxy proxyUrl
+```
+
+
+Alternatively, proxy functionality can be disabled (system environment variables are suppressed and CodePush ignores proxy settings) by passing the `--noproxy` flag:
+
+```
+code-push login --noproxy
+```
+
+If at any time you want to determine if you're already logged in, you can run the following command to display the e-mail address associated with your current authentication session, which identity providers your account is linked to (e.g. GitHub) and any previously set proxy:
 
 ```shell
 code-push whoami
@@ -245,7 +260,7 @@ Once your app has been configured to query for updates against the CodePush serv
 
 2. [React Native](#releasing-updates-react-native) - Performs the same functionality as the general release command, but also handles the task of generating the updated app contents for you (JS bundle and assets), instead of requiring you to run both `react-native bundle` and then `code-push release`.
 
-3. [Cordova](#releasing-updates-cordova) - Performs the same functionality as the general release command, but also handles the task of preparing the app update for you, instead of requiring you to run both `cordova prepare` and then `code-push release`.
+3. [Cordova](#releasing-updates-cordova) - Performs the same functionality as the general release command, but also handles the task of preparing the app update for you, instead of requiring you to run both `cordova prepare` (or `phonegap build` for PhoneGap instances)  and then `code-push release`.
 
 Which of these commands you should use is mostly a matter of requirements and/or preference. However, we generally recommend using the relevant platform-specific command to start (since it greatly simplifies the experience), and then leverage the general-purpose `release` command if/when greater control is needed.
 
@@ -483,7 +498,7 @@ code-push release-cordova <appName> <platform>
 
 The `release-cordova` command is a Cordova-specific version of the "vanilla" [`release`](#releasing-app-updates) command, which supports all of the same parameters (e.g. `--mandatory`, `--description`), yet simplifies the process of releasing updates by performing the following additional behavior:
 
-1. Running the `cordova prepare` command in order to generate the [update contents](#update-contents-parameter) (`www` folder) that will be released to the CodePush server.
+1. Running the `cordova prepare` (or `phonegap build` for PhoneGap instances) command in order to generate the [update contents](#update-contents-parameter) (`www` folder) that will be released to the CodePush server.
 
 2. Inferring the [`targetBinaryVersion`](#target-binary-version-parameter) of this release by using the version name that is specified in your project's `config.xml` file.
 
