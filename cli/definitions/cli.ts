@@ -124,6 +124,8 @@ export interface ILinkCommand extends ICommand {
 export interface ILoginCommand extends ICommand {
     serverUrl?: string;
     accessKey: string;
+    proxy?: string;
+    noProxy?: boolean;
 }
 
 export interface IPackageInfo {
@@ -149,6 +151,8 @@ export interface IPromoteCommand extends ICommand, IPackageInfo {
 
 export interface IRegisterCommand extends ICommand {
     serverUrl?: string;
+    proxy?: string;
+    noProxy?: boolean;
 }
 
 export interface IReleaseBaseCommand extends ICommand, IPackageInfo {

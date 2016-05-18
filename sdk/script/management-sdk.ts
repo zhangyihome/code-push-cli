@@ -8,6 +8,9 @@ import Promise = Q.Promise;
 
 import { AccessKey, Account, App, CodePushError, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, UpdateMetrics } from "./types";
 
+var superproxy = require("superagent-proxy");
+superproxy(superagent);
+
 var packageJson = require("../package.json");
 
 declare var fs: any;
@@ -52,13 +55,15 @@ class AccountManager {
     private _accessKey: string;
     private _serverUrl: string;
     private _customHeaders: Headers;
+    private _proxy: string;
 
-    constructor(accessKey: string, customHeaders?: Headers, serverUrl?: string) {
+    constructor(accessKey: string, customHeaders?: Headers, serverUrl?: string, proxy?: string) {
         if (!accessKey) throw new Error("An access key must be specified.");
 
         this._accessKey = accessKey;
         this._customHeaders = customHeaders;
         this._serverUrl = serverUrl || AccountManager.SERVER_URL;
+        this._proxy = proxy;
     }
 
     public get accessKey(): string {
@@ -68,6 +73,7 @@ class AccountManager {
     public isAuthenticated(): Promise<boolean> {
         return Promise<boolean>((resolve, reject, notify) => {
             var request: superagent.Request<any> = superagent.get(this._serverUrl + urlEncode `/authenticated`);
+            if (this._proxy) (<any>request).proxy(this._proxy);
             this.attachCredentials(request);
 
             request.end((err: any, res: superagent.Response) => {
@@ -210,6 +216,7 @@ class AccountManager {
         return Promise<void>((resolve, reject, notify) => {
             updateMetadata.appVersion = targetBinaryVersion;
             var request: superagent.Request<any> = superagent.post(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`);
+            if (this._proxy) (<any>request).proxy(this._proxy);
             this.attachCredentials(request);
 
             var file: any;
@@ -288,6 +295,7 @@ class AccountManager {
     private makeApiRequest(method: string, endpoint: string, requestBody: string, expectResponseBody: boolean, contentType: string): Promise<JsonResponse> {
         return Promise<JsonResponse>((resolve, reject, notify) => {
             var request: superagent.Request<any> = (<any>superagent)[method](this._serverUrl + endpoint);
+            if (this._proxy) (<any>request).proxy(this._proxy);
             this.attachCredentials(request);
 
             if (requestBody) {

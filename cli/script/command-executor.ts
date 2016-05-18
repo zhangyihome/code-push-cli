@@ -20,6 +20,7 @@ import * as semver from "semver";
 import slash = require("slash");
 var Table = require("cli-table");
 import * as yazl from "yazl";
+var which = require("which");
 import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
@@ -51,6 +52,8 @@ interface ILoginConnectionInfo {
     accessKey: string;
     customServerUrl?: string;   // A custom serverUrl for internal debugging purposes
     preserveAccessKeyOnLogout?: boolean;
+    proxy?: string; // To specify the proxy url explicitly, other than the environment var (HTTP_PROXY)
+    noProxy?: boolean; // To suppress the environment proxy setting, like HTTP_PROXY
 }
 
 interface IPackageFile {
@@ -384,7 +387,11 @@ function deserializeConnectionInfo(): ILoginConnectionInfo {
             };
         }
 
-        return <ILoginConnectionInfo>connectionInfo;
+        var connInfo = <ILoginConnectionInfo>connectionInfo;
+
+        connInfo.proxy = getProxy(connInfo.proxy, connInfo.noProxy);
+
+        return connInfo;
     } catch (ex) {
         return;
     }
@@ -416,7 +423,7 @@ export function execute(command: cli.ICommand): Promise<void> {
                         throw new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server.");
                     }
 
-                    sdk = new AccountManager(connectionInfo.accessKey, CLI_HEADERS, connectionInfo.customServerUrl);
+                    sdk = new AccountManager(connectionInfo.accessKey, CLI_HEADERS, connectionInfo.customServerUrl, connectionInfo.proxy);
                     break;
             }
 
@@ -558,21 +565,22 @@ function link(command: cli.ILinkCommand): Promise<void> {
 function login(command: cli.ILoginCommand): Promise<void> {
     // Check if one of the flags were provided.
     if (command.accessKey) {
-        sdk = new AccountManager(command.accessKey, CLI_HEADERS, command.serverUrl);
+        var proxy = getProxy(command.proxy, command.noProxy);
+        sdk = new AccountManager(command.accessKey, CLI_HEADERS, command.serverUrl, proxy);
         return sdk.isAuthenticated()
             .then((isAuthenticated: boolean): void => {
                 if (isAuthenticated) {
-                    serializeConnectionInfo(command.accessKey, /*preserveAccessKeyOnLogout*/ true, command.serverUrl);
+                    serializeConnectionInfo(command.accessKey, /*preserveAccessKeyOnLogout*/ true, command.serverUrl, command.proxy, command.noProxy);
                 } else {
                     throw new Error("Invalid access key.");
                 }
             });
     } else {
-        return loginWithExternalAuthentication("login", command.serverUrl);
+        return loginWithExternalAuthentication("login", command.serverUrl, command.proxy, command.noProxy);
     }
 }
 
-function loginWithExternalAuthentication(action: string, serverUrl?: string): Promise<void> {
+function loginWithExternalAuthentication(action: string, serverUrl?: string, proxy?: string, noProxy?: boolean): Promise<void> {
     initiateExternalAuthenticationAsync(action, serverUrl);
     log("");    // Insert newline
 
@@ -583,12 +591,12 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string): Pr
                 return;
             }
 
-            sdk = new AccountManager(accessKey, CLI_HEADERS, serverUrl);
+            sdk = new AccountManager(accessKey, CLI_HEADERS, serverUrl, getProxy(proxy, noProxy));
 
             return sdk.isAuthenticated()
                 .then((isAuthenticated: boolean): void => {
                     if (isAuthenticated) {
-                        serializeConnectionInfo(accessKey, /*preserveAccessKeyOnLogout*/ false, serverUrl);
+                        serializeConnectionInfo(accessKey, /*preserveAccessKeyOnLogout*/ false, serverUrl, proxy, noProxy);
                     } else {
                         throw new Error("Invalid access key.");
                     }
@@ -816,14 +824,14 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
     var missingPatchVersionRegex: RegExp = /^\d+\.\d+$/;
     if (platform === "ios") {
         try {
-            var infoPlistContainingFolder: string = path.join("iOS", projectName);
+            var infoPlistContainingFolder: string = path.join("ios", projectName);
             var infoPlistContents: string = fs.readFileSync(path.join(infoPlistContainingFolder, "Info.plist")).toString();
         } catch (err) {
             try {
-                infoPlistContainingFolder = "iOS";
+                infoPlistContainingFolder = "ios";
                 infoPlistContents = fs.readFileSync(path.join(infoPlistContainingFolder, "Info.plist")).toString();
             } catch (err) {
-                throw new Error(`Unable to find or read "Info.plist" in the "iOS/${projectName}" or "iOS" folders.`);
+                throw new Error(`Unable to find or read "Info.plist" in the "ios/${projectName}" or "ios" folders.`);
             }
         }
 
@@ -920,7 +928,7 @@ function printTable(columnNames: string[], readData: (dataSource: any[]) => void
 }
 
 function register(command: cli.IRegisterCommand): Promise<void> {
-    return loginWithExternalAuthentication("register", command.serverUrl);
+    return loginWithExternalAuthentication("register", command.serverUrl, command.proxy, command.noProxy);
 }
 
 function promote(command: cli.IPromoteCommand): Promise<void> {
@@ -1060,18 +1068,28 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
     } else {
         throw new Error("Platform must be either \"ios\" or \"android\".");
     }
-
+    
     var cordovaCommand: string = command.build ? "build" : "prepare";
-
-    log(chalk.cyan(`Running "cordova ${cordovaCommand}" command:\n`));
-    try {
-        execSync(["cordova", cordovaCommand, platform, "--verbose"].join(" "), { stdio: "inherit" });
-    } catch (error) {
-        if (error.code == "ENOENT") {
-            throw new Error(`Failed to call "cordova ${cordovaCommand}". Please ensure that the Cordova CLI is installed.`);
+    var cordovaCLI: string = "cordova";
+    
+    // Check whether the Cordova or PhoneGap CLIs are 
+    // installed, and if not, fail early
+    try { 
+        which.sync(cordovaCLI);
+    } catch (e) {
+        try {
+            cordovaCLI = "phonegap";            
+            which.sync(cordovaCLI);
+        } catch (e) {
+            throw new Error(`Unable to ${cordovaCommand} project. Please ensure that either the Cordova or PhoneGap CLI is installed.`);
         }
+    }
 
-        throw new Error(`Unable to ${cordovaCommand} project. Please ensure that this is a Cordova project and that platform "${platform}" was added with "cordova platform add ${platform}"`);
+    log(chalk.cyan(`Running "${cordovaCLI} ${cordovaCommand}" command:\n`));
+    try {
+        execSync([cordovaCLI, cordovaCommand, platform, "--verbose"].join(" "), { stdio: "inherit" });
+    } catch (error) {
+        throw new Error(`Unable to ${cordovaCommand} project. Please ensure that the CWD represents a Cordova project and that the "${platform}" platform was added by running "${cordovaCLI} platform add ${platform}".`);
     }
 
     try {
@@ -1263,8 +1281,8 @@ export var runReactNativeBundleCommand = (bundleName: string, development: boole
     });
 }
 
-function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: boolean, customServerUrl?: string): void {
-    var connectionInfo: ILoginConnectionInfo = { accessKey: accessKey, preserveAccessKeyOnLogout: preserveAccessKeyOnLogout };
+function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: boolean, customServerUrl?: string, proxy?: string, noProxy?: boolean): void {
+    var connectionInfo: ILoginConnectionInfo = { accessKey: accessKey, preserveAccessKeyOnLogout: preserveAccessKeyOnLogout, proxy: proxy, noProxy: noProxy };
     if (customServerUrl) {
         connectionInfo.customServerUrl = customServerUrl;
     }
@@ -1312,6 +1330,22 @@ function throwForInvalidOutputFormat(format: string): void {
 function whoami(command: cli.ICommand): Promise<void> {
     return sdk.getAccountInfo()
         .then((account): void => {
-            log(`${account.email} (${account.linkedProviders.join(", ")})`);
+            var accountInfo = `${account.email} (${account.linkedProviders.join(", ")})`;
+
+            var connectionInfo = deserializeConnectionInfo();
+            if (connectionInfo.noProxy || connectionInfo.proxy) {
+                log(chalk.green('Account: ') + accountInfo);
+
+                var proxyInfo = chalk.green('Proxy: ') + (connectionInfo.noProxy ? 'Ignored' : connectionInfo.proxy);
+                log(proxyInfo);
+            } else {
+                log(accountInfo);
+            }
         });
+}
+
+function getProxy(proxy?: string, noProxy?: boolean): string {
+    if (noProxy) return null;
+    if (!proxy) return process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
+    else return proxy;
 }
