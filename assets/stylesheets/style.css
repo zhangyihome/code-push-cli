@@ -1022,6 +1022,14 @@ html, body {
 .docs .col-sm-3 {
   width: 22%; }
 
+h3, h4, h5 {
+  padding: 4px 0; }
+
+blockquote {
+  font-size: 10px;
+  margin: 2em 0;
+  padding: .4em 2em; }
+
 nav.xs-toc {
   padding-top: 3em;
   margin-bottom: -3em; }
@@ -1083,7 +1091,8 @@ nav.xs-toc {
     line-height: 1.8em; }
   .doc-content img {
     height: auto;
-    max-width: 100%; }
+    max-width: 100%;
+    padding-bottom: 1.2em; }
 
 p code, li code, td code {
   background-color: transparent;
