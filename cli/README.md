@@ -21,6 +21,8 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
 * [Viewing Release History](#viewing-release-history)
 * [Clearing Release History](#clearing-release-history)
 
+[[中文版]](./README-cn.md)
+
 ## Installation
 
 * Install [Node.js](https://nodejs.org/)
