@@ -1,5 +1,7 @@
 # CodePush 命令行
 
+备注：这篇文章是由社区贡献和维护的。
+
 CodePush是一个云服务，它能让Cordova和React Native的开发者将手机应用的更新直接部署到用户的设备上。
 它担任类似中间仓库的角色，开发者可以把更新（JS，HTML，CSS和图片）发布到这个仓库上，然后那些Apps就能查询到更新了（那些集成了CodePush SDKs的[Cordova](http://github.com/Microsoft/cordova-plugin-code-push)和[React Native](http://github.com/Microsoft/react-native-code-push) 应用）。
 
@@ -33,11 +35,11 @@ CodePush是一个云服务，它能让Cordova和React Native的开发者将手�
 
 ## 快速开始
 
-1. 使用CodePush CLI创建一个[CodePush 账号](#创建账号)。
-2. 注册你的CodePush[应用](#应用管理), 并[分享](#应用合作)给你团队的其它开发者 。
-3. 使用[Cordova插件](http://github.com/Microsoft/cordova-plugin-code-push) 或 [React Native插件](http://github.com/Microsoft/react-native-code-push))配置好CodePush。（原文：CodePush-ify your app and point it at the deployment you wish to use ([Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push))）
-4. [发布](#发布更新) 更新。
-5. 活的长而成功！[详细资料](https://en.wikipedia.org/wiki/Vulcan_salute)（原文：Live long and prosper! ([details](https://en.wikipedia.org/wiki/Vulcan_salute))）
+1. 使用CodePush CLI创建一个[CodePush 账号](#创建账号)
+2. 注册你的CodePush[应用](#应用管理), 并[分享](#应用合作)给你团队的其它开发者 
+3. 用[Cordova插件](http://github.com/Microsoft/cordova-plugin-code-push) 或 [React Native插件](http://github.com/Microsoft/react-native-code-push)配置好CodePush并指向你希望的部署环境
+4. [发布](#发布更新)更新
+5. 活的长而成功！[详细资料](https://en.wikipedia.org/wiki/Vulcan_salute)
 
 ## 创建账号
 
@@ -91,20 +93,17 @@ code-push access-key ls
 code-push access-key rm <accessKey>
 ```
 
-如果你需要额外的Keys,被用来验证CodePush服务而不需要给你的GitHub和/或访问微软凭证,您可以运行下面的命令来创建一个持久的Access Key(连同一个描述):
-（原文是：If you need additional keys that can be used to authenticate against the CodePush service without needing to give access to your GitHub and/or Microsoft credentials, you can run the following command to create a persistent one (along with a description of what it is for):）
+如果你需要额外的Keys，被用来验证CodePush服务而不需要给你的GitHub和/或访问微软凭证，您可以运行下面的命令来创建一个持久的Access Key(连同一个描述):
 
 ```
 code-push access-key add "VSTS Integration"
 ```
-在创建新的密钥之后,您可以在`login`命令后使用`--accessKey`标志并指定其值，它允许您执行“无头”身份验证,而不是启动一个浏览器。
-（原文：After creating the new key, you can specify its value using the `--accessKey` flag of the `login` command, which allows you to perform "headless" authentication, as opposed to launching a browser.）
+在创建新的密钥之后，您可以在`login`命令后使用`--accessKey`标志并指定其值，它允许您执行“无头”身份验证，而不是启动一个浏览器。
 
 ```
 code-push login --accessKey <accessKey>
 ```
-当使用这种方式登录时，密钥(Access Key)在注销时不会自动失效，它可以一直被使用，除非它从CodePush服务端明确被移除掉。
-然而，仍然建议一旦你完成了会话就注销掉，以便从本地磁盘移除掉你的授权。（原文：However, it is still recommended to log out once your session is complete, in order to remove your credentials from disk.）
+当使用这种方式登录时，密钥(Access Key)在注销时不会自动失效，它可以一直被使用，除非它从CodePush服务端明确被移除掉。然而，仍然建议一旦你完成了会话就注销掉，以便从本地磁盘移除掉你的授权证书。
 
 ## 应用管理
 
@@ -226,7 +225,7 @@ code-push deployment ls <appName> [--displayKeys|-k]
 
 这将不仅显示部署环境列表，而且还有元数据（例如：强制性属性，描述）和最新版本的安装指标：
 
-![Deployment lis](https://cloud.githubusercontent.com/assets/116461/12526883/7730991c-c127-11e5-9196-98e9ceec758f.png)
+![Deployment list](https://cloud.githubusercontent.com/assets/116461/12526883/7730991c-c127-11e5-9196-98e9ceec758f.png)
 
 *注意: 因为他们很少用和需要屏幕，部署密钥默认是不显示的。如果你需要查看它们，只要在`deployment ls`命令后面加上`-k`标识即可。*
 
@@ -254,7 +253,7 @@ code-push deployment ls <appName> [--displayKeys|-k]
 
 2. [React Native](#发布更新-react-native) - 跟通用发布命令一样执行相同的功能，但是还会为你生成的应用更新内容(JS包和资源)，而不需要你运行`react-native bundle`，然后执行`code-push release`。
 
-3. [Cordova](#releasing-updates-cordova) - 跟通用发布命令一样执行相同的功能，但也会为你处理准备应用更新的任务，而不需要你运行`cordova prepare`，然后执行`code-push release`。
+3. [Cordova](#发布更新-cordova) - 跟通用发布命令一样执行相同的功能，但也会为你处理准备应用更新的任务，而不需要你运行`cordova prepare`，然后执行`code-push release`。
 
 你应该使用哪个命令主要是一种需求或偏好的事。然而，我们通常推荐使用相关的特定平台的命令开始(因为它大大简化了体验)，然后当有更大控制必要时用通用的`release`命令。
 
@@ -352,7 +351,7 @@ code-push release <appName> <updateContents> <targetBinaryVersion>
 
 如果用户当前是`v2`版本，然后从服务器查询更新，响应结果为`v3`，但会留着这个版本作为可选的。这个因为他们已经接受了强制更新，所以没有必要去修改`v3`。这样的行为就是为什么我们说服务器会"动态改变"强制标签，因为随着版本的迭代，新版本的强制属性总会保存你设置的这个值。当有一个版本更新检查要响应给用户时，它只会在相邻的版本上改变。
 
-If you never release an update that is marked as mandatory, then the above behavior doesn't apply to you, since the server will never change an optional release to mandatory unless there were intermingled mandatory updates as illustrated above. Additionally, if a release is marked as mandatory, it will never be converted to optional, since that wouldn't make any sense. The server will only change an optional release to mandatory in order to respect the semantics described above.
+如果你从没发布一个强制的更新，那么上面的行为不会应用到你，因为服务器从不改变一个可选的版本为强制版本，除非有像上面阐述的那样掺杂了强制版本。此外，如果一个版本标记成强制了，它决不会被转变成可选的，因为那没有任何意义。为了尊重上面描述的语义，服务器将只会把一个可选的发布改变为强制的。
 
 *注意：这个参数可以用`--mandatory` 或 `-m`来设置*
 
@@ -360,16 +359,15 @@ If you never release an update that is marked as mandatory, then the above behav
 
 **重要：为了使这个参数有效，终端用户需要运行CodePush插件的`1.6.0-beta+`版本 (Cordova) 或 `1.9.0-beta+`版本 (React Native)。如果你发布了一个指明了首次展示(Rollout)属性的更新，那么运行老版本的Cordova或ReactNative用户不会更新。因此，直到你已经采取了必要CodePush SDK的版本，否则我们不建议设置一个首次展示(rollout)版本，因为没有人会接受它。**
 
-
-This specifies the percentage of users (as an integer between `1` and `100`) that should be eligible to receive this update. It can be helpful if you want to "flight" new releases with a portion of your audience (e.g. 25%), and get feedback and/or watch for exceptions/crashes, before making it broadly available for everyone. If this 参数 isn't set, it is set to `100%`, and therefore, you only need to set it if you want to actually limit how many users will receive it.
+这指定了可以接收这次更新的用户百分比（在`1`到`100`之间的数字）。这会是有帮助的，假如你想在每个人广泛获取之前，"飞行"一个新版本给部分的受众（如：25%） ，并且得到异常/崩溃的反馈观察。如果没有设置这个参数，它会设置为`100%`，所以，你只需要在你想实际限制多少用户能接收时去设置它。
 
 当借用首次展现(rollout)能力，要记住一些额外注意事项：
 
-1. You cannot release a new update to a deployment whose latest release is an "active" rollout (i.e. its rollout property is non-null). The rollout needs to be "completed" (i.e. setting the `rollout` property to `100`) before you can release further updates to the deployment.
+1. 你不可以在最新版本的首次展示是"有效的"（如：首次展示值非空）的部署环境上发布新更新。在你在部署环境上发布进一步更新之前，首次展示属性需要是"完全的"（如：设置`roullout`属性为`100`）。
 
-2. If you rollback a deployment whose latest release is an "active" rollout, the rollout value will be cleared, effectively "deactivating" the rollout behavior
+2. 如果你回滚部署环境，它的最新版本的首次展示是"有效的"，那首次展示的值将被清除，实际上"禁止"首次展示行为。
 
-3. Unlike the `mandatory` and `description` fields, when you promote a release from one deployment to another, it will not propagate the `rollout` property, and therefore, if you want the new release (in the target deployment) to have a rollout value, you need to explicitly set it when you call the `promote` command.
+3. 不像`mandatory`和`description`字段，当从一个部署环境中促进发布时，它将不会传送`rollout`属性，所以，如果你想新的发布（在目标部署环境里）有首次展示的值，那么你需要在调用`promote`命令时明确的设置它。
 
 *注意：这个参数可以用 `--rollout` or `-r` 来设置*
 
@@ -394,11 +392,11 @@ code-push release-react <appName> <platform>
 [--targetBinaryVersion <targetBinaryVersion>]
 [--rollout <rolloutPercentage>]
 ```
-`release-react`命令是React Native特有的[`发布`](#发布更新-react-native)命令，支持相同的所有参数（如：`--mandatory`,`--description`），然而通过如下额外的动作简化了发布更新过程：
+`release-react`命令是React Native特有的[`发布`](#发布更新)命令，支持相同的所有参数（如：`--mandatory`,`--description`），然而通过如下额外的动作简化了发布更新过程：
  
 1. 运行`react-native bundle`命令去生成将要发布到CodePush服务的[更新](#update-contents-params)(JS Bundle和资源)。它尽可能使用合理的默认值(如：创建一个non-dev构建,假设一个iOS入口文件被命名为“index.ios.js”)，但也暴露了有关`react-native bundle`参数使得灵活（如：`--sourcemapOutput`）。
 
-2. 推断[`目标二进制版本`](#target-binary-version-param)通过使用定义在项目文件`info.plist`(IOS)和`build.gradle`(Android)里的版本名。
+2. 通过使用定义在项目文件`info.plist`(IOS)和`build.gradle`(Android)里的版本名，推断[`targetBinaryVersion`](#target-binary-version-目标二进制版本-参数)的值。
 
 为了阐述`release-react`命令产生的差异，如下的例子是你可能如何生成和发布一个React Native应用版本更新，通过使用`release`命令：
 
@@ -420,11 +418,11 @@ code-push release MyApp ./CodePush 1.0.0
 code-push release-react MyApp ios
 ```
 
-*注意：我们相信`release-react`命令对大多数React Native的开发者是有价值的，所以如果你发现它不够灵活或者缺少关键功能，不要犹豫请[让我知道](mailto:codepushfeed@microsoft.com)，以便我们可以提高它。*
+*注意：我们相信`release-react`命令对大多数React Native的开发者是有价值的，所以如果你发现它不够灵活或者缺少关键功能，不要犹豫请[让我们知道](mailto:codepushfeed@microsoft.com)，以便我们可以提高它。*
 
 #### App name 参数
 
-这个参数跟[上面章节](#App name (应用名)参数)描述的一样。
+这个参数跟[上面章节](#App-name-应用名-参数)描述的一样。
 
 #### Platform 参数
 
@@ -490,64 +488,65 @@ code-push release-cordova <appName> <platform>
 [--build]
 ```
 
-The `release-cordova` command is a Cordova-specific version of the "vanilla" [`release`](#releasing-app-updates) command, which supports all of the same 参数s (e.g. `--mandatory`, `--description`), yet simplifies the process of releasing updates by performing the following additional behavior:
+这个`release-cordova` 命令是Cordova特有的[`发布`](#发布更新)命令，支持相同的所有参数（如：`--mandatory`，`--description`），然而通过如下额外的动作简化了发布更新过程：
 
-1. Running the `cordova prepare` command in order to generate the [update contents](#update-contents-参数) (`www` folder) that will be released to the CodePush server.
+1. 运行`cordova prepare`命令去生成将要发布到CodePush服务的[更新内容](#update-contents-更新内容-参数) (`www` 文件夹) 。
 
-2. Inferring the [`targetBinaryVersion`](#target-binary-version-参数) of this release by using the version name that is specified in your project's `config.xml` file.
+2. 通过使用定义在项目文件`config.xml`文件里的版本名，推断[`targetBinaryVersion`](#target-binary-version-目标二进制版本-参数) 的值。
 
-To illustrate the difference that the `release-cordova` command can make, the following is an example of how you might generate and release an update for a Cordova app using the "vanilla" `release` command:
+为了阐述`release-cordova`命令产生的差异，如下的例子是你可能如何生成和发布一个Cordova应用版本更新，通过使用`release`命令：
+
 
 ```shell
 cordova prepare ios
 code-push release MyApp ./platforms/ios/www 1.0.0
 ```
 
-Achieving the equivalent behavior with the `release-cordova` command would simply require the following command, which is generally less error-prone:
+用`release-cordova`命令实现等效的行为只需简单的如下的命令，这个通常更,这是通常更少出错：
 
 ```shell
 code-push release-cordova MyApp ios
 ```
 
-*NOTE: We believe that the `release-cordova` command should be valuable for most Cordova developers, so if you're finding that it isn't flexible enough or missing a key feature, please don't hesistate to [let us know](mailto:codepushfeed@microsoft.com), so that we can improve it.*
+注意：我们相信`release-cordova`命令对大多数Cordova的开发者是有价值的，所以如果你发现它不够灵活或者缺少关键功能，不要犹豫请[让我们知道](mailto:codepushfeed@microsoft.com)，以便我们可以提高它。
 
 #### App name 参数
 
-This is the same 参数 as the one described in the [上面的章节](#app-name-参数).
+这个参数跟[上面章节](#App-name-应用名-参数)描述的一样。
 
 #### Platform 参数
 
-This specifies which platform the current update is targeting, and can be either `ios` or `android` (case-insensitive).
+指定当前的更新是哪个平台的，可以是`ios`或`android`（不区分大小写）。
 
 #### Deployment name 参数
 
-This is the same 参数 as the one described in the [上面的章节](#deployment-name-参数).
+相同的参数跟 [上面的章节](#deployment-name-参数)描述一样。
 
 #### Description 参数
 
-This is the same 参数 as the one described in the [上面的章节](#description-参数).
+相同的参数跟 [上面的章节](#description-参数)描述一样。
 
 #### Mandatory 参数
 
-This is the same 参数 as the one described in the [上面的章节](#mandatory-参数).
+相同的参数跟 [上面的章节](#mandatory-参数)描述一样。
 
 #### Rollout 参数
 
-This is the same 参数 as the one described in the [上面的章节](#rollout-参数). If left unspecified, the release will be made available to all users.
+相同的参数跟 [上面的章节](#rollout-参数)描述一样。如果没有指定，版本将对所有用户有效可下载。
 
 #### Target binary version 参数
 
-This is the same 参数 as the one described in the [上面的章节](#target-binary-version-参数). If left unspecified, the command defaults to targeting only the specified version in the project's metadata (`Info.plist` if this update is for iOS clients, and `build.gradle` for Android clients).
+相同的参数跟 [上面的章节](#target-binary-version-参数)描述一样。如果没有指定，默认使用项目元数据里指定的（`Info.plist` (iOS) and `build.gradle` (Android)版本号。
 
 #### Disabled 参数
 
-This is the same 参数 as the one described in the [上面的章节](#disabled-参数).
+相同的参数跟 [上面的章节](#disabled-参数))描述一样。
 
 #### Build 参数
 
-Specifies whether you want to run `cordova build` instead of `cordova prepare` (which is the default behavior), when generating your updated web assets. This is valuable if your project includes before and/or after build hooks (e.g. to transpile TypeScript), and therefore, having CodePush simply run `cordova prepare` isn't sufficient to create and release an update. If left unspecified, this defaults to `false`.
+当你生成版本更新的web资源时，指定是否想用`cordova build`来取代`cordova prepare`（默认行为）。这是有价值的，假设你的项目包含构建钩子（如：转换TypeScript），所以CodePush简单的运行`cordova prepare`不够充分的创建和发布更新。如果没有指定，它默认是`false`。
 
-*NOTE: This 参数 can be set using either --build or -b*
+*注意：这个参数可以用`--build`或`-b`来设置*
 
 ## 补丁更新
 
