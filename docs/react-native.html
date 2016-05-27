@@ -510,6 +510,7 @@
 <ul>
 <li>iOS (8+)</li>
 <li>Android (4.1+)</li>
+<li>Windows (UWP)</li>
 </ul>
 
 <p>We try our best to maintain backwards compatability of our plugin with previous versions of React Native, but due to the nature of the platform, and the existence of breaking changes between releases, it is possible that you need to use a specific version of the CodePush plugin in order to support the exact version of React Native you are using. The following table outlines which CodePush plugin versions officially support the respective React Native versions:</p>
@@ -533,11 +534,11 @@
 <td>v1.4.0-v1.6.0 <em>(introduced iOS asset support)</em></td>
 </tr>
 <tr>
-<td>v0.19.0-v0.26.0</td>
+<td>v0.19.0-v0.27.0</td>
 <td>v1.7.0+ <em>(introduced Android asset support)</em></td>
 </tr>
 <tr>
-<td>v0.27.0+</td>
+<td>v0.28.0+</td>
 <td>TBD :) We work hard to respond to new RN releases, but they do occasionally break us. We will update this chart with each RN release, so that users can check to see what our &ldquo;official&rdquo; support is.</td>
 </tr>
 </tbody></table>
@@ -640,7 +641,11 @@
 <li><p>Add the CodePush plugin dependency to your <code>Podfile</code>, pointing at the path where NPM installed it</p>
 <div class="highlight"><pre><code class="language-ruby" data-lang="ruby">pod &#39;CodePush&#39;, :path =&gt; &#39;./node_modules/react-native-code-push&#39;
 </code></pre></div>
-<p><em>NOTE: The above path needs to be relative to your app&rsquo;s <code>Podfile</code>, so adjust it as neccessary.</em></p></li>
+<p>CodePush depends on an internal copy of the <code>SSZipArchive</code> library, so if your project already includes that (either directly or via a transitive dependency), then you can install a version of CodePush which excludes it by using the following subspec:</p>
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby">pod &#39;CodePush&#39;, :path =&gt; &#39;./node_modules/react-native-code-push&#39;, :subspecs =&gt; [&#39;NoZip&#39;]
+</code></pre></div>
+<p><em>NOTE: The above paths needs to be relative to your app&rsquo;s <code>Podfile</code>, so adjust it as nec
+cessary.</em></p></li>
 <li><p>Run <code>pod install</code></p></li>
 </ol>
 
@@ -786,6 +791,73 @@ public class MainActivity extends ReactActivity {
     ...
 }
 </code></pre></div>
+<h2>Windows Setup</h2>
+
+<p>Once you&rsquo;ve acquired the CodePush plugin, you need to integrate it into the Visual Studio project of your React Native app and configure it correctly. To do this, take the following steps:</p>
+
+<h3>Plugin Installation (Windows)</h3>
+
+<ol>
+<li><p>Open the Visual Studio solution located at <code>windows\&lt;AppName&gt;\&lt;AppName&gt;.sln</code> within your app</p></li>
+<li><p>Right-click the solution node in the <code>Solution Explorer</code> window and select the <code>Add -&gt; Existing Project...</code> menu item</p></li>
+</ol>
+
+<p><img src="https://cloud.githubusercontent.com/assets/116461/14467164/ddf6312e-008e-11e6-8a10-44a8b44b5dfc.PNG" alt="Add Project"></p>
+
+<ol>
+<li><p>Browse to the <code>node_modules\react-native-code-push\windows</code> directory, select the <code>CodePush.csproj</code> file and click <code>OK</code></p></li>
+<li><p>Back in the <code>Solution Explorer</code>, right-click the project node that is named after your app, and select the <code>Add -&gt; Reference...</code> menu item</p></li>
+</ol>
+
+<p><img src="https://cloud.githubusercontent.com/assets/116461/14467154/d833bc98-008e-11e6-8e95-09864b1f05ef.PNG" alt="Add Reference"></p>
+
+<ol>
+<li>Select the <code>Projects</code> tab on the left hand side, check the <code>CodePush</code> item and then click <code>OK</code></li>
+</ol>
+
+<p><img src="https://cloud.githubusercontent.com/assets/116461/14467147/cb805b6e-008e-11e6-964f-f856c59b65af.PNG" alt="Add Reference Dialog"></p>
+
+<h3>Plugin Configuration (Windows)</h3>
+
+<p>After installing the plugin, you need to configure your app to consult CodePush for the location of your JS bundle, since it will &ldquo;take control&rdquo; of managing the current and all future versions. To do this, update the <code>AppReactPage.cs</code> file to use CodePush via the following changes:</p>
+<div class="highlight"><pre><code class="language-c#" data-lang="c#">...
+// 1. Import the CodePush namespace 
+using CodePush.ReactNative;
+...
+class AppReactPage : ReactPage
+{
+    // 2. Declare a private instance variable for the CodePushModule instance.
+    private CodePushReactPackage codePushReactPackage;
+
+    // 3. Update the JavaScriptBundleFile property to initalize the CodePush runtime,
+    // specifying the right deployment key, then use it to return the bundle URL from 
+    // CodePush instead of statically from the binary. If you don&#39;t already have your
+    // deployment key, you can run &quot;code-push deployment ls &lt;appName&gt; -k&quot; to retrieve it.
+    public override string JavaScriptBundleFile
+    {
+        get
+        {
+            codePushReactPackage = new CodePushReactPackage(&quot;deployment-key-here&quot;, this);
+            return codePushReactPackage.GetJavaScriptBundleFile();
+        }
+    }
+
+    // 4. Add the codePushReactPackage instance to the list of existing packages. 
+    public override List&lt;IReactPackage&gt; Packages
+    {
+        get
+        {
+            return new List&lt;IReactPackage&gt;
+            {
+                new MainReactPackage(),
+                ...
+                codePushReactPackage
+            };
+        }
+    }
+    ...
+}
+</code></pre></div>
 <h2>Plugin Usage</h2>
 
 <p>With the CodePush plugin downloaded and linked, and your app asking CodePush where to get the right JS bundle from, the only thing left is to add the necessary code to your app to control the following policies:</p>
@@ -813,6 +885,8 @@ public class MainActivity extends ReactActivity {
     newState === &quot;active&quot; &amp;&amp; codePush.sync();
 });
 </code></pre></div>
+<p><em>NOTE: If you are using <a href="http://redux.js.org">Redux</a> and <a href="http://yelouafi.github.io/redux-saga/">Redux Saga</a>, you can alternatively use the <a href="http://github.com/lostintangent/react-native-code-push-saga">react-native-code-push-saga</a> module, which allows you to customize when <code>sync</code> is called in simpler/more idiomatic way.</em></p>
+
 <p>Additionally, if you would like to display an update confirmation dialog (an &ldquo;active install&rdquo;), configure when an available update is installed (e.g. force an immediate restart) or customize the update experience in any way, refer to the <code>sync</code> method&rsquo;s <a href="#codepushsync">API reference</a> for information on how to tweak this default behavior.</p>
 
 <p><a id="apple-note"><em>NOTE: While <a href="https://developer.apple.com/programs/ios/information/iOS_Program_Information_4_3_15.pdf">Apple&rsquo;s developer agreement</a> fully allows performing over-the-air updates of JavaScript and assets (which is what enables CodePush!), it is against their policy for an app to display an update prompt. Because of this, we recommend that App Store-distributed apps don&rsquo;t enable the <code>updateDialog</code> option when calling <code>sync</code>, whereas Google Play and internally distributed apps (e.g. Enterprise, Fabric, HockeyApp) can choose to enable/customize it.</em></a></p>
@@ -827,7 +901,7 @@ public class MainActivity extends ReactActivity {
 code-push release-react MyApp ios
 code-push release-react MyApp-Android android
 </code></pre></div>
-<p>The <code>release-react</code> command enables such a simple workflow because it provides many sensible defaults (e.g. generating a release bundle, assuming your app&rsquo;s entry file on iOS is either <code>index.ios.js</code> or <code>index.js</code>). However, all of these defaults can be customized to allow incremental flexibility as neccessary, which makes it a good fit for most scenarios. </p>
+<p>The <code>release-react</code> command enables such a simple workflow because it provides many sensible defaults (e.g. generating a release bundle, assuming your app&rsquo;s entry file on iOS is either <code>index.ios.js</code> or <code>index.js</code>). However, all of these defaults can be customized to allow incremental flexibility as necessary, which makes it a good fit for most scenarios. </p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell"># Release a mandatory update with a changelog
 code-push release-react MyApp ios -m --description &quot;Modified the header color&quot;
 
@@ -867,13 +941,35 @@ code-push release-react MyApp-Android android --targetBinaryVersion &quot;~1.1.0
 <p>When you require <code>react-native-code-push</code>, the module object provides the following top-level methods:</p>
 
 <ul>
+<li><p><a href="#codepushallowrestart">allowRestart</a>: Re-allows programmatic restarts to occur as a result of an update being installed, and optionally, immediately restarts the app if a pending update had attempted to restart the app while restarts were disallowed. This is an advanced API and is only necessary if your app explicitly disallowed restarts via the <code>disallowRestart</code> method.</p></li>
 <li><p><a href="#codepushcheckforupdate">checkForUpdate</a>: Asks the CodePush service whether the configured app deployment has an update available. </p></li>
+<li><p><a href="#codepushdisallowrestart">disallowRestart</a>: Temporarily disallows any programmatic restarts to occur as a result of a CodePush update being installed. This is an advanced API, and is useful when a component within your app (e.g. an onboarding process) needs to ensure that no end-user interruptions can occur during its lifetime.</p></li>
 <li><p><a href="#codepushgetcurrentpackage">getCurrentPackage</a>: Retrieves the metadata about the currently installed update (e.g. description, installation time, size). <em>NOTE: As of <code>v1.10.3-beta</code> of the CodePush module, this method is deprecated in favor of <a href="#codepushgetupdatemetadata"><code>getUpdateMetadata</code></a></em>.</p></li>
 <li><p><a href="#codepushgetupdatemetadata">getUpdateMetadata</a>: Retrieves the metadata for an installed update (e.g. description, mandatory).</p></li>
 <li><p><a href="#codepushnotifyappready">notifyAppReady</a>: Notifies the CodePush runtime that an installed update is considered successful. If you are manually checking for and installing updates (i.e. not using the <a href="#codepushsync">sync</a> method to handle it all for you), then this method <strong>MUST</strong> be called; otherwise CodePush will treat the update as failed and rollback to the previous version when the app next restarts.</p></li>
 <li><p><a href="#codepushrestartapp">restartApp</a>: Immediately restarts the app. If there is an update pending, it will be immediately displayed to the end user. Otherwise, calling this method simply has the same behavior as the end user killing and restarting the process.</p></li>
 <li><p><a href="#codepushsync">sync</a>: Allows checking for an update, downloading it and installing it, all with a single call. Unless you need custom UI and/or behavior, we recommend most developers to use this method when integrating CodePush into their apps</p></li>
 </ul>
+
+<h4>codePush.allowRestart</h4>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.allowRestart(): void;
+</code></pre></div>
+<p>Re-allows programmatic restarts to occur, that would have otherwise been rejected due to a previous call to <code>disallowRestart</code>. If <code>disallowRestart</code> was never called in the first place, then calling this method will simply result in a no-op.</p>
+
+<p>If a CodePush update is currently pending, which attempted to restart the app (e.g. it used <code>InstallMode.IMMEDIATE</code>), but was blocked due to <code>disallowRestart</code> having been called, then calling <code>allowRestart</code> will result in an immediate restart. This allows the update to be applied as soon as possible, without interrupting the end user during critical workflows (e.g. an onboarding process).</p>
+
+<p>For example, calling <code>allowRestart</code> would trigger an immediate restart if either of the three scenarios mentioned in the <a href="#codepushdisallowrestart"><code>disallowRestart</code> docs</a> occured after <code>disallowRestart</code> was called. However, calling <code>allowRestart</code> wouldn&rsquo;t trigger a restart if the following were true:</p>
+
+<ol>
+<li><p>No CodePush updates were installed since the last time <code>disallowRestart</code> was called, and therefore, there isn&rsquo;t any need to restart anyways.</p></li>
+<li><p>There is currently a pending CodePush update, but it was installed via <code>InstallMode.ON_NEXT_RESTART</code>, and therefore, doesn&rsquo;t require a programmatic restart.</p></li>
+<li><p>There is currently a pending CodePush update, but it was installed via <code>InstallMode.ON_NEXT_RESUME</code> and the app hasn&rsquo;t been put into the background yet, and therefore, there isn&rsquo;t a need to programmatically restart yet.</p></li>
+<li><p>No calls to <code>restartApp</code> were made since the last time <code>disallowRestart</code> was called.</p></li>
+</ol>
+
+<p>This behavior ensures that no restarts will be triggered as a result of calling <code>allowRestart</code> unless one was explictly requested during the disallowed period. In this way, <code>allowRestart</code> is somewhat similar to calling <code>restartApp(true)</code>, except the former will only trigger a restart if the currently pending update wanted to restart, whereas the later would restart as long as an update is pending.</p>
+
+<p>See <a href="#codepushdisallowrestart">disallowRestart</a> for an example of how this method can be used.</p>
 
 <h4>codePush.checkForUpdate</h4>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.checkForUpdate(deploymentKey: String = null): Promise&lt;RemotePackage&gt;;
@@ -902,6 +998,45 @@ code-push release-react MyApp-Android android --targetBinaryVersion &quot;~1.1.0
         console.log(&quot;An update is available! Should we download it?&quot;);
     }
 });
+</code></pre></div>
+<h4>codePush.disallowRestart</h4>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.disallowRestart(): void;
+</code></pre></div>
+<p>Temporarily disallows programmatic restarts to occur as a result of either of following scenarios:</p>
+
+<ol>
+<li>A CodePush update is installed using <code>InstallMode.IMMEDIATE</code></li>
+<li>A CodePush update is installed using <code>InstallMode.ON_NEXT_RESUME</code> and the app is resumed from the background (optionally being throttled by the <code>minimumBackgroundDuration</code> property)</li>
+<li>The <code>restartApp</code> method was called</li>
+</ol>
+
+<p><em>NOTE: #1 and #2 effectively work by calling <code>restartApp</code> for you, so you can think of <code>disallowRestart</code> as blocking any call to <code>restartApp</code>, regardless if your app calls it directly or indirectly.</em></p>
+
+<p>After calling this method, any calls to <code>sync</code> would still be allowed to check for an update, download it and install it, but an attempt to restart the app would be queued until <code>allowRestart</code> is called. This way, the restart request is captured and can be &ldquo;flushed&rdquo; whenever you want to allow it to occur.</p>
+
+<p>This is an advanced API, and is primarily useful when individual components within your app (e.g. an onboarding process) need to ensure that no end-user interruptions can occur during their lifetime, while continuing to allow the app to keep syncing with the CodePush server at its own pace and using whatever install modes are appropriate. This has the benefit of allowing the app to discover and download available updates as soon as possible, while also preventing any disruptions during key end-user experiences.</p>
+
+<p>As an alternative, you could also choose to simply use <code>InstallMode.ON_NEXT_RESTART</code> whenever calling <code>sync</code> (which will never attempt to programmatically restart the app), and then explicity calling <code>restartApp</code> at points in your app that you know it is &ldquo;safe&rdquo; to do so. <code>disallowRestart</code> provides an alternative approach to this when the code that synchronizes with the CodePush server is separate from the code/components that want to enforce a no-restart policy.</p>
+
+<p>Example Usage: </p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">class OnboardingProcess extends Component {
+    ...
+
+    componentWillMount() {
+        // Ensure that any CodePush updates which are
+        // synchronized in the background can&#39;t trigger
+        // a restart while this component is mounted.
+        codePush.disallowRestart();    
+    }
+
+    componentWillUnmount() {
+        // Reallow restarts, and optionally trigger
+        // a restart if one was currently pending.
+        codePush.allowRestart();
+    }
+
+    ...   
+}
 </code></pre></div>
 <h4>codePush.getCurrentPackage</h4>
 
@@ -1218,7 +1353,7 @@ codePush.sync({ updateDialog: true },
 <li><p>Repeat #2 and #3 as the CodePush releases and app store releases continue on into infinity (and beyond?)</p></li>
 </ol>
 
-<p>Because of this behavior, you can safely deploy updates to both the app store(s) and CodePush as neccesary, and rest assured that your end-users will always get the most recent version.  </p>
+<p>Because of this behavior, you can safely deploy updates to both the app store(s) and CodePush as necesary, and rest assured that your end-users will always get the most recent version.  </p>
 
 <h5>Methods</h5>
 
@@ -1254,7 +1389,7 @@ codePush.sync({ updateDialog: true },
 <li><p><strong>getBundleUrl(String bundleName)</strong> - Returns the path to the most recent version of your app&rsquo;s JS bundle file, using the specified resource name (e.g. <code>index.android.bundle</code>). This method has the same resolution behavior as the Objective-C equivalent described above.</p></li>
 </ul>
 
-<h2>Example Apps</h2>
+<h2>Example Apps / Starters</h2>
 
 <p>The React Native community has graciously created some awesome open source apps that can serve as examples for developers that are getting started. The following is a list of OSS React Native apps that are also using CodePush, and can therefore be used to see how others are using the service:</p>
 
@@ -1265,6 +1400,8 @@ codePush.sync({ updateDialog: true },
 <li><a href="https://github.com/Khan/math-facts">Math Facts</a> - An app by Khan Academy to help memorize math facts more easily.</li>
 <li><a href="https://github.com/multunus/moveit-react-native">MoveIt!</a> - An app by <a href="http://www.multunus.com">Multunus</a> that allows employees within a company to track their work-outs.</li>
 </ul>
+
+<p>Additionally, if you&rsquo;re looking to get started with React Native + CodePush, and are looking for an awesome starter kit, you should check out <a href="http://getpepperoni.com/">Pepperoni</a>. It includes everything you&rsquo;ll need to get going quickly, with modern / best practices (including CodePush!).</p>
 
 <p><em>Note: If you&rsquo;ve developed a React Native app using CodePush, that is also open-source, please let us know. We would love to add it to this list!</em></p>
 
@@ -1296,7 +1433,7 @@ codePush.sync({ updateDialog: true },
 <td>Double-check that your version of React Native is <a href="#supported-react-native-platforms">compatible</a> with the CodePush version you are using.</td>
 </tr>
 <tr>
-<td>Network timeout / hang when calling <code>sync</code> or <code>checkForUpadte</code> in the iOS Simulator</td>
+<td>Network timeout / hang when calling <code>sync</code> or <code>checkForUpdate</code> in the iOS Simulator</td>
 <td>Try resetting the simulator by selecting the <code>Simulator -&gt; Reset Content and Settings..</code> menu item, and then re-running your app.</td>
 </tr>
 <tr>
@@ -1320,6 +1457,15 @@ codePush.sync({ updateDialog: true },
 <td>By default, React Native doesn&rsquo;t generate your JS bundle when running against the simulator. Therefore, if you&rsquo;re using <code>[CodePush bundleURL]</code>, and targetting the iOS simulator, you may be getting a <code>nil</code> result. This issue will be fixed in RN 0.22.0, but only for release builds. You can unblock this scenario right now by making <a href="https://github.com/facebook/react-native/commit/9ae3714f4bebdd2bcab4d7fdbf23acebdc5ed2ba">this change</a> locally.</td>
 </tr>
 </tbody></table>
+
+<h2>Continuous Integration / Delivery</h2>
+
+<p>In addition to being able to use the CodePush CLI to &ldquo;manually&rdquo; release updates, we believe that it&rsquo;s important to create a repeatable and sustainable solution for contiously delivering updates to your app. That way, it&rsquo;s simple enough for you and/or your team to create and maintain the rhythm of performing agile deployments. In order to assist with seting up a CodePush-based CD pipeline, refer to the following integrations with various CI servers:</p>
+
+<ul>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=ms-vsclient.code-push">Visual Studio Team Services</a> - <em>NOTE: VSTS also has extensions for publishing to <a href="https://marketplace.visualstudio.com/items?itemName=ms.hockeyapp">HockeyApp</a> and the <a href="https://github.com/Microsoft/google-play-vsts-extension">Google Play</a> store, so it provides a pretty great mobile CD solution in general.</em></li>
+<li><a href="https://github.com/mondora/code-push-travis-cli">Travis CI</a></li>
+</ul>
   
                 </article>
             </div>  

@@ -618,6 +618,7 @@ code-push release-cordova MyApp-ios ios -x
 <ul>
 <li><p><strong><a href="#codepushcheckforupdate">checkForUpdate</a></strong>: Asks the CodePush service whether the configured app deployment has an update available.</p></li>
 <li><p><strong><a href="#codepushgetcurrentpackage">getCurrentPackage</a></strong>: Retrieves the metadata about the currently installed update (e.g. description, installation time, size).</p></li>
+<li><p><strong><a href="#codepushgetpendingpackage">getPendingPackage</a></strong>: Retrieves the metadata for an update (if one exists) that was downloaded and installed, but hasn&rsquo;t been applied yet via a restart.</p></li>
 <li><p><strong><a href="#codepushnotifyapplicationready">notifyApplicationReady</a></strong>: Notifies the CodePush runtime that an installed update is considered successful. If you are manually checking for and installing updates (i.e. not using the sync method to handle it all for you), then this method <strong>MUST</strong> be called; otherwise CodePush will treat the update as failed and rollback to the previous version when the app next restarts.</p></li>
 <li><p><strong><a href="#codepushrestartapplication">restartApplication</a></strong>: Immediately restarts the app. If there is an update pending, it will be immediately displayed to the end user.</p></li>
 <li><p><strong><a href="#codepushsync">sync</a></strong>: Allows checking for an update, downloading it and installing it, all with a single call. Unless you need custom UI and/or behavior, we recommend most developers to use this method when integrating CodePush into their apps.</p></li>
@@ -668,11 +669,11 @@ code-push release-cordova MyApp-ios ios -x
 });
 </code></pre></div>
 <h3>codePush.getCurrentPackage</h3>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.getCurrentPackage(onPackageSuccess, onError?);
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.getCurrentPackage(onSuccess, onError?);
 </code></pre></div>
 <p>Retrieves the metadata about the currently installed &ldquo;package&rdquo; (e.g. description, installation time). This can be useful for scenarios such as displaying a &ldquo;what&rsquo;s new?&rdquo; dialog after an update has been applied or checking whether there is a pending update that is waiting to be applied via a resume or restart.</p>
 
-<p>When the update retrieval completes, it will trigger the <code>onPackageSuccess</code> callback with one of two possible values:</p>
+<p>When the update retrieval completes, it will trigger the <code>onSuccess</code> callback with one of two possible values:</p>
 
 <ol>
 <li><p><code>null</code> if the app is currently running the HTML start page from the binary and not a CodePush update. This occurs in the following scenarios:</p>
@@ -687,7 +688,7 @@ code-push release-cordova MyApp-ios ios -x
 <p>Parameters:</p>
 
 <ul>
-<li><p><strong>onPackageSuccess</strong>: Callback that is invoked upon receiving the metadata about the currently running update. The callback receives a single parameter, which is described above.</p></li>
+<li><p><strong>onSuccess</strong>: Callback that is invoked upon receiving the metadata about the currently running update. The callback receives a single parameter, which is described above.</p></li>
 <li><p><strong>onError</strong>: Optional callback that is invoked in the event of an error. The callback takes one error parameter, containing the details of the error.</p></li>
 </ul>
 
@@ -703,6 +704,33 @@ code-push release-cordova MyApp-ios ios -x
     // with it upon release, let&#39;s show it to the end user
     if (update.isFirstRun &amp;&amp; update.description) {
         // Display a &quot;what&#39;s new?&quot; modal
+    }
+});
+</code></pre></div>
+<h3>codePush.getPendingPackage</h3>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.getPendingPackage(onSuccess, onError?);
+</code></pre></div>
+<p>Gets the metadata for the currently pending update (if one exists). An update is considered &ldquo;pending&rdquo; if it has been downloaded and installed, but hasn&rsquo;t been applied yet via an app restart. An update could only ever be in this state if   <code>InstallMode.ON_NEXT_RESTART</code> or <code>InstallMode.ON_NEXT_RESUME</code> were specified upon calling <code>sync</code> or <code>LocalPackage.install</code>, and the app hasn&rsquo;t yet been restarted or resumed (respectively). This method can be useful if you&rsquo;d like to determine whether there is a pending update and then prompt the user if they would like to restart now (via <code>codePush.restartApplication</code>) in order to apply it.</p>
+
+<p>When the update retrieval completes, it will trigger the <code>onSuccess</code> callback with one of two possible values:</p>
+
+<ol>
+<li><p><code>null</code> if the app doesn&rsquo;t currently have a pending update (e.g. the app is already running the latest available version).</p></li>
+<li><p>A <code>LocalPackage</code> instance which represents the metadata for the currently pending CodePush update.</p></li>
+</ol>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>onSuccess</strong>: Callback that is invoked upon receiving the metadata about the currently pending update. The callback receives a single parameter, which is described above.</p></li>
+<li><p><strong>onError</strong>: Optional callback that is invoked in the event of an error. The callback takes one error parameter, containing the details of the error.</p></li>
+</ul>
+
+<p>Example Usage:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.getPendingPackage(function (update) {
+    if (update) {
+        // An update is currently pending, ask the
+        // user if they would like to restart
     }
 });
 </code></pre></div>
@@ -1028,7 +1056,17 @@ window.codePush.checkForUpdate(onUpdateCheck, onError);
 
 <p>This plugin is compatible with <a href="https://build.phonegap.com">PhoneGap Build</a>, and supports creating Android and iOS builds out-of-the-box. However, in order for CodePush to calculate the hash of your binary contents on Android, PhoneGap Build needs to use Gradle to build your app, which isn&rsquo;t its default behavior (it uses Ant). To resolve this, simply add the following element to your app&rsquo;s <code>config.xml</code> file, as a child of the <code>&lt;platform name=&quot;android&quot;&gt;</code> element:</p>
 <div class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;preference name=&quot;android-build-tool&quot; value=&quot;gradle&quot; /&gt;
-</code></pre></div>  
+</code></pre></div>
+<h2>Example Apps</h2>
+
+<p>The Cordova community has graciously created some awesome open source apps that can serve as examples for developers that are getting started. The following is a list of OSS Cordova apps that are also using CodePush, and can therefore be used to see how others are using the service:</p>
+
+<ul>
+<li><a href="https://github.com/rangle/pgdays-codepush-demo">PGDay CodePush Demo</a> - Demo app created by <a href="http://rangle.io">Rangle.io</a> used for <a href="http://pgday.phonegap.com/eu2016/">PhoneGap Day Europe 2016</a>.</li>
+</ul>
+
+<p><em>Note: If you&rsquo;ve developed a Cordova app using CodePush, that is also open-source, please let us know. We would love to add it to this list!</em></p>
+  
                 </article>
             </div>  
         </div>           

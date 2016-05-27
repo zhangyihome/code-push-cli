@@ -539,8 +539,9 @@
 <li><p><strong>getDeploymentHistory(appName: string, deploymentName: string): Promise&lt;Package[]&gt;</strong> - Retrieves the list of releases that have been made to the specified app deployment.</p></li>
 <li><p><strong>getDeploymentMetrics(appName: string, deploymentName): Promise&lt;DeploymentMetrics&gt;</strong> - Retrieves the installation metrics for the specified app deployment. </p></li>
 <li><p><strong>getDeployments(appName: string): Promose&lt;Deployment[]&gt;</strong> - Retrieves the list of deployments associated with the specified app.</p></li>
-<li><p><strong>promote(appName: string, sourceDeploymentName: string, destDeploymentName: string): Promise&lt;void&gt;</strong> - Promotes the latest release from one deployment to another for the specified app.</p></li>
-<li><p><strong>release(appName: string, deploymentName: string, updateContentsPath: string, targetBinaryVersion: string, description?: string, isMandatory: boolean = false): Promise&lt;void&gt;</strong> - Releases a new update to the specified deployment.</p></li>
+<li><p><strong>patchRelease(appName: string, deploymentName: string, label: string, updateMetadata: PackageInfo): Promise&lt;void&gt;</strong> - Updates the specified release&rsquo;s metadata with the given information.</p></li>
+<li><p><strong>promote(appName: string, sourceDeploymentName: string, destinationDeploymentName: string, updateMetadata: PackageInfo): Promise&lt;void&gt;</strong> - Promotes the latest release from one deployment to another for the specified app and updates the release with the given metadata.</p></li>
+<li><p><strong>release(appName: string, deploymentName: string, updateContentsPath: string, targetBinaryVersion: string, updateMetadata: PackageInfo): Promise&lt;void&gt;</strong> - Releases a new update to the specified deployment with the given metadata.</p></li>
 <li><p><strong>removeAccessKey(accessKey: string): Promise&lt;void&gt;</strong> - Removes the specified access key from your CodePush account.</p></li>
 <li><p><strong>removeApp(appName: string): Promise&lt;void&gt;</strong> - Deletes the specified CodePush app from your account.</p></li>
 <li><p><strong>removeCollaborator(appName: string, email: string): Promise&lt;void&gt;</strong> - Removes the specified account as a collaborator from the specified app.</p></li>
