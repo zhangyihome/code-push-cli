@@ -1,7 +1,7 @@
 # CodePush 命令行
 
 #### Note: This translated document is community contributed and maintained, it will not be kept updated or in sync with the [original](./README.md) by the main contributors. Please send a pull request if you find any issues.
-#### 注：本翻译文档是由社区贡献和维护，主要贡献者不会保持它与[原文](./README.md)的更新。如果您发现任何问题，请发送pull请求。
+#### 注：本翻译文档是由社区贡献和维护，不受[原文](./README.md)的作者持续维护并更新。如果您发现任何问题，请发送pull请求。
 
 CodePush是一个云服务，它能让Cordova和React Native的开发者将手机应用的更新直接部署到用户的设备上。
 它担任类似中间仓库的角色，开发者可以把更新（JS，HTML，CSS和图片）发布到这个仓库上，然后那些Apps就能查询到更新了（那些集成了CodePush SDKs的[Cordova](http://github.com/Microsoft/cordova-plugin-code-push)和[React Native](http://github.com/Microsoft/react-native-code-push) 应用）。
