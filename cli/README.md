@@ -21,6 +21,8 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
 * [Viewing Release History](#viewing-release-history)
 * [Clearing Release History](#clearing-release-history)
 
+[[中文版]](./README-cn.md)
+
 ## Installation
 
 * Install [Node.js](https://nodejs.org/)
@@ -232,7 +234,7 @@ code-push deployment ls <appName> [--displayKeys|-k]
 
 This will display not only the list of deployments, but also the update metadata (e.g. mandatory, description) and installation metrics for their latest release:
 
-![Deployment lis](https://cloud.githubusercontent.com/assets/116461/12526883/7730991c-c127-11e5-9196-98e9ceec758f.png)
+![Deployment list](https://cloud.githubusercontent.com/assets/116461/12526883/7730991c-c127-11e5-9196-98e9ceec758f.png)
 
 *NOTE: Due to their infrequent use and needed screen real estate, deployment keys aren't displayed by default. If you need to view them, simply make sure to pass the `-k` flag to the `deployment ls` command.*
 
