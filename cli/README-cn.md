@@ -155,6 +155,7 @@ code-push collaborator add <appName> <collaboratorEmail>
 *注意： 这个期待开发者已经用e-mail[注册](#创建账号)了CodePush，所以在打算分享应用之前确保他们已经准备好了一切。*
 
 一旦添加了，所有的合作者将立即拥有了最新分享App的如下权限：
+
 1. 查看App，它的合作者，[部署管理](#部署管理)和[查看发布历史](#查看发布历史)。
 1. [发布](#发布更新)更新到任何应用的部署环境。
 1. [促进](#促进更新)更新在任何应用部署环境之间。
@@ -196,7 +197,6 @@ code-push app transfer <appName> <newOwnerEmail>
 ## 部署管理
 
 从CodePush的角度来看，一个应用把一个或更多的东西简单命名分组称为“部署(环境)”。
-
 
 While the app represents a conceptual "namespace" or "scope" for a platform-specific version of an app (e.g. the iOS port of Foo app), its deployments represent the actual target for releasing updates (for developers) and synchronizing updates (for end-users). Deployments allow you to have multiple "environments" for each app in-flight at any given time, and help model the reality that apps typically move from a dev's personal environment to a testing/QA/staging environment, before finally making their way into production.
 
@@ -299,19 +299,20 @@ code-push release <appName> <updateContents> <targetBinaryVersion>
 
 如下是有效的版本号范围表达式的例子：
 
-| 范围表达式 | 谁获得更新                                                                    |
+| 范围表达式 | 谁获得更新                                                                                         |
 |------------------|----------------------------------------------------------------------------------------|
-| `1.2.3`          | 只有`1.2.3`版本  |
-| `*`                 | 所有版本                    |
-| `1.2.x`          | 主版本为1，小版本为2的任何版本  |
-| `1.2.3 - 1.2.7`  | 在 `1.2.3` (包含) 和 `1.2.7` (包含) 之间的版本 |
-| `>=1.2.3 <1.2.7` | 在 `1.2.3` (包含) 和 `1.2.7` (不包含)之间的版本 |
+| `1.2.3`          | 只有`1.2.3`版本                                                                                |
+| `*`                 | 所有版本                                                                                        |
+| `1.2.x`          | 主版本为1，小版本为2的任何版本                                       |
+| `1.2.3 - 1.2.7`  | 在 `1.2.3` (包含) 和 `1.2.7` (包含) 之间的版本                 |
+| `>=1.2.3 <1.2.7` | 在 `1.2.3` (包含) 和 `1.2.7` (不包含)之间的版本          |
 | `~1.2.3`         | 相当于`>=1.2.3 <1.3.0`                                                         |
 | `^1.2.3`         | 相当于`>=1.2.3 <2.0.0`                                                         |
 
 *注意：如果语义表达式以特殊字符开始如`>`,`^`或***，如果你没有用引号括起来的话命令可能执行不对，因为shell在CLI里不支持右边的值。所以，当调用`release`命令时最好能把你的`targetBinaryVersion`参数用双引号括起来，如：`code-push release MyApp updateContents ">1.2.3"`。*
 
 如下表格分别概括了每个应用类型的CodePush更新的语义版本范围的版本值：
+
 | 平台               | 应用商店版本来源 |
 |------------------------|------------------------------------------------------------------------------|
 | Cordova                | 在`config.xml`文件里的`<widget version>` 属性   |
