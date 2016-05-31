@@ -567,6 +567,7 @@ code-push patch <appName> <deploymentName>
 [--mandatory <isMandatory>]
 [--description <description>]
 [--rollout <rolloutPercentage>]
+[--disabled <isDisabled>]
 [--targetBinaryVersion <targetBinaryVersion>]
 ```
 
