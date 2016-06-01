@@ -1,6 +1,6 @@
 {
   "name": "code-push-cli",
-  "version": "1.11.0-beta",
+  "version": "1.12.0-beta",
   "description": "Management CLI for the CodePush service",
   "main": "script/cli.js",
   "scripts": {
@@ -28,11 +28,12 @@
     "base-64": "^0.1.0",
     "chalk": "^1.1.0",
     "cli-table": "^0.3.1",
-    "code-push": "1.9.1-beta",
+    "code-push": "1.10.0-beta",
     "email-validator": "^1.0.3",
     "gradle-to-js": "0.1.0",
     "moment": "^2.10.6",
     "opener": "^1.4.1",
+    "parse-duration": "0.1.1",
     "plist": "1.2.0",
     "progress": "^1.1.8",
     "prompt": "^0.2.14",

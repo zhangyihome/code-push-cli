@@ -1,5 +1,6 @@
 ﻿export enum CommandType {
     accessKeyAdd,
+    accessKeyEdit,
     accessKeyList,
     accessKeyRemove,
     appAdd,
@@ -35,7 +36,14 @@ export interface ICommand {
 }
 
 export interface IAccessKeyAddCommand extends ICommand {
-    description: string;
+    friendlyName: string;
+    maxAge?: number;
+}
+
+export interface IAccessKeyEditCommand extends ICommand {
+    oldFriendlyName: string;
+    newFriendlyName?: string;
+    maxAge?: number;
 }
 
 export interface IAccessKeyListCommand extends ICommand {

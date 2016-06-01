@@ -3,6 +3,7 @@ import * as cli from "../definitions/cli";
 import * as chalk from "chalk";
 import * as updateNotifier from "update-notifier";
 import backslash = require("backslash");
+import parseDuration = require("parse-duration");
 
 var packageJson = require("../package.json");
 const ROLLOUT_PERCENTAGE_REGEX: RegExp = /^(100|[1-9][0-9]|[1-9])%?$/;
@@ -42,9 +43,22 @@ function updateCheck(): void {
 function accessKeyAdd(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
     yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <description>")
-        .demand(/*count*/ 3, /*max*/ 3)  // Require exactly two non-option arguments.
-        .example("access-key " + commandName + " \"VSO Integration\"", "Creates a new access key with the description \"VSO Integration\"");
+        .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
+        .example("access-key " + commandName + " \"VSTS Integration\"", "Creates a new access key with the name \"VSO Integration\" which expires by default in 60 days")
+        .example("access-key " + commandName + " \"One time key\" --maxAge 5m", "Creates a new access key with the name \"One time key\" which expires in 5 minutes")
+        .option("maxAge", { default: null, demand: false, description: "A duration string specifying the time for which the access key remains valid for use", type: "string" });
 
+    addCommonConfiguration(yargs);
+}
+
+function accessKeyEdit(commandName: string, yargs: yargs.Argv): void {
+    isValidCommand = true;
+    yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <description>")
+        .demand(/*count*/ 3, /*max*/ 3)  // Require exactly two non-option arguments.
+        .example("access-key " + commandName + " \"Key for build server\" --name \"Key for CI machine\"", "Renames the access key named \"Key for build server\" to \"Key for CI machine\"")
+        .example("access-key " + commandName + " \"Key for build server\" --maxAge 7d", "Edits the access key named \"Key for build server\" to expire in 7 days")
+        .option("name", { default: null, demand: false, description: "New name for the access key", type: "string" })
+        .option("maxAge", { default: null, demand: false, description: "Duration string specifying the time for which the access key remains valid for use", type: "string" });
     addCommonConfiguration(yargs);
 }
 
@@ -162,6 +176,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " access-key <command>")
             .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
             .command("add", "Create a new access key associated with your account", (yargs: yargs.Argv) => accessKeyAdd("add", yargs))
+            .command("edit", "Edit the name and expiry of an access key", (yargs: yargs.Argv) => accessKeyEdit("edit", yargs))
             .command("remove", "Remove an existing access key", (yargs: yargs.Argv) => accessKeyRemove("remove", yargs))
             .command("rm", "Remove an existing access key", (yargs: yargs.Argv) => accessKeyRemove("rm", yargs))
             .command("list", "List the access keys associated with your account", (yargs: yargs.Argv) => accessKeyList("list", yargs))
@@ -424,7 +439,30 @@ function createCommand(): cli.ICommand {
                     case "add":
                         if (arg2) {
                             cmd = { type: cli.CommandType.accessKeyAdd };
-                            (<cli.IAccessKeyAddCommand>cmd).description = arg2;
+                            var accessKeyAddCmd = <cli.IAccessKeyAddCommand>cmd;
+                            accessKeyAddCmd.friendlyName = arg2;
+                            var maxAgeOption: string = argv["maxAge"];
+                            if (isDefined(maxAgeOption)) {
+                                accessKeyAddCmd.maxAge = parseDurationMilliseconds(maxAgeOption);
+                            }
+                        }
+                        break;
+
+                    case "edit":
+                        if (arg2) {
+                            cmd = { type: cli.CommandType.accessKeyEdit };
+                            var accessKeyEditCmd = <cli.IAccessKeyEditCommand>cmd;
+                            accessKeyEditCmd.oldFriendlyName = arg2;
+
+                            var newFriendlyNameOption: string = argv["name"];
+                            var maxAgeOption: string = argv["maxAge"];
+                            if (isDefined(newFriendlyNameOption)) {
+                                accessKeyEditCmd.newFriendlyName = newFriendlyNameOption;
+                            }
+
+                            if (isDefined(maxAgeOption)) {
+                                accessKeyEditCmd.maxAge = parseDurationMilliseconds(maxAgeOption);
+                            }
                         }
                         break;
 
@@ -740,7 +778,7 @@ function createCommand(): cli.ICommand {
                     rollbackCommand.targetRelease = argv["targetRelease"];
                 }
                 break;
-                
+
             case "whoami":
                 cmd = { type: cli.CommandType.whoami };
                 break;
@@ -760,7 +798,7 @@ function isValidRollout(args: any): boolean {
 }
 
 function checkValidReleaseOptions(args: any): boolean {
-    return isValidRollout(args) && !!args["deploymentName"];    
+    return isValidRollout(args) && !!args["deploymentName"];
 }
 
 function getRolloutValue(input: string): number {
@@ -779,6 +817,14 @@ function getServerUrl(url: string): string {
     url = url.replace(/^(https?):\\/, "$1://");     // Replace 'http(s):\' with 'http(s)://' for Windows Git Bash
 
     return url;
+}
+
+function isDefined(object: any) {
+    return object !== undefined && object !== null;
+}
+
+function parseDurationMilliseconds(durationString: string) {
+    return Math.floor(parseDuration(durationString));
 }
 
 export var command = createCommand();

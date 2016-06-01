@@ -101,9 +101,36 @@ export var confirm = (): Promise<boolean> => {
 }
 
 function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
-    return sdk.addAccessKey(command.description)
+    return sdk.addAccessKey(command.friendlyName, command.maxAge)
         .then((accessKey: AccessKey) => {
-            log("Successfully created a new access key" + (command.description ? (" \"" + command.description + "\"") : "") + ": " + accessKey.name);
+            log(`Successfully created a new access key "${command.friendlyName}": ${accessKey.name}\n(Expires: ${new Date(accessKey.expires).toString()})`);
+        });
+}
+
+function accessKeyEdit(command: cli.IAccessKeyEditCommand): Promise<void> {
+    var willEditFriendlyName = !!command.newFriendlyName && command.oldFriendlyName !== command.newFriendlyName;
+    var willEditMaxAge = command.maxAge !== null && command.maxAge !== undefined;
+
+    if (!willEditFriendlyName && !willEditMaxAge) {
+        throw new Error("A new name or maxAge must be provided.");
+    }
+
+    return sdk.editAccessKey(command.oldFriendlyName, command.newFriendlyName, command.maxAge)
+        .then((accessKey: AccessKey) => {
+            var logMessage: string = "Successfully ";
+            if (willEditFriendlyName) {
+                logMessage += `renamed the access key "${command.oldFriendlyName}" to "${command.newFriendlyName}"`;
+            }
+
+            if (willEditMaxAge) {
+                if (willEditFriendlyName) {
+                    logMessage += ` and changed its expiry to ${new Date(accessKey.expires).toString()}`;
+                } else {
+                    logMessage += `changed the access key "${command.oldFriendlyName}"'s expiry to ${new Date(accessKey.expires).toString()}`;
+                }
+            }
+
+            log(logMessage + ".");
         });
 }
 
@@ -431,6 +458,9 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.accessKeyAdd:
                     return accessKeyAdd(<cli.IAccessKeyAddCommand>command);
 
+                case cli.CommandType.accessKeyEdit:
+                    return accessKeyEdit(<cli.IAccessKeyEditCommand>command);
+
                 case cli.CommandType.accessKeyList:
                     return accessKeyList(<cli.IAccessKeyListCommand>command);
 
@@ -511,7 +541,7 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.whoami:
                     return whoami(command);
-                    
+
                 default:
                     // We should never see this message as invalid commands should be caught by the argument parser.
                     throw new Error("Invalid command:  " + JSON.stringify(command));
@@ -623,7 +653,7 @@ function logout(command: cli.ICommand): Promise<void> {
 function formatDate(unixOffset: number): string {
     var date: moment.Moment = moment(unixOffset);
     var now: moment.Moment = moment();
-    if (now.diff(date, "days") < 30) {
+    if (Math.abs(now.diff(date, "days")) < 30) {
         return date.fromNow();                  // "2 hours ago"
     } else if (now.year() === date.year()) {
         return date.format("MMM D");            // "Nov 6"
@@ -743,7 +773,6 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, deployme
                 row.push(packageObject.description ? wordwrap(30)(packageObject.description) : "");
                 row.push(getPackageMetricsString(packageObject) + (packageObject.isDisabled ? `\n${chalk.green("Disabled:")} Yes` : ""));
                 if (packageObject.isDisabled) {
-                    // "dim" does not exist as a style in DefinitelyTyped.
                     row = row.map((cellContents: string) => applyChalkSkippingLineBreaks(cellContents, (<any>chalk).dim));
                 }
 
@@ -865,7 +894,7 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
                     if (typeof buildGradle.android.defaultConfig.versionName !== "string") {
                         throw new Error(`The "android.defaultConfig.versionName" property value in "android/app/build.gradle" is not a valid string. If this is expected, consider using the --targetBinaryVersion option to specify the value manually.`);
                     }
-                    
+
                     var appVersion: string = buildGradle.android.defaultConfig.versionName.replace(/"/g, "").trim();
                     if (semver.valid(appVersion) || missingPatchVersionRegex.test(appVersion)) {
                         return appVersion;
@@ -884,7 +913,7 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
         } catch (err) {
             throw new Error(`Unable to find or read "${appxManifestFileName}" in the "${path.join("windows", projectName)}" folder.`);
         }
-            
+
         return parseXml(appxManifestContents)
             .catch((err: any) => {
                 throw new Error(`Unable to parse the "${path.join(appxManifestContainingFolder, appxManifestFileName)}" file, it could be malformed.`);
@@ -907,15 +936,34 @@ function printAccessKeys(format: string, keys: AccessKey[]): void {
     if (format === "json") {
         printJson(keys);
     } else if (format === "table") {
-        printTable(["Key", "Time Created", "Created From", "Description"], (dataSource: any[]): void => {
-            keys.forEach((key: AccessKey): void => {
-                dataSource.push([
-                    key.name,
+        printTable(["Name", "Time Created", "Created From", "Expires"], (dataSource: any[]): void => {
+            var now = new Date().getTime();
+
+            function isExpired(key: AccessKey) {
+                return now >= key.expires;
+            }
+
+            function keyToTableRow(key: AccessKey, dim: boolean) {
+                var row: string[] = [
+                    key.friendlyName,
                     key.createdTime ? formatDate(key.createdTime) : "",
                     key.createdBy ? key.createdBy : "",
-                    key.description ? key.description : ""
-                ]);
-            });
+                    formatDate(key.expires)
+                ];
+
+                if (dim) {
+                    row.forEach((col: string, index: number) => {
+                        row[index] = (<any>chalk).dim(col);
+                    });
+                }
+
+                return row;
+            }
+
+            keys.forEach((key: AccessKey) =>
+                !isExpired(key) && dataSource.push(keyToTableRow(key, /*dim*/ false)));
+            keys.forEach((key: AccessKey) =>
+                isExpired(key) && dataSource.push(keyToTableRow(key, /*dim*/ true)));
         });
     }
 }
@@ -1072,17 +1120,17 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
     } else {
         throw new Error("Platform must be either \"ios\" or \"android\".");
     }
-    
+
     var cordovaCommand: string = command.build ? "build" : "prepare";
     var cordovaCLI: string = "cordova";
-    
-    // Check whether the Cordova or PhoneGap CLIs are 
+
+    // Check whether the Cordova or PhoneGap CLIs are
     // installed, and if not, fail early
-    try { 
+    try {
         which.sync(cordovaCLI);
     } catch (e) {
         try {
-            cordovaCLI = "phonegap";            
+            cordovaCLI = "phonegap";
             which.sync(cordovaCLI);
         } catch (e) {
             throw new Error(`Unable to ${cordovaCommand} project. Please ensure that either the Cordova or PhoneGap CLI is installed.`);
@@ -1147,7 +1195,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
                     ? "main.jsbundle"
                     : `index.${platform}.bundle`;
             }
-            
+
             break;
         default:
             throw new Error("Platform must be either \"android\", \"ios\" or \"windows\".");

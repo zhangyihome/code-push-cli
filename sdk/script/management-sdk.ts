@@ -6,7 +6,7 @@ import superagent = require("superagent");
 
 import Promise = Q.Promise;
 
-import { AccessKey, Account, App, CodePushError, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, UpdateMetrics } from "./types";
+import { AccessKey, AccessKeyRequest, Account, App, CodePushError, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, UpdateMetrics } from "./types";
 
 var superproxy = require("superagent-proxy");
 superproxy(superagent);
@@ -90,25 +90,39 @@ class AccountManager {
         });
     }
 
-    public addAccessKey(description: string): Promise<AccessKey> {
-        if (!description) {
-            throw new Error("A description must be specified when adding an access key.");
+    public addAccessKey(friendlyName: string, maxAge?: number): Promise<AccessKey> {
+        if (!friendlyName) {
+            throw new Error("A name must be specified when adding an access key.");
         }
 
-        var hostname: string = os.hostname();
-        var accessKeyRequest: AccessKey = { createdBy: hostname, description: description };
+        var accessKeyRequest: AccessKeyRequest = {
+            createdBy: os.hostname(),
+            friendlyName,
+            maxAge
+        };
+
         return this.post(urlEncode `/accessKeys/`, JSON.stringify(accessKeyRequest), /*expectResponseBody=*/ true)
             .then((response: JsonResponse) => response.body.accessKey);
     }
 
-    public getAccessKey(accessKey: string): Promise<AccessKey> {
-        return this.get(urlEncode `/accessKeys/${accessKey}`)
+    public getAccessKey(accessKeyName: string): Promise<AccessKey> {
+        return this.get(urlEncode `/accessKeys/${accessKeyName}`)
             .then((res: JsonResponse) => res.body.accessKey);
     }
 
     public getAccessKeys(): Promise<AccessKey[]> {
         return this.get(urlEncode `/accessKeys`)
             .then((res: JsonResponse) => res.body.accessKeys);
+    }
+
+    public editAccessKey(oldFriendlyName: string, newFriendlyName?: string, maxAge?: number): Promise<AccessKey> {
+        var accessKeyRequest: AccessKeyRequest = {
+            friendlyName: newFriendlyName,
+            maxAge
+        };
+
+        return this.patch(urlEncode `/accessKeys/${oldFriendlyName}`, JSON.stringify(accessKeyRequest))
+            .then((res: JsonResponse) => res.body.accessKey);
     }
 
     public removeAccessKey(accessKey: string): Promise<void> {
@@ -176,7 +190,7 @@ class AccountManager {
         return this.post(urlEncode `/apps/${appName}/deployments/`, JSON.stringify(deployment), /*expectResponseBody=*/ true)
             .then((res: JsonResponse) => res.body.deployment);
     }
-    
+
     public clearDeploymentHistory(appName: string, deploymentName: string): Promise<void> {
         return this.del(urlEncode `/apps/${appName}/deployments/${deploymentName}/history`)
             .then(() => null);

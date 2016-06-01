@@ -23,6 +23,13 @@ function ensureInTestAppDirectory(): void {
     }
 }
 
+function isDefined(object: any): boolean {
+    return object !== undefined && object !== null;
+}
+
+const NOW = new Date().getTime();
+const DEFAULT_ACCESS_KEY_MAX_AGE = 1000 * 60 * 60 * 24 * 60; // 60 days
+
 export class SdkStub {
     public getAccountInfo(): Promise<codePush.Account> {
         return Q(<codePush.Account>{
@@ -30,12 +37,22 @@ export class SdkStub {
         });
     }
 
-    public addAccessKey(description: string): Promise<codePush.AccessKey> {
+    public addAccessKey(friendlyName: string, maxAge: number): Promise<codePush.AccessKey> {
         return Q(<codePush.AccessKey>{
             name: "key123",
             createdTime: new Date().getTime(),
             createdBy: os.hostname(),
-            description: description
+            friendlyName,
+            expires: NOW + (isDefined(maxAge) ? maxAge : DEFAULT_ACCESS_KEY_MAX_AGE)
+        });
+    }
+
+    public editAccessKey(oldFriendlyName: string, newFriendlyName?: string, newMaxAge?: number): Promise<codePush.AccessKey> {
+        return Q(<codePush.AccessKey>{
+            createdTime: new Date().getTime(),
+            createdBy: os.hostname(),
+            friendlyName: newFriendlyName,
+            expires: NOW + (isDefined(newMaxAge) ? newMaxAge : DEFAULT_ACCESS_KEY_MAX_AGE)
         });
     }
 
@@ -62,10 +79,10 @@ export class SdkStub {
 
     public getAccessKeys(): Promise<codePush.AccessKey[]> {
         return Q([<codePush.AccessKey>{
-            name: "8",
             createdTime: 0,
             createdBy: os.hostname(),
-            description: "Test Description"
+            friendlyName: "Test name",
+            expires: NOW + DEFAULT_ACCESS_KEY_MAX_AGE
         }]);
     }
 
@@ -233,10 +250,10 @@ describe("CLI", () => {
         sandbox.restore();
     });
 
-    it("accessKeyAdd creates access key with description", (done: MochaDone): void => {
+    it("accessKeyAdd creates access key with friendlyName and default maxAge", (done: MochaDone): void => {
         var command: cli.IAccessKeyAddCommand = {
             type: cli.CommandType.accessKeyAdd,
-            description: "Test description"
+            friendlyName: "Test name"
         };
 
         cmdexec.execute(command)
@@ -245,14 +262,99 @@ describe("CLI", () => {
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = "Successfully created a new access key \"Test description\": key123";
+                var expected = `Successfully created a new access key "Test name": key123\n(Expires: ${new Date(NOW + DEFAULT_ACCESS_KEY_MAX_AGE)})`;
 
                 assert.equal(actual, expected);
                 done();
             });
     });
 
-    it("accessKeyList lists access key names and ID's", (done: MochaDone): void => {
+    it("accessKeyAdd creates access key with friendlyName and specified maxAge", (done: MochaDone): void => {
+        var maxAge = 10000;
+        var command: cli.IAccessKeyAddCommand = {
+            type: cli.CommandType.accessKeyAdd,
+            friendlyName: "Test name",
+            maxAge
+        };
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(log);
+                assert.equal(log.args[0].length, 1);
+
+                var actual: string = log.args[0][0];
+                var expected = `Successfully created a new access key "Test name": key123\n(Expires: ${new Date(NOW + maxAge)})`;
+
+                assert.equal(actual, expected);
+                done();
+            });
+    });
+
+    it("accessKeyEdit updates access key with new friendlyName", (done: MochaDone): void => {
+        var command: cli.IAccessKeyEditCommand = {
+            type: cli.CommandType.accessKeyEdit,
+            oldFriendlyName: "Test name",
+            newFriendlyName: "Updated name"
+        };
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(log);
+                assert.equal(log.args[0].length, 1);
+
+                var actual: string = log.args[0][0];
+                var expected = `Successfully renamed the access key "Test name" to "Updated name".`;
+
+                assert.equal(actual, expected);
+                done();
+            });
+    });
+
+
+    it("accessKeyEdit updates access key with new maxAge", (done: MochaDone): void => {
+        var maxAge = 10000;
+        var command: cli.IAccessKeyEditCommand = {
+            type: cli.CommandType.accessKeyEdit,
+            oldFriendlyName: "Test name",
+            maxAge
+        };
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(log);
+                assert.equal(log.args[0].length, 1);
+
+                var actual: string = log.args[0][0];
+                var expected = `Successfully changed the access key "Test name"'s expiry to ${new Date(NOW + maxAge).toString()}.`;
+
+                assert.equal(actual, expected);
+                done();
+            });
+    });
+
+    it("accessKeyEdit updates access key with new friendlyName and maxAge", (done: MochaDone): void => {
+        var maxAge = 10000;
+        var command: cli.IAccessKeyEditCommand = {
+            type: cli.CommandType.accessKeyEdit,
+            oldFriendlyName: "Test name",
+            newFriendlyName: "Updated name",
+            maxAge
+        };
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(log);
+                assert.equal(log.args[0].length, 1);
+
+                var actual: string = log.args[0][0];
+                var expected = `Successfully renamed the access key "Test name" to "Updated name" and changed its expiry to ${new Date(NOW + maxAge)}.`;
+
+                assert.equal(actual, expected);
+                done();
+            });
+    });
+
+    it("accessKeyList lists access key friendlyName and expires fields", (done: MochaDone): void => {
         var command: cli.IAccessKeyListCommand = {
             type: cli.CommandType.accessKeyList,
             format: "json"
@@ -266,10 +368,10 @@ describe("CLI", () => {
                 var actual: string = log.args[0][0];
                 var expected = [
                     {
-                        name: "8",
                         createdTime: 0,
                         createdBy: os.hostname(),
-                        description: "Test Description"
+                        friendlyName: "Test name",
+                        expires: NOW + DEFAULT_ACCESS_KEY_MAX_AGE
                     }
                 ];
 
@@ -846,7 +948,7 @@ describe("CLI", () => {
             })
             .done();
     });
-    
+
     it("promote works successfully", (done: MochaDone): void => {
         var command: cli.IPromoteCommand = {
             type: cli.CommandType.promote,
@@ -870,7 +972,7 @@ describe("CLI", () => {
                 done();
             });
     });
-    
+
     it("promote works successfully without appStoreVersion", (done: MochaDone): void => {
         var command: cli.IPromoteCommand = {
             type: cli.CommandType.promote,
