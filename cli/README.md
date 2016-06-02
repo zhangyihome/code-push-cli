@@ -21,7 +21,7 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
 * [Viewing Release History](#viewing-release-history)
 * [Clearing Release History](#clearing-release-history)
 
-[[中文版]](./README-cn.md)
+[[Chinese version 中文版]](./README-cn.md)
 
 ## Installation
 
@@ -94,18 +94,20 @@ code-push logout
 ```
 
 If you forget to logout from a machine you'd prefer not to leave a running session on (e.g. your friend's laptop), you can use the following commands to list and remove any "live" access keys.
-The list of access keys will display the name of the machine the key was created on, as well as the time the login occurred. This should make it easy to spot keys you don't want to keep around.
+The list of access keys will display the name of the machine the key was created on, the time the login occurred, and the time it expires. This should make it easy to spot keys you don't want to keep around.
 
 ```
 code-push access-key ls
-code-push access-key rm <accessKey>
+code-push access-key rm <accessKeyName>
 ```
 
-If you need additional keys that can be used to authenticate against the CodePush service without needing to give access to your GitHub and/or Microsoft credentials, you can run the following command to create a persistent one (along with a description of what it is for):
+If you need additional keys that can be used to authenticate against the CodePush service without needing to give access to your GitHub and/or Microsoft credentials, you can run the following command to create a persistent one (along with a name describing what it is for):
 
 ```
 code-push access-key add "VSTS Integration"
 ```
+
+By default, access keys expire in 60 days. You can specify a different expiry duration by using the `--maxAge` option and passing in a [human readable duration string](https://github.com/jkroso/parse-duration#parsestr) (e.g. "2d" => 2 days, "1h 15 min" => 1 hour and 15 minutes). For security, the key will only be shown once on creation, so remember to save it somewhere if needed!
 
 After creating the new key, you can specify its value using the `--accessKey` flag of the `login` command, which allows you to perform "headless" authentication, as opposed to launching a browser.
 
@@ -114,6 +116,12 @@ code-push login --accessKey <accessKey>
 ```
 
 When logging in via this method, the access key will not be automatically invalidated on logout, and can be used in future sessions until it is explicitly removed from the CodePush server. However, it is still recommended to log out once your session is complete, in order to remove your credentials from disk.
+
+Finally, if you need to change a key's name or expiry date, you can use the following command:
+
+```
+code-push access-key edit <accessKeyName> --name "new name" --maxAge 10d
+```
 
 ## App Management
 
@@ -248,7 +256,7 @@ The install metrics have the following meaning:
 
 * **Rollbacks** - The number of times that this release has been automatically rolled back on the client. Ideally this number should be zero, and in that case, this metric isn't even shown. However, if you released an update that includes a crash as part of the installation process, the CodePush plugin will roll the end-user back to the previous release, and report that issue back to the server. This allows your end-users to remain unblocked in the event of broken releases, and by being able to see this telemetry in the CLI, you can identify erroneous releases and respond to them by [rolling it back](#rolling-back-undesired-updates) on the server.
 
-* **Rollout** - Indicates the percentage of users that are elligble to receive this update. This property will only be displayed for releases that represent an "active" rollout, and therefore, have a rollout percentage that is less than 100%. Additionally, since a deployment can only have one active rollout at any given time, this label would only be present on the latest release within a deployment. 
+* **Rollout** - Indicates the percentage of users that are elligble to receive this update. This property will only be displayed for releases that represent an "active" rollout, and therefore, have a rollout percentage that is less than 100%. Additionally, since a deployment can only have one active rollout at any given time, this label would only be present on the latest release within a deployment.
 
 * **Disabled** - Indicates whether the release has been marked as disabled or not, and therefore, is downloadable by end users. This property will only be displayed for releases that are actually disabled.
 
@@ -657,7 +665,7 @@ This is the same parameter as the one described in the [above section](#rollout-
 This is the same parameter as the one described in the [above section](#target-binary-version-parameter), and simply allows you to override the target binary version that will be used for the promoted release. If unspecified, the new release will inherit the target binary version property from the release being promoted.
 
 ```shell
-# Promote the release to production and make it 
+# Promote the release to production and make it
 # available to all versions using that deployment
 code-push promote MyApp Staging Production -t "*"
 ```

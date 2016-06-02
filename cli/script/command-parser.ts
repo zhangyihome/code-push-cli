@@ -42,7 +42,7 @@ function updateCheck(): void {
 
 function accessKeyAdd(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
-    yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <description>")
+    yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <accessKeyName>")
         .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
         .example("access-key " + commandName + " \"VSTS Integration\"", "Creates a new access key with the name \"VSO Integration\" which expires by default in 60 days")
         .example("access-key " + commandName + " \"One time key\" --maxAge 5m", "Creates a new access key with the name \"One time key\" which expires in 5 minutes")
@@ -53,8 +53,8 @@ function accessKeyAdd(commandName: string, yargs: yargs.Argv): void {
 
 function accessKeyEdit(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
-    yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <description>")
-        .demand(/*count*/ 3, /*max*/ 3)  // Require exactly two non-option arguments.
+    yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <accessKeyName>")
+        .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
         .example("access-key " + commandName + " \"Key for build server\" --name \"Key for CI machine\"", "Renames the access key named \"Key for build server\" to \"Key for CI machine\"")
         .example("access-key " + commandName + " \"Key for build server\" --maxAge 7d", "Edits the access key named \"Key for build server\" to expire in 7 days")
         .option("name", { default: null, demand: false, description: "New name for the access key", type: "string" })
@@ -75,7 +75,7 @@ function accessKeyList(commandName: string, yargs: yargs.Argv): void {
 
 function accessKeyRemove(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
-    yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <accessKey>")
+    yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <accessKeyName>")
         .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
         .example("access-key " + commandName + " 8d6513de-050c-4788-96f7-b2a50dd9684v", "Removes the \"8d6513de-050c-4788-96f7-b2a50dd9684v\" access key");
 
