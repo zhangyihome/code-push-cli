@@ -108,8 +108,8 @@ function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
 }
 
 function accessKeyEdit(command: cli.IAccessKeyEditCommand): Promise<void> {
-    var willEditFriendlyName = !!command.newFriendlyName && command.oldFriendlyName !== command.newFriendlyName;
-    var willEditMaxAge = command.maxAge !== null && command.maxAge !== undefined;
+    var willEditFriendlyName = isCommandOptionSpecified(command.newFriendlyName) && command.oldFriendlyName !== command.newFriendlyName;
+    var willEditMaxAge = isCommandOptionSpecified(command.maxAge);
 
     if (!willEditFriendlyName && !willEditMaxAge) {
         throw new Error("A new name or maxAge must be provided.");
@@ -1400,4 +1400,8 @@ function getProxy(proxy?: string, noProxy?: boolean): string {
     if (noProxy) return null;
     if (!proxy) return process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
     else return proxy;
+}
+
+function isCommandOptionSpecified(option: any): boolean {
+    return option !== undefined && option !== null;
 }
