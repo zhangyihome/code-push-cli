@@ -90,7 +90,7 @@ class AccountManager {
         });
     }
 
-    public addAccessKey(friendlyName: string, maxAge?: number): Promise<AccessKey> {
+    public addAccessKey(friendlyName: string, ttl?: number): Promise<AccessKey> {
         if (!friendlyName) {
             throw new Error("A name must be specified when adding an access key.");
         }
@@ -98,7 +98,7 @@ class AccountManager {
         var accessKeyRequest: AccessKeyRequest = {
             createdBy: os.hostname(),
             friendlyName,
-            maxAge
+            ttl
         };
 
         return this.post(urlEncode `/accessKeys/`, JSON.stringify(accessKeyRequest), /*expectResponseBody=*/ true)
@@ -115,10 +115,10 @@ class AccountManager {
             .then((res: JsonResponse) => res.body.accessKeys);
     }
 
-    public editAccessKey(oldFriendlyName: string, newFriendlyName?: string, maxAge?: number): Promise<AccessKey> {
+    public editAccessKey(oldFriendlyName: string, newFriendlyName?: string, ttl?: number): Promise<AccessKey> {
         var accessKeyRequest: AccessKeyRequest = {
             friendlyName: newFriendlyName,
-            maxAge
+            ttl
         };
 
         return this.patch(urlEncode `/accessKeys/${oldFriendlyName}`, JSON.stringify(accessKeyRequest))

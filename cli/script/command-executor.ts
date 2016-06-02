@@ -101,28 +101,30 @@ export var confirm = (): Promise<boolean> => {
 }
 
 function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
-    return sdk.addAccessKey(command.friendlyName, command.maxAge)
+    return sdk.addAccessKey(command.friendlyName, command.ttl)
         .then((accessKey: AccessKey) => {
-            log(`Successfully created a new access key "${command.friendlyName}": ${accessKey.name}\n(Expires: ${new Date(accessKey.expires).toString()})`);
+            log(`Successfully created a new access key "${command.friendlyName}": ${accessKey.name}`);
+            log(`(Expires: ${new Date(accessKey.expires).toString()})`);
+            log(`Please save this key as it will only be shown once!`);
         });
 }
 
 function accessKeyEdit(command: cli.IAccessKeyEditCommand): Promise<void> {
     var willEditFriendlyName = isCommandOptionSpecified(command.newFriendlyName) && command.oldFriendlyName !== command.newFriendlyName;
-    var willEditMaxAge = isCommandOptionSpecified(command.maxAge);
+    var willEditTtl = isCommandOptionSpecified(command.ttl);
 
-    if (!willEditFriendlyName && !willEditMaxAge) {
-        throw new Error("A new name or maxAge must be provided.");
+    if (!willEditFriendlyName && !willEditTtl) {
+        throw new Error("A new name or TTL must be provided.");
     }
 
-    return sdk.editAccessKey(command.oldFriendlyName, command.newFriendlyName, command.maxAge)
+    return sdk.editAccessKey(command.oldFriendlyName, command.newFriendlyName, command.ttl)
         .then((accessKey: AccessKey) => {
             var logMessage: string = "Successfully ";
             if (willEditFriendlyName) {
                 logMessage += `renamed the access key "${command.oldFriendlyName}" to "${command.newFriendlyName}"`;
             }
 
-            if (willEditMaxAge) {
+            if (willEditTtl) {
                 if (willEditFriendlyName) {
                     logMessage += ` and changed its expiry to ${new Date(accessKey.expires).toString()}`;
                 } else {
@@ -936,7 +938,7 @@ function printAccessKeys(format: string, keys: AccessKey[]): void {
     if (format === "json") {
         printJson(keys);
     } else if (format === "table") {
-        printTable(["Name", "Time Created", "Created From", "Expires"], (dataSource: any[]): void => {
+        printTable(["Name", "Created", "Origin", "Expires"], (dataSource: any[]): void => {
             var now = new Date().getTime();
 
             function isExpired(key: AccessKey) {

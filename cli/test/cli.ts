@@ -37,22 +37,22 @@ export class SdkStub {
         });
     }
 
-    public addAccessKey(friendlyName: string, maxAge: number): Promise<codePush.AccessKey> {
+    public addAccessKey(friendlyName: string, ttl: number): Promise<codePush.AccessKey> {
         return Q(<codePush.AccessKey>{
             name: "key123",
             createdTime: new Date().getTime(),
             createdBy: os.hostname(),
             friendlyName,
-            expires: NOW + (isDefined(maxAge) ? maxAge : DEFAULT_ACCESS_KEY_MAX_AGE)
+            expires: NOW + (isDefined(ttl) ? ttl : DEFAULT_ACCESS_KEY_MAX_AGE)
         });
     }
 
-    public editAccessKey(oldFriendlyName: string, newFriendlyName?: string, newMaxAge?: number): Promise<codePush.AccessKey> {
+    public editAccessKey(oldFriendlyName: string, newFriendlyName?: string, newTtl?: number): Promise<codePush.AccessKey> {
         return Q(<codePush.AccessKey>{
             createdTime: new Date().getTime(),
             createdBy: os.hostname(),
             friendlyName: newFriendlyName,
-            expires: NOW + (isDefined(newMaxAge) ? newMaxAge : DEFAULT_ACCESS_KEY_MAX_AGE)
+            expires: NOW + (isDefined(newTtl) ? newTtl : DEFAULT_ACCESS_KEY_MAX_AGE)
         });
     }
 
@@ -250,7 +250,7 @@ describe("CLI", () => {
         sandbox.restore();
     });
 
-    it("accessKeyAdd creates access key with friendlyName and default maxAge", (done: MochaDone): void => {
+    it("accessKeyAdd creates access key with friendlyName and default ttl", (done: MochaDone): void => {
         var command: cli.IAccessKeyAddCommand = {
             type: cli.CommandType.accessKeyAdd,
             friendlyName: "Test name"
@@ -258,34 +258,50 @@ describe("CLI", () => {
 
         cmdexec.execute(command)
             .done((): void => {
-                sinon.assert.calledOnce(log);
+                sinon.assert.calledThrice(log);
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = `Successfully created a new access key "Test name": key123\n(Expires: ${new Date(NOW + DEFAULT_ACCESS_KEY_MAX_AGE)})`;
-
+                var expected = `Successfully created a new access key "Test name": key123`;
                 assert.equal(actual, expected);
+
+                actual = log.args[1][0];
+                expected = `(Expires: ${new Date(NOW + DEFAULT_ACCESS_KEY_MAX_AGE)})`;
+                assert.equal(actual, expected);
+
+                actual = log.args[2][0];
+                expected = "Please save this key as it will only be shown once!";
+                assert.equal(actual, expected);
+
                 done();
             });
     });
 
-    it("accessKeyAdd creates access key with friendlyName and specified maxAge", (done: MochaDone): void => {
-        var maxAge = 10000;
+    it("accessKeyAdd creates access key with friendlyName and specified ttl", (done: MochaDone): void => {
+        var ttl = 10000;
         var command: cli.IAccessKeyAddCommand = {
             type: cli.CommandType.accessKeyAdd,
             friendlyName: "Test name",
-            maxAge
+            ttl
         };
 
         cmdexec.execute(command)
             .done((): void => {
-                sinon.assert.calledOnce(log);
+                sinon.assert.calledThrice(log);
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = `Successfully created a new access key "Test name": key123\n(Expires: ${new Date(NOW + maxAge)})`;
-
+                var expected = `Successfully created a new access key "Test name": key123`;
                 assert.equal(actual, expected);
+
+                actual = log.args[1][0];
+                expected = `(Expires: ${new Date(NOW + ttl)})`;
+                assert.equal(actual, expected);
+
+                actual = log.args[2][0];
+                expected = "Please save this key as it will only be shown once!";
+                assert.equal(actual, expected);
+
                 done();
             });
     });
@@ -311,12 +327,12 @@ describe("CLI", () => {
     });
 
 
-    it("accessKeyEdit updates access key with new maxAge", (done: MochaDone): void => {
-        var maxAge = 10000;
+    it("accessKeyEdit updates access key with new ttl", (done: MochaDone): void => {
+        var ttl = 10000;
         var command: cli.IAccessKeyEditCommand = {
             type: cli.CommandType.accessKeyEdit,
             oldFriendlyName: "Test name",
-            maxAge
+            ttl
         };
 
         cmdexec.execute(command)
@@ -325,20 +341,20 @@ describe("CLI", () => {
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = `Successfully changed the access key "Test name"'s expiry to ${new Date(NOW + maxAge).toString()}.`;
+                var expected = `Successfully changed the access key "Test name"'s expiry to ${new Date(NOW + ttl).toString()}.`;
 
                 assert.equal(actual, expected);
                 done();
             });
     });
 
-    it("accessKeyEdit updates access key with new friendlyName and maxAge", (done: MochaDone): void => {
-        var maxAge = 10000;
+    it("accessKeyEdit updates access key with new friendlyName and ttl", (done: MochaDone): void => {
+        var ttl = 10000;
         var command: cli.IAccessKeyEditCommand = {
             type: cli.CommandType.accessKeyEdit,
             oldFriendlyName: "Test name",
             newFriendlyName: "Updated name",
-            maxAge
+            ttl
         };
 
         cmdexec.execute(command)
@@ -347,7 +363,7 @@ describe("CLI", () => {
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = `Successfully renamed the access key "Test name" to "Updated name" and changed its expiry to ${new Date(NOW + maxAge)}.`;
+                var expected = `Successfully renamed the access key "Test name" to "Updated name" and changed its expiry to ${new Date(NOW + ttl)}.`;
 
                 assert.equal(actual, expected);
                 done();

@@ -107,7 +107,7 @@ If you need additional keys that can be used to authenticate against the CodePus
 code-push access-key add "VSTS Integration"
 ```
 
-By default, access keys expire in 60 days. You can specify a different expiry duration by using the `--maxAge` option and passing in a [human readable duration string](https://github.com/jkroso/parse-duration#parsestr) (e.g. "2d" => 2 days, "1h 15 min" => 1 hour and 15 minutes). For security, the key will only be shown once on creation, so remember to save it somewhere if needed!
+By default, access keys expire in 60 days. You can specify a different expiry duration by using the `--ttl` option and passing in a [human readable duration string](https://github.com/jkroso/parse-duration#parsestr) (e.g. "2d" => 2 days, "1h 15 min" => 1 hour and 15 minutes). For security, the key will only be shown once on creation, so remember to save it somewhere if needed!
 
 After creating the new key, you can specify its value using the `--accessKey` flag of the `login` command, which allows you to perform "headless" authentication, as opposed to launching a browser.
 
@@ -120,7 +120,7 @@ When logging in via this method, the access key will not be automatically invali
 Finally, if you need to change a key's name or expiry date, you can use the following command:
 
 ```
-code-push access-key edit <accessKeyName> --name "new name" --maxAge 10d
+code-push access-key edit <accessKeyName> --name "new name" --ttl 10d
 ```
 
 ## App Management

@@ -37,13 +37,13 @@ export interface ICommand {
 
 export interface IAccessKeyAddCommand extends ICommand {
     friendlyName: string;
-    maxAge?: number;
+    ttl?: number;
 }
 
 export interface IAccessKeyEditCommand extends ICommand {
     oldFriendlyName: string;
     newFriendlyName?: string;
-    maxAge?: number;
+    ttl?: number;
 }
 
 export interface IAccessKeyListCommand extends ICommand {

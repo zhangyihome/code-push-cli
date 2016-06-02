@@ -22,7 +22,7 @@ declare module "rest-definitions" {
 
     /*in*/
     export interface AccessKeyRequest extends AccessKeyBase {
-        maxAge?: number;
+        ttl?: number;
     }
 
     /*out*/

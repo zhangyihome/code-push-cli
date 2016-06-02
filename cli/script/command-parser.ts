@@ -45,8 +45,8 @@ function accessKeyAdd(commandName: string, yargs: yargs.Argv): void {
     yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <accessKeyName>")
         .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
         .example("access-key " + commandName + " \"VSTS Integration\"", "Creates a new access key with the name \"VSO Integration\" which expires by default in 60 days")
-        .example("access-key " + commandName + " \"One time key\" --maxAge 5m", "Creates a new access key with the name \"One time key\" which expires in 5 minutes")
-        .option("maxAge", { default: null, demand: false, description: "A duration string specifying the time for which the access key remains valid for use", type: "string" });
+        .example("access-key " + commandName + " \"One time key\" --ttl 5m", "Creates a new access key with the name \"One time key\" which expires in 5 minutes")
+        .option("ttl", { default: null, demand: false, description: "A duration string specifying the time for which the access key remains valid for use", type: "string" });
 
     addCommonConfiguration(yargs);
 }
@@ -56,9 +56,9 @@ function accessKeyEdit(commandName: string, yargs: yargs.Argv): void {
     yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <accessKeyName>")
         .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
         .example("access-key " + commandName + " \"Key for build server\" --name \"Key for CI machine\"", "Renames the access key named \"Key for build server\" to \"Key for CI machine\"")
-        .example("access-key " + commandName + " \"Key for build server\" --maxAge 7d", "Edits the access key named \"Key for build server\" to expire in 7 days")
+        .example("access-key " + commandName + " \"Key for build server\" --ttl 7d", "Edits the access key named \"Key for build server\" to expire in 7 days")
         .option("name", { default: null, demand: false, description: "New name for the access key", type: "string" })
-        .option("maxAge", { default: null, demand: false, description: "Duration string specifying the time for which the access key remains valid for use", type: "string" });
+        .option("ttl", { default: null, demand: false, description: "Duration string specifying the time for which the access key remains valid for use", type: "string" });
     addCommonConfiguration(yargs);
 }
 
@@ -441,9 +441,9 @@ function createCommand(): cli.ICommand {
                             cmd = { type: cli.CommandType.accessKeyAdd };
                             var accessKeyAddCmd = <cli.IAccessKeyAddCommand>cmd;
                             accessKeyAddCmd.friendlyName = arg2;
-                            var maxAgeOption: string = argv["maxAge"];
-                            if (isDefined(maxAgeOption)) {
-                                accessKeyAddCmd.maxAge = parseDurationMilliseconds(maxAgeOption);
+                            var ttlOption: string = argv["ttl"];
+                            if (isDefined(ttlOption)) {
+                                accessKeyAddCmd.ttl = parseDurationMilliseconds(ttlOption);
                             }
                         }
                         break;
@@ -455,13 +455,13 @@ function createCommand(): cli.ICommand {
                             accessKeyEditCmd.oldFriendlyName = arg2;
 
                             var newFriendlyNameOption: string = argv["name"];
-                            var maxAgeOption: string = argv["maxAge"];
+                            var ttlOption: string = argv["ttl"];
                             if (isDefined(newFriendlyNameOption)) {
                                 accessKeyEditCmd.newFriendlyName = newFriendlyNameOption;
                             }
 
-                            if (isDefined(maxAgeOption)) {
-                                accessKeyEditCmd.maxAge = parseDurationMilliseconds(maxAgeOption);
+                            if (isDefined(ttlOption)) {
+                                accessKeyEditCmd.ttl = parseDurationMilliseconds(ttlOption);
                             }
                         }
                         break;
