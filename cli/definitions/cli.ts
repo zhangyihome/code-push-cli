@@ -28,6 +28,8 @@
     releaseCordova,
     releaseReact,
     rollback,
+    sessionList,
+    sessionRemove,
     whoami
 }
 
@@ -190,4 +192,12 @@ export interface IRollbackCommand extends ICommand {
     appName: string;
     deploymentName: string;
     targetRelease: string;
+}
+
+export interface ISessionListCommand extends ICommand {
+    format: string;
+}
+
+export interface ISessionRemoveCommand extends ICommand {
+    machineName: string;
 }

@@ -29,6 +29,7 @@ function isDefined(object: any): boolean {
 
 const NOW = new Date().getTime();
 const DEFAULT_ACCESS_KEY_MAX_AGE = 1000 * 60 * 60 * 24 * 60; // 60 days
+const TEST_MACHINE_NAME = "Test machine";
 
 export class SdkStub {
     public getAccountInfo(): Promise<codePush.Account> {
@@ -82,7 +83,14 @@ export class SdkStub {
             createdTime: 0,
             createdBy: os.hostname(),
             friendlyName: "Test name",
-            expires: NOW + DEFAULT_ACCESS_KEY_MAX_AGE
+            expires: NOW + DEFAULT_ACCESS_KEY_MAX_AGE,
+            isSession: false,
+        },<codePush.AccessKey>{
+            createdTime: 0,
+            createdBy: TEST_MACHINE_NAME,
+            friendlyName: "Test session",
+            expires: NOW + DEFAULT_ACCESS_KEY_MAX_AGE,
+            isSession: true,
         }]);
     }
 
@@ -199,6 +207,10 @@ export class SdkStub {
     }
 
     public removeDeployment(appId: string, deployment: string): Promise<void> {
+        return Q(<void>null);
+    }
+
+    public removeSessions(createdBy: string): Promise<void> {
         return Q(<void>null);
     }
 
@@ -1674,6 +1686,94 @@ describe("CLI", () => {
                     `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)} --dev false --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
                 );
                 assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
+                done();
+            })
+            .done();
+    });
+
+    it("sessionList lists session friendlyName and expires fields", (done: MochaDone): void => {
+        var command: cli.IAccessKeyListCommand = {
+            type: cli.CommandType.sessionList,
+            format: "json"
+        };
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(log);
+                assert.equal(log.args[0].length, 1);
+
+                var actual: string = log.args[0][0];
+                var expected = [
+                    {
+                        createdTime: 0,
+                        createdBy: TEST_MACHINE_NAME,
+                        friendlyName: "Test session",
+                        expires: NOW + DEFAULT_ACCESS_KEY_MAX_AGE
+                    }
+                ];
+
+                assertJsonDescribesObject(actual, expected);
+                done();
+            });
+    });
+
+    it("sessionRemove removes session", (done: MochaDone): void => {
+        var machineName = TEST_MACHINE_NAME;
+        var command: cli.ISessionRemoveCommand = {
+            type: cli.CommandType.sessionRemove,
+            machineName: machineName
+        };
+
+        var removeSessions: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeSessions");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(removeSessions);
+                sinon.assert.calledWithExactly(removeSessions, machineName);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, `Successfully removed the existing session for "${machineName}".`);
+
+                done();
+            });
+    });
+
+    it("sessionRemove does not remove session if cancelled", (done: MochaDone): void => {
+        var machineName = TEST_MACHINE_NAME;
+        var command: cli.ISessionRemoveCommand = {
+            type: cli.CommandType.sessionRemove,
+            machineName: machineName
+        };
+
+        var removeSessions: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeSessions");
+
+        wasConfirmed = false;
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.notCalled(removeSessions);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, "Session removal cancelled.");
+
+                done();
+            });
+    });
+
+    it("sessionRemove does not remove current session", (done: MochaDone): void => {
+        var machineName = os.hostname();
+        var command: cli.ISessionRemoveCommand = {
+            type: cli.CommandType.sessionRemove,
+            machineName: machineName
+        };
+
+        var removeSessions: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeSessions");
+
+        wasConfirmed = false;
+
+        cmdexec.execute(command)
+            .then(() => {
+                done(new Error("Did not throw error."));
+            })
+            .catch((err) => {
                 done();
             })
             .done();

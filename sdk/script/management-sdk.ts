@@ -130,6 +130,11 @@ class AccountManager {
             .then(() => null);
     }
 
+    public removeSessions(createdBy: string): Promise<void> {
+        return this.del(urlEncode `/sessions/${createdBy}`)
+            .then(() => null);
+    }
+
     // Account
     public getAccountInfo(): Promise<Account> {
         return this.get(urlEncode `/account`)
@@ -322,7 +327,11 @@ class AccountManager {
 
             request.end((err: any, res: superagent.Response) => {
                 if (err) {
-                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    reject(<CodePushError>{
+                        message: this.getErrorMessage(err, res),
+                        statusCode: res.status
+                    });
+
                     return;
                 }
 
