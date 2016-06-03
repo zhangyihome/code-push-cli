@@ -41,8 +41,8 @@ export interface IAccessKeyAddCommand extends ICommand {
 }
 
 export interface IAccessKeyEditCommand extends ICommand {
-    oldFriendlyName: string;
     newFriendlyName?: string;
+    oldFriendlyName: string;
     ttl?: number;
 }
 

@@ -44,7 +44,7 @@ function accessKeyAdd(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
     yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <accessKeyName>")
         .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
-        .example("access-key " + commandName + " \"VSTS Integration\"", "Creates a new access key with the name \"VSO Integration\" which expires by default in 60 days")
+        .example("access-key " + commandName + " \"VSTS Integration\"", "Creates a new access key with the name \"VSTS Integration\" which expires by default in 60 days")
         .example("access-key " + commandName + " \"One time key\" --ttl 5m", "Creates a new access key with the name \"One time key\" which expires in 5 minutes")
         .option("ttl", { default: null, demand: false, description: "A duration string specifying the time for which the access key remains valid for use", type: "string" });
 
@@ -819,11 +819,11 @@ function getServerUrl(url: string): string {
     return url;
 }
 
-function isDefined(object: any) {
+function isDefined(object: any): boolean {
     return object !== undefined && object !== null;
 }
 
-function parseDurationMilliseconds(durationString: string) {
+function parseDurationMilliseconds(durationString: string): number {
     return Math.floor(parseDuration(durationString));
 }
 

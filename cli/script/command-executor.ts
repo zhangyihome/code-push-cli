@@ -110,11 +110,11 @@ function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
 }
 
 function accessKeyEdit(command: cli.IAccessKeyEditCommand): Promise<void> {
-    var willEditFriendlyName = isCommandOptionSpecified(command.newFriendlyName) && command.oldFriendlyName !== command.newFriendlyName;
-    var willEditTtl = isCommandOptionSpecified(command.ttl);
+    var willEditFriendlyName: boolean = isCommandOptionSpecified(command.newFriendlyName) && command.oldFriendlyName !== command.newFriendlyName;
+    var willEditTtl: boolean = isCommandOptionSpecified(command.ttl);
 
     if (!willEditFriendlyName && !willEditTtl) {
-        throw new Error("A new name or TTL must be provided.");
+        throw new Error("A new name and/or TTL must be provided.");
     }
 
     return sdk.editAccessKey(command.oldFriendlyName, command.newFriendlyName, command.ttl)
@@ -941,11 +941,11 @@ function printAccessKeys(format: string, keys: AccessKey[]): void {
         printTable(["Name", "Created", "Origin", "Expires"], (dataSource: any[]): void => {
             var now = new Date().getTime();
 
-            function isExpired(key: AccessKey) {
+            function isExpired(key: AccessKey): boolean {
                 return now >= key.expires;
             }
 
-            function keyToTableRow(key: AccessKey, dim: boolean) {
+            function keyToTableRow(key: AccessKey, dim: boolean): string[] {
                 var row: string[] = [
                     key.friendlyName,
                     key.createdTime ? formatDate(key.createdTime) : "",
