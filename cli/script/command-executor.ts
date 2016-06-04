@@ -24,7 +24,7 @@ var which = require("which");
 import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
-import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, UpdateMetrics } from "code-push/script/types";
+import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, Session, UpdateMetrics } from "code-push/script/types";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var emailValidator = require("email-validator");
@@ -101,34 +101,34 @@ export var confirm = (): Promise<boolean> => {
 }
 
 function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
-    return sdk.addAccessKey(command.friendlyName, command.ttl)
+    return sdk.addAccessKey(command.name, command.ttl)
         .then((accessKey: AccessKey) => {
-            log(`Successfully created a new access key "${command.friendlyName}": ${accessKey.name}`);
+            log(`Successfully created a new access key "${command.name}": ${accessKey.key}`);
             log(`(Expires: ${new Date(accessKey.expires).toString()})`);
             log(`Please save this key as it will only be shown once!`);
         });
 }
 
 function accessKeyEdit(command: cli.IAccessKeyEditCommand): Promise<void> {
-    var willEditFriendlyName = isCommandOptionSpecified(command.newFriendlyName) && command.oldFriendlyName !== command.newFriendlyName;
+    var willEditFriendlyName = isCommandOptionSpecified(command.newName) && command.oldName !== command.newName;
     var willEditTtl = isCommandOptionSpecified(command.ttl);
 
     if (!willEditFriendlyName && !willEditTtl) {
         throw new Error("A new name or TTL must be provided.");
     }
 
-    return sdk.editAccessKey(command.oldFriendlyName, command.newFriendlyName, command.ttl)
+    return sdk.editAccessKey(command.oldName, command.newName, command.ttl)
         .then((accessKey: AccessKey) => {
             var logMessage: string = "Successfully ";
             if (willEditFriendlyName) {
-                logMessage += `renamed the access key "${command.oldFriendlyName}" to "${command.newFriendlyName}"`;
+                logMessage += `renamed the access key "${command.oldName}" to "${command.newName}"`;
             }
 
             if (willEditTtl) {
                 if (willEditFriendlyName) {
                     logMessage += ` and changed its expiry to ${new Date(accessKey.expires).toString()}`;
                 } else {
-                    logMessage += `changed the access key "${command.oldFriendlyName}"'s expiry to ${new Date(accessKey.expires).toString()}`;
+                    logMessage += `changed the access key "${command.oldName}"'s expiry to ${new Date(accessKey.expires).toString()}`;
                 }
             }
 
@@ -141,13 +141,7 @@ function accessKeyList(command: cli.IAccessKeyListCommand): Promise<void> {
 
     return sdk.getAccessKeys()
         .then((accessKeys: AccessKey[]): void => {
-            var notSessionKeys: AccessKey[] = [];
-            accessKeys.forEach((accessKey: AccessKey) => {
-                !accessKey.isSession && notSessionKeys.push(accessKey);
-                delete accessKey.isSession;
-            });
-
-            printAccessKeys(command.format, notSessionKeys);
+            printAccessKeys(command.format, accessKeys);
         });
 }
 
@@ -651,7 +645,7 @@ function logout(command: cli.ICommand): Promise<void> {
         .then((): Promise<void> => {
             if (!connectionInfo.preserveAccessKeyOnLogout) {
                 var machineName: string = os.hostname();
-                return sdk.removeSessions(machineName);
+                return sdk.removeSession(machineName);
             }
         })
         .finally((): void => {
@@ -955,7 +949,7 @@ function printAccessKeys(format: string, keys: AccessKey[]): void {
 
             function keyToTableRow(key: AccessKey, dim: boolean) {
                 var row: string[] = [
-                    key.friendlyName,
+                    key.name,
                     key.createdTime ? formatDate(key.createdTime) : "",
                     formatDate(key.expires)
                 ];
@@ -977,13 +971,13 @@ function printAccessKeys(format: string, keys: AccessKey[]): void {
     }
 }
 
-function printSessions(format: string, sessions: AccessKey[]): void {
+function printSessions(format: string, sessions: Session[]): void {
     if (format === "json") {
         printJson(sessions);
     } else if (format === "table") {
-        printTable(["Machine", "Started"], (dataSource: any[]): void => {
-            sessions.forEach((session: AccessKey) =>
-                dataSource.push([session.createdBy, formatDate(session.createdTime)]));
+        printTable(["Machine", "Logged in"], (dataSource: any[]): void => {
+            sessions.forEach((session: Session) =>
+                dataSource.push([session.machineName, formatDate(session.loggedInTime)]));
         });
     }
 }
@@ -1368,22 +1362,8 @@ function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: b
 function sessionList(command: cli.ISessionListCommand): Promise<void> {
     throwForInvalidOutputFormat(command.format);
 
-    return sdk.getAccessKeys()
-        .then((accessKeys: AccessKey[]): void => {
-            // A machine name might be associated with multiple session keys,
-            // but we should only display one per machine.
-            var sessionMap: { [machineName: string]: AccessKey } = {};
-            var now: number = new Date().getTime();
-            accessKeys.forEach((accessKey: AccessKey) => {
-                if (accessKey.isSession && accessKey.expires > now) {
-                    sessionMap[accessKey.createdBy] = accessKey;
-                    delete accessKey.isSession;
-                }
-            });
-
-            var sessions: AccessKey[] = Object.keys(sessionMap)
-                .map((machineName: string) => sessionMap[machineName]);
-
+    return sdk.getSessions()
+        .then((sessions: Session[]): void => {
             printSessions(command.format, sessions);
         });
 }
@@ -1395,7 +1375,7 @@ function sessionRemove(command: cli.ISessionRemoveCommand): Promise<void> {
         return confirm()
             .then((wasConfirmed: boolean): Promise<void> => {
                 if (wasConfirmed) {
-                    return sdk.removeSessions(command.machineName)
+                    return sdk.removeSession(command.machineName)
                         .then((): void => {
                             log(`Successfully removed the existing session for "${command.machineName}".`);
                         });

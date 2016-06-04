@@ -38,13 +38,13 @@ export interface ICommand {
 }
 
 export interface IAccessKeyAddCommand extends ICommand {
-    friendlyName: string;
+    name: string;
     ttl?: number;
 }
 
 export interface IAccessKeyEditCommand extends ICommand {
-    oldFriendlyName: string;
-    newFriendlyName?: string;
+    oldName: string;
+    newName?: string;
     ttl?: number;
 }
 

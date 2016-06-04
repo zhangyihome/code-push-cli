@@ -133,8 +133,8 @@ function sessionList(commandName: string, yargs: yargs.Argv): void {
     yargs.usage(USAGE_PREFIX + " session " + commandName + " [options]")
         .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
         .example("session " + commandName, "Lists your sessions in tabular format")
-        .example("session " + commandName + " --format json", "Lists your sessions in JSON format")
-        .option("format", { default: "table", demand: false, description: "Output format to display your access keys with (\"json\" or \"table\")", type: "string" });
+        .example("session " + commandName + " --format json", "Lists your login sessions in JSON format")
+        .option("format", { default: "table", demand: false, description: "Output format to display your login sessions with (\"json\" or \"table\")", type: "string" });
 
     addCommonConfiguration(yargs);
 }
@@ -472,7 +472,7 @@ function createCommand(): cli.ICommand {
                         if (arg2) {
                             cmd = { type: cli.CommandType.accessKeyAdd };
                             var accessKeyAddCmd = <cli.IAccessKeyAddCommand>cmd;
-                            accessKeyAddCmd.friendlyName = arg2;
+                            accessKeyAddCmd.name = arg2;
                             var ttlOption: string = argv["ttl"];
                             if (isDefined(ttlOption)) {
                                 accessKeyAddCmd.ttl = parseDurationMilliseconds(ttlOption);
@@ -484,12 +484,12 @@ function createCommand(): cli.ICommand {
                         if (arg2) {
                             cmd = { type: cli.CommandType.accessKeyEdit };
                             var accessKeyEditCmd = <cli.IAccessKeyEditCommand>cmd;
-                            accessKeyEditCmd.oldFriendlyName = arg2;
+                            accessKeyEditCmd.oldName = arg2;
 
-                            var newFriendlyNameOption: string = argv["name"];
+                            var newNameOption: string = argv["name"];
                             var ttlOption: string = argv["ttl"];
-                            if (isDefined(newFriendlyNameOption)) {
-                                accessKeyEditCmd.newFriendlyName = newFriendlyNameOption;
+                            if (isDefined(newNameOption)) {
+                                accessKeyEditCmd.newName = newNameOption;
                             }
 
                             if (isDefined(ttlOption)) {
