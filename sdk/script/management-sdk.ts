@@ -102,12 +102,25 @@ class AccountManager {
         };
 
         return this.post(urlEncode `/accessKeys/`, JSON.stringify(accessKeyRequest), /*expectResponseBody=*/ true)
-            .then((response: JsonResponse) => response.body.accessKey);
+            .then((response: JsonResponse) => {
+                return {
+                    createdTime: response.body.accessKey.createdTime,
+                    expires: response.body.accessKey.expires,
+                    key: response.body.accessKey.name,
+                    name: response.body.accessKey.friendlyName
+                };
+            });
     }
 
     public getAccessKey(accessKeyName: string): Promise<AccessKey> {
         return this.get(urlEncode `/accessKeys/${accessKeyName}`)
-            .then((res: JsonResponse) => res.body.accessKey);
+            .then((res: JsonResponse) => {
+                return {
+                    createdTime: res.body.accessKey.createdTime,
+                    expires: res.body.accessKey.expires,
+                    name: res.body.accessKey.friendlyName,
+                };
+            });
     }
 
     public getAccessKeys(): Promise<AccessKey[]> {
@@ -158,7 +171,13 @@ class AccountManager {
         };
 
         return this.patch(urlEncode `/accessKeys/${oldName}`, JSON.stringify(accessKeyRequest))
-            .then((res: JsonResponse) => res.body.accessKey);
+            .then((res: JsonResponse) => {
+                return {
+                    createdTime: res.body.accessKey.createdTime,
+                    expires: res.body.accessKey.expires,
+                    name: res.body.accessKey.friendlyName,
+                };
+            });
     }
 
     public removeAccessKey(name: string): Promise<void> {
