@@ -43,8 +43,8 @@ export interface IAccessKeyAddCommand extends ICommand {
 }
 
 export interface IAccessKeyEditCommand extends ICommand {
-    oldName: string;
     newName?: string;
+    oldName: string;
     ttl?: number;
 }
 

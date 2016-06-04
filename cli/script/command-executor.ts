@@ -110,22 +110,22 @@ function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
 }
 
 function accessKeyEdit(command: cli.IAccessKeyEditCommand): Promise<void> {
-    var willEditFriendlyName = isCommandOptionSpecified(command.newName) && command.oldName !== command.newName;
-    var willEditTtl = isCommandOptionSpecified(command.ttl);
+    var willEditName: boolean = isCommandOptionSpecified(command.newName) && command.oldName !== command.newName;
+    var willEditTtl: boolean = isCommandOptionSpecified(command.ttl);
 
-    if (!willEditFriendlyName && !willEditTtl) {
-        throw new Error("A new name or TTL must be provided.");
+    if (!willEditName && !willEditTtl) {
+        throw new Error("A new name and/or TTL must be provided.");
     }
 
     return sdk.editAccessKey(command.oldName, command.newName, command.ttl)
         .then((accessKey: AccessKey) => {
             var logMessage: string = "Successfully ";
-            if (willEditFriendlyName) {
+            if (willEditName) {
                 logMessage += `renamed the access key "${command.oldName}" to "${command.newName}"`;
             }
 
             if (willEditTtl) {
-                if (willEditFriendlyName) {
+                if (willEditName) {
                     logMessage += ` and changed its expiry to ${new Date(accessKey.expires).toString()}`;
                 } else {
                     logMessage += `changed the access key "${command.oldName}"'s expiry to ${new Date(accessKey.expires).toString()}`;
@@ -943,11 +943,11 @@ function printAccessKeys(format: string, keys: AccessKey[]): void {
         printTable(["Name", "Created", "Expires"], (dataSource: any[]): void => {
             var now = new Date().getTime();
 
-            function isExpired(key: AccessKey) {
+            function isExpired(key: AccessKey): boolean {
                 return now >= key.expires;
             }
 
-            function keyToTableRow(key: AccessKey, dim: boolean) {
+            function keyToTableRow(key: AccessKey, dim: boolean): string[] {
                 var row: string[] = [
                     key.name,
                     key.createdTime ? formatDate(key.createdTime) : "",
