@@ -47,7 +47,7 @@ export class SdkStub {
         });
     }
 
-    public editAccessKey(oldName: string, newName?: string, newTtl?: number): Promise<codePush.AccessKey> {
+    public patchAccessKey(oldName: string, newName?: string, newTtl?: number): Promise<codePush.AccessKey> {
         return Q(<codePush.AccessKey>{
             createdTime: new Date().getTime(),
             name: newName,
@@ -315,9 +315,9 @@ describe("CLI", () => {
             });
     });
 
-    it("accessKeyEdit updates access key with new name", (done: MochaDone): void => {
-        var command: cli.IAccessKeyEditCommand = {
-            type: cli.CommandType.accessKeyEdit,
+    it("accessKeyPatch updates access key with new name", (done: MochaDone): void => {
+        var command: cli.IAccessKeyPatchCommand = {
+            type: cli.CommandType.accessKeyPatch,
             oldName: "Test name",
             newName: "Updated name"
         };
@@ -336,10 +336,10 @@ describe("CLI", () => {
     });
 
 
-    it("accessKeyEdit updates access key with new ttl", (done: MochaDone): void => {
+    it("accessKeyPatch updates access key with new ttl", (done: MochaDone): void => {
         var ttl = 10000;
-        var command: cli.IAccessKeyEditCommand = {
-            type: cli.CommandType.accessKeyEdit,
+        var command: cli.IAccessKeyPatchCommand = {
+            type: cli.CommandType.accessKeyPatch,
             oldName: "Test name",
             ttl
         };
@@ -357,10 +357,10 @@ describe("CLI", () => {
             });
     });
 
-    it("accessKeyEdit updates access key with new name and ttl", (done: MochaDone): void => {
+    it("accessKeyPatch updates access key with new name and ttl", (done: MochaDone): void => {
         var ttl = 10000;
-        var command: cli.IAccessKeyEditCommand = {
-            type: cli.CommandType.accessKeyEdit,
+        var command: cli.IAccessKeyPatchCommand = {
+            type: cli.CommandType.accessKeyPatch,
             oldName: "Test name",
             newName: "Updated name",
             ttl

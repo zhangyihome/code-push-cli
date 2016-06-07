@@ -109,23 +109,23 @@ function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
         });
 }
 
-function accessKeyEdit(command: cli.IAccessKeyEditCommand): Promise<void> {
-    var willEditName: boolean = isCommandOptionSpecified(command.newName) && command.oldName !== command.newName;
-    var willEditTtl: boolean = isCommandOptionSpecified(command.ttl);
+function accessKeyPatch(command: cli.IAccessKeyPatchCommand): Promise<void> {
+    var willUpdateName: boolean = isCommandOptionSpecified(command.newName) && command.oldName !== command.newName;
+    var willUpdateTtl: boolean = isCommandOptionSpecified(command.ttl);
 
-    if (!willEditName && !willEditTtl) {
+    if (!willUpdateName && !willUpdateTtl) {
         throw new Error("A new name and/or TTL must be provided.");
     }
 
-    return sdk.editAccessKey(command.oldName, command.newName, command.ttl)
+    return sdk.patchAccessKey(command.oldName, command.newName, command.ttl)
         .then((accessKey: AccessKey) => {
             var logMessage: string = "Successfully ";
-            if (willEditName) {
+            if (willUpdateName) {
                 logMessage += `renamed the access key "${command.oldName}" to "${command.newName}"`;
             }
 
-            if (willEditTtl) {
-                if (willEditName) {
+            if (willUpdateTtl) {
+                if (willUpdateName) {
                     logMessage += ` and changed its expiry to ${new Date(accessKey.expires).toString()}`;
                 } else {
                     logMessage += `changed the access key "${command.oldName}"'s expiry to ${new Date(accessKey.expires).toString()}`;
@@ -458,8 +458,8 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.accessKeyAdd:
                     return accessKeyAdd(<cli.IAccessKeyAddCommand>command);
 
-                case cli.CommandType.accessKeyEdit:
-                    return accessKeyEdit(<cli.IAccessKeyEditCommand>command);
+                case cli.CommandType.accessKeyPatch:
+                    return accessKeyPatch(<cli.IAccessKeyPatchCommand>command);
 
                 case cli.CommandType.accessKeyList:
                     return accessKeyList(<cli.IAccessKeyListCommand>command);

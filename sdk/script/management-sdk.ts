@@ -164,7 +164,7 @@ class AccountManager {
     }
 
 
-    public editAccessKey(oldName: string, newName?: string, ttl?: number): Promise<AccessKey> {
+    public patchAccessKey(oldName: string, newName?: string, ttl?: number): Promise<AccessKey> {
         var accessKeyRequest: AccessKeyRequest = {
             friendlyName: newName,
             ttl

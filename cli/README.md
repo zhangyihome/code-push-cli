@@ -120,7 +120,7 @@ When logging in via this method, the access key will not be automatically invali
 Finally, if you need to change a key's name or expiry date, you can use the following command:
 
 ```
-code-push access-key edit <accessKeyName> --name "new name" --ttl 10d
+code-push access-key patch <accessKeyName> --name "new name" --ttl 10d
 ```
 
 ## App Management

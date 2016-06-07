@@ -1,6 +1,6 @@
 ﻿export enum CommandType {
     accessKeyAdd,
-    accessKeyEdit,
+    accessKeyPatch,
     accessKeyList,
     accessKeyRemove,
     appAdd,
@@ -42,7 +42,7 @@ export interface IAccessKeyAddCommand extends ICommand {
     ttl?: number;
 }
 
-export interface IAccessKeyEditCommand extends ICommand {
+export interface IAccessKeyPatchCommand extends ICommand {
     newName?: string;
     oldName: string;
     ttl?: number;

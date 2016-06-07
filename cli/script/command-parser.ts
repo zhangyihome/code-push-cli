@@ -51,7 +51,7 @@ function accessKeyAdd(commandName: string, yargs: yargs.Argv): void {
     addCommonConfiguration(yargs);
 }
 
-function accessKeyEdit(commandName: string, yargs: yargs.Argv): void {
+function accessKeyPatch(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
     yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <accessKeyName>")
         .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
@@ -196,7 +196,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " access-key <command>")
             .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
             .command("add", "Create a new access key associated with your account", (yargs: yargs.Argv) => accessKeyAdd("add", yargs))
-            .command("edit", "Edit the name and expiry of an access key", (yargs: yargs.Argv) => accessKeyEdit("edit", yargs))
+            .command("patch", "Update the name and expiry of an access key", (yargs: yargs.Argv) => accessKeyPatch("patch", yargs))
             .command("remove", "Remove an existing access key", (yargs: yargs.Argv) => accessKeyRemove("remove", yargs))
             .command("rm", "Remove an existing access key", (yargs: yargs.Argv) => accessKeyRemove("rm", yargs))
             .command("list", "List the access keys associated with your account", (yargs: yargs.Argv) => accessKeyList("list", yargs))
@@ -480,20 +480,20 @@ function createCommand(): cli.ICommand {
                         }
                         break;
 
-                    case "edit":
+                    case "patch":
                         if (arg2) {
-                            cmd = { type: cli.CommandType.accessKeyEdit };
-                            var accessKeyEditCmd = <cli.IAccessKeyEditCommand>cmd;
-                            accessKeyEditCmd.oldName = arg2;
+                            cmd = { type: cli.CommandType.accessKeyPatch };
+                            var accessKeyPatchCmd = <cli.IAccessKeyPatchCommand>cmd;
+                            accessKeyPatchCmd.oldName = arg2;
 
                             var newNameOption: string = argv["name"];
                             var ttlOption: string = argv["ttl"];
                             if (isDefined(newNameOption)) {
-                                accessKeyEditCmd.newName = newNameOption;
+                                accessKeyPatchCmd.newName = newNameOption;
                             }
 
                             if (isDefined(ttlOption)) {
-                                accessKeyEditCmd.ttl = parseDurationMilliseconds(ttlOption);
+                                accessKeyPatchCmd.ttl = parseDurationMilliseconds(ttlOption);
                             }
                         }
                         break;
