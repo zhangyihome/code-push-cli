@@ -6,12 +6,23 @@ declare module "rest-definitions" {
      * - key: This property is the identifier for an object, with certain uniqueness constraints.
      */
 
-    /*inout*/
-    export interface AccessKey {
-        createdBy: string;
-        /*generated*/ createdTime?: number;
-        description?: string;
+    interface AccessKeyBase {
+        createdBy?: string;
+        /*legacy*/ description?: string;
+        /*key*/ friendlyName?: string;
         /*generated key*/ name?: string;
+    }
+
+    /*out*/
+    export interface AccessKey extends AccessKeyBase {
+        /*generated*/ createdTime?: number;
+        expires: number;
+        /*generated*/ isSession?: boolean;
+    }
+
+    /*in*/
+    export interface AccessKeyRequest extends AccessKeyBase {
+        ttl?: number;
     }
 
     /*out*/
@@ -82,7 +93,7 @@ declare module "rest-definitions" {
         installed?: number;
     }
 
-    /*inout*/
+    /*out*/
     export interface Account {
         /*key*/ email: string;
         name: string;

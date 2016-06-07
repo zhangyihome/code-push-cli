@@ -24,7 +24,7 @@ var which = require("which");
 import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
-import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, UpdateMetrics } from "code-push/script/types";
+import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, Session, UpdateMetrics } from "code-push/script/types";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var emailValidator = require("email-validator");
@@ -101,9 +101,38 @@ export var confirm = (): Promise<boolean> => {
 }
 
 function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
-    return sdk.addAccessKey(command.description)
+    return sdk.addAccessKey(command.name, command.ttl)
         .then((accessKey: AccessKey) => {
-            log("Successfully created a new access key" + (command.description ? (" \"" + command.description + "\"") : "") + ": " + accessKey.name);
+            log(`Successfully created a new access key "${command.name}": ${accessKey.key}`);
+            log(`(Expires: ${new Date(accessKey.expires).toString()})`);
+            log(`Please save this key as it will only be shown once!`);
+        });
+}
+
+function accessKeyPatch(command: cli.IAccessKeyPatchCommand): Promise<void> {
+    var willUpdateName: boolean = isCommandOptionSpecified(command.newName) && command.oldName !== command.newName;
+    var willUpdateTtl: boolean = isCommandOptionSpecified(command.ttl);
+
+    if (!willUpdateName && !willUpdateTtl) {
+        throw new Error("A new name and/or TTL must be provided.");
+    }
+
+    return sdk.patchAccessKey(command.oldName, command.newName, command.ttl)
+        .then((accessKey: AccessKey) => {
+            var logMessage: string = "Successfully ";
+            if (willUpdateName) {
+                logMessage += `renamed the access key "${command.oldName}" to "${command.newName}"`;
+            }
+
+            if (willUpdateTtl) {
+                if (willUpdateName) {
+                    logMessage += ` and changed its expiry to ${new Date(accessKey.expires).toString()}`;
+                } else {
+                    logMessage += `changed the access key "${command.oldName}"'s expiry to ${new Date(accessKey.expires).toString()}`;
+                }
+            }
+
+            log(logMessage + ".");
         });
 }
 
@@ -117,21 +146,17 @@ function accessKeyList(command: cli.IAccessKeyListCommand): Promise<void> {
 }
 
 function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
-    if (command.accessKey === sdk.accessKey) {
-        throw new Error("Cannot remove the access key for the current session. Please run 'code-push logout' if you would like to remove this access key.");
-    } else {
-        return confirm()
-            .then((wasConfirmed: boolean): Promise<void> => {
-                if (wasConfirmed) {
-                    return sdk.removeAccessKey(command.accessKey)
-                        .then((): void => {
-                            log("Successfully removed the \"" + command.accessKey + "\" access key.");
-                        });
-                }
+    return confirm()
+        .then((wasConfirmed: boolean): Promise<void> => {
+            if (wasConfirmed) {
+                return sdk.removeAccessKey(command.accessKey)
+                    .then((): void => {
+                        log("Successfully removed the \"" + command.accessKey + "\" access key.");
+                    });
+            }
 
-                log("Access key removal cancelled.");
-            });
-    }
+            log("Access key removal cancelled.");
+        });
 }
 
 function appAdd(command: cli.IAppAddCommand): Promise<void> {
@@ -251,11 +276,13 @@ function removeCollaborator(command: cli.ICollaboratorRemoveCommand): Promise<vo
         });
 }
 
-function deleteConnectionInfoCache(): void {
+function deleteConnectionInfoCache(printMessage: boolean = true): void {
     try {
         fs.unlinkSync(configFilePath);
 
-        log(`Successfully logged-out. The session file located at ${chalk.cyan(configFilePath)} has been deleted.\r\n`);
+        if (printMessage) {
+            log(`Successfully logged-out. The session file located at ${chalk.cyan(configFilePath)} has been deleted.\r\n`);
+        }
     } catch (ex) {
     }
 }
@@ -423,13 +450,16 @@ export function execute(command: cli.ICommand): Promise<void> {
                         throw new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server.");
                     }
 
-                    sdk = new AccountManager(connectionInfo.accessKey, CLI_HEADERS, connectionInfo.customServerUrl, connectionInfo.proxy);
+                    sdk = getSdk(connectionInfo.accessKey, CLI_HEADERS, connectionInfo.customServerUrl, connectionInfo.proxy);
                     break;
             }
 
             switch (command.type) {
                 case cli.CommandType.accessKeyAdd:
                     return accessKeyAdd(<cli.IAccessKeyAddCommand>command);
+
+                case cli.CommandType.accessKeyPatch:
+                    return accessKeyPatch(<cli.IAccessKeyPatchCommand>command);
 
                 case cli.CommandType.accessKeyList:
                     return accessKeyList(<cli.IAccessKeyListCommand>command);
@@ -509,9 +539,15 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.rollback:
                     return rollback(<cli.IRollbackCommand>command);
 
+                case cli.CommandType.sessionList:
+                    return sessionList(<cli.ISessionListCommand>command);
+
+                case cli.CommandType.sessionRemove:
+                    return sessionRemove(<cli.ISessionRemoveCommand>command);
+
                 case cli.CommandType.whoami:
                     return whoami(command);
-                    
+
                 default:
                     // We should never see this message as invalid commands should be caught by the argument parser.
                     throw new Error("Invalid command:  " + JSON.stringify(command));
@@ -566,7 +602,7 @@ function login(command: cli.ILoginCommand): Promise<void> {
     // Check if one of the flags were provided.
     if (command.accessKey) {
         var proxy = getProxy(command.proxy, command.noProxy);
-        sdk = new AccountManager(command.accessKey, CLI_HEADERS, command.serverUrl, proxy);
+        sdk = getSdk(command.accessKey, CLI_HEADERS, command.serverUrl, proxy);
         return sdk.isAuthenticated()
             .then((isAuthenticated: boolean): void => {
                 if (isAuthenticated) {
@@ -591,7 +627,7 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string, pro
                 return;
             }
 
-            sdk = new AccountManager(accessKey, CLI_HEADERS, serverUrl, getProxy(proxy, noProxy));
+            sdk = getSdk(accessKey, CLI_HEADERS, serverUrl, getProxy(proxy, noProxy));
 
             return sdk.isAuthenticated()
                 .then((isAuthenticated: boolean): void => {
@@ -608,10 +644,8 @@ function logout(command: cli.ICommand): Promise<void> {
     return Q(<void>null)
         .then((): Promise<void> => {
             if (!connectionInfo.preserveAccessKeyOnLogout) {
-                return sdk.removeAccessKey(sdk.accessKey)
-                    .then((): void => {
-                        log(`Removed access key ${sdk.accessKey}.`);
-                    });
+                var machineName: string = os.hostname();
+                return sdk.removeSession(machineName);
             }
         })
         .finally((): void => {
@@ -623,7 +657,7 @@ function logout(command: cli.ICommand): Promise<void> {
 function formatDate(unixOffset: number): string {
     var date: moment.Moment = moment(unixOffset);
     var now: moment.Moment = moment();
-    if (now.diff(date, "days") < 30) {
+    if (Math.abs(now.diff(date, "days")) < 30) {
         return date.fromNow();                  // "2 hours ago"
     } else if (now.year() === date.year()) {
         return date.format("MMM D");            // "Nov 6"
@@ -743,7 +777,6 @@ function printDeploymentHistory(command: cli.IDeploymentHistoryCommand, deployme
                 row.push(packageObject.description ? wordwrap(30)(packageObject.description) : "");
                 row.push(getPackageMetricsString(packageObject) + (packageObject.isDisabled ? `\n${chalk.green("Disabled:")} Yes` : ""));
                 if (packageObject.isDisabled) {
-                    // "dim" does not exist as a style in DefinitelyTyped.
                     row = row.map((cellContents: string) => applyChalkSkippingLineBreaks(cellContents, (<any>chalk).dim));
                 }
 
@@ -865,7 +898,7 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
                     if (typeof buildGradle.android.defaultConfig.versionName !== "string") {
                         throw new Error(`The "android.defaultConfig.versionName" property value in "android/app/build.gradle" is not a valid string. If this is expected, consider using the --targetBinaryVersion option to specify the value manually.`);
                     }
-                    
+
                     var appVersion: string = buildGradle.android.defaultConfig.versionName.replace(/"/g, "").trim();
                     if (semver.valid(appVersion) || missingPatchVersionRegex.test(appVersion)) {
                         return appVersion;
@@ -884,7 +917,7 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string):
         } catch (err) {
             throw new Error(`Unable to find or read "${appxManifestFileName}" in the "${path.join("windows", projectName)}" folder.`);
         }
-            
+
         return parseXml(appxManifestContents)
             .catch((err: any) => {
                 throw new Error(`Unable to parse the "${path.join(appxManifestContainingFolder, appxManifestFileName)}" file, it could be malformed.`);
@@ -907,15 +940,44 @@ function printAccessKeys(format: string, keys: AccessKey[]): void {
     if (format === "json") {
         printJson(keys);
     } else if (format === "table") {
-        printTable(["Key", "Time Created", "Created From", "Description"], (dataSource: any[]): void => {
-            keys.forEach((key: AccessKey): void => {
-                dataSource.push([
+        printTable(["Name", "Created", "Expires"], (dataSource: any[]): void => {
+            var now = new Date().getTime();
+
+            function isExpired(key: AccessKey): boolean {
+                return now >= key.expires;
+            }
+
+            function keyToTableRow(key: AccessKey, dim: boolean): string[] {
+                var row: string[] = [
                     key.name,
                     key.createdTime ? formatDate(key.createdTime) : "",
-                    key.createdBy ? key.createdBy : "",
-                    key.description ? key.description : ""
-                ]);
-            });
+                    formatDate(key.expires)
+                ];
+
+                if (dim) {
+                    row.forEach((col: string, index: number) => {
+                        row[index] = (<any>chalk).dim(col);
+                    });
+                }
+
+                return row;
+            }
+
+            keys.forEach((key: AccessKey) =>
+                !isExpired(key) && dataSource.push(keyToTableRow(key, /*dim*/ false)));
+            keys.forEach((key: AccessKey) =>
+                isExpired(key) && dataSource.push(keyToTableRow(key, /*dim*/ true)));
+        });
+    }
+}
+
+function printSessions(format: string, sessions: Session[]): void {
+    if (format === "json") {
+        printJson(sessions);
+    } else if (format === "table") {
+        printTable(["Machine", "Logged in"], (dataSource: any[]): void => {
+            sessions.forEach((session: Session) =>
+                dataSource.push([session.machineName, formatDate(session.loggedInTime)]));
         });
     }
 }
@@ -1072,17 +1134,17 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
     } else {
         throw new Error("Platform must be either \"ios\" or \"android\".");
     }
-    
+
     var cordovaCommand: string = command.build ? "build" : "prepare";
     var cordovaCLI: string = "cordova";
-    
-    // Check whether the Cordova or PhoneGap CLIs are 
+
+    // Check whether the Cordova or PhoneGap CLIs are
     // installed, and if not, fail early
-    try { 
+    try {
         which.sync(cordovaCLI);
     } catch (e) {
         try {
-            cordovaCLI = "phonegap";            
+            cordovaCLI = "phonegap";
             which.sync(cordovaCLI);
         } catch (e) {
             throw new Error(`Unable to ${cordovaCommand} project. Please ensure that either the Cordova or PhoneGap CLI is installed.`);
@@ -1147,7 +1209,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
                     ? "main.jsbundle"
                     : `index.${platform}.bundle`;
             }
-            
+
             break;
         default:
             throw new Error("Platform must be either \"android\", \"ios\" or \"windows\".");
@@ -1297,6 +1359,33 @@ function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: b
     log(`\r\nSuccessfully logged-in. Your session file was written to ${chalk.cyan(configFilePath)}. You can run the ${chalk.cyan("code-push logout")} command at any time to delete this file and terminate your session.\r\n`);
 }
 
+function sessionList(command: cli.ISessionListCommand): Promise<void> {
+    throwForInvalidOutputFormat(command.format);
+
+    return sdk.getSessions()
+        .then((sessions: Session[]): void => {
+            printSessions(command.format, sessions);
+        });
+}
+
+function sessionRemove(command: cli.ISessionRemoveCommand): Promise<void> {
+    if (os.hostname() === command.machineName) {
+        throw new Error("Cannot remove the current session via this command. Please run 'code-push logout' if you would like to end it.");
+    } else {
+        return confirm()
+            .then((wasConfirmed: boolean): Promise<void> => {
+                if (wasConfirmed) {
+                    return sdk.removeSession(command.machineName)
+                        .then((): void => {
+                            log(`Successfully removed the existing session for "${command.machineName}".`);
+                        });
+                }
+
+                log("Session removal cancelled.");
+            });
+    }
+}
+
 function isBinaryOrZip(path: string): boolean {
     return path.search(/\.zip$/i) !== -1
         || path.search(/\.apk$/i) !== -1
@@ -1352,4 +1441,41 @@ function getProxy(proxy?: string, noProxy?: boolean): string {
     if (noProxy) return null;
     if (!proxy) return process.env.HTTPS_PROXY || process.env.https_proxy || process.env.HTTP_PROXY || process.env.http_proxy;
     else return proxy;
+}
+
+function isCommandOptionSpecified(option: any): boolean {
+    return option !== undefined && option !== null;
+}
+
+function getSdk(accessKey: string, headers: Headers, customServerUrl: string, proxy: string): AccountManager {
+    var sdk: any = new AccountManager(accessKey, CLI_HEADERS, customServerUrl, proxy);
+    /*
+     * If the server returns 401 (Unauthorized), it must be due to an invalid
+     * (probably expired) access key. For convenience, we patch every SDK call
+     * to delete the cached connection if we receive a 401 so the user can simply
+     * login again instead of having to log out first.
+     */
+    Object.getOwnPropertyNames(AccountManager.prototype).forEach((functionName: any) => {
+        if (typeof sdk[functionName] === "function") {
+            var originalFunction = sdk[functionName];
+            sdk[functionName] = function() {
+                var maybePromise: Promise<any> = originalFunction.apply(sdk, arguments);
+                if (maybePromise && maybePromise.then !== undefined) {
+                    maybePromise = maybePromise
+                        .catch((error: any) => {
+                            if (error.statusCode && error.statusCode === 401) {
+                                deleteConnectionInfoCache(/* printMessage */ false);
+                                error.message = `Invalid credentials. Run the 'code-push login' command to authenticate with the CodePush server.`;
+                            }
+
+                            throw error;
+                        });
+                }
+
+                return maybePromise;
+            };
+        }
+    });
+
+    return sdk;
 }
