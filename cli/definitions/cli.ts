@@ -28,6 +28,8 @@
     releaseCordova,
     releaseReact,
     rollback,
+    sessionList,
+    sessionRemove,
     whoami
 }
 
@@ -36,13 +38,13 @@ export interface ICommand {
 }
 
 export interface IAccessKeyAddCommand extends ICommand {
-    friendlyName: string;
+    name: string;
     ttl?: number;
 }
 
 export interface IAccessKeyEditCommand extends ICommand {
-    newFriendlyName?: string;
-    oldFriendlyName: string;
+    newName?: string;
+    oldName: string;
     ttl?: number;
 }
 
@@ -190,4 +192,12 @@ export interface IRollbackCommand extends ICommand {
     appName: string;
     deploymentName: string;
     targetRelease: string;
+}
+
+export interface ISessionListCommand extends ICommand {
+    format: string;
+}
+
+export interface ISessionRemoveCommand extends ICommand {
+    machineName: string;
 }

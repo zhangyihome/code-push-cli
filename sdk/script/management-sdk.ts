@@ -6,7 +6,7 @@ import superagent = require("superagent");
 
 import Promise = Q.Promise;
 
-import { AccessKey, AccessKeyRequest, Account, App, CodePushError, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, UpdateMetrics } from "./types";
+import { AccessKey, AccessKeyRequest, Account, App, CodePushError, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, ServerAccessKey, Session, UpdateMetrics } from "./types";
 
 var superproxy = require("superagent-proxy");
 superproxy(superagent);
@@ -102,31 +102,91 @@ class AccountManager {
         };
 
         return this.post(urlEncode `/accessKeys/`, JSON.stringify(accessKeyRequest), /*expectResponseBody=*/ true)
-            .then((response: JsonResponse) => response.body.accessKey);
+            .then((response: JsonResponse) => {
+                return {
+                    createdTime: response.body.accessKey.createdTime,
+                    expires: response.body.accessKey.expires,
+                    key: response.body.accessKey.name,
+                    name: response.body.accessKey.friendlyName
+                };
+            });
     }
 
     public getAccessKey(accessKeyName: string): Promise<AccessKey> {
         return this.get(urlEncode `/accessKeys/${accessKeyName}`)
-            .then((res: JsonResponse) => res.body.accessKey);
+            .then((res: JsonResponse) => {
+                return {
+                    createdTime: res.body.accessKey.createdTime,
+                    expires: res.body.accessKey.expires,
+                    name: res.body.accessKey.friendlyName,
+                };
+            });
     }
 
     public getAccessKeys(): Promise<AccessKey[]> {
         return this.get(urlEncode `/accessKeys`)
-            .then((res: JsonResponse) => res.body.accessKeys);
+            .then((res: JsonResponse) => {
+                var accessKeys: AccessKey[] = [];
+
+                res.body.accessKeys.forEach((serverAccessKey: ServerAccessKey) => {
+                    !serverAccessKey.isSession && accessKeys.push({
+                        createdTime: serverAccessKey.createdTime,
+                        expires: serverAccessKey.expires,
+                        name: serverAccessKey.friendlyName
+                    });
+                });
+
+                return accessKeys;
+            });
     }
 
-    public editAccessKey(oldFriendlyName: string, newFriendlyName?: string, ttl?: number): Promise<AccessKey> {
+    public getSessions(): Promise<Session[]> {
+        return this.get(urlEncode `/accessKeys`)
+            .then((res: JsonResponse) => {
+                // A machine name might be associated with multiple session keys,
+                // but we should only return one per machine name.
+                var sessionMap: { [machineName: string]: Session } = {};
+                var now: number = new Date().getTime();
+                res.body.accessKeys.forEach((serverAccessKey: ServerAccessKey) => {
+                    if (serverAccessKey.isSession && serverAccessKey.expires > now) {
+                        sessionMap[serverAccessKey.createdBy] = {
+                            loggedInTime: serverAccessKey.createdTime,
+                            machineName: serverAccessKey.createdBy
+                        };
+                    }
+                });
+
+                var sessions: Session[] = Object.keys(sessionMap)
+                    .map((machineName: string) => sessionMap[machineName]);
+
+                return sessions;
+            });
+    }
+
+
+    public editAccessKey(oldName: string, newName?: string, ttl?: number): Promise<AccessKey> {
         var accessKeyRequest: AccessKeyRequest = {
-            friendlyName: newFriendlyName,
+            friendlyName: newName,
             ttl
         };
 
-        return this.patch(urlEncode `/accessKeys/${oldFriendlyName}`, JSON.stringify(accessKeyRequest))
-            .then((res: JsonResponse) => res.body.accessKey);
+        return this.patch(urlEncode `/accessKeys/${oldName}`, JSON.stringify(accessKeyRequest))
+            .then((res: JsonResponse) => {
+                return {
+                    createdTime: res.body.accessKey.createdTime,
+                    expires: res.body.accessKey.expires,
+                    name: res.body.accessKey.friendlyName,
+                };
+            });
     }
 
-    public removeAccessKey(accessKey: string): Promise<void> {
-        return this.del(urlEncode `/accessKeys/${accessKey}`)
+    public removeAccessKey(name: string): Promise<void> {
+        return this.del(urlEncode `/accessKeys/${name}`)
+            .then(() => null);
+    }
+
+    public removeSession(machineName: string): Promise<void> {
+        return this.del(urlEncode `/sessions/${machineName}`)
             .then(() => null);
     }
 
@@ -322,7 +382,11 @@ class AccountManager {
 
             request.end((err: any, res: superagent.Response) => {
                 if (err) {
-                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                    reject(<CodePushError>{
+                        message: this.getErrorMessage(err, res),
+                        statusCode: res.status
+                    });
+
                     return;
                 }
 

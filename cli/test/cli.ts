@@ -29,6 +29,7 @@ function isDefined(object: any): boolean {
 
 const NOW = new Date().getTime();
 const DEFAULT_ACCESS_KEY_MAX_AGE = 1000 * 60 * 60 * 24 * 60; // 60 days
+const TEST_MACHINE_NAME = "Test machine";
 
 export class SdkStub {
     public getAccountInfo(): Promise<codePush.Account> {
@@ -37,21 +38,19 @@ export class SdkStub {
         });
     }
 
-    public addAccessKey(friendlyName: string, ttl: number): Promise<codePush.AccessKey> {
+    public addAccessKey(name: string, ttl: number): Promise<codePush.AccessKey> {
         return Q(<codePush.AccessKey>{
-            name: "key123",
+            key: "key123",
             createdTime: new Date().getTime(),
-            createdBy: os.hostname(),
-            friendlyName,
+            name,
             expires: NOW + (isDefined(ttl) ? ttl : DEFAULT_ACCESS_KEY_MAX_AGE)
         });
     }
 
-    public editAccessKey(oldFriendlyName: string, newFriendlyName?: string, newTtl?: number): Promise<codePush.AccessKey> {
+    public editAccessKey(oldName: string, newName?: string, newTtl?: number): Promise<codePush.AccessKey> {
         return Q(<codePush.AccessKey>{
             createdTime: new Date().getTime(),
-            createdBy: os.hostname(),
-            friendlyName: newFriendlyName,
+            name: newName,
             expires: NOW + (isDefined(newTtl) ? newTtl : DEFAULT_ACCESS_KEY_MAX_AGE)
         });
     }
@@ -80,9 +79,15 @@ export class SdkStub {
     public getAccessKeys(): Promise<codePush.AccessKey[]> {
         return Q([<codePush.AccessKey>{
             createdTime: 0,
-            createdBy: os.hostname(),
-            friendlyName: "Test name",
+            name: "Test name",
             expires: NOW + DEFAULT_ACCESS_KEY_MAX_AGE
+        }]);
+    }
+
+    public getSessions(): Promise<codePush.Session[]> {
+        return Q([<codePush.Session>{
+            loggedInTime: 0,
+            machineName: TEST_MACHINE_NAME
         }]);
     }
 
@@ -202,6 +207,10 @@ export class SdkStub {
         return Q(<void>null);
     }
 
+    public removeSession(createdBy: string): Promise<void> {
+        return Q(<void>null);
+    }
+
     public renameApp(app: codePush.App): Promise<void> {
         return Q(<void>null);
     }
@@ -250,10 +259,10 @@ describe("CLI", () => {
         sandbox.restore();
     });
 
-    it("accessKeyAdd creates access key with friendlyName and default ttl", (done: MochaDone): void => {
+    it("accessKeyAdd creates access key with name and default ttl", (done: MochaDone): void => {
         var command: cli.IAccessKeyAddCommand = {
             type: cli.CommandType.accessKeyAdd,
-            friendlyName: "Test name"
+            name: "Test name"
         };
 
         cmdexec.execute(command)
@@ -277,11 +286,11 @@ describe("CLI", () => {
             });
     });
 
-    it("accessKeyAdd creates access key with friendlyName and specified ttl", (done: MochaDone): void => {
+    it("accessKeyAdd creates access key with name and specified ttl", (done: MochaDone): void => {
         var ttl = 10000;
         var command: cli.IAccessKeyAddCommand = {
             type: cli.CommandType.accessKeyAdd,
-            friendlyName: "Test name",
+            name: "Test name",
             ttl
         };
 
@@ -306,11 +315,11 @@ describe("CLI", () => {
             });
     });
 
-    it("accessKeyEdit updates access key with new friendlyName", (done: MochaDone): void => {
+    it("accessKeyEdit updates access key with new name", (done: MochaDone): void => {
         var command: cli.IAccessKeyEditCommand = {
             type: cli.CommandType.accessKeyEdit,
-            oldFriendlyName: "Test name",
-            newFriendlyName: "Updated name"
+            oldName: "Test name",
+            newName: "Updated name"
         };
 
         cmdexec.execute(command)
@@ -331,7 +340,7 @@ describe("CLI", () => {
         var ttl = 10000;
         var command: cli.IAccessKeyEditCommand = {
             type: cli.CommandType.accessKeyEdit,
-            oldFriendlyName: "Test name",
+            oldName: "Test name",
             ttl
         };
 
@@ -348,12 +357,12 @@ describe("CLI", () => {
             });
     });
 
-    it("accessKeyEdit updates access key with new friendlyName and ttl", (done: MochaDone): void => {
+    it("accessKeyEdit updates access key with new name and ttl", (done: MochaDone): void => {
         var ttl = 10000;
         var command: cli.IAccessKeyEditCommand = {
             type: cli.CommandType.accessKeyEdit,
-            oldFriendlyName: "Test name",
-            newFriendlyName: "Updated name",
+            oldName: "Test name",
+            newName: "Updated name",
             ttl
         };
 
@@ -370,7 +379,7 @@ describe("CLI", () => {
             });
     });
 
-    it("accessKeyList lists access key friendlyName and expires fields", (done: MochaDone): void => {
+    it("accessKeyList lists access key name and expires fields", (done: MochaDone): void => {
         var command: cli.IAccessKeyListCommand = {
             type: cli.CommandType.accessKeyList,
             format: "json"
@@ -385,8 +394,7 @@ describe("CLI", () => {
                 var expected = [
                     {
                         createdTime: 0,
-                        createdBy: os.hostname(),
-                        friendlyName: "Test name",
+                        name: "Test name",
                         expires: NOW + DEFAULT_ACCESS_KEY_MAX_AGE
                     }
                 ];
@@ -1674,6 +1682,92 @@ describe("CLI", () => {
                     `${path.join("node_modules", "react-native", "local-cli", "cli.js")} bundle --assets-dest ${path.join(os.tmpdir(), "CodePush")} --bundle-output ${path.join(os.tmpdir(), "CodePush", bundleName)} --dev false --entry-file index.android.js --platform android --sourcemap-output index.android.js.map`
                 );
                 assertJsonDescribesObject(JSON.stringify(release.args[0][0], /*replacer=*/ null, /*spacing=*/ 2), releaseCommand);
+                done();
+            })
+            .done();
+    });
+
+    it("sessionList lists session name and expires fields", (done: MochaDone): void => {
+        var command: cli.IAccessKeyListCommand = {
+            type: cli.CommandType.sessionList,
+            format: "json"
+        };
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(log);
+                assert.equal(log.args[0].length, 1);
+
+                var actual: string = log.args[0][0];
+                var expected = [
+                    {
+                        loggedInTime: 0,
+                        machineName: TEST_MACHINE_NAME,
+                    }
+                ];
+
+                assertJsonDescribesObject(actual, expected);
+                done();
+            });
+    });
+
+    it("sessionRemove removes session", (done: MochaDone): void => {
+        var machineName = TEST_MACHINE_NAME;
+        var command: cli.ISessionRemoveCommand = {
+            type: cli.CommandType.sessionRemove,
+            machineName: machineName
+        };
+
+        var removeSession: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeSession");
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.calledOnce(removeSession);
+                sinon.assert.calledWithExactly(removeSession, machineName);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, `Successfully removed the existing session for "${machineName}".`);
+
+                done();
+            });
+    });
+
+    it("sessionRemove does not remove session if cancelled", (done: MochaDone): void => {
+        var machineName = TEST_MACHINE_NAME;
+        var command: cli.ISessionRemoveCommand = {
+            type: cli.CommandType.sessionRemove,
+            machineName: machineName
+        };
+
+        var removeSession: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeSession");
+
+        wasConfirmed = false;
+
+        cmdexec.execute(command)
+            .done((): void => {
+                sinon.assert.notCalled(removeSession);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, "Session removal cancelled.");
+
+                done();
+            });
+    });
+
+    it("sessionRemove does not remove current session", (done: MochaDone): void => {
+        var machineName = os.hostname();
+        var command: cli.ISessionRemoveCommand = {
+            type: cli.CommandType.sessionRemove,
+            machineName: machineName
+        };
+
+        var removeSession: Sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeSession");
+
+        wasConfirmed = false;
+
+        cmdexec.execute(command)
+            .then(() => {
+                done(new Error("Did not throw error."));
+            })
+            .catch((err) => {
                 done();
             })
             .done();

@@ -63,6 +63,7 @@ describe("Management SDK", () => {
                     reject();
                 }, (error: any) => {
                     assert.equal(error.message, "Text");
+                    assert(error.statusCode);
                     resolve();
                 });
             });

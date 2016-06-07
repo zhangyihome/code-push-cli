@@ -128,6 +128,26 @@ function removeCollaborator(commandName: string, yargs: yargs.Argv): void {
     addCommonConfiguration(yargs);
 }
 
+function sessionList(commandName: string, yargs: yargs.Argv): void {
+    isValidCommand = true;
+    yargs.usage(USAGE_PREFIX + " session " + commandName + " [options]")
+        .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
+        .example("session " + commandName, "Lists your sessions in tabular format")
+        .example("session " + commandName + " --format json", "Lists your login sessions in JSON format")
+        .option("format", { default: "table", demand: false, description: "Output format to display your login sessions with (\"json\" or \"table\")", type: "string" });
+
+    addCommonConfiguration(yargs);
+}
+
+function sessionRemove(commandName: string, yargs: yargs.Argv): void {
+    isValidCommand = true;
+    yargs.usage(USAGE_PREFIX + " session " + commandName + " <machineName>")
+        .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
+        .example("session " + commandName + " \"John's PC\"", "Removes the existing login session from \"John's PC\"");
+
+    addCommonConfiguration(yargs);
+}
+
 function deploymentHistoryClear(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
     yargs.usage(USAGE_PREFIX + " deployment " + commandName + " <appName> <deploymentName>")
@@ -406,6 +426,18 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
         addCommonConfiguration(yargs);
     })
+    .command("session", "View and manage the current login sessions associated with your account", (yargs: yargs.Argv) => {
+        isValidCommandCategory = true;
+        yargs.usage(USAGE_PREFIX + " session <command>")
+            .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
+            .command("remove", "Remove an existing login session", (yargs: yargs.Argv) => sessionRemove("remove", yargs))
+            .command("rm", "Remove an existing login session", (yargs: yargs.Argv) => sessionRemove("rm", yargs))
+            .command("list", "List the current login sessions associated with your account", (yargs: yargs.Argv) => sessionList("list", yargs))
+            .command("ls", "List the current login sessions associated with your account", (yargs: yargs.Argv) => sessionList("ls", yargs))
+            .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand);  // Report unrecognized, non-hyphenated command category.
+
+        addCommonConfiguration(yargs);
+    })
     .command("whoami", "Display the account info for the current login session", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         isValidCommand = true;
@@ -440,7 +472,7 @@ function createCommand(): cli.ICommand {
                         if (arg2) {
                             cmd = { type: cli.CommandType.accessKeyAdd };
                             var accessKeyAddCmd = <cli.IAccessKeyAddCommand>cmd;
-                            accessKeyAddCmd.friendlyName = arg2;
+                            accessKeyAddCmd.name = arg2;
                             var ttlOption: string = argv["ttl"];
                             if (isDefined(ttlOption)) {
                                 accessKeyAddCmd.ttl = parseDurationMilliseconds(ttlOption);
@@ -452,12 +484,12 @@ function createCommand(): cli.ICommand {
                         if (arg2) {
                             cmd = { type: cli.CommandType.accessKeyEdit };
                             var accessKeyEditCmd = <cli.IAccessKeyEditCommand>cmd;
-                            accessKeyEditCmd.oldFriendlyName = arg2;
+                            accessKeyEditCmd.oldName = arg2;
 
-                            var newFriendlyNameOption: string = argv["name"];
+                            var newNameOption: string = argv["name"];
                             var ttlOption: string = argv["ttl"];
-                            if (isDefined(newFriendlyNameOption)) {
-                                accessKeyEditCmd.newFriendlyName = newFriendlyNameOption;
+                            if (isDefined(newNameOption)) {
+                                accessKeyEditCmd.newName = newNameOption;
                             }
 
                             if (isDefined(ttlOption)) {
@@ -776,6 +808,26 @@ function createCommand(): cli.ICommand {
                     rollbackCommand.appName = arg1;
                     rollbackCommand.deploymentName = arg2;
                     rollbackCommand.targetRelease = argv["targetRelease"];
+                }
+                break;
+
+            case "session":
+                switch (arg1) {
+                    case "list":
+                    case "ls":
+                        cmd = { type: cli.CommandType.sessionList };
+
+                        (<cli.ISessionListCommand>cmd).format = argv["format"];
+                        break;
+
+                    case "remove":
+                    case "rm":
+                        if (arg2) {
+                            cmd = { type: cli.CommandType.sessionRemove };
+
+                            (<cli.ISessionRemoveCommand>cmd).machineName = arg2;
+                        }
+                        break;
                 }
                 break;
 

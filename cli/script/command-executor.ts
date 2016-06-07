@@ -24,7 +24,7 @@ var which = require("which");
 import wordwrap = require("wordwrap");
 
 import * as cli from "../definitions/cli";
-import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, UpdateMetrics } from "code-push/script/types";
+import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, Session, UpdateMetrics } from "code-push/script/types";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var emailValidator = require("email-validator");
@@ -101,34 +101,34 @@ export var confirm = (): Promise<boolean> => {
 }
 
 function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
-    return sdk.addAccessKey(command.friendlyName, command.ttl)
+    return sdk.addAccessKey(command.name, command.ttl)
         .then((accessKey: AccessKey) => {
-            log(`Successfully created a new access key "${command.friendlyName}": ${accessKey.name}`);
+            log(`Successfully created a new access key "${command.name}": ${accessKey.key}`);
             log(`(Expires: ${new Date(accessKey.expires).toString()})`);
             log(`Please save this key as it will only be shown once!`);
         });
 }
 
 function accessKeyEdit(command: cli.IAccessKeyEditCommand): Promise<void> {
-    var willEditFriendlyName: boolean = isCommandOptionSpecified(command.newFriendlyName) && command.oldFriendlyName !== command.newFriendlyName;
+    var willEditName: boolean = isCommandOptionSpecified(command.newName) && command.oldName !== command.newName;
     var willEditTtl: boolean = isCommandOptionSpecified(command.ttl);
 
-    if (!willEditFriendlyName && !willEditTtl) {
+    if (!willEditName && !willEditTtl) {
         throw new Error("A new name and/or TTL must be provided.");
     }
 
-    return sdk.editAccessKey(command.oldFriendlyName, command.newFriendlyName, command.ttl)
+    return sdk.editAccessKey(command.oldName, command.newName, command.ttl)
         .then((accessKey: AccessKey) => {
             var logMessage: string = "Successfully ";
-            if (willEditFriendlyName) {
-                logMessage += `renamed the access key "${command.oldFriendlyName}" to "${command.newFriendlyName}"`;
+            if (willEditName) {
+                logMessage += `renamed the access key "${command.oldName}" to "${command.newName}"`;
             }
 
             if (willEditTtl) {
-                if (willEditFriendlyName) {
+                if (willEditName) {
                     logMessage += ` and changed its expiry to ${new Date(accessKey.expires).toString()}`;
                 } else {
-                    logMessage += `changed the access key "${command.oldFriendlyName}"'s expiry to ${new Date(accessKey.expires).toString()}`;
+                    logMessage += `changed the access key "${command.oldName}"'s expiry to ${new Date(accessKey.expires).toString()}`;
                 }
             }
 
@@ -146,21 +146,17 @@ function accessKeyList(command: cli.IAccessKeyListCommand): Promise<void> {
 }
 
 function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
-    if (command.accessKey === sdk.accessKey) {
-        throw new Error("Cannot remove the access key for the current session. Please run 'code-push logout' if you would like to remove this access key.");
-    } else {
-        return confirm()
-            .then((wasConfirmed: boolean): Promise<void> => {
-                if (wasConfirmed) {
-                    return sdk.removeAccessKey(command.accessKey)
-                        .then((): void => {
-                            log("Successfully removed the \"" + command.accessKey + "\" access key.");
-                        });
-                }
+    return confirm()
+        .then((wasConfirmed: boolean): Promise<void> => {
+            if (wasConfirmed) {
+                return sdk.removeAccessKey(command.accessKey)
+                    .then((): void => {
+                        log("Successfully removed the \"" + command.accessKey + "\" access key.");
+                    });
+            }
 
-                log("Access key removal cancelled.");
-            });
-    }
+            log("Access key removal cancelled.");
+        });
 }
 
 function appAdd(command: cli.IAppAddCommand): Promise<void> {
@@ -280,11 +276,13 @@ function removeCollaborator(command: cli.ICollaboratorRemoveCommand): Promise<vo
         });
 }
 
-function deleteConnectionInfoCache(): void {
+function deleteConnectionInfoCache(printMessage: boolean = true): void {
     try {
         fs.unlinkSync(configFilePath);
 
-        log(`Successfully logged-out. The session file located at ${chalk.cyan(configFilePath)} has been deleted.\r\n`);
+        if (printMessage) {
+            log(`Successfully logged-out. The session file located at ${chalk.cyan(configFilePath)} has been deleted.\r\n`);
+        }
     } catch (ex) {
     }
 }
@@ -452,7 +450,7 @@ export function execute(command: cli.ICommand): Promise<void> {
                         throw new Error("You are not currently logged in. Run the 'code-push login' command to authenticate with the CodePush server.");
                     }
 
-                    sdk = new AccountManager(connectionInfo.accessKey, CLI_HEADERS, connectionInfo.customServerUrl, connectionInfo.proxy);
+                    sdk = getSdk(connectionInfo.accessKey, CLI_HEADERS, connectionInfo.customServerUrl, connectionInfo.proxy);
                     break;
             }
 
@@ -541,6 +539,12 @@ export function execute(command: cli.ICommand): Promise<void> {
                 case cli.CommandType.rollback:
                     return rollback(<cli.IRollbackCommand>command);
 
+                case cli.CommandType.sessionList:
+                    return sessionList(<cli.ISessionListCommand>command);
+
+                case cli.CommandType.sessionRemove:
+                    return sessionRemove(<cli.ISessionRemoveCommand>command);
+
                 case cli.CommandType.whoami:
                     return whoami(command);
 
@@ -598,7 +602,7 @@ function login(command: cli.ILoginCommand): Promise<void> {
     // Check if one of the flags were provided.
     if (command.accessKey) {
         var proxy = getProxy(command.proxy, command.noProxy);
-        sdk = new AccountManager(command.accessKey, CLI_HEADERS, command.serverUrl, proxy);
+        sdk = getSdk(command.accessKey, CLI_HEADERS, command.serverUrl, proxy);
         return sdk.isAuthenticated()
             .then((isAuthenticated: boolean): void => {
                 if (isAuthenticated) {
@@ -623,7 +627,7 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string, pro
                 return;
             }
 
-            sdk = new AccountManager(accessKey, CLI_HEADERS, serverUrl, getProxy(proxy, noProxy));
+            sdk = getSdk(accessKey, CLI_HEADERS, serverUrl, getProxy(proxy, noProxy));
 
             return sdk.isAuthenticated()
                 .then((isAuthenticated: boolean): void => {
@@ -640,10 +644,8 @@ function logout(command: cli.ICommand): Promise<void> {
     return Q(<void>null)
         .then((): Promise<void> => {
             if (!connectionInfo.preserveAccessKeyOnLogout) {
-                return sdk.removeAccessKey(sdk.accessKey)
-                    .then((): void => {
-                        log(`Removed access key ${sdk.accessKey}.`);
-                    });
+                var machineName: string = os.hostname();
+                return sdk.removeSession(machineName);
             }
         })
         .finally((): void => {
@@ -938,7 +940,7 @@ function printAccessKeys(format: string, keys: AccessKey[]): void {
     if (format === "json") {
         printJson(keys);
     } else if (format === "table") {
-        printTable(["Name", "Created", "Origin", "Expires"], (dataSource: any[]): void => {
+        printTable(["Name", "Created", "Expires"], (dataSource: any[]): void => {
             var now = new Date().getTime();
 
             function isExpired(key: AccessKey): boolean {
@@ -947,9 +949,8 @@ function printAccessKeys(format: string, keys: AccessKey[]): void {
 
             function keyToTableRow(key: AccessKey, dim: boolean): string[] {
                 var row: string[] = [
-                    key.friendlyName,
+                    key.name,
                     key.createdTime ? formatDate(key.createdTime) : "",
-                    key.createdBy ? key.createdBy : "",
                     formatDate(key.expires)
                 ];
 
@@ -966,6 +967,17 @@ function printAccessKeys(format: string, keys: AccessKey[]): void {
                 !isExpired(key) && dataSource.push(keyToTableRow(key, /*dim*/ false)));
             keys.forEach((key: AccessKey) =>
                 isExpired(key) && dataSource.push(keyToTableRow(key, /*dim*/ true)));
+        });
+    }
+}
+
+function printSessions(format: string, sessions: Session[]): void {
+    if (format === "json") {
+        printJson(sessions);
+    } else if (format === "table") {
+        printTable(["Machine", "Logged in"], (dataSource: any[]): void => {
+            sessions.forEach((session: Session) =>
+                dataSource.push([session.machineName, formatDate(session.loggedInTime)]));
         });
     }
 }
@@ -1347,6 +1359,33 @@ function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: b
     log(`\r\nSuccessfully logged-in. Your session file was written to ${chalk.cyan(configFilePath)}. You can run the ${chalk.cyan("code-push logout")} command at any time to delete this file and terminate your session.\r\n`);
 }
 
+function sessionList(command: cli.ISessionListCommand): Promise<void> {
+    throwForInvalidOutputFormat(command.format);
+
+    return sdk.getSessions()
+        .then((sessions: Session[]): void => {
+            printSessions(command.format, sessions);
+        });
+}
+
+function sessionRemove(command: cli.ISessionRemoveCommand): Promise<void> {
+    if (os.hostname() === command.machineName) {
+        throw new Error("Cannot remove the current session via this command. Please run 'code-push logout' if you would like to end it.");
+    } else {
+        return confirm()
+            .then((wasConfirmed: boolean): Promise<void> => {
+                if (wasConfirmed) {
+                    return sdk.removeSession(command.machineName)
+                        .then((): void => {
+                            log(`Successfully removed the existing session for "${command.machineName}".`);
+                        });
+                }
+
+                log("Session removal cancelled.");
+            });
+    }
+}
+
 function isBinaryOrZip(path: string): boolean {
     return path.search(/\.zip$/i) !== -1
         || path.search(/\.apk$/i) !== -1
@@ -1406,4 +1445,37 @@ function getProxy(proxy?: string, noProxy?: boolean): string {
 
 function isCommandOptionSpecified(option: any): boolean {
     return option !== undefined && option !== null;
+}
+
+function getSdk(accessKey: string, headers: Headers, customServerUrl: string, proxy: string): AccountManager {
+    var sdk: any = new AccountManager(accessKey, CLI_HEADERS, customServerUrl, proxy);
+    /*
+     * If the server returns 401 (Unauthorized), it must be due to an invalid
+     * (probably expired) access key. For convenience, we patch every SDK call
+     * to delete the cached connection if we receive a 401 so the user can simply
+     * login again instead of having to log out first.
+     */
+    Object.getOwnPropertyNames(AccountManager.prototype).forEach((functionName: any) => {
+        if (typeof sdk[functionName] === "function") {
+            var originalFunction = sdk[functionName];
+            sdk[functionName] = function() {
+                var maybePromise: Promise<any> = originalFunction.apply(sdk, arguments);
+                if (maybePromise && maybePromise.then !== undefined) {
+                    maybePromise = maybePromise
+                        .catch((error: any) => {
+                            if (error.statusCode && error.statusCode === 401) {
+                                deleteConnectionInfoCache(/* printMessage */ false);
+                                error.message = `Invalid credentials. Run the 'code-push login' command to authenticate with the CodePush server.`;
+                            }
+
+                            throw error;
+                        });
+                }
+
+                return maybePromise;
+            };
+        }
+    });
+
+    return sdk;
 }
