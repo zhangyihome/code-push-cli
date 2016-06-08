@@ -450,8 +450,7 @@
     margin-top: -0.5em;
 }
 
-.well_code {
-    @extend .well;
+.well_code {    
 
     padding: 19px;
     padding-bottom: 19px + 50px;
@@ -463,8 +462,7 @@
         font-family: Menlo, Monaco, "Courier New", monospace;
     }
 
-    div {
-        @extend .well_code;
+    div {        
 
         position: absolute;
         top: 100%;
@@ -484,7 +482,6 @@
 }
 
 .well_text {
-    @extend .well;
     
     padding: 19px;
     margin-top: 46px;
