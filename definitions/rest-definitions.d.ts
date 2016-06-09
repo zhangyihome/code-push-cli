@@ -104,6 +104,7 @@ declare module "rest-definitions" {
     export interface App {
         /*generated*/ collaborators?: CollaboratorMap;
         /*key*/ name: string;
+        /* generated */ deployments?: string[];
     }
 
     /*in*/

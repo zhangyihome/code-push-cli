@@ -72,10 +72,12 @@ export class SdkStub {
     public getApps(): Promise<codePush.App[]> {
         return Q([<codePush.App>{
             name: "a",
-            collaborators: { "a@a.com": { permission: "Owner", isCurrentAccount: true } }
+            collaborators: { "a@a.com": { permission: "Owner", isCurrentAccount: true } },
+            deployments: [ "Production", "Staging" ]
         }, <codePush.App>{
             name: "b",
-            collaborators: { "a@a.com": { permission: "Owner", isCurrentAccount: true } }
+            collaborators: { "a@a.com": { permission: "Owner", isCurrentAccount: true } },
+            deployments: [ "Production", "Staging" ]
         }]);
     }
 
