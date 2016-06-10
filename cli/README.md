@@ -579,7 +579,7 @@ code-push patch <appName> <deploymentName>
 [--targetBinaryVersion <targetBinaryVersion>]
 ```
 
-*NOTE: This command doesn't allow modifying the actual update contents of a release (e.g. wwww folder of a Cordova app). If you need to respond to a release that has been identified as being broken, you should use the [rollback](#rolling-back-updates) command to immediately roll it back, and then if necessary, release a new update with the approrpriate fix when it is available.*
+*NOTE: This command doesn't allow modifying the actual update contents of a release (e.g. `www` folder of a Cordova app). If you need to respond to a release that has been identified as being broken, you should use the [rollback](#rolling-back-updates) command to immediately roll it back, and then if necessary, release a new update with the approrpriate fix when it is available.*
 
 Aside from the `appName` and `deploymentName`, all parameters are optional, and therefore, you can use this command to update just a single attribute or all of them at once. Calling the `patch` command without specifying any attribute flag will result in a no-op.
 
