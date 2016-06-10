@@ -15,7 +15,7 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
     * [Releasing Updates (General)](#releasing-updates-general)
     * [Releasing Updates (React Native)](#releasing-updates-react-native)
     * [Releasing Updates (Cordova)](#releasing-updates-cordova)
-* [Patching Updates](#patching-updates)
+* [Patching Update Metadata](#patching-update-metadata)
 * [Promoting Updates](#promoting-updates)
 * [Rolling Back Updates](#rolling-back-updates)
 * [Viewing Release History](#viewing-release-history)
@@ -176,8 +176,8 @@ code-push collaborator add <appName> <collaboratorEmail>
 Once added, all collaborators will immediately have the following permissions with regards to the newly shared app:
 
 1. View the app, its collaborators, [deployments](#deployment-management) and [release history](#viewing-release-history)
-1. [Release](#releasing-app-updates) updates to any of the app's deployments
-1. [Promote](#promoting-updates-across-deployments) an update between any of the app's deployments
+1. [Release](#releasing-updates) updates to any of the app's deployments
+1. [Promote](#promoting-updates) an update between any of the app's deployments
 1. [Rollback](#rolling-back-undesired-updates) any of the app's deployments
 1. [Patch](#updating-existing-releases) any releases within any of the app's deployments
 
@@ -565,9 +565,9 @@ Specifies whether you want to run `cordova build` instead of `cordova prepare` (
 
 *NOTE: This parameter can be set using either --build or -b*
 
-## Patching Updates
+## Patching Update Metadata
 
-After releasing an update, there may be scenarios where you need to modify one or more of the attributes associated with it (e.g. you forgot to mark a critical bug fix as mandatory, you want to increase the rollout percentage of an update). You can easily do this by running the following command:
+After releasing an update, there may be scenarios where you need to modify one or more of the metadata attributes associated with it (e.g. you forgot to mark a critical bug fix as mandatory, you want to increase the rollout percentage of an update). You can easily do this by running the following command:
 
 ```shell
 code-push patch <appName> <deploymentName>
@@ -578,6 +578,8 @@ code-push patch <appName> <deploymentName>
 [--disabled <isDisabled>]
 [--targetBinaryVersion <targetBinaryVersion>]
 ```
+
+*NOTE: This command doesn't allow modifying the actual update contents of a release (e.g. wwww folder of a Cordova app). If you need to respond to a release that has been identified as being broken, you should use the [rollback](#rolling-back-updates) command to immediately roll it back, and then release a new update with the approrpriate fix.*
 
 Aside from the `appName` and `deploymentName`, all parameters are optional, and therefore, you can use this command to update just a single attribute or all of them at once. Calling the `patch` command without specifying any attribute flag will result in a no-op.
 
