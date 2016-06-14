@@ -19,7 +19,7 @@ class AndroidDebugPlatform implements IDebugPlatform {
             throw new Error("ADB command not found. Please ensure it is installed and available on your path.");
         }
 
-        if (!this.isAndroidDeviceAvailable()) {
+        if (!this.isDeviceAvailable()) {
             throw new Error("No Android devices found. Re-run this command after starting one.");
         }
 
@@ -27,18 +27,18 @@ class AndroidDebugPlatform implements IDebugPlatform {
     }
 
     // The following is an example of what the output looks
-    // like for when running the "adb devices" command.
+    // like when running the "adb devices" command.
     //
     // List of devices attached
     // emulator-5554	device
-    private isAndroidDeviceAvailable() {
+    private isDeviceAvailable() {
         const output = childProcess.execSync("adb devices").toString();
         return output.search(/^[\w-]+\s+device$/mi) > -1;
     }
 }
 
 class iOSDebugPlatform implements IDebugPlatform {
-    private getIOSSimulatorID(): string {
+    private getSimulatorID(): string {
         const output: any = simctl.list({ devices: true, silent: true });
         const simulators = output.json.devices
                             .map((platform: any) => platform.devices)
@@ -54,7 +54,7 @@ class iOSDebugPlatform implements IDebugPlatform {
             throw new Error("iOS debug logs can only be viewed on OS X.");
         }
 
-        const simulatorID = this.getIOSSimulatorID();
+        const simulatorID = this.getSimulatorID();
         if (!simulatorID) {
             throw new Error("No iOS simulators found. Re-run this command after starting one."); 
         }

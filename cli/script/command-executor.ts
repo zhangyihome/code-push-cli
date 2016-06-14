@@ -24,12 +24,11 @@ import * as yazl from "yazl";
 var which = require("which");
 import wordwrap = require("wordwrap");
 
-var debugCommand = require("./commands/debug");
-
 import * as cli from "../definitions/cli";
 import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, Session, UpdateMetrics } from "code-push/script/types";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
+var debugCommand = require("./commands/debug");
 var emailValidator = require("email-validator");
 var packageJson = require("../package.json");
 var parseXml = Q.denodeify(require("xml2js").parseString);
