@@ -12,7 +12,7 @@ interface IDebugPlatform {
 }
 
 class AndroidDebugPlatform implements IDebugPlatform {
-    getLogProcess() {
+    public getLogProcess(): any {
         try {
             which.sync("adb");
         } catch (e) {
@@ -31,7 +31,7 @@ class AndroidDebugPlatform implements IDebugPlatform {
     //
     // List of devices attached
     // emulator-5554	device
-    private isDeviceAvailable() {
+    private isDeviceAvailable(): boolean {
         const output = childProcess.execSync("adb devices").toString();
         return output.search(/^[\w-]+\s+device$/mi) > -1;
     }
@@ -40,21 +40,21 @@ class AndroidDebugPlatform implements IDebugPlatform {
 class iOSDebugPlatform implements IDebugPlatform {
     private getSimulatorID(): string {
         const output: any = simctl.list({ devices: true, silent: true });
-        const simulators = output.json.devices
-                            .map((platform: any) => platform.devices)
-                            .reduce((prev: any, next: any) => prev.concat(next))
-                            .filter((device: any) => device.state === "Booted")
-                            .map((device: any) => device.id);
+        const simulators: string[] = output.json.devices
+                                        .map((platform: any) => platform.devices)
+                                        .reduce((prev: any, next: any) => prev.concat(next))
+                                        .filter((device: any) => device.state === "Booted")
+                                        .map((device: any) => device.id);
 
         return simulators[0];
     }
 
-    getLogProcess() {
+    public getLogProcess(): any {
         if (process.platform !== "darwin") {
             throw new Error("iOS debug logs can only be viewed on OS X.");
         }
 
-        const simulatorID = this.getSimulatorID();
+        const simulatorID: string = this.getSimulatorID();
         if (!simulatorID) {
             throw new Error("No iOS simulators found. Re-run this command after starting one."); 
         }
@@ -68,13 +68,13 @@ const logMessagePrefix = "[CodePush] ";
 function processLogData(logData: Buffer) {
     const content = logData.toString()
     content.split("\n")
-        .filter((line) => line.indexOf(logMessagePrefix) > -1)
-        .map((line) => {
+        .filter((line: string) => line.indexOf(logMessagePrefix) > -1)
+        .map((line: string) => {
             const timeStamp = moment().format("hh:mm:ss");
             const message = line.substring(line.indexOf(logMessagePrefix) + logMessagePrefix.length);
             return `[${timeStamp}] ${message}`;
         })
-        .forEach((line) => console.log(line));
+        .forEach((line: string) => console.log(line));
 }
 
 const debugPlatforms: any = {
