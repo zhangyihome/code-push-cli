@@ -260,6 +260,16 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
 
         addCommonConfiguration(yargs);
     })
+    .command("debug", "View the CodePush debug logs for a running app", (yargs: yargs.Argv) => {
+        isValidCommandCategory = true;
+        isValidCommand = true;
+        yargs.usage(USAGE_PREFIX + " debug <platform>")
+            .demand(/*count*/ 2, /*max*/ 2)
+            .example("debug android", "View the CodePush debug logs for an Android emulator or device")
+            .example("debug ios", "View the CodePush debug logs for the iOS simulator");
+
+        addCommonConfiguration(yargs);
+    })
     .command("deployment", "View and manage your app deployments", (yargs: yargs.Argv) => {
         isValidCommandCategory = true;
         yargs.usage(USAGE_PREFIX + " deployment <command>")
@@ -597,6 +607,15 @@ function createCommand(): cli.ICommand {
                         }
                         break;
                 }
+                break;
+
+            
+            case "debug":
+                cmd = { type: cli.CommandType.debug };
+
+                var debugCommand = <cli.IDebugCommand>cmd;
+                debugCommand.platform = arg1;
+
                 break;
 
             case "deployment":

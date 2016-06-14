@@ -17,11 +17,14 @@ import * as Q from "q";
 import * as recursiveFs from "recursive-fs";
 var rimraf = require("rimraf");
 import * as semver from "semver";
+var simctl = require("simctl");
 import slash = require("slash");
 var Table = require("cli-table");
 import * as yazl from "yazl";
 var which = require("which");
 import wordwrap = require("wordwrap");
+
+var debugCommand = require("./commands/debug");
 
 import * as cli from "../definitions/cli";
 import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, Session, UpdateMetrics } from "code-push/script/types";
@@ -490,6 +493,9 @@ export function execute(command: cli.ICommand): Promise<void> {
 
                 case cli.CommandType.collaboratorRemove:
                     return removeCollaborator(<cli.ICollaboratorRemoveCommand>command);
+
+                case cli.CommandType.debug:
+                    return debugCommand(<cli.IDebugCommand>command);
 
                 case cli.CommandType.deploymentAdd:
                     return deploymentAdd(<cli.IDeploymentAddCommand>command);
