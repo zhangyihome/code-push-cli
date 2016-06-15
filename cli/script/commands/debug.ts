@@ -94,6 +94,8 @@ export default function (command: cli.IDebugCommand): Q.Promise<void> {
 
         try {
             const logProcess = debugPlatform.getLogProcess();
+            console.log(`Listening for ${platform} debug logs (Press CTRL+C to exit)`);
+
             logProcess.stdout.on("data", processLogData);
             logProcess.stderr.on("data", reject);
 
