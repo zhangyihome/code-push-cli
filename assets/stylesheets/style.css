@@ -1182,6 +1182,31 @@ th {
   .toc-container .row {
     position: fixed; }
 
+.feedback-container {
+  width: 80%; }
+  .feedback-container .widget {
+    background-color: #a6e1f2;
+    padding: 6px 20px 20px 20px;
+    font-size: 1.3rem;
+    margin-top: 10px;
+    margin-bottom: 40px; }
+    .feedback-container .widget h3 {
+      color: #404040;
+      font-size: 1.6em; }
+    .feedback-container .widget .widget-thankyou h3 {
+      font-size: 2.2em; }
+    .feedback-container .widget .widget-thankyou .message p {
+      color: #666;
+      font-size: 1.2em; }
+    .feedback-container .widget .buttons button {
+      background-color: #21bbed;
+      color: #fff;
+      font-size: 1.4rem;
+      padding: 5px 20px;
+      margin-right: 5px;
+      margin-top: 10px;
+      border: 0px transparent; }
+
 .faq hr {
   margin-top: 3em;
   padding-bottom: 1em; }

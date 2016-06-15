@@ -228,3 +228,41 @@ th {
         position: fixed;
     }
 }
+
+.feedback-container{
+    width: 80%;
+    .widget{
+        background-color: #a6e1f2;
+        padding: 6px 20px 20px 20px;
+        font-size: 1.3rem;
+        margin-top: 10px;
+        margin-bottom: 40px;
+        
+        h3{
+            color:white;
+            font-size: 1.6em;
+        }
+        
+        .widget-thankyou{
+            h3{
+                font-size: 2.2em;
+            }
+            .message{
+                p{
+                    color: #666;  
+                    font-size: 1.2em;
+                }
+            }                      
+        }
+
+        .buttons button {
+            background-color: #21bbed;
+            color: #fff;
+            font-size: 1.4rem;
+            padding: 5px 20px;
+            margin-right: 5px;
+            margin-top: 10px;
+            border: 0px transparent;
+        }                     
+    }    
+}
