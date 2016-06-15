@@ -11,6 +11,7 @@
     collaboratorAdd,
     collaboratorList,
     collaboratorRemove,
+    debug,
     deploymentAdd,
     deploymentHistory,
     deploymentHistoryClear,
@@ -91,6 +92,11 @@ export interface ICollaboratorListCommand extends ICommand {
 export interface ICollaboratorRemoveCommand extends ICommand {
     appName: string;
     email: string;
+}
+
+
+export interface IDebugCommand extends ICommand {
+    platform: string;
 }
 
 export interface IDeploymentAddCommand extends ICommand {
