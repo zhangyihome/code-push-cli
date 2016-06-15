@@ -4,6 +4,7 @@ import AccountManager = require("code-push");
 import * as base64 from "base-64";
 import * as chalk from "chalk";
 var childProcess = require("child_process");
+import debugCommand from "./commands/debug";
 import * as fs from "fs";
 var g2js = require("gradle-to-js/lib/parser");
 import * as moment from "moment";
@@ -23,12 +24,10 @@ var Table = require("cli-table");
 import * as yazl from "yazl";
 var which = require("which");
 import wordwrap = require("wordwrap");
-
 import * as cli from "../definitions/cli";
 import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, Session, UpdateMetrics } from "code-push/script/types";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
-var debugCommand = require("./commands/debug");
 var emailValidator = require("email-validator");
 var packageJson = require("../package.json");
 var parseXml = Q.denodeify(require("xml2js").parseString);

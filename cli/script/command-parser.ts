@@ -611,10 +611,10 @@ function createCommand(): cli.ICommand {
 
             
             case "debug":
-                cmd = { type: cli.CommandType.debug };
-
-                var debugCommand = <cli.IDebugCommand>cmd;
-                debugCommand.platform = arg1;
+                cmd = <cli.IDebugCommand>{
+                    type: cli.CommandType.debug,
+                    platform: arg1
+                };
 
                 break;
 

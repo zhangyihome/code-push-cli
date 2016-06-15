@@ -82,7 +82,7 @@ const debugPlatforms: any = {
     ios: new iOSDebugPlatform()
 };
 
-module.exports = (command: cli.IDebugCommand): Q.Promise<void> => {
+export default function (command: cli.IDebugCommand): Q.Promise<void> {
     return Q.Promise<void>((resolve, reject) => {
         const platform: string = command.platform.toLowerCase();
         const debugPlatform: IDebugPlatform = debugPlatforms[platform];
