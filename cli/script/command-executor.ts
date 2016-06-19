@@ -857,24 +857,25 @@ function getPackageMetricsString(obj: Package): string {
     return returnString;
 }
 
-function getReactNativeProjectAppVersion(platform: string, projectName: string, options: any): Promise<string> {
+function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, projectName: string): Promise<string> {
     const missingPatchVersionRegex: RegExp = /^\d+\.\d+$/;
 
-    if (platform === "ios") {
+    if (command.platform === "ios") {
         const fileExists = (file: string): boolean => {
             try { return fs.statSync(file).isFile() }
             catch (e) { return false }
         };        
     
-        let resolvedPlistFile: string = options.plistFile;
-
-        // If a plist file path is explicitly provided, then we don't
-        // need to attempt to "resolve" it within the well-known locations.
-        if (resolvedPlistFile && !fileExists(resolvedPlistFile)) {
-            throw new Error("The specified plist file doesn't exist. Please check that the provided path is correct.");
+        let resolvedPlistFile: string = command.plistFile;
+        if (resolvedPlistFile) {
+            // If a plist file path is explicitly provided, then we don't
+            // need to attempt to "resolve" it within the well-known locations.
+            if (!fileExists(resolvedPlistFile)) {
+                throw new Error("The specified plist file doesn't exist. Please check that the provided path is correct.");
+            }
         } else {
             const iOSDirectory: string = "ios";
-            const plistFileName = `${options.plistFilePrefix || ""}Info.plist`;
+            const plistFileName = `${command.plistFilePrefix || ""}Info.plist`;
 
             const knownLocations = [
                 path.join(iOSDirectory, projectName, plistFileName),
@@ -887,7 +888,7 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string, 
                 throw new Error(`Unable to find either of the following plist files in order to infer your app's binary version: "${knownLocations.join("\", \"")}".`);
             }
         }
-
+        console.log(resolvedPlistFile);
         const plistContents = fs.readFileSync(resolvedPlistFile).toString();
 
         try {
@@ -900,12 +901,12 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string, 
             if (semver.valid(parsedPlist.CFBundleShortVersionString) || missingPatchVersionRegex.test(parsedPlist.CFBundleShortVersionString)) {
                 return Q(parsedPlist.CFBundleShortVersionString);
             } else {
-                throw new Error(`The "CFBundleShortVersionString" key in "${resolvedPlistFile}" needs to have at least a major and minor version, for example "2.0" or "1.0.3".`);
+                throw new Error(`The "CFBundleShortVersionString" key in the "${resolvedPlistFile}" needs to have at least a major and minor version, for example "2.0" or "1.0.3".`);
             }
         } else {
-            throw new Error(`The "CFBundleShortVersionString" key does not exist in "${resolvedPlistFile}" file.`);
+            throw new Error(`The "CFBundleShortVersionString" key doesn't exist within the "${resolvedPlistFile}" file.`);
         }
-    } else if (platform === "android") {
+    } else if (command.platform === "android") {
         var buildGradlePath: string = path.join("android", "app", "build.gradle");
         if (fileDoesNotExistOrIsDirectory(buildGradlePath)) {
             throw new Error("Unable to find or read \"build.gradle\" in the \"android/app\" folder.");
@@ -1218,7 +1219,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
     var bundleName: string = command.bundleName;
     var entryFile: string = command.entryFile;
     var outputFolder: string = path.join(os.tmpdir(), "CodePush");
-    var platform: string = command.platform.toLowerCase();
+    var platform: string = command.platform = command.platform.toLowerCase();
     var releaseCommand: cli.IReleaseCommand = <any>command;
     releaseCommand.package = outputFolder;
 
@@ -1272,10 +1273,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
 
     var appVersionPromise: Promise<string> = command.appStoreVersion
         ? Q(command.appStoreVersion)
-        : getReactNativeProjectAppVersion(platform, projectName, {
-            plistFile: command.plistFile,
-            plistFilePrefix: command.plistFilePrefix
-        });
+        : getReactNativeProjectAppVersion(command, projectName);
 
     return appVersionPromise
         .then((appVersion: string) => {
