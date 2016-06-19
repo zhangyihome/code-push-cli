@@ -867,10 +867,11 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string, 
         };        
     
         let resolvedPlistFile: string = options.plistFile;
-        if (resolvedPlistFile) {
-            if (!fileExistsPredicate(resolvedPlistFile)) {
-                throw new Error("The specified plist file doesn't exist. Please check that the provided path is correct.");
-            }
+
+        // If a plist file path is explicitly provided, then we don't
+        // need to attempt to "resolve" it within the well-known locations.
+        if (resolvedPlistFile && !fileExistsPredicate(resolvedPlistFile)) {
+            throw new Error("The specified plist file doesn't exist. Please check that the provided path is correct.");
         } else {
             const iOSDirectory: string = "ios";
             const plistFileName = `${options.plistFilePrefix || ""}Info.plist`;
@@ -880,7 +881,7 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string, 
                 path.join(iOSDirectory, plistFileName)
             ];
             
-            resolvedPlistFile = (<any>knownLocations).find((fileExistsPredicate));
+            resolvedPlistFile = (<any>knownLocations).find(fileExistsPredicate);
 
             if (!resolvedPlistFile) {
                 throw new Error(`Unable to find either of the following plist files in order to infer your app's binary version: "${knownLocations.join("\", \"")}".`);
