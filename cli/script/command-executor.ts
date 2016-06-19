@@ -861,7 +861,7 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string, 
     const missingPatchVersionRegex: RegExp = /^\d+\.\d+$/;
 
     if (platform === "ios") {
-        const fileExistsPredicate = (file: string): boolean => {
+        const fileExists = (file: string): boolean => {
             try { return fs.statSync(file).isFile() }
             catch (e) { return false }
         };        
@@ -870,7 +870,7 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string, 
 
         // If a plist file path is explicitly provided, then we don't
         // need to attempt to "resolve" it within the well-known locations.
-        if (resolvedPlistFile && !fileExistsPredicate(resolvedPlistFile)) {
+        if (resolvedPlistFile && !fileExists(resolvedPlistFile)) {
             throw new Error("The specified plist file doesn't exist. Please check that the provided path is correct.");
         } else {
             const iOSDirectory: string = "ios";
@@ -881,7 +881,7 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string, 
                 path.join(iOSDirectory, plistFileName)
             ];
             
-            resolvedPlistFile = (<any>knownLocations).find(fileExistsPredicate);
+            resolvedPlistFile = (<any>knownLocations).find(fileExists);
 
             if (!resolvedPlistFile) {
                 throw new Error(`Unable to find either of the following plist files in order to infer your app's binary version: "${knownLocations.join("\", \"")}".`);
@@ -903,7 +903,7 @@ function getReactNativeProjectAppVersion(platform: string, projectName: string, 
                 throw new Error(`The "CFBundleShortVersionString" key in "${resolvedPlistFile}" needs to have at least a major and minor version, for example "2.0" or "1.0.3".`);
             }
         } else {
-            throw new Error(`The "CFBundleShortVersionString" key does not exist in "${resolvedPlistFile}" file..`);
+            throw new Error(`The "CFBundleShortVersionString" key does not exist in "${resolvedPlistFile}" file.`);
         }
     } else if (platform === "android") {
         var buildGradlePath: string = path.join("android", "app", "build.gradle");
