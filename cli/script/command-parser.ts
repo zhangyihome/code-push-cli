@@ -420,6 +420,8 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("disabled", { alias: "x", default: false, demand: false, description: "Specifies whether this release should be immediately downloadable", type: "boolean" })
             .option("entryFile", { alias: "e", default: null, demand: false, description: "Path to the app's entry Javascript file. If omitted, \"index.<platform>.js\" and then \"index.js\" will be used (if they exist)", type: "string" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Specifies whether this release should be considered mandatory", type: "boolean" })
+            .option("plistFile", { alias: "p", default: null, demand: false, description: "Path to the plist file which specifies the binary version you want to target this release at (iOS only)." })
+            .option("plistFilePrefix", { alias: "pre", default: null, demand: false, description: "Prefix to append to the file name when attempting to find your app's Info.plist file (iOS only)." })
             .option("rollout", { alias: "r", default: "100%", demand: false, description: "Percentage of users this release should be immediately available to", type: "string" })
             .option("sourcemapOutput", { alias: "s", default: null, demand: false, description: "Path to where the sourcemap for the resulting bundle should be written. If omitted, a sourcemap will not be generated.", type: "string" })
             .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "Semver expression that specifies the binary app version(s) this release is targeting (e.g. 1.1.0, ~1.2.3). If omitted, the release will target the exact version specified in the \"Info.plist\" (iOS), \"build.gradle\" (Android) or \"Package.appxmanifest\" (Windows) files.", type: "string" })
@@ -805,6 +807,7 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.appName = arg1;
                     releaseReactCommand.platform = arg2;
 
+                    releaseReactCommand.appStoreVersion = argv["targetBinaryVersion"];                    
                     releaseReactCommand.bundleName = argv["bundleName"];
                     releaseReactCommand.deploymentName = argv["deploymentName"];
                     releaseReactCommand.disabled = argv["disabled"];
@@ -812,9 +815,10 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.development = argv["development"];
                     releaseReactCommand.entryFile = argv["entryFile"];
                     releaseReactCommand.mandatory = argv["mandatory"];
+                    releaseReactCommand.plistFile = argv["plistFile"];  
+                    releaseReactCommand.plistFilePrefix = argv["plistFilePrefix"];                    
                     releaseReactCommand.rollout = getRolloutValue(argv["rollout"]);
                     releaseReactCommand.sourcemapOutput = argv["sourcemapOutput"];
-                    releaseReactCommand.appStoreVersion = argv["targetBinaryVersion"];
                 }
                 break;
 

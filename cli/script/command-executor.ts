@@ -857,37 +857,56 @@ function getPackageMetricsString(obj: Package): string {
     return returnString;
 }
 
-function getReactNativeProjectAppVersion(platform: string, projectName: string): Promise<string> {
-    var missingPatchVersionRegex: RegExp = /^\d+\.\d+$/;
-    if (platform === "ios") {
-        try {
-            var infoPlistContainingFolder: string = path.join("ios", projectName);
-            var infoPlistContents: string = fs.readFileSync(path.join(infoPlistContainingFolder, "Info.plist")).toString();
-        } catch (err) {
-            try {
-                infoPlistContainingFolder = "ios";
-                infoPlistContents = fs.readFileSync(path.join(infoPlistContainingFolder, "Info.plist")).toString();
-            } catch (err) {
-                throw new Error(`Unable to find or read "Info.plist" in the "ios/${projectName}" or "ios" folders.`);
-            }
-        }
+function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, projectName: string): Promise<string> {
+    const missingPatchVersionRegex: RegExp = /^\d+\.\d+$/;
 
-        try {
-            var parsedInfoPlist: any = plist.parse(infoPlistContents);
-        } catch (err) {
-            throw new Error(`Unable to parse the "${infoPlistContainingFolder}/Info.plist" file, it could be malformed.`);
-        }
-
-        if (parsedInfoPlist && parsedInfoPlist.CFBundleShortVersionString) {
-            if (semver.valid(parsedInfoPlist.CFBundleShortVersionString) || missingPatchVersionRegex.test(parsedInfoPlist.CFBundleShortVersionString)) {
-                return Q(parsedInfoPlist.CFBundleShortVersionString);
-            } else {
-                throw new Error(`The "CFBundleShortVersionString" key in "${infoPlistContainingFolder}/Info.plist" needs to have at least a major and minor version, for example "2.0" or "1.0.3".`);
+    if (command.platform === "ios") {
+        const fileExists = (file: string): boolean => {
+            try { return fs.statSync(file).isFile() }
+            catch (e) { return false }
+        };        
+    
+        let resolvedPlistFile: string = command.plistFile;
+        if (resolvedPlistFile) {
+            // If a plist file path is explicitly provided, then we don't
+            // need to attempt to "resolve" it within the well-known locations.
+            if (!fileExists(resolvedPlistFile)) {
+                throw new Error("The specified plist file doesn't exist. Please check that the provided path is correct.");
             }
         } else {
-            throw new Error(`The "CFBundleShortVersionString" key does not exist in "${infoPlistContainingFolder}/Info.plist".`);
+            const iOSDirectory: string = "ios";
+            const plistFileName = `${command.plistFilePrefix || ""}Info.plist`;
+
+            const knownLocations = [
+                path.join(iOSDirectory, projectName, plistFileName),
+                path.join(iOSDirectory, plistFileName)
+            ];
+            
+            resolvedPlistFile = (<any>knownLocations).find(fileExists);
+
+            if (!resolvedPlistFile) {
+                throw new Error(`Unable to find either of the following plist files in order to infer your app's binary version: "${knownLocations.join("\", \"")}".`);
+            }
         }
-    } else if (platform === "android") {
+        console.log(resolvedPlistFile);
+        const plistContents = fs.readFileSync(resolvedPlistFile).toString();
+
+        try {
+            var parsedPlist = plist.parse(plistContents);
+        } catch (e) {
+            throw new Error(`Unable to parse "${resolvedPlistFile}". Please ensure it is a well-formed plist file.`);
+        }
+
+        if (parsedPlist && parsedPlist.CFBundleShortVersionString) {
+            if (semver.valid(parsedPlist.CFBundleShortVersionString) || missingPatchVersionRegex.test(parsedPlist.CFBundleShortVersionString)) {
+                return Q(parsedPlist.CFBundleShortVersionString);
+            } else {
+                throw new Error(`The "CFBundleShortVersionString" key in the "${resolvedPlistFile}" needs to have at least a major and minor version, for example "2.0" or "1.0.3".`);
+            }
+        } else {
+            throw new Error(`The "CFBundleShortVersionString" key doesn't exist within the "${resolvedPlistFile}" file.`);
+        }
+    } else if (command.platform === "android") {
         var buildGradlePath: string = path.join("android", "app", "build.gradle");
         if (fileDoesNotExistOrIsDirectory(buildGradlePath)) {
             throw new Error("Unable to find or read \"build.gradle\" in the \"android/app\" folder.");
@@ -1200,7 +1219,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
     var bundleName: string = command.bundleName;
     var entryFile: string = command.entryFile;
     var outputFolder: string = path.join(os.tmpdir(), "CodePush");
-    var platform: string = command.platform.toLowerCase();
+    var platform: string = command.platform = command.platform.toLowerCase();
     var releaseCommand: cli.IReleaseCommand = <any>command;
     releaseCommand.package = outputFolder;
 
@@ -1254,7 +1273,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
 
     var appVersionPromise: Promise<string> = command.appStoreVersion
         ? Q(command.appStoreVersion)
-        : getReactNativeProjectAppVersion(platform, projectName);
+        : getReactNativeProjectAppVersion(command, projectName);
 
     return appVersionPromise
         .then((appVersion: string) => {
