@@ -33,6 +33,7 @@ var packageJson = require("../package.json");
 var parseXml = Q.denodeify(require("xml2js").parseString);
 var progress = require("progress");
 import Promise = Q.Promise;
+var properties = require("properties");
 
 const ACTIVE_METRICS_KEY: string = "Active";
 const CLI_HEADERS: Headers = {
@@ -858,14 +859,14 @@ function getPackageMetricsString(obj: Package): string {
 }
 
 function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, projectName: string): Promise<string> {
-    const missingPatchVersionRegex: RegExp = /^\d+\.\d+$/;
+    const fileExists = (file: string): boolean => {
+        try { return fs.statSync(file).isFile() }
+        catch (e) { return false }
+    };
 
+    const isValidVersion = (version: string): boolean => !!semver.valid(version) || /^\d+\.\d+$/.test(version);
+        
     if (command.platform === "ios") {
-        const fileExists = (file: string): boolean => {
-            try { return fs.statSync(file).isFile() }
-            catch (e) { return false }
-        };        
-    
         let resolvedPlistFile: string = command.plistFile;
         if (resolvedPlistFile) {
             // If a plist file path is explicitly provided, then we don't
@@ -888,7 +889,7 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
                 throw new Error(`Unable to find either of the following plist files in order to infer your app's binary version: "${knownLocations.join("\", \"")}".`);
             }
         }
-        console.log(resolvedPlistFile);
+
         const plistContents = fs.readFileSync(resolvedPlistFile).toString();
 
         try {
@@ -898,7 +899,7 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
         }
 
         if (parsedPlist && parsedPlist.CFBundleShortVersionString) {
-            if (semver.valid(parsedPlist.CFBundleShortVersionString) || missingPatchVersionRegex.test(parsedPlist.CFBundleShortVersionString)) {
+            if (isValidVersion(parsedPlist.CFBundleShortVersionString)) {
                 return Q(parsedPlist.CFBundleShortVersionString);
             } else {
                 throw new Error(`The "CFBundleShortVersionString" key in the "${resolvedPlistFile}" needs to have at least a major and minor version, for example "2.0" or "1.0.3".`);
@@ -907,30 +908,66 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
             throw new Error(`The "CFBundleShortVersionString" key doesn't exist within the "${resolvedPlistFile}" file.`);
         }
     } else if (command.platform === "android") {
-        var buildGradlePath: string = path.join("android", "app", "build.gradle");
+        const buildGradlePath: string = path.join("android", "app", "build.gradle");
         if (fileDoesNotExistOrIsDirectory(buildGradlePath)) {
             throw new Error("Unable to find or read \"build.gradle\" in the \"android/app\" folder.");
         }
-
+        
         return g2js.parseFile(buildGradlePath)
-            .catch((err: Error) => {
-                throw new Error("Unable to parse the \"android/app/build.gradle\" file, it could be malformed.");
+            .catch(() => {
+                throw new Error(`Unable to parse the "android/app/build.gradle" file. Please ensure it is a well-formed Gradle file.`);
             })
             .then((buildGradle: any) => {
-                if (buildGradle.android && buildGradle.android.defaultConfig && buildGradle.android.defaultConfig.versionName) {
-                    if (typeof buildGradle.android.defaultConfig.versionName !== "string") {
-                        throw new Error(`The "android.defaultConfig.versionName" property value in "android/app/build.gradle" is not a valid string. If this is expected, consider using the --targetBinaryVersion option to specify the value manually.`);
-                    }
-
-                    var appVersion: string = buildGradle.android.defaultConfig.versionName.replace(/"/g, "").trim();
-                    if (semver.valid(appVersion) || missingPatchVersionRegex.test(appVersion)) {
-                        return appVersion;
-                    } else {
-                        throw new Error("The \"android.defaultConfig.versionName\" property in \"android/app/build.gradle\" needs to have at least a major and minor version, for example \"2.0\" or \"1.0.3\".");
-                    }
-                } else {
-                    throw new Error("The \"android/app/build.gradle\" file does not include a value for android.defaultConfig.versionName.");
+                if (!buildGradle.android || !buildGradle.android.defaultConfig || !buildGradle.android.defaultConfig.versionName) {
+                    throw new Error(`The "android/app/build.gradle" file doesn't specify a value for the "android.defaultConfig.versionName" property.`);
                 }
+
+                if (typeof buildGradle.android.defaultConfig.versionName !== "string") {
+                    throw new Error(`The "android.defaultConfig.versionName" property value in "android/app/build.gradle" is not a valid string. If this is expected, consider using the --targetBinaryVersion option to specify the value manually.`);
+                }
+
+                let appVersion: string = buildGradle.android.defaultConfig.versionName.replace(/"/g, "").trim();
+
+                if (isValidVersion(appVersion)) {
+                    // The versionName property is a valid semver string,
+                    // so we can safely use that and move on.
+                    return appVersion;
+                } else if (/^\d.*/.test(appVersion)) {
+                    // The versionName property isn't a valid semver string,
+                    // but it starts with a number, and therefore, it can't
+                    // be a valid Gradle property reference.
+                    throw new Error(`The "android.defaultConfig.versionName" property in "android/app/build.gradle" needs to specify a valid semver string, containing both a major and minor version (e.g. 1.3.2, 1.1).`);
+                }
+
+                // The version property isn't a valid semver string
+                // so we assume it is a reference to a property variable.
+                const propertyName = appVersion.replace("project.", "");
+                const propertiesFileName = "gradle.properties";
+
+                const knownLocations = [
+                    path.join("android", "app", propertiesFileName),
+                    path.join("android", propertiesFileName)
+                ];
+
+                const propertiesFile: string = (<any>knownLocations).find(fileExists);
+                const propertiesContent: string = fs.readFileSync(propertiesFile).toString();
+
+                try {    
+                    const parsedProperties: any = properties.parse(propertiesContent);
+                    appVersion = parsedProperties[propertyName];
+                } catch (e) {
+                    throw new Error(`Unable to parse "${propertiesFile}". Please ensure it is a well-formed properties file.`);
+                }
+
+                if (!appVersion) {
+                    throw new Error(`No property named "${propertyName}" exists in the "${propertiesFile}" file.`);
+                }
+                
+                if (!isValidVersion(appVersion)) {
+                    throw new Error(`The "${propertyName}" property in "${propertiesFile}" needs to specify a valid semver string, containing both a major and minor version (e.g. 1.3.2, 1.1).`);
+                }
+
+                return appVersion.toString();
             });
     } else {
         var appxManifestFileName: string = "Package.appxmanifest";
