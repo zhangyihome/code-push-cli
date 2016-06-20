@@ -859,13 +859,13 @@ function getPackageMetricsString(obj: Package): string {
 }
 
 function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, projectName: string): Promise<string> {
-    const validVersion = (version: string) => semver.valid(version) || /^\d+\.\d+$/.test(version);
-
     const fileExists = (file: string): boolean => {
         try { return fs.statSync(file).isFile() }
         catch (e) { return false }
-    };        
-    
+    };
+
+    const validVersion = (version: string) => semver.valid(version) || /^\d+\.\d+$/.test(version);
+        
     if (command.platform === "ios") {
         let resolvedPlistFile: string = command.plistFile;
         if (resolvedPlistFile) {
@@ -932,7 +932,7 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
                     // The versionName property is a valid semver string,
                     // so we can safely use that and move on.
                     return appVersion;
-                } else if (Number(appVersion[0])) {
+                } else if (/^\d.*/.test(appVersion)) {
                     // The versionName property isn't a valid semver string,
                     // but it starts with a number, and therefore, it can't
                     // be a valid Gradle property reference.
@@ -956,7 +956,7 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
                     const parsedProperties: any = properties.parse(propertiesContent);
                     appVersion = parsedProperties[propertyName];
                 } catch (e) {
-                    throw new Error(`Unable to parse ${propertiesFile}. Please ensure it as well-formed properties file.`);
+                    throw new Error(`Unable to parse "${propertiesFile}". Please ensure it is a well-formed properties file.`);
                 }
 
                 if (!appVersion) {
