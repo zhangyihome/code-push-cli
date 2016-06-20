@@ -859,8 +859,7 @@ function getPackageMetricsString(obj: Package): string {
 }
 
 function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, projectName: string): Promise<string> {
-    const missingPatchVersionRegex: RegExp = /^\d+\.\d+$/;
-    const validVersion = (version: string) => semver.valid(version) || missingPatchVersionRegex.test(version);
+    const validVersion = (version: string) => semver.valid(version) || /^\d+\.\d+$/.test(version);
 
     const fileExists = (file: string): boolean => {
         try { return fs.statSync(file).isFile() }
@@ -900,7 +899,7 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
         }
 
         if (parsedPlist && parsedPlist.CFBundleShortVersionString) {
-            if (semver.valid(parsedPlist.CFBundleShortVersionString) || missingPatchVersionRegex.test(parsedPlist.CFBundleShortVersionString)) {
+            if (validVersion(parsedPlist.CFBundleShortVersionString)) {
                 return Q(parsedPlist.CFBundleShortVersionString);
             } else {
                 throw new Error(`The "CFBundleShortVersionString" key in the "${resolvedPlistFile}" needs to have at least a major and minor version, for example "2.0" or "1.0.3".`);
