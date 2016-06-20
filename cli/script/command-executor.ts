@@ -864,7 +864,7 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
         catch (e) { return false }
     };
 
-    const validVersion = (version: string) => semver.valid(version) || /^\d+\.\d+$/.test(version);
+    const isValidVersion = (version: string): boolean => !!semver.valid(version) || /^\d+\.\d+$/.test(version);
         
     if (command.platform === "ios") {
         let resolvedPlistFile: string = command.plistFile;
@@ -899,7 +899,7 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
         }
 
         if (parsedPlist && parsedPlist.CFBundleShortVersionString) {
-            if (validVersion(parsedPlist.CFBundleShortVersionString)) {
+            if (isValidVersion(parsedPlist.CFBundleShortVersionString)) {
                 return Q(parsedPlist.CFBundleShortVersionString);
             } else {
                 throw new Error(`The "CFBundleShortVersionString" key in the "${resolvedPlistFile}" needs to have at least a major and minor version, for example "2.0" or "1.0.3".`);
@@ -928,7 +928,7 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
 
                 let appVersion: string = buildGradle.android.defaultConfig.versionName.replace(/"/g, "").trim();
 
-                if (validVersion(appVersion)) {
+                if (isValidVersion(appVersion)) {
                     // The versionName property is a valid semver string,
                     // so we can safely use that and move on.
                     return appVersion;
@@ -963,7 +963,7 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
                     throw new Error(`No property named "${propertyName}" exists in the "${propertiesFile}" file.`);
                 }
                 
-                if (!validVersion(appVersion)) {
+                if (!isValidVersion(appVersion)) {
                     throw new Error(`The "${propertyName}" property in "${propertiesFile}" needs to specify a valid semver string, containing both a major and minor version (e.g. 1.3.2, 1.1).`);
                 }
 
