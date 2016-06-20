@@ -860,7 +860,8 @@ function getPackageMetricsString(obj: Package): string {
 
 function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, projectName: string): Promise<string> {
     const missingPatchVersionRegex: RegExp = /^\d+\.\d+$/;
-    
+    const validVersion = (version: string) => semver.valid(version) || missingPatchVersionRegex.test(version);
+
     const fileExists = (file: string): boolean => {
         try { return fs.statSync(file).isFile() }
         catch (e) { return false }
@@ -908,12 +909,10 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
             throw new Error(`The "CFBundleShortVersionString" key doesn't exist within the "${resolvedPlistFile}" file.`);
         }
     } else if (command.platform === "android") {
-        var buildGradlePath: string = path.join("android", "app", "build.gradle");
+        const buildGradlePath: string = path.join("android", "app", "build.gradle");
         if (fileDoesNotExistOrIsDirectory(buildGradlePath)) {
             throw new Error("Unable to find or read \"build.gradle\" in the \"android/app\" folder.");
         }
-
-        const validVersion = (version: string) => semver.valid(version) || missingPatchVersionRegex.test(version);
         
         return g2js.parseFile(buildGradlePath)
             .catch(() => {
@@ -931,12 +930,18 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
                 let appVersion: string = buildGradle.android.defaultConfig.versionName.replace(/"/g, "").trim();
 
                 if (validVersion(appVersion)) {
+                    // The versionName property is a valid semver string,
+                    // so we can safely use that and move on.
                     return appVersion;
+                } else if (Number(appVersion[0])) {
+                    // The versionName property isn't a valid semver string,
+                    // but it starts with a number, and therefore, it can't
+                    // be a valid Gradle property reference.
+                    throw new Error(`The "android.defaultConfig.versionName" property in "android/app/build.gradle" needs to specify a valid semver string, containing both a major and minor version (e.g. 1.3.2, 1.1).`);
                 }
 
                 // The version property isn't a valid semver string
                 // so we assume it is a reference to a property variable.
-
                 const propertyName = appVersion.replace("project.", "");
                 const propertiesFileName = "gradle.properties";
 
