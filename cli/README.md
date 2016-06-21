@@ -2,12 +2,13 @@
 
 CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users' devices. It works by acting as a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using the provided client SDKs for [Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push)). This allows you to have a more deterministic and direct engagement model with your user base, when addressing bugs and/or adding small features that don't require you to re-build a binary and re-distribute it through the respective app stores.
 
-![CodePush CLI](https://cloud.githubusercontent.com/assets/116461/14505396/c97bdc78-016d-11e6-89da-3f3557f8b33d.png)
+![CodePush CLI](https://cloud.githubusercontent.com/assets/116461/16246693/2e7df77c-37bb-11e6-9456-e392af7f7b84.png)
 
 * [Installation](#installation)
 * [Getting Started](#getting-started)
-* [Account Creation](#account-creation)
-* [Authentication](#authentication)
+* [Account Management](#account-management)
+    * [Authentication](#authentication)
+    * [Access Keys](#access-keys)
 * [App Management](#app-management)
 * [App Collaboration](#app-collaboration)
 * [Deployment Management](#deployment-management)
@@ -15,6 +16,7 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
     * [Releasing Updates (General)](#releasing-updates-general)
     * [Releasing Updates (React Native)](#releasing-updates-react-native)
     * [Releasing Updates (Cordova)](#releasing-updates-cordova)
+* [Debugging CodePush Integration](#debugging-codepush-integration)
 * [Patching Update Metadata](#patching-update-metadata)
 * [Promoting Updates](#promoting-updates)
 * [Rolling Back Updates](#rolling-back-updates)
@@ -34,9 +36,10 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
 2. Register your [app](#app-management) with CodePush, and optionally [share it](#app-collaboration) with other developers on your team
 3. CodePush-ify your app and point it at the deployment you wish to use ([Cordova](http://github.com/Microsoft/cordova-plugin-code-push) and [React Native](http://github.com/Microsoft/react-native-code-push))
 4. [Release](#releasing-updates) an update for your app
-5. Live long and prosper! ([details](https://en.wikipedia.org/wiki/Vulcan_salute))
+5. Check out the [debug logs](#debugging-codepush-integration) to ensure everything is working as expected
+6. Live long and prosper! ([details](https://en.wikipedia.org/wiki/Vulcan_salute))
 
-## Account creation
+## Account Management
 
 Before you can begin releasing app updates, you need to create a CodePush account. You can do this by simply running the following command once you've installed the CLI:
 
@@ -48,19 +51,19 @@ This will launch a browser, asking you to authenticate with either your GitHub o
 
 *Note: After registering, you are automatically logged-in with the CLI, so until you explicitly log out, you don't need to login again from the same machine.*
 
-If you have an existing account, you may also link your account to another identity provider by running:
+If you have an existing account, you may also link your account to another identity provider (e.g. Microsoft, GitHub) by running:
 
 ```
 code-push link
 ```
 
-Note that in order to do this, the email address used on the provider must match the one on your existing account.
+*Note: In order to link multiple accounts, the email address associated with each provider must match.*
 
-## Authentication
+### Authentication
 
 Most commands within the CodePush CLI require authentication, and therefore, before you can begin managing your account, you need to login using the GitHub or Microsoft account you used when registering. You can do this by running the following command:
 
-```
+```shell
 code-push login
 ```
 
@@ -70,14 +73,13 @@ By default, the login command supports proxies and will look for system environm
 
 CodePush specific proxy settings are also supported and can be set using the `--proxy` flag:
 
+```shell
+code-push login --proxy <proxyURL>
 ```
-code-push login --proxy proxyUrl
-```
-
 
 Alternatively, proxy functionality can be disabled (system environment variables are suppressed and CodePush ignores proxy settings) by passing the `--noproxy` flag:
 
-```
+```shell
 code-push login --noproxy
 ```
 
@@ -89,21 +91,22 @@ code-push whoami
 
 When you login from the CLI, your access key is persisted to disk for the duration of your session so that you don't have to login every time you attempt to access your account. In order to end your session and delete this access key, simply run the following command:
 
-```
+```shell
 code-push logout
 ```
 
-If you forget to logout from a machine you'd prefer not to leave a running session on (e.g. your friend's laptop), you can use the following commands to list and remove any "live" access keys.
-The list of access keys will display the name of the machine the key was created on, the time the login occurred, and the time it expires. This should make it easy to spot keys you don't want to keep around.
+If you forget to logout from a machine you'd prefer not to leave a running session on (e.g. your friend's laptop), you can use the following commands to list and remove any current login sessions.
 
-```
-code-push access-key ls
-code-push access-key rm <accessKeyName>
+```shell
+code-push session ls
+code-push session rm <machineName>
 ```
 
-If you need additional keys that can be used to authenticate against the CodePush service without needing to give access to your GitHub and/or Microsoft credentials, you can run the following command to create a persistent one (along with a name describing what it is for):
+### Access Keys
 
-```
+If you need to be able to authenticate against the CodePush service without launching a browser and/or without needing to use your GitHub and/or Microsoft credentials (e.g. in a CI environment), you can run the following command to create an "access key" (along with a name describing what it is for):
+
+```shell
 code-push access-key add "VSTS Integration"
 ```
 
@@ -111,17 +114,19 @@ By default, access keys expire in 60 days. You can specify a different expiry du
 
 After creating the new key, you can specify its value using the `--accessKey` flag of the `login` command, which allows you to perform "headless" authentication, as opposed to launching a browser.
 
-```
+```shell
 code-push login --accessKey <accessKey>
 ```
 
-When logging in via this method, the access key will not be automatically invalidated on logout, and can be used in future sessions until it is explicitly removed from the CodePush server. However, it is still recommended to log out once your session is complete, in order to remove your credentials from disk.
+When logging in via this method, the access key will not be automatically invalidated on logout, and can be used in future sessions until it is explicitly removed from the CodePush server or expires. However, it is still recommended that you log out once your session is complete, in order to remove your credentials from disk.
 
-Finally, if you need to change a key's name or expiry date, you can use the following command:
+Finally, if at any point you need to change a key's name and/or expiration date, you can use the following command:
 
-```
+```shell
 code-push access-key patch <accessKeyName> --name "new name" --ttl 10d
 ```
+
+*NOTE: When patching the TTL of an existing access key, its expiration date will be set relative to the current time, with no regard for its previous value.* 
 
 ## App Management
 
@@ -405,6 +410,8 @@ code-push release-react <appName> <platform>
 [--disabled <disabled>]
 [--entryFile <entryFile>]
 [--mandatory]
+[--plistFile <plistFile>]
+[--plistFilePrefix <plistFilePrefix>]
 [--sourcemapOutput <sourcemapOutput>]
 [--targetBinaryVersion <targetBinaryVersion>]
 [--rollout <rolloutPercentage>]
@@ -436,7 +443,7 @@ Achieving the equivalent behavior with the `release-react` command would simply 
 code-push release-react MyApp ios
 ```
 
-*NOTE: We believe that the `release-react` command should be valuable for most React Native developers, so if you're finding that it isn't flexible enough or missing a key feature, please don't hesistate to [let us know](mailto:codepushfeed@microsoft.com), so that we can improve it.*
+*NOTE: We believe that the `release-react` command should be valuable for most React Native developers, so if you're finding that it isn't flexible enough or missing a key feature, please don't hesistate to [let us know](mailto:codepushfeed@microsoft.com), so that we can improve it!*
 
 #### App name parameter
 
@@ -444,7 +451,7 @@ This is the same parameter as the one described in the [above section](#app-name
 
 #### Platform parameter
 
-This specifies which platform the current update is targeting, and can be either `android`, `ios` or `windows` (case-insensitive).
+This specifies which platform the current update is targeting, and can be either `android`, `ios` or `windows` (case-insensitive). This value is only used to determine how to properly bundle your update contents and isn't actually sent to the server. 
 
 #### Deployment name parameter
 
@@ -466,9 +473,11 @@ This is the same parameter as the one described in the [above section](#rollout-
 
 This is the same parameter as the one described in the [above section](#target-binary-version-parameter). If left unspecified, this defaults to targeting the exact version specified in the app's `Info.plist` (for iOS) and `build.gradle` (for Android) files.
 
-#### Disabled parameter
+#### Bundle name parameter
 
-This is the same parameter as the one described in the [above section](#disabled-parameter).
+This specifies the file name that should be used for the generated JS bundle. If left unspecified, the standard bundle name will be used for the specified platform: `main.jsbundle` (iOS), `index.android.bundle` (Android) and `index.windows.bundle` (Windows).
+
+*NOTE: This parameter can be set using either --bundleName or -b*
 
 #### Development parameter
 
@@ -476,17 +485,41 @@ This specifies whether to generate a unminified, development JS bundle. If left 
 
 *NOTE: This parameter can be set using either --development or --dev*
 
+#### Disabled parameter
+
+This is the same parameter as the one described in the [above section](#disabled-parameter).
+
 #### Entry file parameter
 
 This specifies the relative path to the app's root/entry JavaScript file. If left unspecified, this defaults to `index.ios.js` (for iOS),  `index.android.js` (for Android) or `index.windows.bundle` (for Windows) if that file exists, or `index.js` otherwise.
 
 *NOTE: This parameter can be set using either --entryFile or -e*
 
-#### Bundle name parameter
+#### Plist file parameter
 
-This specifies the file name that should be used for the generated JS bundle. If left unspecified, the standard bundle name will be used for the specified platform: `main.jsbundle` (iOS), `index.android.bundle` (Android) and `index.windows.bundle` (Windows).
+This specifies the relative path to the `Info.plist` file that the CLI should use when attempting to auto-detect the target binary version for the release. This parameter is only meant for advanced scenarios, since the CLI will automatically be able to find your `Info.plist` file in "standard" React Native projects, and you can use the `--plistFilePrefix` parameter in order to support per-environment plist files (e.g. `STAGING-Info.plist`). However, if your plist is located in an arbitrary location, that the CLI can't discover, then using this parameter allows you to continue releasing CodePush updates, without needing to explicitly set the `--targetBinaryVersion` parameter.
 
-*NOTE: This parameter can be set using either --bundleName or -b*
+```shell
+code-push release-react foo ios -p "./foo/bar/MyFile.plist"
+```
+
+*NOTE: This parameter can be set using either --plistFile or -p*
+
+#### Plist file prefix parameter
+
+This specifies the file name prefix of the `Info.plist` file that that CLI should use when attempting to auto-detect the target binary version for the release. This can be useful if you've created per-environment plist files (e.g. `DEV-Info.plist`, `STAGING-Info.plist`), and you want to be able to release CodePush updates without needing to explicity set the `--targetBinaryVersion` parameter. By specifying a `--plistFilePrefx`, the CLI will look for a file named `<prefix>-Info.plist`, instead of simply `Info.plist` (which is the default behavior), in the following locations: `./ios` and `./ios/<appName>`. If your plist file isn't located in either of those directories (e.g. your app is a native iOS app with embedded RN views), or uses an entirely different file naming convention, then consider using the `--plistFile` parameter. 
+
+```shell
+# Auto-detect the target binary version of this release by looking up the 
+# app version within the STAGING-Info.plist file in either the ./ios or ./ios/<APP> directories.
+code-push release-react foo ios --pre "STAGING"
+
+# Tell the CLI to use your dev plist (`DEV-Info.plist`).
+# Note that the hyphen separator can be explicitly stated.
+code-push release-react foo ios --pre "DEV-"
+```
+
+*NOTE: This parameter can be set using either --plistFilePrefix or --pre*
 
 #### Sourcemap output parameter
 
@@ -564,6 +597,28 @@ This is the same parameter as the one described in the [above section](#disabled
 Specifies whether you want to run `cordova build` instead of `cordova prepare` (which is the default behavior), when generating your updated web assets. This is valuable if your project includes before and/or after build hooks (e.g. to transpile TypeScript), and therefore, having CodePush simply run `cordova prepare` isn't sufficient to create and release an update. If left unspecified, this defaults to `false`.
 
 *NOTE: This parameter can be set using either --build or -b*
+
+## Debugging CodePush Integration
+
+Once you've released an update, and the Cordova or React Native plugin has been integrated into your app, it can be helpful to diagnose how the plugin is behaving, especially if you run into an issue and want to understand why. In order to debug the CodePush update discovery experience, you can run the following command in order to easily view the diagnostic logs produced by the CodePush plugin wihtin your app: 
+
+```shell
+code-push debug <platform>
+
+# View all CodePush logs from a running
+# instace of the iOS simulator.
+code-push debug ios
+
+# View all CodePush logs from a running
+# Android emulator or attached device.
+code-push debug android
+```
+
+<img width="500" src="https://cloud.githubusercontent.com/assets/116461/16246597/bd49a9ac-37ba-11e6-9aa4-a2d3b2821a90.png" />
+
+Under the covers, this command simply automates the usage of the iOS system logs and ADB logcat, but provides a platform-agnostic, filtered view of all logs coming from the CodePush plugin, for both Cordova or React Native. This, you don't need to learn and/or use another tool simply to be able to answer basic questions about how CodePush is behaving.
+
+*NOTE: The debug command supports both emulators and devices for Android, but currently only supports listening to logs from the iOS simulator. We hope to add device support soon.*
 
 ## Patching Update Metadata
 
