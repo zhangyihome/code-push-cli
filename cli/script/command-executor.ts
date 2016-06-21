@@ -878,7 +878,8 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
             }
         } else {
             // Allow the plist prefix to be specified with or without a trailing
-            // seperator character, but prescribe the use of a "-" when omitted.
+            // separator character, but prescribe the use of a hyphen when omitted,
+            // since this is the most commonly used convetion for plist files.
             if (command.plistFilePrefix && /.+[^-.]$/.test(command.plistFilePrefix)) {
                 command.plistFilePrefix += "-";
             }
