@@ -866,6 +866,8 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
 
     const isValidVersion = (version: string): boolean => !!semver.valid(version) || /^\d+\.\d+$/.test(version);
         
+    log(chalk.cyan(`Detecting ${command.platform} app version:\n`));
+
     if (command.platform === "ios") {
         let resolvedPlistFile: string = command.plistFile;
         if (resolvedPlistFile) {
@@ -875,6 +877,13 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
                 throw new Error("The specified plist file doesn't exist. Please check that the provided path is correct.");
             }
         } else {
+            // Allow the plist prefix to be specified with or without a trailing
+            // separator character, but prescribe the use of a hyphen when omitted,
+            // since this is the most commonly used convetion for plist files.
+            if (command.plistFilePrefix && /.+[^-.]$/.test(command.plistFilePrefix)) {
+                command.plistFilePrefix += "-";
+            }
+
             const iOSDirectory: string = "ios";
             const plistFileName = `${command.plistFilePrefix || ""}Info.plist`;
 
@@ -886,7 +895,7 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
             resolvedPlistFile = (<any>knownLocations).find(fileExists);
 
             if (!resolvedPlistFile) {
-                throw new Error(`Unable to find either of the following plist files in order to infer your app's binary version: "${knownLocations.join("\", \"")}".`);
+                throw new Error(`Unable to find either of the following plist files in order to infer your app's binary version: "${knownLocations.join("\", \"")}". If your plist has a different name, or is located in a different directory, consider using either the "--plistFile" or "--plistFilePrefix" parameters to help inform the CLI how to find it.`);
             }
         }
 
@@ -900,9 +909,10 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
 
         if (parsedPlist && parsedPlist.CFBundleShortVersionString) {
             if (isValidVersion(parsedPlist.CFBundleShortVersionString)) {
+                log(`Using the target binary version value "${parsedPlist.CFBundleShortVersionString}" from "${resolvedPlistFile}".\n`);
                 return Q(parsedPlist.CFBundleShortVersionString);
             } else {
-                throw new Error(`The "CFBundleShortVersionString" key in the "${resolvedPlistFile}" needs to have at least a major and minor version, for example "2.0" or "1.0.3".`);
+                throw new Error(`The "CFBundleShortVersionString" key in the "${resolvedPlistFile}" file needs to specify a valid semver string, containing both a major and minor version (e.g. 1.3.2, 1.1).`);
             }
         } else {
             throw new Error(`The "CFBundleShortVersionString" key doesn't exist within the "${resolvedPlistFile}" file.`);
@@ -910,20 +920,20 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
     } else if (command.platform === "android") {
         const buildGradlePath: string = path.join("android", "app", "build.gradle");
         if (fileDoesNotExistOrIsDirectory(buildGradlePath)) {
-            throw new Error("Unable to find or read \"build.gradle\" in the \"android/app\" folder.");
+            throw new Error(`Unable to find the "build.gradle" file in your "android/app" directory.`);
         }
         
         return g2js.parseFile(buildGradlePath)
             .catch(() => {
-                throw new Error(`Unable to parse the "android/app/build.gradle" file. Please ensure it is a well-formed Gradle file.`);
+                throw new Error(`Unable to parse the "${buildGradlePath}" file. Please ensure it is a well-formed Gradle file.`);
             })
             .then((buildGradle: any) => {
                 if (!buildGradle.android || !buildGradle.android.defaultConfig || !buildGradle.android.defaultConfig.versionName) {
-                    throw new Error(`The "android/app/build.gradle" file doesn't specify a value for the "android.defaultConfig.versionName" property.`);
+                    throw new Error(`The "${buildGradlePath}" file doesn't specify a value for the "android.defaultConfig.versionName" property.`);
                 }
 
                 if (typeof buildGradle.android.defaultConfig.versionName !== "string") {
-                    throw new Error(`The "android.defaultConfig.versionName" property value in "android/app/build.gradle" is not a valid string. If this is expected, consider using the --targetBinaryVersion option to specify the value manually.`);
+                    throw new Error(`The "android.defaultConfig.versionName" property value in "${buildGradlePath}" is not a valid string. If this is expected, consider using the --targetBinaryVersion option to specify the value manually.`);
                 }
 
                 let appVersion: string = buildGradle.android.defaultConfig.versionName.replace(/"/g, "").trim();
@@ -931,12 +941,13 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
                 if (isValidVersion(appVersion)) {
                     // The versionName property is a valid semver string,
                     // so we can safely use that and move on.
+                    log(`Using the target binary version value "${appVersion}" from "${buildGradlePath}".\n`);
                     return appVersion;
                 } else if (/^\d.*/.test(appVersion)) {
                     // The versionName property isn't a valid semver string,
                     // but it starts with a number, and therefore, it can't
                     // be a valid Gradle property reference.
-                    throw new Error(`The "android.defaultConfig.versionName" property in "android/app/build.gradle" needs to specify a valid semver string, containing both a major and minor version (e.g. 1.3.2, 1.1).`);
+                    throw new Error(`The "android.defaultConfig.versionName" property in the "${buildGradlePath}" file needs to specify a valid semver string, containing both a major and minor version (e.g. 1.3.2, 1.1).`);
                 }
 
                 // The version property isn't a valid semver string
@@ -964,9 +975,10 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
                 }
                 
                 if (!isValidVersion(appVersion)) {
-                    throw new Error(`The "${propertyName}" property in "${propertiesFile}" needs to specify a valid semver string, containing both a major and minor version (e.g. 1.3.2, 1.1).`);
+                    throw new Error(`The "${propertyName}" property in the "${propertiesFile}" file needs to specify a valid semver string, containing both a major and minor version (e.g. 1.3.2, 1.1).`);
                 }
 
+                log(`Using the target binary version value "${appVersion}" from the "${propertyName}" key in the "${propertiesFile}" file.\n`);
                 return appVersion.toString();
             });
     } else {
