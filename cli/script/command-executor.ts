@@ -153,7 +153,7 @@ function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
             if (wasConfirmed) {
                 return sdk.removeAccessKey(command.accessKey)
                     .then((): void => {
-                        log("Successfully removed the \"" + command.accessKey + "\" access key.");
+                        log(`Successfully removed the "${command.accessKey}" access key.`);
                     });
             }
 
@@ -1430,14 +1430,14 @@ function sessionList(command: cli.ISessionListCommand): Promise<void> {
 
 function sessionRemove(command: cli.ISessionRemoveCommand): Promise<void> {
     if (os.hostname() === command.machineName) {
-        throw new Error("Cannot remove the current session via this command. Please run 'code-push logout' if you would like to end it.");
+        throw new Error("Cannot remove the current login session via this command. Please run 'code-push logout' instead.");
     } else {
         return confirm()
             .then((wasConfirmed: boolean): Promise<void> => {
                 if (wasConfirmed) {
                     return sdk.removeSession(command.machineName)
                         .then((): void => {
-                            log(`Successfully removed the existing session for "${command.machineName}".`);
+                            log(`Successfully removed the login session for "${command.machineName}".`);
                         });
                 }
 
