@@ -44,9 +44,9 @@ function accessKeyAdd(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
     yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <accessKeyName>")
         .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
-        .example("access-key " + commandName + " \"VSTS Integration\"", "Creates a new access key with the name \"VSTS Integration\" which expires by default in 60 days")
-        .example("access-key " + commandName + " \"One time key\" --ttl 5m", "Creates a new access key with the name \"One time key\" which expires in 5 minutes")
-        .option("ttl", { default: null, demand: false, description: "A duration string specifying the time for which the access key remains valid for use", type: "string" });
+        .example("access-key " + commandName + " \"VSTS Integration\"", "Creates a new access key with the name \"VSTS Integration\", which expires in 60 days")
+        .example("access-key " + commandName + " \"One time key\" --ttl 5m", "Creates a new access key with the name \"One time key\", which expires in 5 minutes")
+        .option("ttl", { default: "60d", demand: false, description: "Duration string which specifies the amount of time that the access key should remain valid for (e.g 5m, 60d, 1y)", type: "string" });
 
     addCommonConfiguration(yargs);
 }
@@ -56,9 +56,9 @@ function accessKeyPatch(commandName: string, yargs: yargs.Argv): void {
     yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <accessKeyName>")
         .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
         .example("access-key " + commandName + " \"Key for build server\" --name \"Key for CI machine\"", "Renames the access key named \"Key for build server\" to \"Key for CI machine\"")
-        .example("access-key " + commandName + " \"Key for build server\" --ttl 7d", "Edits the access key named \"Key for build server\" to expire in 7 days")
-        .option("name", { default: null, demand: false, description: "New name for the access key", type: "string" })
-        .option("ttl", { default: null, demand: false, description: "Duration string specifying the time for which the access key remains valid for use", type: "string" });
+        .example("access-key " + commandName + " \"Key for build server\" --ttl 7d", "Updates the access key named \"Key for build server\" to expire in 7 days")
+        .option("name", { default: null, demand: false, description: "Display name for the access key", type: "string" })
+        .option("ttl", { default: null, demand: false, description: "Duration string which specifies the amount of time that the access key should remain valid for (e.g 5m, 60d, 1y)", type: "string" });
     addCommonConfiguration(yargs);
 }
 
@@ -77,7 +77,7 @@ function accessKeyRemove(commandName: string, yargs: yargs.Argv): void {
     isValidCommand = true;
     yargs.usage(USAGE_PREFIX + " access-key " + commandName + " <accessKeyName>")
         .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
-        .example("access-key " + commandName + " 8d6513de-050c-4788-96f7-b2a50dd9684v", "Removes the \"8d6513de-050c-4788-96f7-b2a50dd9684v\" access key");
+        .example("access-key " + commandName + " \"VSTS Integration\"", "Removes the \"VSTS Integration\" access key");
 
     addCommonConfiguration(yargs);
 }
@@ -196,7 +196,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " access-key <command>")
             .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments.
             .command("add", "Create a new access key associated with your account", (yargs: yargs.Argv) => accessKeyAdd("add", yargs))
-            .command("patch", "Update the name and expiry of an access key", (yargs: yargs.Argv) => accessKeyPatch("patch", yargs))
+            .command("patch", "Update the name and/or TTL of an existing access key", (yargs: yargs.Argv) => accessKeyPatch("patch", yargs))
             .command("remove", "Remove an existing access key", (yargs: yargs.Argv) => accessKeyRemove("remove", yargs))
             .command("rm", "Remove an existing access key", (yargs: yargs.Argv) => accessKeyRemove("rm", yargs))
             .command("list", "List the access keys associated with your account", (yargs: yargs.Argv) => accessKeyList("list", yargs))
