@@ -105,15 +105,14 @@ export var confirm = (): Promise<boolean> => {
 function accessKeyAdd(command: cli.IAccessKeyAddCommand): Promise<void> {
     return sdk.addAccessKey(command.name, command.ttl)
         .then((accessKey: AccessKey) => {
-            log(`Successfully created a new access key "${command.name}": ${accessKey.key}`);
-            log(`(Expires: ${new Date(accessKey.expires).toString()})`);
-            log(`Please save this key as it will only be shown once!`);
+            log(`Successfully created the "${command.name}" access key: ${accessKey.key}`);
+            log("Make sure to save this key value somewhere safe, since you won't be able to view it from the CLI again!");
         });
 }
 
 function accessKeyPatch(command: cli.IAccessKeyPatchCommand): Promise<void> {
-    var willUpdateName: boolean = isCommandOptionSpecified(command.newName) && command.oldName !== command.newName;
-    var willUpdateTtl: boolean = isCommandOptionSpecified(command.ttl);
+    const willUpdateName: boolean = isCommandOptionSpecified(command.newName) && command.oldName !== command.newName;
+    const willUpdateTtl: boolean = isCommandOptionSpecified(command.ttl);
 
     if (!willUpdateName && !willUpdateTtl) {
         throw new Error("A new name and/or TTL must be provided.");
@@ -121,20 +120,21 @@ function accessKeyPatch(command: cli.IAccessKeyPatchCommand): Promise<void> {
 
     return sdk.patchAccessKey(command.oldName, command.newName, command.ttl)
         .then((accessKey: AccessKey) => {
-            var logMessage: string = "Successfully ";
+            let logMessage: string = "Successfully ";
             if (willUpdateName) {
                 logMessage += `renamed the access key "${command.oldName}" to "${command.newName}"`;
             }
 
             if (willUpdateTtl) {
+                const expirationDate = moment(accessKey.expires).format("LLLL");
                 if (willUpdateName) {
-                    logMessage += ` and changed its expiry to ${new Date(accessKey.expires).toString()}`;
+                    logMessage += ` and changed its expiration date to ${expirationDate}`;
                 } else {
-                    logMessage += `changed the access key "${command.oldName}"'s expiry to ${new Date(accessKey.expires).toString()}`;
+                    logMessage += `changed the expiration date of the "${command.oldName}" access key to ${expirationDate}`;
                 }
             }
 
-            log(logMessage + ".");
+            log(`${logMessage}.`);
         });
 }
 
