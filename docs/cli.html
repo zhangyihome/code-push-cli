@@ -592,7 +592,9 @@
                     <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/CLI.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
                 </header>  
                 <article class="doc-content">               
-                    <p><img src="https://cloud.githubusercontent.com/assets/116461/14505396/c97bdc78-016d-11e6-89da-3f3557f8b33d.png" alt="CodePush CLI"></p>
+                    <p><img src="https://cloud.githubusercontent.com/assets/116461/16246693/2e7df77c-37bb-11e6-9456-e392af7f7b84.png" alt="CodePush CLI"></p>
+
+<p><a href="./README-cn.md">[Chinese version 中文版]</a></p>
 
 <h2>Installation</h2>
 
@@ -608,10 +610,11 @@
 <li>Register your <a href="#app-management">app</a> with CodePush, and optionally <a href="#app-collaboration">share it</a> with other developers on your team</li>
 <li>CodePush-ify your app and point it at the deployment you wish to use (<a href="http://github.com/Microsoft/cordova-plugin-code-push">Cordova</a> and <a href="http://github.com/Microsoft/react-native-code-push">React Native</a>)</li>
 <li><a href="#releasing-updates">Release</a> an update for your app</li>
+<li>Check out the <a href="#debugging-codepush-integration">debug logs</a> to ensure everything is working as expected</li>
 <li>Live long and prosper! (<a href="https://en.wikipedia.org/wiki/Vulcan_salute">details</a>)</li>
 </ol>
 
-<h2>Account creation</h2>
+<h2>Account Management</h2>
 
 <p>Before you can begin releasing app updates, you need to create a CodePush account. You can do this by simply running the following command once you&rsquo;ve installed the CLI:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push register
@@ -620,44 +623,52 @@
 
 <p><em>Note: After registering, you are automatically logged-in with the CLI, so until you explicitly log out, you don&rsquo;t need to login again from the same machine.</em></p>
 
-<p>If you have an existing account, you may also link your account to another identity provider by running:</p>
+<p>If you have an existing account, you may also link your account to another identity provider (e.g. Microsoft, GitHub) by running:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push link
 </code></pre></div>
-<p>Note that in order to do this, the email address used on the provider must match the one on your existing account.</p>
+<p><em>Note: In order to link multiple accounts, the email address associated with each provider must match.</em></p>
 
-<h2>Authentication</h2>
+<h3>Authentication</h3>
 
 <p>Most commands within the CodePush CLI require authentication, and therefore, before you can begin managing your account, you need to login using the GitHub or Microsoft account you used when registering. You can do this by running the following command:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push login
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push login
 </code></pre></div>
 <p>This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. This will generate an access key that you need to copy/paste into the CLI (it will prompt you for it). You are now successfully authenticated and can safely close your browser window.</p>
 
 <p>By default, the login command supports proxies and will look for system environment variables (<code>HTTPS_PROXY</code> or <code>HTTP_PROXY</code> for HTTPS or HTTP traffic respectively) to establish proxy connections.</p>
 
 <p>CodePush specific proxy settings are also supported and can be set using the <code>--proxy</code> flag:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push login --proxy proxyUrl
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push login --proxy &lt;proxyURL&gt;
 </code></pre></div>
 <p>Alternatively, proxy functionality can be disabled (system environment variables are suppressed and CodePush ignores proxy settings) by passing the <code>--noproxy</code> flag:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push login --noproxy
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push login --noproxy
 </code></pre></div>
 <p>If at any time you want to determine if you&rsquo;re already logged in, you can run the following command to display the e-mail address associated with your current authentication session, which identity providers your account is linked to (e.g. GitHub) and any previously set proxy:</p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push whoami
 </code></pre></div>
 <p>When you login from the CLI, your access key is persisted to disk for the duration of your session so that you don&rsquo;t have to login every time you attempt to access your account. In order to end your session and delete this access key, simply run the following command:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push logout
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push logout
 </code></pre></div>
-<p>If you forget to logout from a machine you&rsquo;d prefer not to leave a running session on (e.g. your friend&rsquo;s laptop), you can use the following commands to list and remove any &ldquo;live&rdquo; access keys.
-The list of access keys will display the name of the machine the key was created on, as well as the time the login occurred. This should make it easy to spot keys you don&rsquo;t want to keep around.</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push access-key ls
-code-push access-key rm &lt;accessKey&gt;
+<p>If you forget to logout from a machine you&rsquo;d prefer not to leave a running session on (e.g. your friend&rsquo;s laptop), you can use the following commands to list and remove any current login sessions.</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push session ls
+code-push session rm &lt;machineName&gt;
 </code></pre></div>
-<p>If you need additional keys that can be used to authenticate against the CodePush service without needing to give access to your GitHub and/or Microsoft credentials, you can run the following command to create a persistent one (along with a description of what it is for):</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push access-key add &quot;VSTS Integration&quot;
+<h3>Access Keys</h3>
+
+<p>If you need to be able to authenticate against the CodePush service without launching a browser and/or without needing to use your GitHub and/or Microsoft credentials (e.g. in a CI environment), you can run the following command to create an &ldquo;access key&rdquo; (along with a name describing what it is for):</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push access-key add &quot;VSTS Integration&quot;
 </code></pre></div>
+<p>By default, access keys expire in 60 days. You can specify a different expiry duration by using the <code>--ttl</code> option and passing in a <a href="https://github.com/jkroso/parse-duration#parsestr">human readable duration string</a> (e.g. &ldquo;2d&rdquo; =&gt; 2 days, &ldquo;1h 15 min&rdquo; =&gt; 1 hour and 15 minutes). For security, the key will only be shown once on creation, so remember to save it somewhere if needed!</p>
+
 <p>After creating the new key, you can specify its value using the <code>--accessKey</code> flag of the <code>login</code> command, which allows you to perform &ldquo;headless&rdquo; authentication, as opposed to launching a browser.</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push login --accessKey &lt;accessKey&gt;
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push login --accessKey &lt;accessKey&gt;
 </code></pre></div>
-<p>When logging in via this method, the access key will not be automatically invalidated on logout, and can be used in future sessions until it is explicitly removed from the CodePush server. However, it is still recommended to log out once your session is complete, in order to remove your credentials from disk.</p>
+<p>When logging in via this method, the access key will not be automatically invalidated on logout, and can be used in future sessions until it is explicitly removed from the CodePush server or expires. However, it is still recommended that you log out once your session is complete, in order to remove your credentials from disk.</p>
+
+<p>Finally, if at any point you need to change a key&rsquo;s name and/or expiration date, you can use the following command:</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push access-key patch &lt;accessKeyName&gt; --name &quot;new name&quot; --ttl 10d
+</code></pre></div>
+<p><em>NOTE: When patching the TTL of an existing access key, its expiration date will be set relative to the current time, with no regard for its previous value.</em> </p>
 
 <h2>App Management</h2>
 
@@ -695,8 +706,8 @@ you can run the following command:</p>
 
 <ol>
 <li>View the app, its collaborators, <a href="#deployment-management">deployments</a> and <a href="#viewing-release-history">release history</a></li>
-<li><a href="#releasing-app-updates">Release</a> updates to any of the app&rsquo;s deployments</li>
-<li><a href="#promoting-updates-across-deployments">Promote</a> an update between any of the app&rsquo;s deployments</li>
+<li><a href="#releasing-updates">Release</a> updates to any of the app&rsquo;s deployments</li>
+<li><a href="#promoting-updates">Promote</a> an update between any of the app&rsquo;s deployments</li>
 <li><a href="#rolling-back-undesired-updates">Rollback</a> any of the app&rsquo;s deployments</li>
 <li><a href="#updating-existing-releases">Patch</a> any releases within any of the app&rsquo;s deployments</li>
 </ol>
@@ -753,11 +764,11 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 <p>The install metrics have the following meaning:</p>
 
 <ul>
-<li><p><strong>Active</strong> - The number of successful installs that are currently running this release. This number will increase and decrease as end-users upgrade to and away from this release, respectively.</p></li>
-<li><p><strong>Total</strong> - The total number of successful installations that this update has received overall. This number only ever increases as new users/devices install it, and therefore, this is always a superset of the active count.</p></li>
-<li><p><strong>Pending</strong> - The number of times this release has been downloaded, but not yet installed. This would only apply to updates that aren&rsquo;t installed immediately, and helps provide the broader picture of release adoption for apps that rely on app resume and restart to apply an update.</p></li>
+<li><p><strong>Active</strong> - The number of successful installs that are currently running this release (i.e. if the user opened your app, they would see/run this version). This number will increase and decrease as end-users upgrade to and away from this release, respectively. This metric shows both the total of active users, as well as what percentage of your overall audience that represents. This makes it easy to determine the distribution of updates that your users are currently running, as well as answer questions such as &ldquo;How many of my users have received my latest update?&rdquo;.</p></li>
+<li><p><strong>Total</strong> - The total number of successful installations that this update has received overall. This number only ever increases as new users/devices install it, and therefore, this is always a superset of the total active count. An update is considered successful once <code>notifyApplicationReady</code> (or <code>sync</code>) is called after it was installed. Between the moment that an update is downloaded, and it is marked as being successful, it will be reported as a &ldquo;pending&rdquo; update (see below for details).</p></li>
+<li><p><strong>Pending</strong> - The number of times this release has been downloaded, but not yet installed (i.e. the app was restarted to apply the changes). Therefore, this metric increases as updates are downloaded, and decreases as those corresponding downloaded updates are installed. This metric primarily applies to updates that aren&rsquo;t configured to install immediately, and helps provide the broader picture of release adoption for apps that rely on app resume and/or restart to apply an update (e.g. I want to rollback an update and I&rsquo;m curious if anyone has downloaded it yet). If you&rsquo;ve configured updates to install immediately, and are still seeing pending updates being reported, then it&rsquo;s likely that you&rsquo;re not calling <code>notifyApplicationReady</code> (or <code>sync</code>) on app start, which is the method that initiates sending install reports and marks installed updates as being considered successful.</p></li>
 <li><p><strong>Rollbacks</strong> - The number of times that this release has been automatically rolled back on the client. Ideally this number should be zero, and in that case, this metric isn&rsquo;t even shown. However, if you released an update that includes a crash as part of the installation process, the CodePush plugin will roll the end-user back to the previous release, and report that issue back to the server. This allows your end-users to remain unblocked in the event of broken releases, and by being able to see this telemetry in the CLI, you can identify erroneous releases and respond to them by <a href="#rolling-back-undesired-updates">rolling it back</a> on the server.</p></li>
-<li><p><strong>Rollout</strong> - Indicates the percentage of users that are elligble to receive this update. This property will only be displayed for releases that represent an &ldquo;active&rdquo; rollout, and therefore, have a rollout percentage that is less than 100%. Additionally, since a deployment can only have one active rollout at any given time, this label would only be present on the latest release within a deployment. </p></li>
+<li><p><strong>Rollout</strong> - Indicates the percentage of users that are eligible to receive this update. This property will only be displayed for releases that represent an &ldquo;active&rdquo; rollout, and therefore, have a rollout percentage that is less than 100%. Additionally, since a deployment can only have one active rollout at any given time, this label would only be present on the latest release within a deployment.</p></li>
 <li><p><strong>Disabled</strong> - Indicates whether the release has been marked as disabled or not, and therefore, is downloadable by end users. This property will only be displayed for releases that are actually disabled.</p></li>
 </ul>
 
@@ -960,7 +971,7 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 
 <h4>Rollout parameter</h4>
 
-<p><strong>IMPORTANT: In order for this parameter to actually take affect, your end users need to be running version <code>1.6.0-beta+</code> (for Cordova) or <code>1.9.0-beta+</code> (for React Native) of the CodePush plugin. If you release an update that specifies a rollout property, no end user running an older version of the Cordova or React Native plugins will be eligible for the update. Therefore, until you have adopted the neccessary version of the CodePush SDK, we would advise not setting a rollout value on your releases, since no one would end up receiving it.</strong></p>
+<p><strong>IMPORTANT: In order for this parameter to actually take affect, your end users need to be running version <code>1.6.0-beta+</code> (for Cordova) or <code>1.9.0-beta+</code> (for React Native) of the CodePush plugin. If you release an update that specifies a rollout property, no end user running an older version of the Cordova or React Native plugins will be eligible for the update. Therefore, until you have adopted the neccessary version of the platform-specific CodePush plugin (as previously mentioned), we would advise not setting a rollout value on your releases, since no one would end up receiving it.</strong></p>
 
 <p>This specifies the percentage of users (as an integer between <code>1</code> and <code>100</code>) that should be eligible to receive this update. It can be helpful if you want to &ldquo;flight&rdquo; new releases with a portion of your audience (e.g. 25%), and get feedback and/or watch for exceptions/crashes, before making it broadly available for everyone. If this parameter isn&rsquo;t set, it is set to <code>100%</code>, and therefore, you only need to set it if you want to actually limit how many users will receive it.</p>
 
@@ -989,6 +1000,8 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 [--disabled &lt;disabled&gt;]
 [--entryFile &lt;entryFile&gt;]
 [--mandatory]
+[--plistFile &lt;plistFile&gt;]
+[--plistFilePrefix &lt;plistFilePrefix&gt;]
 [--sourcemapOutput &lt;sourcemapOutput&gt;]
 [--targetBinaryVersion &lt;targetBinaryVersion&gt;]
 [--rollout &lt;rolloutPercentage&gt;]
@@ -1014,7 +1027,7 @@ code-push release MyApp ./CodePush 1.0.0
 <p>Achieving the equivalent behavior with the <code>release-react</code> command would simply require the following command, which is generally less error-prone:</p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-react MyApp ios
 </code></pre></div>
-<p><em>NOTE: We believe that the <code>release-react</code> command should be valuable for most React Native developers, so if you&rsquo;re finding that it isn&rsquo;t flexible enough or missing a key feature, please don&rsquo;t hesistate to <a href="mailto:codepushfeed@microsoft.com">let us know</a>, so that we can improve it.</em></p>
+<p><em>NOTE: We believe that the <code>release-react</code> command should be valuable for most React Native developers, so if you&rsquo;re finding that it isn&rsquo;t flexible enough or missing a key feature, please don&rsquo;t hesistate to <a href="mailto:codepushfeed@microsoft.com">let us know</a>, so that we can improve it!</em></p>
 
 <h4>App name parameter</h4>
 
@@ -1022,7 +1035,7 @@ code-push release MyApp ./CodePush 1.0.0
 
 <h4>Platform parameter</h4>
 
-<p>This specifies which platform the current update is targeting, and can be either <code>android</code>, <code>ios</code> or <code>windows</code> (case-insensitive).</p>
+<p>This specifies which platform the current update is targeting, and can be either <code>android</code>, <code>ios</code> or <code>windows</code> (case-insensitive). This value is only used to determine how to properly bundle your update contents and isn&rsquo;t actually sent to the server. </p>
 
 <h4>Deployment name parameter</h4>
 
@@ -1044,9 +1057,11 @@ code-push release MyApp ./CodePush 1.0.0
 
 <p>This is the same parameter as the one described in the <a href="#target-binary-version-parameter">above section</a>. If left unspecified, this defaults to targeting the exact version specified in the app&rsquo;s <code>Info.plist</code> (for iOS) and <code>build.gradle</code> (for Android) files.</p>
 
-<h4>Disabled parameter</h4>
+<h4>Bundle name parameter</h4>
 
-<p>This is the same parameter as the one described in the <a href="#disabled-parameter">above section</a>.</p>
+<p>This specifies the file name that should be used for the generated JS bundle. If left unspecified, the standard bundle name will be used for the specified platform: <code>main.jsbundle</code> (iOS), <code>index.android.bundle</code> (Android) and <code>index.windows.bundle</code> (Windows).</p>
+
+<p><em>NOTE: This parameter can be set using either &ndash;bundleName or -b</em></p>
 
 <h4>Development parameter</h4>
 
@@ -1054,17 +1069,35 @@ code-push release MyApp ./CodePush 1.0.0
 
 <p><em>NOTE: This parameter can be set using either &ndash;development or &ndash;dev</em></p>
 
+<h4>Disabled parameter</h4>
+
+<p>This is the same parameter as the one described in the <a href="#disabled-parameter">above section</a>.</p>
+
 <h4>Entry file parameter</h4>
 
 <p>This specifies the relative path to the app&rsquo;s root/entry JavaScript file. If left unspecified, this defaults to <code>index.ios.js</code> (for iOS),  <code>index.android.js</code> (for Android) or <code>index.windows.bundle</code> (for Windows) if that file exists, or <code>index.js</code> otherwise.</p>
 
 <p><em>NOTE: This parameter can be set using either &ndash;entryFile or -e</em></p>
 
-<h4>Bundle name parameter</h4>
+<h4>Plist file parameter</h4>
 
-<p>This specifies the file name that should be used for the generated JS bundle. If left unspecified, the standard bundle name will be used for the specified platform: <code>main.jsbundle</code> (iOS), <code>index.android.bundle</code> (Android) and <code>index.windows.bundle</code> (Windows).</p>
+<p>This specifies the relative path to the <code>Info.plist</code> file that the CLI should use when attempting to auto-detect the target binary version for the release. This parameter is only meant for advanced scenarios, since the CLI will automatically be able to find your <code>Info.plist</code> file in &ldquo;standard&rdquo; React Native projects, and you can use the <code>--plistFilePrefix</code> parameter in order to support per-environment plist files (e.g. <code>STAGING-Info.plist</code>). However, if your plist is located in an arbitrary location, that the CLI can&rsquo;t discover, then using this parameter allows you to continue releasing CodePush updates, without needing to explicitly set the <code>--targetBinaryVersion</code> parameter.</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-react foo ios -p &quot;./foo/bar/MyFile.plist&quot;
+</code></pre></div>
+<p><em>NOTE: This parameter can be set using either &ndash;plistFile or -p</em></p>
 
-<p><em>NOTE: This parameter can be set using either &ndash;bundleName or -b</em></p>
+<h4>Plist file prefix parameter</h4>
+
+<p>This specifies the file name prefix of the <code>Info.plist</code> file that that CLI should use when attempting to auto-detect the target binary version for the release. This can be useful if you&rsquo;ve created per-environment plist files (e.g. <code>DEV-Info.plist</code>, <code>STAGING-Info.plist</code>), and you want to be able to release CodePush updates without needing to explicity set the <code>--targetBinaryVersion</code> parameter. By specifying a <code>--plistFilePrefx</code>, the CLI will look for a file named <code>&lt;prefix&gt;-Info.plist</code>, instead of simply <code>Info.plist</code> (which is the default behavior), in the following locations: <code>./ios</code> and <code>./ios/&lt;appName&gt;</code>. If your plist file isn&rsquo;t located in either of those directories (e.g. your app is a native iOS app with embedded RN views), or uses an entirely different file naming convention, then consider using the <code>--plistFile</code> parameter. </p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell"># Auto-detect the target binary version of this release by looking up the 
+# app version within the STAGING-Info.plist file in either the ./ios or ./ios/&lt;APP&gt; directories.
+code-push release-react foo ios --pre &quot;STAGING&quot;
+
+# Tell the CLI to use your dev plist (`DEV-Info.plist`).
+# Note that the hyphen separator can be explicitly stated.
+code-push release-react foo ios --pre &quot;DEV-&quot;
+</code></pre></div>
+<p><em>NOTE: This parameter can be set using either &ndash;plistFilePrefix or &ndash;pre</em></p>
 
 <h4>Sourcemap output parameter</h4>
 
@@ -1135,16 +1168,38 @@ code-push release MyApp ./platforms/ios/www 1.0.0
 
 <p><em>NOTE: This parameter can be set using either &ndash;build or -b</em></p>
 
-<h2>Patching Updates</h2>
+<h2>Debugging CodePush Integration</h2>
 
-<p>After releasing an update, there may be scenarios where you need to modify one or more of the attributes associated with it (e.g. you forgot to mark a critical bug fix as mandatory, you want to increase the rollout percentage of an update). You can easily do this by running the following command:</p>
+<p>Once you&rsquo;ve released an update, and the Cordova or React Native plugin has been integrated into your app, it can be helpful to diagnose how the plugin is behaving, especially if you run into an issue and want to understand why. In order to debug the CodePush update discovery experience, you can run the following command in order to easily view the diagnostic logs produced by the CodePush plugin wihtin your app: </p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push debug &lt;platform&gt;
+
+# View all CodePush logs from a running
+# instace of the iOS simulator.
+code-push debug ios
+
+# View all CodePush logs from a running
+# Android emulator or attached device.
+code-push debug android
+</code></pre></div>
+<p><img width="500" src="https://cloud.githubusercontent.com/assets/116461/16246597/bd49a9ac-37ba-11e6-9aa4-a2d3b2821a90.png" /></p>
+
+<p>Under the covers, this command simply automates the usage of the iOS system logs and ADB logcat, but provides a platform-agnostic, filtered view of all logs coming from the CodePush plugin, for both Cordova or React Native. This, you don&rsquo;t need to learn and/or use another tool simply to be able to answer basic questions about how CodePush is behaving.</p>
+
+<p><em>NOTE: The debug command supports both emulators and devices for Android, but currently only supports listening to logs from the iOS simulator. We hope to add device support soon.</em></p>
+
+<h2>Patching Update Metadata</h2>
+
+<p>After releasing an update, there may be scenarios where you need to modify one or more of the metadata attributes associated with it (e.g. you forgot to mark a critical bug fix as mandatory, you want to increase the rollout percentage of an update). You can easily do this by running the following command:</p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push patch &lt;appName&gt; &lt;deploymentName&gt;
 [--label &lt;releaseLabel&gt;]
 [--mandatory &lt;isMandatory&gt;]
 [--description &lt;description&gt;]
 [--rollout &lt;rolloutPercentage&gt;]
+[--disabled &lt;isDisabled&gt;]
 [--targetBinaryVersion &lt;targetBinaryVersion&gt;]
 </code></pre></div>
+<p><em>NOTE: This command doesn&rsquo;t allow modifying the actual update contents of a release (e.g. <code>www</code> folder of a Cordova app). If you need to respond to a release that has been identified as being broken, you should use the <a href="#rolling-back-updates">rollback</a> command to immediately roll it back, and then if necessary, release a new update with the approrpriate fix when it is available.</em></p>
+
 <p>Aside from the <code>appName</code> and <code>deploymentName</code>, all parameters are optional, and therefore, you can use this command to update just a single attribute or all of them at once. Calling the <code>patch</code> command without specifying any attribute flag will result in a no-op.</p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell"># Mark the latest production release as mandatory
 code-push patch MyApp Production -m
@@ -1221,7 +1276,7 @@ code-push patch MyApp Staging -t &quot;1.0.0 - 1.0.5&quot;
 <h3>Target binary version parameter</h3>
 
 <p>This is the same parameter as the one described in the <a href="#target-binary-version-parameter">above section</a>, and simply allows you to override the target binary version that will be used for the promoted release. If unspecified, the new release will inherit the target binary version property from the release being promoted.</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell"># Promote the release to production and make it 
+<div class="highlight"><pre><code class="language-shell" data-lang="shell"># Promote the release to production and make it
 # available to all versions using that deployment
 code-push promote MyApp Staging Production -t &quot;*&quot;
 </code></pre></div>
