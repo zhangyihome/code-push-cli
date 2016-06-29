@@ -179,24 +179,8 @@ function appList(command: cli.IAppListCommand): Promise<void> {
     throwForInvalidOutputFormat(command.format);
     var apps: App[];
     return sdk.getApps()
-        .then((retrievedApps: App[]): Promise<string[][]> => {
-            apps = retrievedApps;
-            var deploymentListPromises: Promise<string[]>[] = apps.map((app: App) => {
-
-                return sdk.getDeployments(app.name)
-                    .then((deployments: Deployment[]) => {
-                        var deploymentList: string[] = deployments
-                            .map((deployment: Deployment) => deployment.name)
-                            .sort((first: string, second: string) => {
-                                return first.toLowerCase().localeCompare(second.toLowerCase());
-                            });
-                        return deploymentList;
-                    });
-            });
-            return Q.all(deploymentListPromises);
-        })
-        .then((deploymentLists: string[][]): void => {
-            printAppList(command.format, apps, deploymentLists);
+        .then((retrievedApps: App[]): void => {
+            printAppList(command.format, retrievedApps);
         });
 }
 
@@ -671,20 +655,14 @@ function formatDate(unixOffset: number): string {
     }
 }
 
-function printAppList(format: string, apps: App[], deploymentLists: string[][]): void {
+function printAppList(format: string, apps: App[]): void {
     if (format === "json") {
-        var dataSource: any[] = apps.map((app: App, index: number) => {
-            var augmentedApp: any = app;
-            augmentedApp.deployments = deploymentLists[index];
-            return augmentedApp;
-        });
-
-        printJson(dataSource);
+        printJson(apps);
     } else if (format === "table") {
         var headers = ["Name", "Deployments"];
         printTable(headers, (dataSource: any[]): void => {
             apps.forEach((app: App, index: number): void => {
-                var row = [app.name, wordwrap(50)(deploymentLists[index].join(", "))];
+                var row = [app.name, wordwrap(50)(app.deployments.join(", "))];
                 dataSource.push(row);
             });
         });
