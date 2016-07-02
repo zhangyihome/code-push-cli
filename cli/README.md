@@ -133,7 +133,7 @@ Once you've logged in, any inferred and/or specified proxy settings are persiste
 
 Additionally, if at any time you want to see what proxy settings (if any) are being used for your current login setting, simply run the `code-push whoami` command, which will display whether you're using, or explicitly bypassing a proxy.
 
-![noproxy](https://cloud.githubusercontent.com/assets/116461/16537231/4f695518-3fb2-11e6-8196-b839e317c324.PNG)
+![ignoredproxy](https://cloud.githubusercontent.com/assets/116461/16537275/5166abf8-3fb3-11e6-930b-fb6a8164c65d.PNG)
 
 ## App Management
 
@@ -607,7 +607,7 @@ Specifies whether you want to run `cordova build` instead of `cordova prepare` (
 
 ## Debugging CodePush Integration
 
-Once you've released an update, and the Cordova or React Native plugin has been integrated into your app, it can be helpful to diagnose how the plugin is behaving, especially if you run into an issue and want to understand why. In order to debug the CodePush update discovery experience, you can run the following command in order to easily view the diagnostic logs produced by the CodePush plugin wihtin your app: 
+Once you've released an update, and the Cordova or React Native plugin has been integrated into your app, it can be helpful to diagnose how the plugin is behaving, especially if you run into an issue and want to understand why. In order to debug the CodePush update discovery experience, you can run the following command in order to easily view the diagnostic logs produced by the CodePush plugin within your app: 
 
 ```shell
 code-push debug <platform>
@@ -623,7 +623,7 @@ code-push debug android
 
 <img width="500" src="https://cloud.githubusercontent.com/assets/116461/16246597/bd49a9ac-37ba-11e6-9aa4-a2d3b2821a90.png" />
 
-Under the covers, this command simply automates the usage of the iOS system logs and ADB logcat, but provides a platform-agnostic, filtered view of all logs coming from the CodePush plugin, for both Cordova or React Native. This, you don't need to learn and/or use another tool simply to be able to answer basic questions about how CodePush is behaving.
+Under the covers, this command simply automates the usage of the iOS system logs and ADB logcat, but provides a platform-agnostic, filtered view of all logs coming from the CodePush plugin, for both Cordova or React Native. This way, you don't need to learn and/or use another tool simply to be able to answer basic questions about how CodePush is behaving.
 
 *NOTE: The debug command supports both emulators and devices for Android, but currently only supports listening to logs from the iOS simulator. We hope to add device support soon.*
 
