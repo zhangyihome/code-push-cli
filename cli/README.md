@@ -9,9 +9,10 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
 * [Account Management](#account-management)
     * [Authentication](#authentication)
     * [Access Keys](#access-keys)
+    * [Proxy Support](#proxy-support)
 * [App Management](#app-management)
-* [App Collaboration](#app-collaboration)
-* [Deployment Management](#deployment-management)
+   * [App Collaboration](#app-collaboration)
+   * [Deployment Management](#deployment-management)
 * [Releasing Updates](#releasing-updates)
     * [Releasing Updates (General)](#releasing-updates-general)
     * [Releasing Updates (React Native)](#releasing-updates-react-native)
@@ -69,20 +70,6 @@ code-push login
 
 This will launch a browser, asking you to authenticate with either your GitHub or Microsoft account. This will generate an access key that you need to copy/paste into the CLI (it will prompt you for it). You are now successfully authenticated and can safely close your browser window.
 
-By default, the login command supports proxies and will look for system environment variables (`HTTPS_PROXY` or `HTTP_PROXY` for HTTPS or HTTP traffic respectively) to establish proxy connections.
-
-CodePush specific proxy settings are also supported and can be set using the `--proxy` flag:
-
-```shell
-code-push login --proxy <proxyURL>
-```
-
-Alternatively, proxy functionality can be disabled (system environment variables are suppressed and CodePush ignores proxy settings) by passing the `--noproxy` flag:
-
-```shell
-code-push login --noproxy
-```
-
 If at any time you want to determine if you're already logged in, you can run the following command to display the e-mail address associated with your current authentication session, which identity providers your account is linked to (e.g. GitHub) and any previously set proxy:
 
 ```shell
@@ -128,6 +115,26 @@ code-push access-key patch <accessKeyName> --name "new name" --ttl 10d
 
 *NOTE: When patching the TTL of an existing access key, its expiration date will be set relative to the current time, with no regard for its previous value.* 
 
+### Proxy Support
+
+By default, the `login` command will automatically look for a system-wide proxy, specified via an `HTTPS_PROXY` or `HTTP_PROXY` environment variable, and use that to connect to the CodePush server. If you'd like to disable this behavior, and have the CLI establish a direct connection to CodePush, simply specify the `--noProxy` parameter when logging in:
+
+```shell
+code-push login --noProxy
+```
+
+I'd you like to explicitly specify a proxy server that the CodePush CLI should use, without relying on system-wide settings, you can instead pass the `--proxy` parameter when logging in:
+
+```shell
+code-push login --proxy https://foo.com:3454
+```
+
+Once you've logged in, any inferred and/or specified proxy settings are persisted along with your user session. This allows you to continue using the CodePush CLI without needing to re-authenticate or re-specify your preferred proxy. If at any time you want to start or stop using a proxy, simply logout, and then log back in with the newly desired settings.
+
+Additionally, if at any time you want to see what proxy settings (if any) are being used for your current login setting, simply run the `code-push whoami` command, which will display whether you're using, or explicitly bypassing a proxy.
+
+![noproxy](https://cloud.githubusercontent.com/assets/116461/16537231/4f695518-3fb2-11e6-8196-b839e317c324.PNG)
+
 ## App Management
 
 Before you can deploy any updates, you need to register an app with the CodePush service using the following command:
@@ -168,7 +175,7 @@ you can run the following command:
 code-push app ls
 ```
 
-## App Collaboration
+### App Collaboration
 
 If you will be working with other developers on the same CodePush app, you can add them as collaborators using the following command:
 
@@ -218,7 +225,7 @@ code-push app transfer <appName> <newOwnerEmail>
 
 Once confirmed, the specified developer becomes the app's owner and immediately receives the permissions associated with that role. Besides the transfer of ownership, nothing else about the app is modified (e.g. deployments, release history, collaborators). This means that you will still be a collaborator of the app, and therefore, if you want to remove yourself, you simply need to run the `code-push collaborator rm` command after successfully transferring ownership.
 
-## Deployment Management
+### Deployment Management
 
 From the CodePush perspective, an app is simply a named grouping for one or more things called "deployments". While the app represents a conceptual "namespace" or "scope" for a platform-specific version of an app (e.g. the iOS port of Foo app), its deployments represent the actual target for releasing updates (for developers) and synchronizing updates (for end-users). Deployments allow you to have multiple "environments" for each app in-flight at any given time, and help model the reality that apps typically move from a dev's personal environment to a testing/QA/staging environment, before finally making their way into production.
 
