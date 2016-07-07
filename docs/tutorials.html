@@ -1053,6 +1053,8 @@ code-push app add VSTSCDSample-Android
     var baseURL="http://docsfeedback.azurewebsites.net/api/feedback/";
     var feedbackType, messageId;
     var docURL = window.location.host+window.location.pathname;
+    var date = new Date().toUTCString();
+    var project = "CodePush";
 
     function sendFeed(feedType){
         feedbackType = feedType;
@@ -1062,7 +1064,7 @@ code-push app add VSTSCDSample-Android
             crossDomain: true,
             cors: true,           
             url: baseURL+"create",
-            data: { Type: feedbackType, ParentURL: docURL},
+            data: { Type: feedbackType, ParentURL: docURL, Project: project, CreationDate: date},
             success:
                 function (result, textStatus, xhr) {
                     messageId = xhr.responseJSON.Id;
