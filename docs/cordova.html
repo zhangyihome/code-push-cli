@@ -1228,7 +1228,7 @@ window.codePush.checkForUpdate(onUpdateCheck, onError);
             url: baseURL+"create",
             data: { Type: feedbackType, ParentURL: docURL, Project: project, CreationDate: date, Id: messageId}
         })
-        .done(function() {
+        .done(function(result, textStatus, xhr) {
             messageId = xhr.responseJSON.Id;
             $('.widget-entry').css('display','none');
             $('.widget-message').css('display','block');
