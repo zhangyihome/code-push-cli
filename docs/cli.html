@@ -1447,7 +1447,11 @@ code-push rollback MyApp Production
                     function () {  
                         $('.widget-message').css('display','none');
                         $('.widget-thankyou').css('display','block');                  
-                    }        
+                    },
+                 error:
+                    function (err) {  
+                        console.log(err);                  
+                    }
                 }
             );            
         }

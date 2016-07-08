@@ -1243,7 +1243,11 @@ window.codePush.checkForUpdate(onUpdateCheck, onError);
                     function () {  
                         $('.widget-message').css('display','none');
                         $('.widget-thankyou').css('display','block');                  
-                    }        
+                    },
+                 error:
+                    function (err) {  
+                        console.log(err);                  
+                    }
                 }
             );            
         }
