@@ -781,7 +781,47 @@
 </ol>
                     
                 </article>
-                
+                <div class="feedback-container">
+    <div class="widget">
+        <div class="widget-error" style="display:none">
+            <div class="header">
+                <h3>Server trouble... ☹</h3>
+            </div>
+            <div class="message">
+                <P>We appreciate the effort but we are having issues.</P>
+            </div>
+        </div>            
+        <div class="widget-thankyou" style="display:none">
+            <div class="header">
+                <h3>Thank you!</h3>
+            </div>
+            <div class="message">
+                <P>We appreciate your feedback.</P>
+            </div>
+        </div>           
+        <div class="widget-message" style="display:none">
+            <div class="header">
+                <h3>Additional feedback</h3>
+                <!--<span class="charCount">1000</span>-->
+            </div>
+            <textarea class="form-control widget-text" maxlength="1000" rows="4"></textarea>
+            <div class="buttons">
+                <button type="submit" onclick="updateFeed(true)">Submit</button>
+                <button type="submit" onclick="updateFeed()">Skip this</button>
+            </div>
+        </div>        
+        <div class="widget-entry">
+            <div class="header">
+                <h3> Was this documentation helpful?</h3>
+            </div>
+            <div class="buttons">
+                <button onclick="sendFeed(1)">Yes</button>
+                <button onclick="sendFeed(0)"> No</button>
+            </div>
+        </div>     
+    </div>    
+</div>
+
 <script>
 
     var baseURL="http://docsfeedback.azurewebsites.net/api/feedback/";
@@ -798,15 +838,18 @@
             crossDomain: true,
             cors: true,           
             url: baseURL+"create",
-            data: { Type: feedbackType, ParentURL: docURL, Project: project, CreationDate: date},
-            success:
-                function (result, textStatus, xhr) {
-                    messageId = xhr.responseJSON.Id;
-                    $('.widget-entry').css('display','none');
-                    $('.widget-message').css('display','block');
-                }        
-            }
-        );
+            data: { Type: feedbackType, ParentURL: docURL, Project: project, CreationDate: date, Id: messageId}
+        })
+        .done(function() {
+            messageId = xhr.responseJSON.Id;
+            $('.widget-entry').css('display','none');
+            $('.widget-message').css('display','block');
+        })
+        .fail(function(req, status, error ) {
+            console.log( 'Something went wrong - ', status, error );
+            $('.widget-entry').css('display','none');
+            $('.widget-error').css('display','block');            
+        });    
     }
     
     function updateFeed(msg){       
@@ -818,21 +861,21 @@
                 crossDomain: true,
                 cors: true,           
                 url: baseURL+messageId,
-                data: { Type: feedbackType, ParentURL: docURL, Project: project, CreationDate: date, Id: messageId, Message: comments,},
-                success: function () {  
-                        $('.widget-message').css('display','none');
-                        $('.widget-thankyou').css('display','block');
-                 },
-                 error: function( req, status, error ) {
-                    console.log( 'Something went wrong - ', status, error );
-                 }
-                }
-            );            
+                data: { Type: feedbackType, ParentURL: docURL, Project: project, CreationDate: date, Id: messageId, Message: comments}
+            })
+            .done(function() {
+                $('.widget-message').css('display','none');
+                $('.widget-thankyou').css('display','block');
+            })
+            .fail(function(req, status, error ) {
+                console.log( 'Something went wrong - ', status, error );
+                $('.widget-message').css('display','none');
+                $('.widget-error').css('display','block');                
+            });
         }
         else{
             $('.widget-message').css('display','none');
-            $('.widget-thankyou').css('display','block');
-            $('.widget-thankyou').css('display','block');            
+            $('.widget-thankyou').css('display','block');          
         }
         setTimeout(function(){         
             $('.widget').fadeTo( "slow", 0);
