@@ -1239,15 +1239,13 @@ window.codePush.checkForUpdate(onUpdateCheck, onError);
                 cors: true,           
                 url: baseURL+messageId,
                 data: { Type: feedbackType, ParentURL: docURL, Project: project, CreationDate: date, Id: messageId, Message: comments,},
-                success:
-                    function () {  
+                success: function () {  
                         $('.widget-message').css('display','none');
-                        $('.widget-thankyou').css('display','block');                  
-                    },
-                 error:
-                    function (err) {  
-                        console.log(err);                  
-                    }
+                        $('.widget-thankyou').css('display','block');
+                 },
+                 error: function( req, status, error ) {
+                    console.log( 'Something went wrong - ', status, error );
+                 }
                 }
             );            
         }
