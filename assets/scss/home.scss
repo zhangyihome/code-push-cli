@@ -20,7 +20,7 @@
     margin-bottom:-6em;
     margin-top: -5em;
     max-height: 66em;
-    
+
     @include vendor-prefix(transform, translateX(-50%));
 
     position: relative;
@@ -196,7 +196,7 @@
         padding-left: 60px;
         border-left: 1px solid $brand-middle-blue;
     }
-    
+
     p {
         font-size: 1.6em;
     }
@@ -372,11 +372,11 @@
 */
 .how_it_works {
     margin-top: 4em;
-    
+
     small {
         font-size: 1.3em;
     }
-    
+
     ol {
         -moz-padding-start: 1.4em;
         -webkit-padding-start: 1.4em;
@@ -390,12 +390,12 @@
             margin-bottom: 10px;
         }
     }
-    
+
     p {
         font-size: 1.6em;
         line-height: 1.8em;
     }
-    
+
     .img {
         max-width: 375px;
     }
@@ -405,7 +405,7 @@
 ********* Getting Started ***********
 */
 .getting_started {
-    
+
     .row:first-child {
         margin-bottom: 1em;
     }
@@ -450,8 +450,7 @@
     margin-top: -0.5em;
 }
 
-.well_code {    
-
+.well_code {
     padding: 19px;
     padding-bottom: 19px + 50px;
     position: relative;
@@ -462,7 +461,7 @@
         font-family: Menlo, Monaco, "Courier New", monospace;
     }
 
-    div {        
+    div {
 
         position: absolute;
         top: 100%;
@@ -482,7 +481,6 @@
 }
 
 .well_text {
-    
     padding: 19px;
     margin-top: 46px;
     border:0;
@@ -542,14 +540,14 @@
 */
 
  .cp_friends {
-      
+
       padding:2em;
-      
+
       h3{
           text-align: center;
           padding-bottom: 1em;
       }
-      
+
       .friend-container {
           padding-bottom: 4em;
           margin: 0;
@@ -563,8 +561,8 @@
           flex-wrap: wrap;
           height:20em;
       }
-      
-      
+
+
       .friendbar-content {
           position: relative;
           z-index: 5;
@@ -576,11 +574,11 @@
       .friend-info {
           color: #666666;
       }
-      
+
        .friend-contentcontainer {
           width: 100%;
       }
-      
+
       .friend-item {
           padding: 1em;
           width: 20em;
@@ -591,13 +589,13 @@
           margin: 1em;
           line-height: 14em;
           background-color: white;
-          
+
           img{
               width:60%;
           }
-          
+
       }
-      
+
       .carousel-control, {
         &.left,&.right{
           background-image: none;
@@ -609,63 +607,63 @@
       }
 
     }
-      
+
     .carousel {
         background-color: rgba(0, 0, 0, 0.03);
         border-radius: .8em;
-        height: 20em; 
+        height: 20em;
     }
-    
+
     .carousel-inner > .item{
       padding:1em .5em;
     }
-    
+
     .carousel-indicators {
         bottom: -.4em;
         opacity: 0.4;
-        font-size: 30%;    
-        
+        font-size: 30%;
+
         .active {
             width: 1.2em;
             height: 1.2em;
             margin: 0;
             background-color:$brand-backgound-color;
         }
-        
-    }    
-    
+
+    }
+
     h1{
       padding: 2em 0 2.6em 0;
-      text-align: center;   
+      text-align: center;
     }
-    
+
     .more-friends{
       p{
-        padding: 4em 0 3em 0;        
+        padding: 4em 0 3em 0;
       }
     }
-                    
+
   }
-  
-  
+
+
 @media (max-width: $screen-xs-max) {
-    
+
     .hero_logo_container .signup-banner {
         margin-top:3.7em;
     }
-    
-    
-    .cp_friends{        
+
+
+    .cp_friends{
         .carousel-control.left{
-            margin-top: -1.8em;            
+            margin-top: -1.8em;
             margin-left: -1.2em;
         }
         .carousel-control.right {
             margin-top: -1.8em;
             margin-right: -1.2em;
-        }         
-    }   
-        
+        }
+    }
+
 }
 
 @media (min-width: $screen-sm) {
@@ -683,15 +681,15 @@
     .npm-banner {
         padding-top: 40px;
     }
-    
+
     .cp_friends{
-        .carousel-control.left{            
+        .carousel-control.left{
             margin-left: .5em;
         }
         .carousel-control.right {
             margin-right: .5em;
-        }         
-    }      
+        }
+    }
 }
 
 
@@ -713,7 +711,7 @@
             left: -60px;
         }
     }
-    
+
     //Let's us put a numbered circle as aligned to h2 on medium-large devices
     .number_circle {
         margin-left: 15px;
@@ -728,17 +726,17 @@
     .getting-started-text {
         padding-left: calc(15px + 70px);
 
-        //Bootstrap's default + 50px extra for the number circle   
+        //Bootstrap's default + 50px extra for the number circle
     }
-        
+
     .cp_friends{
-        .carousel-control.left{            
+        .carousel-control.left{
             margin-left: .2em;
         }
         .carousel-control.right {
             margin-right: .2em;
-        }         
-    }    
+        }
+    }
 }
 
 @media (min-width: $screen-lg) {
@@ -756,13 +754,13 @@
     .npm-banner {
         padding-top: 40px;
     }
-    
+
     .cp_friends{
-        .carousel-control.left{          
+        .carousel-control.left{
             margin-left: -.4em;
         }
         .carousel-control.right {
             margin-right: -.4em;
-        }         
-    }          
+        }
+    }
 }
