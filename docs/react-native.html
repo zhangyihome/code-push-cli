@@ -1776,7 +1776,7 @@ codePush.sync({ updateDialog: true },
             <div class="message">
                 <P>We appreciate the effort but we are having issues.</P>
             </div>
-        </div>            
+        </div>
         <div class="widget-thankyou" style="display:none">
             <div class="header">
                 <h3>Thank you!</h3>
@@ -1784,7 +1784,7 @@ codePush.sync({ updateDialog: true },
             <div class="message">
                 <P>We appreciate your feedback.</P>
             </div>
-        </div>           
+        </div>
         <div class="widget-message" style="display:none">
             <div class="header">
                 <h3>Additional feedback</h3>
@@ -1795,7 +1795,7 @@ codePush.sync({ updateDialog: true },
                 <button type="submit" onclick="updateFeed(true)">Submit</button>
                 <button type="submit" onclick="updateFeed()">Skip this</button>
             </div>
-        </div>        
+        </div>
         <div class="widget-entry">
             <div class="header">
                 <h3> Was this documentation helpful?</h3>
@@ -1804,13 +1804,13 @@ codePush.sync({ updateDialog: true },
                 <button onclick="sendFeed(1)">Yes</button>
                 <button onclick="sendFeed(0)"> No</button>
             </div>
-        </div>     
-    </div>    
+        </div>
+    </div>
 </div>
 
 <script>
 
-    var baseURL="http://docsfeedback.azurewebsites.net/api/feedback/";
+    var baseURL="https://docsfeedback.azurewebsites.net/api/feedback/";
     var feedbackType, messageId;
     var docURL = window.location.host+window.location.pathname;
     var date = new Date().toUTCString();
@@ -1822,7 +1822,7 @@ codePush.sync({ updateDialog: true },
             method: "POST",
             contentType: "application/x-www-form-urlencoded",
             crossDomain: true,
-            cors: true,           
+            cors: true,
             url: baseURL+"create",
             data: { Type: feedbackType, ParentURL: docURL, Project: project, CreationDate: date, Id: messageId}
         })
@@ -1834,18 +1834,18 @@ codePush.sync({ updateDialog: true },
         .fail(function(req, status, error ) {
             console.log( 'Something went wrong - ', status, error );
             $('.widget-entry').css('display','none');
-            $('.widget-error').css('display','block');            
-        });    
+            $('.widget-error').css('display','block');
+        });
     }
-    
-    function updateFeed(msg){       
-        var comments = $('.widget-text').val();        
+
+    function updateFeed(msg){
+        var comments = $('.widget-text').val();
         if(msg){
             $.ajax({
                 method: "PUT",
                 contentType: "application/x-www-form-urlencoded",
                 crossDomain: true,
-                cors: true,           
+                cors: true,
                 url: baseURL+messageId,
                 data: { Type: feedbackType, ParentURL: docURL, Project: project, CreationDate: date, Id: messageId, Message: comments}
             })
@@ -1856,14 +1856,14 @@ codePush.sync({ updateDialog: true },
             .fail(function(req, status, error ) {
                 console.log( 'Something went wrong - ', status, error );
                 $('.widget-message').css('display','none');
-                $('.widget-error').css('display','block');                
+                $('.widget-error').css('display','block');
             });
         }
         else{
             $('.widget-message').css('display','none');
-            $('.widget-thankyou').css('display','block');          
+            $('.widget-thankyou').css('display','block');
         }
-        setTimeout(function(){         
+        setTimeout(function(){
             $('.widget').fadeTo( "slow", 0);
         },4000);
     }
