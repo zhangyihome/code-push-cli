@@ -615,12 +615,12 @@
 <li><strong>ON_NEXT_RESUME</strong>: The update is downloaded but not installed immediately. The new content will be available the next time the application is resumed or restarted, whichever event happens first.</li>
 </ul>
 
-<p>For example, to download and install an update immediately, developers can use the <code>installMode</code> parameter as follows: </p>
+<p>For example, to download and install an update immediately, developers can use the <code>installMode</code> parameter as follows:</p>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.sync({installMode: InstallMode.IMMEDIATE});
 </code></pre></div>
 <h4>Recommendation</h4>
 
-<p>Depending on the complexity of the app, pushing an update immediately might be a jarring experience for end users (e.g. changing the UI or losing the current state can be frustrating and confusing).  Because of this, we recommend updates are installed only after a certain period of app inactivity has been reached. To achieve this experience, developers can use the InstallMode.ON_NEXT_RESUME and minimumBackgroundDuration parameters as follows: </p>
+<p>Depending on the complexity of the app, pushing an update immediately might be a jarring experience for end users (e.g. changing the UI or losing the current state can be frustrating and confusing).  Because of this, we recommend updates are installed only after a certain period of app inactivity has been reached. To achieve this experience, developers can use the InstallMode.ON_NEXT_RESUME and minimumBackgroundDuration parameters as follows:</p>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">// Download the update silently, but install on next
 // app resume and after 10 minutes of app inactivity
 // We recommend doing this call on app start (e.g. `componentDidMount` event on React Native or `deviceready` on Cordova)
@@ -628,11 +628,14 @@ codePush.sync({ installMode: InstallMode.ON_NEXT_RESUME, minimumBackgroundDurati
 </code></pre></div>
 <blockquote>
 <p><strong>Note:</strong> If <code>codePush.sync()</code> is not called on app start (e.g. <code>componentDidMount</code> event on React Native or <code>deviceready</code> on Cordova), developers will need to notify the update was successfully installed by calling the <code>codePush.notifyApplicationReady()</code> method. Otherwise the CodePush runtime will assume the installed update has failed and roll back to the previous version.</p>
-</blockquote>
 
+<p><strong>Note:</strong> For Cordova, the first parameter that <code>codePush.sync()</code> expects is a <code>syncStatusCallback</code>, so to do the same thing, you should insert <code>null</code> as the first parameter to the call, i.e:</p>
+</blockquote>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.sync(null, { installMode: InstallMode.ON_NEXT_RESUME, minimumBackgroundDuration: 60 * 10 });
+</code></pre></div>
 <h3>2.   Active mode</h3>
 
-<p>In contrast to the silent mode updates, active mode updates prompt end users about available updates and thus require user interaction. </p>
+<p>In contrast to the silent mode updates, active mode updates prompt end users about available updates and thus require user interaction.</p>
 
 <p>The difference is introduced by the usage of the <code>updateDialog</code> parameter.</p>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">    codePush.sync({ updateDialog: true });
@@ -665,7 +668,7 @@ codePush.sync({ installMode: InstallMode.ON_NEXT_RESUME, minimumBackgroundDurati
 
 <h4>Update cycle notifications</h4>
 
-<p>The <code>codePush.sync()</code> method allows the use of a call back to hook into the overall update process and thus provide a custom experience on each stage of the update process as follows. </p>
+<p>The <code>codePush.sync()</code> method allows the use of a call back to hook into the overall update process and thus provide a custom experience on each stage of the update process as follows.</p>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var onSyncStatusChange = function(SyncStatus) {
     switch (SyncStatus) {
         case SyncStatus.CHECKING_FOR_UPDATE:
@@ -673,7 +676,7 @@ codePush.sync({ installMode: InstallMode.ON_NEXT_RESUME, minimumBackgroundDurati
             break;
         case SyncStatus.AWAITING_USER_ACTION:
             // Show &quot;Checking for update&quot; notification
-            break;                
+            break;
         case SyncStatus.DOWNLOADING_PACKAGE:
             // Show &quot;downloading&quot; notification
             break;
@@ -683,7 +686,7 @@ codePush.sync({ installMode: InstallMode.ON_NEXT_RESUME, minimumBackgroundDurati
     }
 }
 
-// Prompt the user when an update is available and display a &quot;downloading&quot; modal 
+// Prompt the user when an update is available and display a &quot;downloading&quot; modal
 codePush.sync({ updateDialog: true }, onSyncStatusChange);
 
 </code></pre></div>
@@ -698,7 +701,7 @@ var onError = function (error) {
 };
 
 var onDownloadProgress = function (downloadProgress) {
-    if (downloadProgress) {        
+    if (downloadProgress) {
         console.log(&quot;Downloading &quot; + downloadProgress.receivedBytes + &quot; of &quot; + downloadProgress
     }
 };
@@ -710,11 +713,11 @@ codePush.sync({ updateDialog: true }, onSyncStatusChange, onDownloadProgress, on
 
 <p>Continuous Integration (CI) and Continuous Deployment (CD) are key practices of DevOps. It requires the team to have a mindset to merge all working copies of developers’ code with a shared repository, producing a new build upon code commit. In turn this provides them with the opportunity to leverage the CI output, deploy it to one or more environments, and ultimately serve the end users via app updates.</p>
 
-<p>This tutorial covers how to leverage Visual Studio Team Services (VSTS) and CodePush in order to create a CD environment to automate app updates from an existing CI environment. Even though a &ldquo;proper&rdquo; CI build not only compiles the code, but ideally runs code analysis, unit (and sometimes even integration) tests and even could package the code, those CI details won’t be discussed but instead go over the basics of CI integration as well as details of how to setup the CD environment. </p>
+<p>This tutorial covers how to leverage Visual Studio Team Services (VSTS) and CodePush in order to create a CD environment to automate app updates from an existing CI environment. Even though a &ldquo;proper&rdquo; CI build not only compiles the code, but ideally runs code analysis, unit (and sometimes even integration) tests and even could package the code, those CI details won’t be discussed but instead go over the basics of CI integration as well as details of how to setup the CD environment.</p>
 
 <h3>Overview</h3>
 
-<p>VSTS is a collection of services that let teams share code, track work, and ship software—for any language. </p>
+<p>VSTS is a collection of services that let teams share code, track work, and ship software—for any language.</p>
 
 <p>From a high-level it provides developers with:</p>
 
@@ -729,7 +732,7 @@ codePush.sync({ updateDialog: true }, onSyncStatusChange, onDownloadProgress, on
 
 <p>In addition, VSTS allows developers to extend the service by creating VSTS extensions that can help with tasks covering the full CI and CD spectrum.</p>
 
-<p>The CodePush service provides a VSTS extension with a set of deployment tasks that allows the automation of releases and the promotion of app updates directly from your CI environment. </p>
+<p>The CodePush service provides a VSTS extension with a set of deployment tasks that allows the automation of releases and the promotion of app updates directly from your CI environment.</p>
 
 <p>Leveraging the workflow discussed below can greatly reduce the effort needed to keep your dev/alpha/beta deployments up-to-date, since you can simply push changes to the configured source control branches, and let your automated build take care of the rest. No need to manually release, promote or rollout from the CodePush CLI!</p>
 
@@ -740,7 +743,7 @@ codePush.sync({ updateDialog: true }, onSyncStatusChange, onDownloadProgress, on
 <ul>
 <li>VSTS Account (Sign up for a free VSTS account <a href="https://www.visualstudio.com/products/free-developer-offers-vs">here</a>)</li>
 <li>CodePush Account (Follow these <a href="http://microsoft.github.io/code-push/docs/getting-started.html#link-0">steps</a> to create an account)</li>
-<li>React Native &ldquo;CodePush ready&rdquo; <a href="https://github.com/rub8n/VSTSCDSample">sample app</a> (Use your own app or download the &ldquo;bare bones&rdquo; sample app to speed things up)<br></li>
+<li>React Native &ldquo;CodePush ready&rdquo; <a href="https://github.com/rub8n/VSTSCDSample">sample app</a> (Use your own app or download the &ldquo;bare bones&rdquo; sample app to speed things up)</li>
 </ul>
 
 <blockquote>
@@ -749,7 +752,7 @@ codePush.sync({ updateDialog: true }, onSyncStatusChange, onDownloadProgress, on
 
 <h3>1. Register your app with CodePush</h3>
 
-<p>Start by registering your app with the CodePush service: 
+<p>Start by registering your app with the CodePush service:
 <code>
 code-push app add VSTSCDSample-Android
 </code></p>
@@ -837,7 +840,7 @@ code-push app add VSTSCDSample-Android
 
 <h4>Configure the build task</h4>
 
-<p>As part of the CI build configuration process, you&rsquo;ll add a series of steps that will build the project and publish an artifact (the Android bundle), which the CD environment will use to update the app.   </p>
+<p>As part of the CI build configuration process, you&rsquo;ll add a series of steps that will build the project and publish an artifact (the Android bundle), which the CD environment will use to update the app.</p>
 
 <p><img src="/code-push/assets/images/docs/tutorials/vsts/vsts-build-steps.png" alt="Build steps"></p>
 
@@ -859,7 +862,7 @@ code-push app add VSTSCDSample-Android
 
 <ul>
 <li>Use <code>mkdir</code> as the <code>Tool</code></li>
-<li>Use <code>artifacts</code> as the <code>Arguments</code><br></li>
+<li>Use <code>artifacts</code> as the <code>Arguments</code></li>
 </ul></li>
 <li><p>Add a new build step to add <code>React Native Prepare</code> from the <code>Build</code> category. Select it and specify the following settings:</p>
 
@@ -885,7 +888,7 @@ code-push app add VSTSCDSample-Android
 <li><p>Save and name the build definition by pressing the <code>Save</code> toolbar button.</p></li>
 </ol>
 
-<p>You can manually queue a new build to test the build process by pressing the <code>Queue build...</code> toolbar button. </p>
+<p>You can manually queue a new build to test the build process by pressing the <code>Queue build...</code> toolbar button.</p>
 
 <p><img src="/code-push/assets/images/docs/tutorials/vsts/vsts-build-queue.png" alt="Build queue"></p>
 
@@ -964,8 +967,8 @@ code-push app add VSTSCDSample-Android
 <li><p>Add a second environment and name it <code>Rollout</code> by clicking on <code>Add environment</code> then on &ldquo;Create new environment&rdquo;. Select <code>Empty</code>, press <code>Next</code> and specify the following settings:</p>
 
 <ul>
-<li>Set <code>Specific users</code> under <code>Pre-deployment approval</code> to control what users decide to approve deployments to the <code>Rollout</code> environment. </li>
-<li>Select the <code>trigger</code> to ensure this step kicks off automatically after the <code>Staging</code> release completes. </li>
+<li>Set <code>Specific users</code> under <code>Pre-deployment approval</code> to control what users decide to approve deployments to the <code>Rollout</code> environment.</li>
+<li>Select the <code>trigger</code> to ensure this step kicks off automatically after the <code>Staging</code> release completes.</li>
 </ul></li>
 <li><p>Configure the environment to target only a fixed number of production users, by clicking on &ldquo;Add tasks&rdquo; and selecting <code>CodePush - Promote</code> from the <code>Deploy</code> category. Select it and specify the following settings:</p>
 
@@ -981,17 +984,17 @@ code-push app add VSTSCDSample-Android
 <li><p>Add a third environment and name it <code>Production</code> by clicking on <code>Add environment</code> then on &ldquo;Create new environment&rdquo;. Select <code>Empty</code>, press <code>Next</code> and specify the following settings:</p>
 
 <ul>
-<li>Set <code>Specific users</code> under <code>Pre-deployment approval</code> to control what users decide to approve deployments to the <code>Rollout</code> environment. </li>
-<li>Select the <code>trigger</code> to ensure this step kicks off automatically after the <code>Rollout</code> release completes. </li>
+<li>Set <code>Specific users</code> under <code>Pre-deployment approval</code> to control what users decide to approve deployments to the <code>Rollout</code> environment.</li>
+<li>Select the <code>trigger</code> to ensure this step kicks off automatically after the <code>Rollout</code> release completes.</li>
 </ul></li>
 <li><p>Configure the environment to target all remaining production users, by clicking on &ldquo;Add tasks&rdquo; and selecting <code>CodePush - Patch</code> from the <code>Deploy</code> category. Select it and specify the following settings:</p>
 
 <ul>
 <li>Use <code>Access Key</code> as the <code>Authentication Method</code></li>
 <li>Use the key created in the previous step as the <code>Access Key</code></li>
-<li>Use <code>VSTSCDSample-android</code> (or the app name used when registering the app with CodePush if different) as the <code>App Name</code><br></li>
+<li>Use <code>VSTSCDSample-android</code> (or the app name used when registering the app with CodePush if different) as the <code>App Name</code></li>
 <li>Use <code>Production</code> as the <code>Deployment</code></li>
-<li>Use <code>Latest</code> as the <code>Release Label</code><br></li>
+<li>Use <code>Latest</code> as the <code>Release Label</code></li>
 <li>Use <code>100%</code> for <code>Rollout</code> in order to deploy to all remaining production users</li>
 </ul></li>
 <li><p>Save and name the release definition by pressing the Save toolbar button.</p></li>
@@ -1001,13 +1004,13 @@ code-push app add VSTSCDSample-Android
 
 <p>If you had both <code>Staging</code> and <code>Production</code> users, you could test the full release environment as configured. Since that&rsquo;s not the case for this tutorial, you can focus on testing the <code>Staging</code> environment.</p>
 
-<p>To test the automated workflow, you&rsquo;ll need deploy a &ldquo;release&rdquo; version of the test app and push a change to the master branch in order to kick off a build and eventually a release. </p>
+<p>To test the automated workflow, you&rsquo;ll need deploy a &ldquo;release&rdquo; version of the test app and push a change to the master branch in order to kick off a build and eventually a release.</p>
 
 <p>You can create a &ldquo;release&rdquo; version of the app by generating a signed APK and installing the release build created with it. Instructions can be found on the <a href="http://facebook.github.io/react-native/docs/signed-apk-android.html#content">React Native docs</a>.</p>
 
 <p>Deploy the app per the instructions linked above, do a small code change and commit the change to master.</p>
 
-<p>VSTS allows you to edit the source code on the CODE hub: 
+<p>VSTS allows you to edit the source code on the CODE hub:
 <img src="/code-push/assets/images/docs/tutorials/vsts/vsts-code-change.png" alt="VSTS code changes"></p>
 
 <h3>Summary</h3>
