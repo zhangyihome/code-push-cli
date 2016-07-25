@@ -16,7 +16,11 @@ Check logs:
 
 ### I'm being rolled back!
 
-Use the ES6 decorator. Or if using something else, ensure notifyApplicationReady() is called.
+Use the ES6 decorator. Or if using sync() or the advanced API:
+
+When are you calling sync()? Is it on button press, resume, app start?
+
+The way our rollback mechanism works is it relies on a function called CodePush.notifyApplicationReady() to be called. If this is not called on the first run of the app, it will be rolled back. CodePush.sync() calls this function internally so that you don’t have to worry about it, and we assume that you call it on app start at minimum. If you don’t do that then you will likely be rolled back, and you should add either a call to sync() or notifyApplicationReady() on app start.
 
 ### Getting a 400 error on updateCheck
 
@@ -25,6 +29,10 @@ Check that your app version is a semver
 ### Logs say 'update targets a newer binary version' but I released with '*'
 
 Check that your app version is not using a prerelease tag. Try using machine metadata instead.
+
+### Can I just upload the files that have changed, instead of the whole package?
+
+Although the release command sends the whole folder to the server, the server performs a diff on the contents of your release with your latest 5 releases, so that your client mobile device only needs to download the files that changed. This diffing happens in a background job, so there might be a slight delay before they are available.
 
 ### Downloading the whole update instead of just a diff!
 
