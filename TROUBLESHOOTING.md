@@ -24,9 +24,9 @@ Alternatively, when you ran `release`, the folder genuinely didn't contain this 
 
 Use the ES6 decorator. Or if using sync() or the advanced API:
 
-When are you calling sync()? Is it on button press, resume, app start?
+When are you calling `sync()`? Is it on button press, resume, app start? We prescribe calling `sync()` on start at minimum, but if you don't call it there you should call `CodePush.notifyApplicationReady()`. On the first run of the app, if we don't detect this call, we assume there has been some kind of crash and roll back the app.
 
-The way our rollback mechanism works is it relies on a function called CodePush.notifyApplicationReady() to be called. If this is not called on the first run of the app, it will be rolled back. CodePush.sync() calls this function internally so that you don’t have to worry about it, and we assume that you call it on app start at minimum. If you don’t do that then you will likely be rolled back, and you should add either a call to sync() or notifyApplicationReady() on app start.
+If a package was specifically installed and then rolled back, that package is 'black-listed' and won't be installed again, even if you patch it. You can release a new package with different contents though.
 
 ### Getting a 400 error on updateCheck
 
