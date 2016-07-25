@@ -14,6 +14,12 @@ Check logs:
 - Are you releasing android on an iOS deployment or vice versa?
 - Does your app version not match?
 
+### [CodePush] Update is invalid - A JS bundle file named "main.jsbundle" could not be found within the downloaded contents.
+
+This likely means that you are releasing android on an iOS deployment or vice versa.
+
+Alternatively, when you ran `release`, the folder genuinely didn't contain this file. If possible, use `release-react` or `release-cordova` to avoid these kinds of issues.
+
 ### I'm being rolled back!
 
 Use the ES6 decorator. Or if using sync() or the advanced API:
