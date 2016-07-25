@@ -39,3 +39,7 @@ There could be a few reasons for that:
 Do you just want to transfer an app? If so, you can ask the other person to create an app and then transfer it to them.
 
 Otherwise, if you actually want to transfer your whole account or change your email address, email us.
+
+### I run into 'Internal Server Error' while running `code-push app ls`, and I have a large number of apps
+
+Please upgrade to the latest CLI (`npm install -g code-push-cli@latest`). If the problem still persists, contact us.
