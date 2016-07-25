@@ -34,4 +34,8 @@ There could be a few reasons for that:
 2.	The version running before the update was not one of the last 5 packages in the deployment, and hence there was no diff for it
 3.	The package is being applied on top of the version shipped with the binary, and the version shipped with the binary was not uploaded to the deployment beforehand (so there was no diff for it)
 
+# My email address changed, or I want to transfer my account!
 
+Do you just want to transfer an app? If so, you can ask the other person to create an app and then transfer it to them.
+
+Otherwise, if you actually want to transfer your whole account or change your email address, email us.
