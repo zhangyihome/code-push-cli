@@ -57,3 +57,9 @@ Otherwise, if you actually want to transfer your whole account or change your em
 ### I run into 'Internal Server Error' while running `code-push app ls`, and I have a large number of apps
 
 Please upgrade to the latest CLI (`npm install -g code-push-cli@latest`). If the problem still persists, contact us.
+
+### When I push my JS, it depends on a newer binary version, so it'll break my older users!
+
+CodePush updates can be scoped by app store version - if you run `code-push deployment history <appName> <deploymentName>`, you should be able to see what each release is scoped to under the App Version column. If a CodePush update is not compatible with a certain binary version, then it should be excluded with a range expression like `'>= 0.1.0'`. We definitely don't want you to break users on older app store versions.
+
+If you're using the `code-push release-react` command to perform CodePush releases, it should automatically infer the app store version from your project, but if you want to specifically control it, there is a `--targetBinaryVersion` flag that you can use to specify any semver range expression you want. There is also a `code-push patch` command if you want to modify the target binary version on packages that you've already released. More info on the target binary version here: https://github.com/Microsoft/code-push/tree/master/cli#target-binary-version-parameter
