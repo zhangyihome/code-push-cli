@@ -1,5 +1,5 @@
 
-My images are not showing up!
+# My images are not showing up!
 
 Is this happening before or after CodePush update is applied?
 
@@ -7,16 +7,26 @@ If before, try removing the line which consults CodePush for the bundle location
 If after, which release command are you using? Try using release-react. If using release command, check folder first.
 Else file issue.
 
-My updates are not being applied!
+# My updates are not being applied!
 
-Check logs - Are you being rolled back?
-Are you releasing android on an iOS deployment or vice versa?
+Check logs:
+- Are you being rolled back?
+- Are you releasing android on an iOS deployment or vice versa?
+- Does your app version not match?
 
-I'm being rolled back!
+# I'm being rolled back!
 
 Use the ES6 decorator. Or if using something else, ensure notifyApplicationReady() is called.
 
-Downloading the whole update instead of just a diff!
+# Getting a 400 error on updateCheck
+
+Check that your app version is a semver
+
+# Logs say 'update targets a newer binary version' but I released with '*'
+
+Check that your app version is not using a prerelease tag. Try using machine metadata instead.
+
+# Downloading the whole update instead of just a diff!
 
 There could be a few reasons for that:
 
