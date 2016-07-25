@@ -30,7 +30,7 @@ The way our rollback mechanism works is it relies on a function called CodePush.
 
 ### Getting a 400 error on updateCheck
 
-Check that your app version is a semver
+Is your deploymentKey configured correctly? If so, then check that your app version is a semver.
 
 ### Logs say 'update targets a newer binary version' but I released with '*'
 
