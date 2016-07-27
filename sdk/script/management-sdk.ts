@@ -77,12 +77,12 @@ class AccountManager {
             this.attachCredentials(request);
 
             request.end((err: any, res: superagent.Response) => {
-                if (err && err.status !== 401) {
-                    reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                var status: number = this.getErrorStatus(err, res);
+                if (err && status !== 401) {
+                    reject(this.getCodePushError(err, res));
                     return;
                 }
 
-                var status: number = res ? res.status : err.status;
                 var authenticated: boolean = status === 200;
 
                 resolve(authenticated);
@@ -310,7 +310,7 @@ class AccountManager {
                 })
                 .end((err: any, res: superagent.Response) => {
                     if (err) {
-                        reject(<CodePushError>{ message: this.getErrorMessage(err, res) });
+                        reject(this.getCodePushError(err, res));
                         return;
                     }
 
@@ -323,9 +323,9 @@ class AccountManager {
                         }
 
                         if (body) {
-                            reject(<CodePushError>body);
+                            reject(<CodePushError>{ message: body.message, statusCode: res && res.status });
                         } else {
-                            reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                            reject(<CodePushError>{ message: res.text, statusCode: res && res.status });
                         }
                     }
                 });
@@ -382,11 +382,7 @@ class AccountManager {
 
             request.end((err: any, res: superagent.Response) => {
                 if (err) {
-                    reject(<CodePushError>{
-                        message: this.getErrorMessage(err, res),
-                        statusCode: res.status
-                    });
-
+                    reject(this.getCodePushError(err, res));
                     return;
                 }
 
@@ -397,7 +393,7 @@ class AccountManager {
 
                 if (res.ok) {
                     if (expectResponseBody && !body) {
-                        reject(<CodePushError>{ message: `Could not parse response: ${res.text}`, statusCode: res.status });
+                        reject(<CodePushError>{ message: `Could not parse response: ${res.text}`, statusCode: 500 });
                     } else {
                         resolve(<JsonResponse>{
                             headers: res.header,
@@ -406,13 +402,24 @@ class AccountManager {
                     }
                 } else {
                     if (body) {
-                        reject(<CodePushError>body);
+                        reject(<CodePushError>{ message: body.message, statusCode: this.getErrorStatus(err, res) });
                     } else {
-                        reject(<CodePushError>{ message: res.text, statusCode: res.status });
+                        reject(<CodePushError>{ message: res.text, statusCode: this.getErrorStatus(err, res) });
                     }
                 }
             });
         });
+    }
+
+    private getCodePushError(error: any, response: superagent.Response): CodePushError {
+        return {
+            message: this.getErrorMessage(error, response),
+            statusCode: this.getErrorStatus(error, response)
+        };
+    }
+
+    private getErrorStatus(error: any, response: superagent.Response): number {
+        return (error && error.status) || (response && response.status);
     }
 
     private getErrorMessage(error: Error, response: superagent.Response): string {
