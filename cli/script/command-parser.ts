@@ -84,7 +84,8 @@ function accessKeyRemove(commandName: string, yargs: yargs.Argv): void {
 
 function addCommonConfiguration(yargs: yargs.Argv): void {
     yargs.wrap(/*columnLimit*/ null)
-        .strict()  // Validate hyphenated (named) arguments.
+        .string("_")                         // Interpret non-hyphenated arguments as strings (e.g. an app version of '1.10').
+        .strict()                            // Validate hyphenated (named) arguments.
         .fail((msg: string) => showHelp());  // Suppress the default error message.
 }
 
@@ -611,7 +612,7 @@ function createCommand(): cli.ICommand {
                 }
                 break;
 
-            
+
             case "debug":
                 cmd = <cli.IDebugCommand>{
                     type: cli.CommandType.debug,
@@ -769,8 +770,7 @@ function createCommand(): cli.ICommand {
 
                     releaseCommand.appName = arg1;
                     releaseCommand.package = arg2;
-                    // Floating points e.g. "1.2" gets parsed as a number by default, but semver requires strings.
-                    releaseCommand.appStoreVersion = arg3.toString();
+                    releaseCommand.appStoreVersion = arg3;
                     releaseCommand.deploymentName = argv["deploymentName"];
                     releaseCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseCommand.disabled = argv["disabled"];
@@ -807,7 +807,7 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.appName = arg1;
                     releaseReactCommand.platform = arg2;
 
-                    releaseReactCommand.appStoreVersion = argv["targetBinaryVersion"];                    
+                    releaseReactCommand.appStoreVersion = argv["targetBinaryVersion"];
                     releaseReactCommand.bundleName = argv["bundleName"];
                     releaseReactCommand.deploymentName = argv["deploymentName"];
                     releaseReactCommand.disabled = argv["disabled"];
@@ -815,8 +815,8 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.development = argv["development"];
                     releaseReactCommand.entryFile = argv["entryFile"];
                     releaseReactCommand.mandatory = argv["mandatory"];
-                    releaseReactCommand.plistFile = argv["plistFile"];  
-                    releaseReactCommand.plistFilePrefix = argv["plistFilePrefix"];                    
+                    releaseReactCommand.plistFile = argv["plistFile"];
+                    releaseReactCommand.plistFilePrefix = argv["plistFilePrefix"];
                     releaseReactCommand.rollout = getRolloutValue(argv["rollout"]);
                     releaseReactCommand.sourcemapOutput = argv["sourcemapOutput"];
                 }
