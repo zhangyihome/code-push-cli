@@ -420,6 +420,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("development", { alias: "dev", default: false, demand: false, description: "Specifies whether to generate a dev or release build", type: "boolean" })
             .option("disabled", { alias: "x", default: false, demand: false, description: "Specifies whether this release should be immediately downloadable", type: "boolean" })
             .option("entryFile", { alias: "e", default: null, demand: false, description: "Path to the app's entry Javascript file. If omitted, \"index.<platform>.js\" and then \"index.js\" will be used (if they exist)", type: "string" })
+            .option("gradleFile", { alias: "g", default: null, demand: false, description: "Path to the gradle file which specifies the binary version you want to target this release at (android only)." })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Specifies whether this release should be considered mandatory", type: "boolean" })
             .option("plistFile", { alias: "p", default: null, demand: false, description: "Path to the plist file which specifies the binary version you want to target this release at (iOS only)." })
             .option("plistFilePrefix", { alias: "pre", default: null, demand: false, description: "Prefix to append to the file name when attempting to find your app's Info.plist file (iOS only)." })
@@ -814,6 +815,7 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     releaseReactCommand.development = argv["development"];
                     releaseReactCommand.entryFile = argv["entryFile"];
+                    releaseReactCommand.gradleFile = argv["gradleFile"];
                     releaseReactCommand.mandatory = argv["mandatory"];
                     releaseReactCommand.plistFile = argv["plistFile"];
                     releaseReactCommand.plistFilePrefix = argv["plistFilePrefix"];
