@@ -901,7 +901,7 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
             buildGradlePath = command.gradleFile;
         }
         if (fileDoesNotExistOrIsDirectory(buildGradlePath)) {
-            throw new Error(`Unable to find gradle file "${buildGradlePath}"".`);
+            throw new Error(`Unable to find gradle file "${buildGradlePath}".`);
         }
 
         return g2js.parseFile(buildGradlePath)
