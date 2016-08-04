@@ -113,7 +113,7 @@ Finally, if at any point you need to change a key's name and/or expiration date,
 code-push access-key patch <accessKeyName> --name "new name" --ttl 10d
 ```
 
-*NOTE: When patching the TTL of an existing access key, its expiration date will be set relative to the current time, with no regard for its previous value.* 
+*NOTE: When patching the TTL of an existing access key, its expiration date will be set relative to the current time, with no regard for its previous value.*
 
 ### Proxy Support
 
@@ -416,6 +416,7 @@ code-push release-react <appName> <platform>
 [--development <development>]
 [--disabled <disabled>]
 [--entryFile <entryFile>]
+[--gradleFile <gradleFile>]
 [--mandatory]
 [--plistFile <plistFile>]
 [--plistFilePrefix <plistFilePrefix>]
@@ -458,7 +459,7 @@ This is the same parameter as the one described in the [above section](#app-name
 
 #### Platform parameter
 
-This specifies which platform the current update is targeting, and can be either `android`, `ios` or `windows` (case-insensitive). This value is only used to determine how to properly bundle your update contents and isn't actually sent to the server. 
+This specifies which platform the current update is targeting, and can be either `android`, `ios` or `windows` (case-insensitive). This value is only used to determine how to properly bundle your update contents and isn't actually sent to the server.
 
 #### Deployment name parameter
 
@@ -502,7 +503,16 @@ This specifies the relative path to the app's root/entry JavaScript file. If lef
 
 *NOTE: This parameter can be set using either --entryFile or -e*
 
-#### Plist file parameter
+#### Gradle file parameter (Android only)
+
+This specifies the relative path to the `build.gradle` file that the CLI should use when attempting to auto-detect the target binary version for the release. This parameter is only meant for advanced scenarios, since the CLI will automatically be able to find your `build.grade` file in "standard" React Native projects. However, if your gradle file is located in an arbitrary location, that the CLI can't discover, then using this parameter allows you to continue releasing CodePush updates, without needing to explicitly set the `--targetBinaryVersion` parameter. Since `build.gradle` is a required file name, specifying the path to the containing folder or the full path to the file itself will both achieve the same effect.
+
+```shell
+code-push release-react foo android -p "./foo/bar/"
+code-push release-react foo android -p "./foo/bar/build.gradle"
+```
+
+#### Plist file parameter (iOS only)
 
 This specifies the relative path to the `Info.plist` file that the CLI should use when attempting to auto-detect the target binary version for the release. This parameter is only meant for advanced scenarios, since the CLI will automatically be able to find your `Info.plist` file in "standard" React Native projects, and you can use the `--plistFilePrefix` parameter in order to support per-environment plist files (e.g. `STAGING-Info.plist`). However, if your plist is located in an arbitrary location, that the CLI can't discover, then using this parameter allows you to continue releasing CodePush updates, without needing to explicitly set the `--targetBinaryVersion` parameter.
 
@@ -512,12 +522,12 @@ code-push release-react foo ios -p "./foo/bar/MyFile.plist"
 
 *NOTE: This parameter can be set using either --plistFile or -p*
 
-#### Plist file prefix parameter
+#### Plist file prefix parameter (iOS only)
 
-This specifies the file name prefix of the `Info.plist` file that that CLI should use when attempting to auto-detect the target binary version for the release. This can be useful if you've created per-environment plist files (e.g. `DEV-Info.plist`, `STAGING-Info.plist`), and you want to be able to release CodePush updates without needing to explicity set the `--targetBinaryVersion` parameter. By specifying a `--plistFilePrefx`, the CLI will look for a file named `<prefix>-Info.plist`, instead of simply `Info.plist` (which is the default behavior), in the following locations: `./ios` and `./ios/<appName>`. If your plist file isn't located in either of those directories (e.g. your app is a native iOS app with embedded RN views), or uses an entirely different file naming convention, then consider using the `--plistFile` parameter. 
+This specifies the file name prefix of the `Info.plist` file that that CLI should use when attempting to auto-detect the target binary version for the release. This can be useful if you've created per-environment plist files (e.g. `DEV-Info.plist`, `STAGING-Info.plist`), and you want to be able to release CodePush updates without needing to explicity set the `--targetBinaryVersion` parameter. By specifying a `--plistFilePrefx`, the CLI will look for a file named `<prefix>-Info.plist`, instead of simply `Info.plist` (which is the default behavior), in the following locations: `./ios` and `./ios/<appName>`. If your plist file isn't located in either of those directories (e.g. your app is a native iOS app with embedded RN views), or uses an entirely different file naming convention, then consider using the `--plistFile` parameter.
 
 ```shell
-# Auto-detect the target binary version of this release by looking up the 
+# Auto-detect the target binary version of this release by looking up the
 # app version within the STAGING-Info.plist file in either the ./ios or ./ios/<APP> directories.
 code-push release-react foo ios --pre "STAGING"
 
@@ -607,7 +617,7 @@ Specifies whether you want to run `cordova build` instead of `cordova prepare` (
 
 ## Debugging CodePush Integration
 
-Once you've released an update, and the Cordova or React Native plugin has been integrated into your app, it can be helpful to diagnose how the plugin is behaving, especially if you run into an issue and want to understand why. In order to debug the CodePush update discovery experience, you can run the following command in order to easily view the diagnostic logs produced by the CodePush plugin within your app: 
+Once you've released an update, and the Cordova or React Native plugin has been integrated into your app, it can be helpful to diagnose how the plugin is behaving, especially if you run into an issue and want to understand why. In order to debug the CodePush update discovery experience, you can run the following command in order to easily view the diagnostic logs produced by the CodePush plugin within your app:
 
 ```shell
 code-push debug <platform>
