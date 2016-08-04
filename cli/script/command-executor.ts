@@ -896,10 +896,14 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
             throw new Error(`The "CFBundleShortVersionString" key doesn't exist within the "${resolvedPlistFile}" file.`);
         }
     } else if (command.platform === "android") {
-        let buildGradlePath: string = path.join("android", "app", "build.gradle");
+        let buildGradlePath: string = path.join("android", "app");
         if (command.gradleFile) {
             buildGradlePath = command.gradleFile;
         }
+        if (fs.lstatSync(buildGradlePath).isDirectory()) {
+            buildGradlePath = path.join(buildGradlePath, "build.gradle");
+        }
+
         if (fileDoesNotExistOrIsDirectory(buildGradlePath)) {
             throw new Error(`Unable to find gradle file "${buildGradlePath}".`);
         }
