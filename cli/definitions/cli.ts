@@ -190,6 +190,7 @@ export interface IReleaseReactCommand extends IReleaseBaseCommand {
     bundleName?: string;
     development?: boolean;
     entryFile?: string;
+    gradleFile?: string;
     platform: string;
     plistFile?: string;
     plistFilePrefix?: string;
