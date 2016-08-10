@@ -1,11 +1,4 @@
 
-### My images are not showing up!
-
-Is this happening before or after CodePush update is applied?
-
-If before, try removing the line which consults CodePush for the bundle location, and see if it still repros.
-If after, which release command are you using? Try using release-react. If using release command, check folder first.
-Else file issue.
 
 ### My updates are not being applied!
 
@@ -16,6 +9,14 @@ Else file issue.
 - Are you being rolled back?
 - Are you releasing android on an iOS deployment or vice versa?
 - Does your app version not match?
+
+### My images are not showing up!
+
+Is this happening before or after CodePush update is applied?
+
+If before, try removing the line which consults CodePush for the bundle location, and see if it still repros.
+If after, which release command are you using? Try using release-react. If using release command, check folder first.
+Else file issue.
 
 ### [CodePush] Update is invalid - A JS bundle file named "main.jsbundle" could not be found within the downloaded contents.
 
