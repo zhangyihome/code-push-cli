@@ -9,7 +9,10 @@ Else file issue.
 
 ### My updates are not being applied!
 
-Check logs:
+1. What do the CodePush logs say when you test it locally if you substitute in the production key? You can use any log viewer or the code-push debug command to see them.
+2. Do you see any installs or rollbacks in your deployment history? code-push deployment history <AppName> Production
+2. Just as a sanity check, you've double checked that the deploymentKey is configured correctly in your app?
+
 - Are you being rolled back?
 - Are you releasing android on an iOS deployment or vice versa?
 - Does your app version not match?
