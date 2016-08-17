@@ -27,7 +27,7 @@ function isDefined(object: any): boolean {
     return object !== undefined && object !== null;
 }
 
-const NOW = new Date().getTime();
+const NOW = 1471460856191;
 const DEFAULT_ACCESS_KEY_MAX_AGE = 1000 * 60 * 60 * 24 * 60; // 60 days
 const TEST_MACHINE_NAME = "Test machine";
 
@@ -269,19 +269,15 @@ describe("CLI", () => {
 
         cmdexec.execute(command)
             .done((): void => {
-                sinon.assert.calledThrice(log);
+                sinon.assert.calledTwice(log);
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = `Successfully created a new access key "Test name": key123`;
+                var expected = `Successfully created the "Test name" access key: key123`;
                 assert.equal(actual, expected);
 
                 actual = log.args[1][0];
-                expected = `(Expires: ${new Date(NOW + DEFAULT_ACCESS_KEY_MAX_AGE)})`;
-                assert.equal(actual, expected);
-
-                actual = log.args[2][0];
-                expected = "Please save this key as it will only be shown once!";
+                expected = "Make sure to save this key value somewhere safe, since you won't be able to view it from the CLI again!";
                 assert.equal(actual, expected);
 
                 done();
@@ -298,19 +294,15 @@ describe("CLI", () => {
 
         cmdexec.execute(command)
             .done((): void => {
-                sinon.assert.calledThrice(log);
+                sinon.assert.calledTwice(log);
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = `Successfully created a new access key "Test name": key123`;
+                var expected = `Successfully created the "Test name" access key: key123`;
                 assert.equal(actual, expected);
 
                 actual = log.args[1][0];
-                expected = `(Expires: ${new Date(NOW + ttl)})`;
-                assert.equal(actual, expected);
-
-                actual = log.args[2][0];
-                expected = "Please save this key as it will only be shown once!";
+                expected = "Make sure to save this key value somewhere safe, since you won't be able to view it from the CLI again!";
                 assert.equal(actual, expected);
 
                 done();
@@ -352,7 +344,7 @@ describe("CLI", () => {
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = `Successfully changed the access key "Test name"'s expiry to ${new Date(NOW + ttl).toString()}.`;
+                var expected = `Successfully changed the expiration date of the "Test name" access key to Wednesday, August 17, 2016 12:07 PM.`;
 
                 assert.equal(actual, expected);
                 done();
@@ -374,7 +366,7 @@ describe("CLI", () => {
                 assert.equal(log.args[0].length, 1);
 
                 var actual: string = log.args[0][0];
-                var expected = `Successfully renamed the access key "Test name" to "Updated name" and changed its expiry to ${new Date(NOW + ttl)}.`;
+                var expected = `Successfully renamed the access key "Test name" to "Updated name" and changed its expiration date to Wednesday, August 17, 2016 12:07 PM.`;
 
                 assert.equal(actual, expected);
                 done();
@@ -1727,7 +1719,7 @@ describe("CLI", () => {
                 sinon.assert.calledOnce(removeSession);
                 sinon.assert.calledWithExactly(removeSession, machineName);
                 sinon.assert.calledOnce(log);
-                sinon.assert.calledWithExactly(log, `Successfully removed the existing session for "${machineName}".`);
+                sinon.assert.calledWithExactly(log, `Successfully removed the login session for "${machineName}".`);
 
                 done();
             });
