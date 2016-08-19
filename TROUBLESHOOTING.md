@@ -2,13 +2,16 @@
 
 ### My updates are not being applied!
 
-1. What do the CodePush logs say when you test it locally if you substitute in the production key? You can use any log viewer or the code-push debug command to see them.
-2. Do you see any installs or rollbacks in your deployment history? code-push deployment history <AppName> Production
-2. Just as a sanity check, you've double checked that the deploymentKey is configured correctly in your app?
+Here are some possible reasons why you might not see updates:
 
-- Are you being rolled back?
-- Are you releasing android on an iOS deployment or vice versa?
-- Does your app version not match?
+* Deployment key mismatch
+* App version mismatch
+* The app is being rolled back
+
+We can try to figure out what it is by following these debugging steps:
+
+1. Do you see any installs or rollbacks in your deployment history? `code-push deployment history <appName> <deploymentName>`
+2. If that doesn't help, what happens when you test it locally with your production key, and view the log output? You can use any log viewer or the `code-push debug` command to see them.
 
 ### My images are not showing up!
 
