@@ -294,6 +294,7 @@ code-push release <appName> <updateContents> <targetBinaryVersion>
 [--description <description>]
 [--disabled <disabled>]
 [--mandatory]
+[--noDuplicateReleaseError]
 [--rollout <rolloutPercentage>]
 ```
 
@@ -362,6 +363,12 @@ This provides an optional "change log" for the deployment. The value is simply r
 
 *NOTE: This parameter can be set using either "--description" or "-desc"*
 
+#### Disabled parameter
+
+This specifies whether an update should be downloadable by end users or not. If left unspecified, the update will not be disabled (i.e. users will download it the moment your app calls `sync`). This parameter can be valuable if you want to release an update that isn't immediately available, until you expicitly [patch it](#patching-releases) when you want end users to be able to download it (e.g. an announcement blog post went live).
+
+*NOTE: This parameter can be set using either "--disabled" or "-x"*
+
 #### Mandatory parameter
 
 This specifies whether the update should be considered mandatory or not (e.g. it includes a critical security fix). This attribute is simply round tripped to the client, who can then decide if and how they would like to enforce it.
@@ -384,6 +391,10 @@ If you never release an update that is marked as mandatory, then the above behav
 
 *NOTE: This parameter can be set using either `--mandatory` or `-m`*
 
+#### No duplicate release error parameter
+
+This specifies that if the update is identical to the latest release on the deployment, the CLI should generate a warning instead of an error. This is useful for continuous integration scenarios where it is expected that small modifications may trigger releases where no production code has changed.
+
 #### Rollout parameter
 
 **IMPORTANT: In order for this parameter to actually take affect, your end users need to be running version `1.6.0-beta+` (for Cordova) or `1.9.0-beta+` (for React Native) of the CodePush plugin. If you release an update that specifies a rollout property, no end user running an older version of the Cordova or React Native plugins will be eligible for the update. Therefore, until you have adopted the neccessary version of the platform-specific CodePush plugin (as previously mentioned), we would advise not setting a rollout value on your releases, since no one would end up receiving it.**
@@ -400,12 +411,6 @@ This specifies the percentage of users (as an integer between `1` and `100`) tha
 
 *NOTE: This parameter can be set using either `--rollout` or `-r`*
 
-#### Disabled parameter
-
-This specifies whether an update should be downloadable by end users or not. If left unspecified, the update will not be disabled (i.e. users will download it the moment your app calls `sync`). This parameter can be valuable if you want to release an update that isn't immediately available, until you expicitly [patch it](#patching-releases) when you want end users to be able to download it (e.g. an announcement blog post went live).
-
-*NOTE: This parameter can be set using either "--disabled" or "-x"*
-
 ### Releasing Updates (React Native)
 
 ```shell
@@ -418,6 +423,7 @@ code-push release-react <appName> <platform>
 [--entryFile <entryFile>]
 [--gradleFile <gradleFile>]
 [--mandatory]
+[--noDuplicateReleaseError]
 [--plistFile <plistFile>]
 [--plistFilePrefix <plistFilePrefix>]
 [--sourcemapOutput <sourcemapOutput>]
@@ -472,6 +478,10 @@ This is the same parameter as the one described in the [above section](#descript
 #### Mandatory parameter
 
 This is the same parameter as the one described in the [above section](#mandatory-parameter).
+
+#### No duplicate release error parameter
+
+This is the same parameter as the one described in the [above section](#no-duplicate-release-error-parameter).
 
 #### Rollout parameter
 
@@ -551,6 +561,7 @@ code-push release-cordova <appName> <platform>
 [--deploymentName <deploymentName>]
 [--description <description>]
 [--mandatory]
+[--noDuplicateReleaseError]
 [--targetBinaryVersion <targetBinaryVersion>]
 [--rollout <rolloutPercentage>]
 [--build]
@@ -596,6 +607,10 @@ This is the same parameter as the one described in the [above section](#descript
 #### Mandatory parameter
 
 This is the same parameter as the one described in the [above section](#mandatory-parameter).
+
+#### No duplicate release error parameter
+
+This is the same parameter as the one described in the [above section](#no-duplicate-release-error-parameter).
 
 #### Rollout parameter
 
@@ -706,6 +721,7 @@ code-push promote <appName> <sourceDeploymentName> <destDeploymentName>
 [--description <description>]
 [--disabled <disabled>]
 [--mandatory]
+[--noDuplicateReleaseError]
 [--rollout <rolloutPercentage>]
 [--targetBinaryVersion <targetBinaryVersion]
 ```
@@ -722,13 +738,17 @@ We recommend that all users take advantage of the automatically created `Staging
 
 This is the same parameter as the one described in the [above section](#description-parameter), and simply allows you to override the description that will be used for the promoted release. If unspecified, the new release will inherit the description from the release being promoted.
 
-#### Disabled parameter
+### Disabled parameter
 
 This is the same parameter as the one described in the [above section](#disabled-parameter), and simply allows you to override the value of the disabled flag that will be used for the promoted release. If unspecified, the new release will inherit the disabled property from the release being promoted.
 
 ### Mandatory parameter
 
 This is the same parameter as the one described in the [above section](#mandatory-parameter), and simply allows you to override the mandatory flag that will be used for the promoted release. If unspecified, the new release will inherit the mandatory property from the release being promoted.
+
+### No duplicate release error parameter
+
+This is the same parameter as the one described in the [above section](#no-duplicate-release-error-parameter).
 
 ### Rollout parameter
 
