@@ -25,7 +25,7 @@ import * as yazl from "yazl";
 var which = require("which");
 import wordwrap = require("wordwrap");
 import * as cli from "../definitions/cli";
-import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, Session, UpdateMetrics } from "code-push/script/types";
+import { AccessKey, Account, App, CodePushError, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, Session, UpdateMetrics } from "code-push/script/types";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var emailValidator = require("email-validator");
@@ -1066,7 +1066,8 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
     return sdk.promote(command.appName, command.sourceDeploymentName, command.destDeploymentName, packageInfo)
         .then((): void => {
             log("Successfully promoted the \"" + command.sourceDeploymentName + "\" deployment of the \"" + command.appName + "\" app to the \"" + command.destDeploymentName + "\" deployment.");
-        });
+        })
+        .catch((err: CodePushError) => releaseErrorHandler(err, command));
 }
 
 function patch(command: cli.IPatchCommand): Promise<void> {
@@ -1173,7 +1174,8 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
                     if (file.isTemporary) {
                         fs.unlinkSync(filePath);
                     }
-                });
+                })
+                .catch((err: CodePushError) => releaseErrorHandler(err, command));
         });
 }
 
@@ -1440,6 +1442,14 @@ function sessionRemove(command: cli.ISessionRemoveCommand): Promise<void> {
 
                 log("Session removal cancelled.");
             });
+    }
+}
+
+function releaseErrorHandler(error: CodePushError, command: cli.ICommand): void {
+    if ((<any>command).noDuplicateReleaseError && error.statusCode === 409) {
+        console.warn(chalk.yellow("[Warning] " + error.message));
+    } else {
+        throw error;
     }
 }
 

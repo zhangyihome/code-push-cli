@@ -163,6 +163,7 @@ export interface IPromoteCommand extends ICommand, IPackageInfo {
     appStoreVersion?: string;
     sourceDeploymentName: string;
     destDeploymentName: string;
+    noDuplicateReleaseError?: boolean;
 }
 
 export interface IRegisterCommand extends ICommand {
@@ -175,6 +176,7 @@ export interface IReleaseBaseCommand extends ICommand, IPackageInfo {
     appName: string;
     appStoreVersion: string;
     deploymentName: string;
+    noDuplicateReleaseError?: boolean;
 }
 
 export interface IReleaseCommand extends IReleaseBaseCommand {
