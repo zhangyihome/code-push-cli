@@ -25,7 +25,7 @@ import * as yazl from "yazl";
 var which = require("which");
 import wordwrap = require("wordwrap");
 import * as cli from "../definitions/cli";
-import { AccessKey, Account, App, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, Session, UpdateMetrics } from "code-push/script/types";
+import { AccessKey, Account, App, CodePushError, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, Session, UpdateMetrics } from "code-push/script/types";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var emailValidator = require("email-validator");
@@ -1168,6 +1168,13 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
             return sdk.release(command.appName, command.deploymentName, file.path, command.appStoreVersion, updateMetadata, uploadProgress)
                 .then((): void => {
                     log("Successfully released an update containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
+                })
+                .catch((err: CodePushError) => {
+                    if (command.noDuplicateReleaseError && err.statusCode === 409) {
+                        console.warn(chalk.yellow("[Warning] " + err.message));
+                    } else {
+                        throw err;
+                    }
                 })
                 .finally((): void => {
                     if (file.isTemporary) {

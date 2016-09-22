@@ -175,6 +175,7 @@ export interface IReleaseBaseCommand extends ICommand, IPackageInfo {
     appName: string;
     appStoreVersion: string;
     deploymentName: string;
+    noDuplicateReleaseError?: boolean;
 }
 
 export interface IReleaseCommand extends IReleaseBaseCommand {
