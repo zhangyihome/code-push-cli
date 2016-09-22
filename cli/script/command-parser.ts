@@ -358,6 +358,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("description", { alias: "des", default: null, demand: false, description: "Description of the changes made to the app with this release. If omitted, the description from the release being promoted will be used.", type: "string" })
             .option("disabled", { alias: "x", default: null, demand: false, description: "Specifies whether this release should be immediately downloadable. If omitted, the disabled attribute from the release being promoted will be used.", type: "boolean" })
             .option("mandatory", { alias: "m", default: null, demand: false, description: "Specifies whether this release should be considered mandatory. If omitted, the mandatory property from the release being promoted will be used.", type: "boolean" })
+            .option("noDuplicateReleaseError", { default: false, demand: false, description: "When this flag is set, promoting a package that is identical to the latest release on the target deployment will produce a warning instead of an error", type: "boolean" })
             .option("rollout", { alias: "r", default: "100%", demand: false, description: "Percentage of users this update should be immediately available to", type: "string" })
             .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "Semver expression that specifies the binary app version(s) this release is targeting (e.g. 1.1.0, ~1.2.3). If omitted, the target binary version property from the release being promoted will be used.", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return isValidRollout(argv); });
@@ -751,6 +752,7 @@ function createCommand(): cli.ICommand {
                     deploymentPromoteCommand.description = argv["description"] ? backslash(argv["description"]) : "";
                     deploymentPromoteCommand.disabled = argv["disabled"];
                     deploymentPromoteCommand.mandatory = argv["mandatory"];
+                    deploymentPromoteCommand.noDuplicateReleaseError = argv["noDuplicateReleaseError"];
                     deploymentPromoteCommand.rollout = getRolloutValue(argv["rollout"]);
                     deploymentPromoteCommand.appStoreVersion = argv["targetBinaryVersion"];
                 }
