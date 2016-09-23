@@ -1538,7 +1538,6 @@ function getSdk(accessKey: string, headers: Headers, customServerUrl: string, pr
                         .catch((error: any) => {
                             if (error.statusCode && error.statusCode === 401) {
                                 deleteConnectionInfoCache(/* printMessage */ false);
-                                error.message = `Invalid credentials. Run the 'code-push login' command to authenticate with the CodePush server.`;
                             }
 
                             throw error;
