@@ -412,6 +412,10 @@ class AccountManager {
     }
 
     private getCodePushError(error: any, response: superagent.Response): CodePushError {
+        if (error.syscall === "getaddrinfo") {
+            error.message = `Unable to connect to the CodePush server. Are you offline, or behind a firewall or proxy?\n(${error.message})`;
+        }
+
         return {
             message: this.getErrorMessage(error, response),
             statusCode: this.getErrorStatus(error, response)
@@ -419,7 +423,7 @@ class AccountManager {
     }
 
     private getErrorStatus(error: any, response: superagent.Response): number {
-        return (error && error.status) || (response && response.status);
+        return (error && error.status) || (response && response.status) || 504;     // Default to 504 Gateway Timeout for network errors
     }
 
     private getErrorMessage(error: Error, response: superagent.Response): string {
