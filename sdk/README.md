@@ -88,3 +88,15 @@ The `code-push` module exports a single class (typically referred to as `CodePus
 - __rollback(appName: string, deploymentName: string, targetRelease?: string): Promise&lt;void&gt;__ - Rolls back the latest release within the specified deployment. Optionally allows you to target a specific release in the deployment's history, as opposed to rolling to the previous release.
 
 - __transferApp(appName: string, email: string): Promise&lt;void&gt;__ - Transfers the ownership of the specified app to the specified account.
+
+### Error Handling
+
+When an error occurs in any of the methods, the promise will be rejected with a CodePushError object with the following properties:
+
+- __message__: A user-friendly message that describes the error.
+- __statusCode__: An HTTP response code that identifies the category of error:
+    - __CodePush.ERROR_GATEWAY_TIMEOUT__: A network error prevented you from connecting to the CodePush server.
+    - __CodePush.ERROR_INTERNAL_SERVER__: An error occurred internally on the CodePush server.
+    - __CodePush.ERROR_NOT_FOUND__: The resource you are attempting to retrieve does not exist.
+    - __CodePush.ERROR_CONFLICT__: The resource you are attempting to create already exists.
+    - __CodePush.ERROR_UNAUTHORIZED__: The access key you configured is invalid or expired.
