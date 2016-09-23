@@ -52,6 +52,12 @@ class AccountManager {
 
     private static API_VERSION: number = 2;
 
+    public static ERROR_GATEWAY_TIMEOUT = 504;  // Used if there is a network error
+    public static ERROR_INTERNAL_SERVER = 500;
+    public static ERROR_NOT_FOUND = 404;
+    public static ERROR_CONFLICT = 409;         // Used if the resource already exists
+    public static ERROR_UNAUTHORIZED = 401;
+
     private _accessKey: string;
     private _serverUrl: string;
     private _customHeaders: Headers;
@@ -78,7 +84,7 @@ class AccountManager {
 
             request.end((err: any, res: superagent.Response) => {
                 var status: number = this.getErrorStatus(err, res);
-                if (err && status !== 401) {
+                if (err && status !== AccountManager.ERROR_UNAUTHORIZED) {
                     reject(this.getCodePushError(err, res));
                     return;
                 }
@@ -393,7 +399,7 @@ class AccountManager {
 
                 if (res.ok) {
                     if (expectResponseBody && !body) {
-                        reject(<CodePushError>{ message: `Could not parse response: ${res.text}`, statusCode: 500 });
+                        reject(<CodePushError>{ message: `Could not parse response: ${res.text}`, statusCode: AccountManager.ERROR_INTERNAL_SERVER });
                     } else {
                         resolve(<JsonResponse>{
                             headers: res.header,
@@ -423,7 +429,7 @@ class AccountManager {
     }
 
     private getErrorStatus(error: any, response: superagent.Response): number {
-        return (error && error.status) || (response && response.status) || 504;     // Default to 504 Gateway Timeout for network errors
+        return (error && error.status) || (response && response.status) || AccountManager.ERROR_GATEWAY_TIMEOUT;
     }
 
     private getErrorMessage(error: Error, response: superagent.Response): string {

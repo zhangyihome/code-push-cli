@@ -637,7 +637,7 @@ function logout(command: cli.ICommand): Promise<void> {
                 return sdk.removeSession(machineName)
                     .catch((error: CodePushError) => {
                         // If we are not authenticated or the session doesn't exist anymore, just swallow the error instead of displaying it
-                        if (error.statusCode !== 401 && error.statusCode !== 404) {
+                        if (error.statusCode !== AccountManager.ERROR_UNAUTHORIZED && error.statusCode !== AccountManager.ERROR_NOT_FOUND) {
                             throw error;
                         }
                     });
@@ -1452,7 +1452,7 @@ function sessionRemove(command: cli.ISessionRemoveCommand): Promise<void> {
 }
 
 function releaseErrorHandler(error: CodePushError, command: cli.ICommand): void {
-    if ((<any>command).noDuplicateReleaseError && error.statusCode === 409) {
+    if ((<any>command).noDuplicateReleaseError && error.statusCode === AccountManager.ERROR_CONFLICT) {
         console.warn(chalk.yellow("[Warning] " + error.message));
     } else {
         throw error;
@@ -1523,9 +1523,9 @@ function isCommandOptionSpecified(option: any): boolean {
 function getSdk(accessKey: string, headers: Headers, customServerUrl: string, proxy: string): AccountManager {
     var sdk: any = new AccountManager(accessKey, CLI_HEADERS, customServerUrl, proxy);
     /*
-     * If the server returns 401 (Unauthorized), it must be due to an invalid
-     * (probably expired) access key. For convenience, we patch every SDK call
-     * to delete the cached connection if we receive a 401 so the user can simply
+     * If the server returns `Unauthorized`, it must be due to an invalid
+     * (or expired) access key. For convenience, we patch every SDK call
+     * to delete the cached connection so the user can simply
      * login again instead of having to log out first.
      */
     Object.getOwnPropertyNames(AccountManager.prototype).forEach((functionName: any) => {
@@ -1536,7 +1536,7 @@ function getSdk(accessKey: string, headers: Headers, customServerUrl: string, pr
                 if (maybePromise && maybePromise.then !== undefined) {
                     maybePromise = maybePromise
                         .catch((error: any) => {
-                            if (error.statusCode && error.statusCode === 401) {
+                            if (error.statusCode && error.statusCode === AccountManager.ERROR_UNAUTHORIZED) {
                                 deleteConnectionInfoCache(/* printMessage */ false);
                             }
 
