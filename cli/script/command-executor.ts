@@ -634,10 +634,16 @@ function logout(command: cli.ICommand): Promise<void> {
         .then((): Promise<void> => {
             if (!connectionInfo.preserveAccessKeyOnLogout) {
                 var machineName: string = os.hostname();
-                return sdk.removeSession(machineName);
+                return sdk.removeSession(machineName)
+                    .catch((error: CodePushError) => {
+                        // If we are not authenticated or the session doesn't exist anymore, just swallow the error instead of displaying it
+                        if (error.statusCode !== 401 && error.statusCode !== 404) {
+                            throw error;
+                        }
+                    });
             }
         })
-        .finally((): void => {
+        .then((): void => {
             sdk = null;
             deleteConnectionInfoCache();
         });
