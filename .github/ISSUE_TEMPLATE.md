@@ -7,4 +7,3 @@ Thanks so much for filing an issue or feature request! We will address it as soo
   * CLI: https://github.com/Microsoft/code-push/tree/master/cli
   * Management SDK: https://github.com/Microsoft/code-push/tree/master/sdk
 3. In your description, please include the version of the CLI or SDK that you are using
-4. Please remove this template once you have filled out your description
