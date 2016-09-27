@@ -73,6 +73,8 @@ If you're using the `code-push release-react` command to perform CodePush releas
 
 ### On React Native Android, my app is always being pulled from localhost instead of CodePush
 
-See: https://github.com/Microsoft/react-native-code-push/issues/438
-https://github.com/Microsoft/react-native-code-push/issues/153
-https://github.com/Microsoft/react-native-code-push/issues/439
+See:
+
+* https://github.com/Microsoft/react-native-code-push/issues/438
+* https://github.com/Microsoft/react-native-code-push/issues/153
+* https://github.com/Microsoft/react-native-code-push/issues/439
