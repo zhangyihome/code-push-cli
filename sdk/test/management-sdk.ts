@@ -70,31 +70,20 @@ describe("Management SDK", () => {
         }
     });
 
-    it("isAuthenticated handles successful auth", (done: MochaDone) => {
+    it("ensureAuthenticated handles successful auth", (done: MochaDone) => {
         mockReturn(JSON.stringify({ authenticated: true }), 200, {});
-        manager.isAuthenticated()
+        manager.ensureAuthenticated()
             .done((authenticated: boolean) => {
                 assert(authenticated, "Should be authenticated");
                 done();
             });
     });
 
-    it("isAuthenticated handles unsuccessful auth", (done: MochaDone) => {
+    it("ensureAuthenticated handles unsuccessful auth", (done: MochaDone) => {
         mockReturn("Unauthorized", 401, {});
-        manager.isAuthenticated()
+        manager.ensureAuthenticated()
             .done((authenticated: boolean) => {
-                assert(!authenticated, "Should not be authenticated");
-                done();
-            });
-    });
-
-    it("isAuthenticated handles unsuccessful auth with promise rejection", (done: MochaDone) => {
-        mockReturn("Unauthorized", 401, {});
-
-        // use optional parameter to ask for rejection of the promise if not authenticated
-        manager.isAuthenticated(true)
-            .done((authenticated: boolean) => {
-                assert.fail("isAuthenticated should have rejected the promise");
+                assert.fail("ensureAuthenticated should have rejected the promise");
                 done();
             }, (err) => {
                 assert.equal(err.message, "Unauthorized", "Error message should be 'Unauthorized'");
@@ -102,11 +91,11 @@ describe("Management SDK", () => {
             });
     });
 
-    it("isAuthenticated handles unexpected status codes", (done: MochaDone) => {
+    it("ensureAuthenticated handles unexpected status codes", (done: MochaDone) => {
         mockReturn("Not Found", 404, {});
-        manager.isAuthenticated()
+        manager.ensureAuthenticated()
             .done((authenticated: boolean) => {
-                assert.fail("isAuthenticated should have rejected the promise");
+                assert.fail("ensureAuthenticated should have rejected the promise");
                 done();
             }, (err) => {
                 assert.equal(err.message, "Not Found", "Error message should be 'Not Found'");

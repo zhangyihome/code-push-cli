@@ -76,7 +76,7 @@ class AccountManager {
         return this._accessKey;
     }
 
-    public isAuthenticated(throwIfUnauthorized?: boolean): Promise<boolean> {
+    public ensureAuthenticated(): Promise<boolean> {
         return Promise<any>((resolve, reject, notify) => {
             var request: superagent.Request<any> = superagent.get(this._serverUrl + urlEncode `/authenticated`);
             if (this._proxy) (<any>request).proxy(this._proxy);
@@ -91,7 +91,7 @@ class AccountManager {
 
                 var authenticated: boolean = status === 200;
 
-                if (!authenticated && throwIfUnauthorized){
+                if (!authenticated ){
                     reject(this.getCodePushError(err, res));
                     return;
                 }
