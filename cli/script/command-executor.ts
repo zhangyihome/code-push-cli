@@ -592,13 +592,12 @@ function login(command: cli.ILoginCommand): Promise<void> {
     if (command.accessKey) {
         var proxy = getProxy(command.proxy, command.noProxy);
         sdk = getSdk(command.accessKey, CLI_HEADERS, command.serverUrl, proxy);
-        return sdk.isAuthenticated()
-            .then((isAuthenticated: boolean): void => {
-                if (isAuthenticated) {
-                    serializeConnectionInfo(command.accessKey, /*preserveAccessKeyOnLogout*/ true, command.serverUrl, command.proxy, command.noProxy);
-                } else {
-                    throw new Error("Invalid access key.");
-                }
+        return sdk.ensureAuthenticated()
+            .catch((err: CodePushError) =>{
+                throw new Error("Invalid access key."); 
+            })
+            .then((): void => {
+                serializeConnectionInfo(command.accessKey, /*preserveAccessKeyOnLogout*/ true, command.serverUrl, command.proxy, command.noProxy);
             });
     } else {
         return loginWithExternalAuthentication("login", command.serverUrl, command.proxy, command.noProxy);
@@ -618,13 +617,12 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string, pro
 
             sdk = getSdk(accessKey, CLI_HEADERS, serverUrl, getProxy(proxy, noProxy));
 
-            return sdk.isAuthenticated()
-                .then((isAuthenticated: boolean): void => {
-                    if (isAuthenticated) {
-                        serializeConnectionInfo(accessKey, /*preserveAccessKeyOnLogout*/ false, serverUrl, proxy, noProxy);
-                    } else {
-                        throw new Error("Invalid access key.");
-                    }
+            return sdk.ensureAuthenticated()
+                .catch((err: CodePushError) => {
+                    throw new Error("Invalid access key.");
+                })
+                .then((): void => {
+                    serializeConnectionInfo(accessKey, /*preserveAccessKeyOnLogout*/ false, serverUrl, proxy, noProxy);
                 });
         });
 }
@@ -1172,7 +1170,10 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
 
     return getPackageFilePromise
         .then((file: IPackageFile): Promise<void> => {
-            return sdk.release(command.appName, command.deploymentName, file.path, command.appStoreVersion, updateMetadata, uploadProgress)
+            return sdk.ensureAuthenticated()
+                .then((isAuth: boolean): Promise<void> => {
+                    return sdk.release(command.appName, command.deploymentName, file.path, command.appStoreVersion, updateMetadata, uploadProgress);
+                })
                 .then((): void => {
                     log("Successfully released an update containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
                 })

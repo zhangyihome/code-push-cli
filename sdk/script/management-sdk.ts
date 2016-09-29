@@ -76,8 +76,8 @@ class AccountManager {
         return this._accessKey;
     }
 
-    public isAuthenticated(): Promise<boolean> {
-        return Promise<boolean>((resolve, reject, notify) => {
+    public ensureAuthenticated(): Promise<boolean> {
+        return Promise<any>((resolve, reject, notify) => {
             var request: superagent.Request<any> = superagent.get(this._serverUrl + urlEncode `/authenticated`);
             if (this._proxy) (<any>request).proxy(this._proxy);
             this.attachCredentials(request);
@@ -91,11 +91,16 @@ class AccountManager {
 
                 var authenticated: boolean = status === 200;
 
+                if (!authenticated ){
+                    reject(this.getCodePushError(err, res));
+                    return;
+                }
+
                 resolve(authenticated);
             });
         });
     }
-
+    
     public addAccessKey(friendlyName: string, ttl?: number): Promise<AccessKey> {
         if (!friendlyName) {
             throw new Error("A name must be specified when adding an access key.");
