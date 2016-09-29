@@ -88,6 +88,20 @@ describe("Management SDK", () => {
             });
     });
 
+    it("isAuthenticated handles unsuccessful auth with promise rejection", (done: MochaDone) => {
+        mockReturn("Unauthorized", 401, {});
+
+        // use optional parameter to ask for rejection of the promise if not authenticated
+        manager.isAuthenticated(true)
+            .done((authenticated: boolean) => {
+                assert.fail("isAuthenticated should have rejected the promise");
+                done();
+            }, (err) => {
+                assert.equal(err.message, "Unauthorized", "Error message should be 'Unauthorized'");
+                done();
+            });
+    });
+
     it("isAuthenticated handles unexpected status codes", (done: MochaDone) => {
         mockReturn("Not Found", 404, {});
         manager.isAuthenticated()

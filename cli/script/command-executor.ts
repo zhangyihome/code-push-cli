@@ -1172,16 +1172,9 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
 
     return getPackageFilePromise
         .then((file: IPackageFile): Promise<void> => {
-            return sdk.isAuthenticatedWithMessage()
-                .then((result: any): Promise<void> => {
-                    if (result.authenticated){
-                        return sdk.release(command.appName, command.deploymentName, file.path, command.appStoreVersion, updateMetadata, uploadProgress);
-                    } else {
-                        throw <CodePushError>{
-                            statusCode: result.status,
-                            message: result.errorMessage
-                        };
-                    }
+            return sdk.isAuthenticated(true)
+                .then((isAuth: boolean): Promise<void> => {
+                    return sdk.release(command.appName, command.deploymentName, file.path, command.appStoreVersion, updateMetadata, uploadProgress);
                 })
                 .then((): void => {
                     log("Successfully released an update containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
