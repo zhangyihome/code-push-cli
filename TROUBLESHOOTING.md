@@ -78,3 +78,11 @@ See:
 * https://github.com/Microsoft/react-native-code-push/issues/438
 * https://github.com/Microsoft/react-native-code-push/issues/153
 * https://github.com/Microsoft/react-native-code-push/issues/439
+
+### CodePush updates from older builds are overriding newer builds
+
+There are two ways to address this:
+
+1. If you never want updates from past builds to be applied to newer builds, you can use the `targetBinaryVersion` flag when you release updates. This simply refers to the version of the binary shell of your app (derived from `versionName` on Android and `CFBundleShortVersionString` on iOS). For example, you could release an update to `<= 1.0.0` or just `1.0.0`, and then just make sure the `binaryVersion` on your older build is `1.0.0` and auto-incremented on each subsequent build (for example to `1.0.1`)
+2. If you want to sometimes share CodePush updates between multiple builds, but your issue is that the build that you released is newer than what was already on CodePush, then what we recommend is to push a CodePush release of the contents of your newer build before you deploy it to a device. Then, when your newer build checks for an update, it will see that the hash of the update is the same as what it already has, and not apply it. We actually recommend doing this anyway, because by uploading the version that is shipped with your binary, the server has something to diff against when you push your next update.
+
