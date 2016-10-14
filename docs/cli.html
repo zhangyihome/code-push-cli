@@ -796,6 +796,7 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 [--description &lt;description&gt;]
 [--disabled &lt;disabled&gt;]
 [--mandatory]
+[--noDuplicateReleaseError]
 [--rollout &lt;rolloutPercentage&gt;]
 </code></pre></div>
 <h4>App name parameter</h4>
@@ -937,6 +938,12 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 
 <p><em>NOTE: This parameter can be set using either &ldquo;&ndash;description&rdquo; or &ldquo;-desc&rdquo;</em></p>
 
+<h4>Disabled parameter</h4>
+
+<p>This specifies whether an update should be downloadable by end users or not. If left unspecified, the update will not be disabled (i.e. users will download it the moment your app calls <code>sync</code>). This parameter can be valuable if you want to release an update that isn&rsquo;t immediately available, until you expicitly <a href="#patching-releases">patch it</a> when you want end users to be able to download it (e.g. an announcement blog post went live).</p>
+
+<p><em>NOTE: This parameter can be set using either &ldquo;&ndash;disabled&rdquo; or &ldquo;-x&rdquo;</em></p>
+
 <h4>Mandatory parameter</h4>
 
 <p>This specifies whether the update should be considered mandatory or not (e.g. it includes a critical security fix). This attribute is simply round tripped to the client, who can then decide if and how they would like to enforce it.</p>
@@ -973,6 +980,10 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 
 <p><em>NOTE: This parameter can be set using either <code>--mandatory</code> or <code>-m</code></em></p>
 
+<h4>No duplicate release error parameter</h4>
+
+<p>This specifies that if the update is identical to the latest release on the deployment, the CLI should generate a warning instead of an error. This is useful for continuous integration scenarios where it is expected that small modifications may trigger releases where no production code has changed.</p>
+
 <h4>Rollout parameter</h4>
 
 <p><strong>IMPORTANT: In order for this parameter to actually take affect, your end users need to be running version <code>1.6.0-beta+</code> (for Cordova) or <code>1.9.0-beta+</code> (for React Native) of the CodePush plugin. If you release an update that specifies a rollout property, no end user running an older version of the Cordova or React Native plugins will be eligible for the update. Therefore, until you have adopted the neccessary version of the platform-specific CodePush plugin (as previously mentioned), we would advise not setting a rollout value on your releases, since no one would end up receiving it.</strong></p>
@@ -989,12 +1000,6 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 
 <p><em>NOTE: This parameter can be set using either <code>--rollout</code> or <code>-r</code></em></p>
 
-<h4>Disabled parameter</h4>
-
-<p>This specifies whether an update should be downloadable by end users or not. If left unspecified, the update will not be disabled (i.e. users will download it the moment your app calls <code>sync</code>). This parameter can be valuable if you want to release an update that isn&rsquo;t immediately available, until you expicitly <a href="#patching-releases">patch it</a> when you want end users to be able to download it (e.g. an announcement blog post went live).</p>
-
-<p><em>NOTE: This parameter can be set using either &ldquo;&ndash;disabled&rdquo; or &ldquo;-x&rdquo;</em></p>
-
 <h3>Releasing Updates (React Native)</h3>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-react &lt;appName&gt; &lt;platform&gt;
 [--bundleName &lt;bundleName&gt;]
@@ -1003,7 +1008,9 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 [--development &lt;development&gt;]
 [--disabled &lt;disabled&gt;]
 [--entryFile &lt;entryFile&gt;]
+[--gradleFile &lt;gradleFile&gt;]
 [--mandatory]
+[--noDuplicateReleaseError]
 [--plistFile &lt;plistFile&gt;]
 [--plistFilePrefix &lt;plistFilePrefix&gt;]
 [--sourcemapOutput &lt;sourcemapOutput&gt;]
@@ -1053,6 +1060,10 @@ code-push release MyApp ./CodePush 1.0.0
 
 <p>This is the same parameter as the one described in the <a href="#mandatory-parameter">above section</a>.</p>
 
+<h4>No duplicate release error parameter</h4>
+
+<p>This is the same parameter as the one described in the <a href="#no-duplicate-release-error-parameter">above section</a>.</p>
+
 <h4>Rollout parameter</h4>
 
 <p>This is the same parameter as the one described in the <a href="#rollout-parameter">above section</a>. If left unspecified, the release will be made available to all users.</p>
@@ -1083,14 +1094,20 @@ code-push release MyApp ./CodePush 1.0.0
 
 <p><em>NOTE: This parameter can be set using either &ndash;entryFile or -e</em></p>
 
-<h4>Plist file parameter</h4>
+<h4>Gradle file parameter (Android only)</h4>
+
+<p>This specifies the relative path to the <code>build.gradle</code> file that the CLI should use when attempting to auto-detect the target binary version for the release. This parameter is only meant for advanced scenarios, since the CLI will automatically be able to find your <code>build.grade</code> file in &ldquo;standard&rdquo; React Native projects. However, if your gradle file is located in an arbitrary location, that the CLI can&rsquo;t discover, then using this parameter allows you to continue releasing CodePush updates, without needing to explicitly set the <code>--targetBinaryVersion</code> parameter. Since <code>build.gradle</code> is a required file name, specifying the path to the containing folder or the full path to the file itself will both achieve the same effect.</p>
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-react foo android -p &quot;./foo/bar/&quot;
+code-push release-react foo android -p &quot;./foo/bar/build.gradle&quot;
+</code></pre></div>
+<h4>Plist file parameter (iOS only)</h4>
 
 <p>This specifies the relative path to the <code>Info.plist</code> file that the CLI should use when attempting to auto-detect the target binary version for the release. This parameter is only meant for advanced scenarios, since the CLI will automatically be able to find your <code>Info.plist</code> file in &ldquo;standard&rdquo; React Native projects, and you can use the <code>--plistFilePrefix</code> parameter in order to support per-environment plist files (e.g. <code>STAGING-Info.plist</code>). However, if your plist is located in an arbitrary location, that the CLI can&rsquo;t discover, then using this parameter allows you to continue releasing CodePush updates, without needing to explicitly set the <code>--targetBinaryVersion</code> parameter.</p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-react foo ios -p &quot;./foo/bar/MyFile.plist&quot;
 </code></pre></div>
 <p><em>NOTE: This parameter can be set using either &ndash;plistFile or -p</em></p>
 
-<h4>Plist file prefix parameter</h4>
+<h4>Plist file prefix parameter (iOS only)</h4>
 
 <p>This specifies the file name prefix of the <code>Info.plist</code> file that that CLI should use when attempting to auto-detect the target binary version for the release. This can be useful if you&rsquo;ve created per-environment plist files (e.g. <code>DEV-Info.plist</code>, <code>STAGING-Info.plist</code>), and you want to be able to release CodePush updates without needing to explicity set the <code>--targetBinaryVersion</code> parameter. By specifying a <code>--plistFilePrefx</code>, the CLI will look for a file named <code>&lt;prefix&gt;-Info.plist</code>, instead of simply <code>Info.plist</code> (which is the default behavior), in the following locations: <code>./ios</code> and <code>./ios/&lt;appName&gt;</code>. If your plist file isn&rsquo;t located in either of those directories (e.g. your app is a native iOS app with embedded RN views), or uses an entirely different file naming convention, then consider using the <code>--plistFile</code> parameter.</p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell"># Auto-detect the target binary version of this release by looking up the
@@ -1114,6 +1131,7 @@ code-push release-react foo ios --pre &quot;DEV-&quot;
 [--deploymentName &lt;deploymentName&gt;]
 [--description &lt;description&gt;]
 [--mandatory]
+[--noDuplicateReleaseError]
 [--targetBinaryVersion &lt;targetBinaryVersion&gt;]
 [--rollout &lt;rolloutPercentage&gt;]
 [--build]
@@ -1153,6 +1171,10 @@ code-push release MyApp ./platforms/ios/www 1.0.0
 <h4>Mandatory parameter</h4>
 
 <p>This is the same parameter as the one described in the <a href="#mandatory-parameter">above section</a>.</p>
+
+<h4>No duplicate release error parameter</h4>
+
+<p>This is the same parameter as the one described in the <a href="#no-duplicate-release-error-parameter">above section</a>.</p>
 
 <h4>Rollout parameter</h4>
 
@@ -1249,6 +1271,7 @@ code-push patch MyApp Staging -t &quot;1.0.0 - 1.0.5&quot;
 [--description &lt;description&gt;]
 [--disabled &lt;disabled&gt;]
 [--mandatory]
+[--noDuplicateReleaseError]
 [--rollout &lt;rolloutPercentage&gt;]
 [--targetBinaryVersion &lt;targetBinaryVersion]
 </code></pre></div>
@@ -1265,13 +1288,17 @@ code-push patch MyApp Staging -t &quot;1.0.0 - 1.0.5&quot;
 
 <p>This is the same parameter as the one described in the <a href="#description-parameter">above section</a>, and simply allows you to override the description that will be used for the promoted release. If unspecified, the new release will inherit the description from the release being promoted.</p>
 
-<h4>Disabled parameter</h4>
+<h3>Disabled parameter</h3>
 
 <p>This is the same parameter as the one described in the <a href="#disabled-parameter">above section</a>, and simply allows you to override the value of the disabled flag that will be used for the promoted release. If unspecified, the new release will inherit the disabled property from the release being promoted.</p>
 
 <h3>Mandatory parameter</h3>
 
 <p>This is the same parameter as the one described in the <a href="#mandatory-parameter">above section</a>, and simply allows you to override the mandatory flag that will be used for the promoted release. If unspecified, the new release will inherit the mandatory property from the release being promoted.</p>
+
+<h3>No duplicate release error parameter</h3>
+
+<p>This is the same parameter as the one described in the <a href="#no-duplicate-release-error-parameter">above section</a>.</p>
 
 <h3>Rollout parameter</h3>
 

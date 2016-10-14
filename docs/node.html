@@ -650,6 +650,23 @@
 <li><p><strong>rollback(appName: string, deploymentName: string, targetRelease?: string): Promise&lt;void&gt;</strong> - Rolls back the latest release within the specified deployment. Optionally allows you to target a specific release in the deployment&rsquo;s history, as opposed to rolling to the previous release.</p></li>
 <li><p><strong>transferApp(appName: string, email: string): Promise&lt;void&gt;</strong> - Transfers the ownership of the specified app to the specified account.</p></li>
 </ul>
+
+<h3>Error Handling</h3>
+
+<p>When an error occurs in any of the methods, the promise will be rejected with a CodePushError object with the following properties:</p>
+
+<ul>
+<li><strong>message</strong>: A user-friendly message that describes the error.</li>
+<li><strong>statusCode</strong>: An HTTP response code that identifies the category of error:
+
+<ul>
+<li><strong>CodePush.ERROR_GATEWAY_TIMEOUT</strong>: A network error prevented you from connecting to the CodePush server.</li>
+<li><strong>CodePush.ERROR_INTERNAL_SERVER</strong>: An error occurred internally on the CodePush server.</li>
+<li><strong>CodePush.ERROR_NOT_FOUND</strong>: The resource you are attempting to retrieve does not exist.</li>
+<li><strong>CodePush.ERROR_CONFLICT</strong>: The resource you are attempting to create already exists.</li>
+<li><strong>CodePush.ERROR_UNAUTHORIZED</strong>: The access key you configured is invalid or expired.</li>
+</ul></li>
+</ul>
                     
                 </article>
                 <div class="feedback-container">

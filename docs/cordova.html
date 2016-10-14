@@ -642,9 +642,10 @@ cordova platform update ios
 <li><p>If you&rsquo;re using an <code>&lt;access origin=&quot;*&quot; /&gt;</code> element in your <code>config.xml</code> file, then your app is already allowed to communicate with the CodePush servers and you can safely skip this step. Otherwise, add the following additional <code>&lt;access /&gt;</code> elements:</p>
 <div class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;access origin=&quot;https://codepush.azurewebsites.net&quot; /&gt;
 &lt;access origin=&quot;https://codepush.blob.core.windows.net&quot; /&gt;
+&lt;access origin=&quot;https://codepushupdates.azureedge.net&quot; /&gt;
 </code></pre></div></li>
 <li><p>To ensure that your app can access the CodePush server on <a href="https://developer.mozilla.org/en-US/docs/Web/Security/CSP/Introducing_Content_Security_Policy">CSP</a>-compliant platforms, add <code>https://codepush.azurewebsites.net</code> to the <code>Content-Security-Policy</code> <code>meta</code> tag in your <code>index.html</code> file:</p>
-<div class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src https://codepush.azurewebsites.net &#39;self&#39; data: gap: https://ssl.gstatic.com &#39;unsafe-eval&#39;; style-src &#39;self&#39; &#39;unsafe-inline&#39;; media-src *&quot; /&gt;
+<div class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src https://codepush.azurewebsites.net 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *&quot; /&gt;
 </code></pre></div></li>
 <li><p>Finally, double-check that you already have the <a href="https://github.com/apache/cordova-plugin-whitelist"><code>cordova-plugin-whitelist</code></a> plugin installed (most apps will). To check this, simply run the following command:</p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell">cordova plugin ls
@@ -802,9 +803,9 @@ code-push release-cordova MyApp-ios ios -x
 
     // If the current app &quot;session&quot; represents the first time
     // this update has run, and it had a description provided
-    // with it upon release, let&#39;s show it to the end user
+    // with it upon release, let's show it to the end user
     if (update.isFirstRun &amp;&amp; update.description) {
-        // Display a &quot;what&#39;s new?&quot; modal
+        // Display a &quot;what's new?&quot; modal
     }
 });
 </code></pre></div>
@@ -966,7 +967,7 @@ function syncStatus(status) {
 function downloadProgress(downloadProgress) {
     if (downloadProgress) {
         // Update &quot;downloading&quot; modal with current download %
-        //console.log(&quot;Downloading &quot; + downloadProgress.receivedBytes + &quot; of &quot; + downloadProgress);
+        //console.log(&quot;Downloading &quot; + downloadProgress.receivedBytes + &quot; of &quot; + downloadProgress.totalBytes);
     }
 }
 </code></pre></div>
@@ -994,7 +995,7 @@ function downloadProgress(downloadProgress) {
 <li><strong>failedInstall</strong>: Indicates whether this update has been previously installed but was rolled back. The <code>sync</code> method will automatically ignore updates which have previously failed, so you only need to worry about this property if using <code>checkForUpdate</code>. <em>(Boolean)</em></li>
 <li><strong>isFirstRun</strong>: Flag indicating if the current application run is the first one after the package was applied. <em>(Boolean)</em></li>
 <li><strong>isMandatory</strong>: Indicates whether the update is considered mandatory. This is the value that was specified in the CLI when the update was released. <em>(Boolean)</em></li>
-<li><strong>label</strong>: The internal label automatically given to the update by the CodePush server. This value uniquely identifies the update within it&rsquo;s deployment. <em>(String)</em></li>
+<li><strong>label</strong>: The internal label automatically given to the update by the CodePush server, such as <code>v5</code>. This value uniquely identifies the update within it&rsquo;s deployment. <em>(String)</em></li>
 <li><strong>packageHash</strong>: The SHA hash value of the update. <em>(String)</em></li>
 <li><strong>packageSize</strong>: The size of the code contained within the update, in bytes. <em>(Number)</em></li>
 </ul>
