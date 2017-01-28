@@ -679,10 +679,12 @@ code-push session rm &lt;machineName&gt;
 <p>Before you can deploy any updates, you need to register an app with the CodePush service using the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push app add &lt;appName&gt;
 </code></pre></div>
-<p>If your app targets both iOS and Android, we recommend creating separate apps with CodePush. One for each platform. This way, you can manage and release updates to them separately, which in the long run, tends to make things simpler. The naming convention that most folks use is to suffix the app name with <code>-iOS</code> and <code>-Android</code>. For example:</p>
+<p>If your app targets both iOS and Android, we highly recommend creating separate apps with CodePush. One for each platform. This way, you can manage and release updates to them separately, which in the long run, tends to make things simpler. The naming convention that most folks use is to suffix the app name with <code>-iOS</code> and <code>-Android</code>. For example:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push app add MyApp-Android
 code-push app add MyApp-iOS
 </code></pre></div>
+<p><em>NOTE: Using the same app for iOS and Android may cause installation exceptions because the CodePush update package produced for iOS will have different content from the update produced for Android.</em></p>
+
 <p>All new apps automatically come with two deployments (<code>Staging</code> and <code>Production</code>) so that you can begin distributing updates to multiple channels without needing to do anything extra (see deployment instructions below). After you create an app, the CLI will output the deployment keys for the <code>Staging</code> and <code>Production</code> deployments, which you can begin using to configure your mobile clients via their respective SDKs (details for <a href="http://github.com/Microsoft/cordova-plugin-code-push">Cordova</a> and <a href="http://github.com/Microsoft/react-native-code-push">React Native</a>).</p>
 
 <p>If you decide that you don&rsquo;t like the name you gave to an app, you can rename it at any time using the following command:</p>
@@ -896,7 +898,7 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 </tbody></table>
 
 <p><em>NOTE: If your semver expression starts with a special shell character or operator such as <code>&gt;</code>, <code>^</code>, or *</em>
-<em>, the command may not execute correctly if you do not wrap the value in quotes as the shell will not supply the right values to our CLI process. Therefore, it is best to wrap your <code>targetBinaryVersion</code> parameter in double quotes when calling the <code>release</code> command, e.g. <code>code-push release MyApp updateContents &quot;&gt;1.2.3&quot;</code>.</em></p>
+<em>, the command may not execute correctly if you do not wrap the value in quotes as the shell will not supply the right values to our CLI process. Therefore, it is best to wrap your <code>targetBinaryVersion</code> parameter in double quotes when calling the <code>release</code> command, e.g. <code>code-push release MyApp-iOS updateContents &quot;&gt;1.2.3&quot;</code>.</em></p>
 
 <p>The following table outlines the version value that CodePush expects your update&rsquo;s semver range to satisfy for each respective app type:</p>
 
@@ -1033,10 +1035,10 @@ react-native bundle --platform ios \
 --assets-dest ./CodePush \
 --dev false
 
-code-push release MyApp ./CodePush 1.0.0
+code-push release MyApp-iOS ./CodePush 1.0.0
 </code></pre></div>
 <p>Achieving the equivalent behavior with the <code>release-react</code> command would simply require the following command, which is generally less error-prone:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-react MyApp ios
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-react MyApp-iOS ios
 </code></pre></div>
 <p><em>NOTE: We believe that the <code>release-react</code> command should be valuable for most React Native developers, so if you&rsquo;re finding that it isn&rsquo;t flexible enough or missing a key feature, please don&rsquo;t hesistate to <a href="mailto:codepushfeed@microsoft.com">let us know</a>, so that we can improve it!</em></p>
 
@@ -1097,13 +1099,13 @@ code-push release MyApp ./CodePush 1.0.0
 <h4>Gradle file parameter (Android only)</h4>
 
 <p>This specifies the relative path to the <code>build.gradle</code> file that the CLI should use when attempting to auto-detect the target binary version for the release. This parameter is only meant for advanced scenarios, since the CLI will automatically be able to find your <code>build.grade</code> file in &ldquo;standard&rdquo; React Native projects. However, if your gradle file is located in an arbitrary location, that the CLI can&rsquo;t discover, then using this parameter allows you to continue releasing CodePush updates, without needing to explicitly set the <code>--targetBinaryVersion</code> parameter. Since <code>build.gradle</code> is a required file name, specifying the path to the containing folder or the full path to the file itself will both achieve the same effect.</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-react foo android -p &quot;./foo/bar/&quot;
-code-push release-react foo android -p &quot;./foo/bar/build.gradle&quot;
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-react MyApp-Android android -p &quot;./foo/bar/&quot;
+code-push release-react MyApp-Android android -p &quot;./foo/bar/build.gradle&quot;
 </code></pre></div>
 <h4>Plist file parameter (iOS only)</h4>
 
 <p>This specifies the relative path to the <code>Info.plist</code> file that the CLI should use when attempting to auto-detect the target binary version for the release. This parameter is only meant for advanced scenarios, since the CLI will automatically be able to find your <code>Info.plist</code> file in &ldquo;standard&rdquo; React Native projects, and you can use the <code>--plistFilePrefix</code> parameter in order to support per-environment plist files (e.g. <code>STAGING-Info.plist</code>). However, if your plist is located in an arbitrary location, that the CLI can&rsquo;t discover, then using this parameter allows you to continue releasing CodePush updates, without needing to explicitly set the <code>--targetBinaryVersion</code> parameter.</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-react foo ios -p &quot;./foo/bar/MyFile.plist&quot;
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-react MyApp-iOS ios -p &quot;./foo/bar/MyFile.plist&quot;
 </code></pre></div>
 <p><em>NOTE: This parameter can be set using either &ndash;plistFile or -p</em></p>
 
@@ -1112,11 +1114,11 @@ code-push release-react foo android -p &quot;./foo/bar/build.gradle&quot;
 <p>This specifies the file name prefix of the <code>Info.plist</code> file that that CLI should use when attempting to auto-detect the target binary version for the release. This can be useful if you&rsquo;ve created per-environment plist files (e.g. <code>DEV-Info.plist</code>, <code>STAGING-Info.plist</code>), and you want to be able to release CodePush updates without needing to explicity set the <code>--targetBinaryVersion</code> parameter. By specifying a <code>--plistFilePrefx</code>, the CLI will look for a file named <code>&lt;prefix&gt;-Info.plist</code>, instead of simply <code>Info.plist</code> (which is the default behavior), in the following locations: <code>./ios</code> and <code>./ios/&lt;appName&gt;</code>. If your plist file isn&rsquo;t located in either of those directories (e.g. your app is a native iOS app with embedded RN views), or uses an entirely different file naming convention, then consider using the <code>--plistFile</code> parameter.</p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell"># Auto-detect the target binary version of this release by looking up the
 # app version within the STAGING-Info.plist file in either the ./ios or ./ios/&lt;APP&gt; directories.
-code-push release-react foo ios --pre &quot;STAGING&quot;
+code-push release-react MyApp-iOS ios --pre &quot;STAGING&quot;
 
 # Tell the CLI to use your dev plist (`DEV-Info.plist`).
 # Note that the hyphen separator can be explicitly stated.
-code-push release-react foo ios --pre &quot;DEV-&quot;
+code-push release-react MyApp-iOS ios --pre &quot;DEV-&quot;
 </code></pre></div>
 <p><em>NOTE: This parameter can be set using either &ndash;plistFilePrefix or &ndash;pre</em></p>
 
@@ -1145,10 +1147,10 @@ code-push release-react foo ios --pre &quot;DEV-&quot;
 
 <p>To illustrate the difference that the <code>release-cordova</code> command can make, the following is an example of how you might generate and release an update for a Cordova app using the &ldquo;vanilla&rdquo; <code>release</code> command:</p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell">cordova prepare ios
-code-push release MyApp ./platforms/ios/www 1.0.0
+code-push release MyApp-iOS ./platforms/ios/www 1.0.0
 </code></pre></div>
 <p>Achieving the equivalent behavior with the <code>release-cordova</code> command would simply require the following command, which is generally less error-prone:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-cordova MyApp ios
+<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-cordova MyApp-iOS ios
 </code></pre></div>
 <p><em>NOTE: We believe that the <code>release-cordova</code> command should be valuable for most Cordova developers, so if you&rsquo;re finding that it isn&rsquo;t flexible enough or missing a key feature, please don&rsquo;t hesistate to <a href="mailto:codepushfeed@microsoft.com">let us know</a>, so that we can improve it.</em></p>
 
@@ -1228,10 +1230,10 @@ code-push debug android
 
 <p>Aside from the <code>appName</code> and <code>deploymentName</code>, all parameters are optional, and therefore, you can use this command to update just a single attribute or all of them at once. Calling the <code>patch</code> command without specifying any attribute flag will result in a no-op.</p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell"># Mark the latest production release as mandatory
-code-push patch MyApp Production -m
+code-push patch MyApp-iOS Production -m
 
 # Increase the rollout for v23 to 50%
-code-push patch MyApp Production -l v23 -rollout 50%
+code-push patch MyApp-iOS Production -l v23 -rollout 50%
 </code></pre></div>
 <h3>Label parameter</h3>
 
@@ -1262,7 +1264,7 @@ code-push patch MyApp Production -l v23 -rollout 50%
 <p>This is the same parameter as the one described in the <a href="#target-binary-version-parameter">above section</a>, and simply allows you to update the semver range that indicates which binary version(s) a release is compatible with. This can be useful if you made a mistake when originally releasing an update (e.g. you specified <code>1.0.0</code> but meant <code>1.1.0</code>) or you want to increase or decrease the version range that a release supports (e.g. you discovered that a release doesn&rsquo;t work with <code>1.1.2</code> after all). If this paremeter is ommitted, no change will be made to the value of the target release&rsquo;s version property.</p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell"># Add a &quot;max binary version&quot; to an existing release
 # by scoping its eligibility to users running &gt;= 1.0.5
-code-push patch MyApp Staging -t &quot;1.0.0 - 1.0.5&quot;
+code-push patch MyApp-iOS Staging -t &quot;1.0.0 - 1.0.5&quot;
 </code></pre></div>
 <h2>Promoting Updates</h2>
 
@@ -1309,13 +1311,13 @@ code-push patch MyApp Staging -t &quot;1.0.0 - 1.0.5&quot;
 <p>This is the same parameter as the one described in the <a href="#target-binary-version-parameter">above section</a>, and simply allows you to override the target binary version that will be used for the promoted release. If unspecified, the new release will inherit the target binary version property from the release being promoted.</p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell"># Promote the release to production and make it
 # available to all versions using that deployment
-code-push promote MyApp Staging Production -t &quot;*&quot;
+code-push promote MyApp-iOS Staging Production -t &quot;*&quot;
 </code></pre></div>
 <h2>Rolling Back Updates</h2>
 
 <p>A deployment&rsquo;s release history is immutable, so you cannot delete or remove an update once it has been released. However, if you release an update that is broken or contains unintended features, it is easy to roll it back using the <code>rollback</code> command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push rollback &lt;appName&gt; &lt;deploymentName&gt;
-code-push rollback MyApp Production
+code-push rollback MyApp-iOS Production
 </code></pre></div>
 <p>This has the effect of creating a new release for the deployment that includes the <strong>exact same code and metadata</strong> as the version prior to the latest one. For example, imagine that you released the following updates to your app:</p>
 
@@ -1377,7 +1379,7 @@ code-push rollback MyApp Production
 <p>End-users that had already acquired <code>v3</code> would now be &ldquo;moved back&rdquo; to <code>v2</code> when the app performs an update check. Additionally, any users that were still running <code>v2</code>, and therefore, had never acquired <code>v3</code>, wouldn&rsquo;t receive an update since they are already running the latest release (this is why our update check uses the package hash in addition to the release label).</p>
 
 <p>If you would like to rollback a deployment to a release other than the previous (e.g. <code>v3</code> -&gt; <code>v2</code>), you can specify the optional <code>--targetRelease</code> parameter:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push rollback MyApp Production --targetRelease v34
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push rollback MyApp-iOS Production --targetRelease v34
 </code></pre></div>
 <p><em>NOTE: The release produced by a rollback will be annotated in the output of the <code>deployment history</code> command to help identify them more easily.</em></p>
 
