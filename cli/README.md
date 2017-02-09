@@ -4,6 +4,8 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
 
 ![CodePush CLI](https://cloud.githubusercontent.com/assets/116461/16246693/2e7df77c-37bb-11e6-9456-e392af7f7b84.png)
 
+<!-- CLI Catalog -->
+
 * [Installation](#installation)
 * [Getting Started](#getting-started)
 * [Account Management](#account-management)
@@ -25,6 +27,8 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
 * [Clearing Release History](#clearing-release-history)
 
 [[Chinese version 中文版]](./README-cn.md)
+
+<!-- CLI Catalog -->
 
 ## Installation
 
