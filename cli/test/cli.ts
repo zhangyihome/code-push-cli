@@ -32,6 +32,25 @@ const DEFAULT_ACCESS_KEY_MAX_AGE = 1000 * 60 * 60 * 24 * 60; // 60 days
 const TEST_MACHINE_NAME = "Test machine";
 
 export class SdkStub {
+    private productionDeployment: codePush.Deployment = {
+        name: "Production",
+        key: "6"
+    };
+    private stagingDeployment: codePush.Deployment = {
+        name: "Staging",
+        key: "6",
+        package: {
+            appVersion: "1.0.0",
+            description: "fgh",
+            label: "v2",
+            packageHash: "jkl",
+            isMandatory: true,
+            size: 10,
+            blobUrl: "http://mno.pqr",
+            uploadTime: 1000
+        }
+    };
+
     public getAccountInfo(): Promise<codePush.Account> {
         return Q(<codePush.Account>{
             email: "a@a.com"
@@ -65,14 +84,14 @@ export class SdkStub {
         return Q(<void>null);
     }
 
-    public addDeployment(appId: string, name: string): Promise<codePush.Deployment> {
+    public addDeployment(appName: string, deploymentName: string): Promise<codePush.Deployment> {
         return Q(<codePush.Deployment>{
-            name: name,
+            name: deploymentName,
             key: "6"
         });
     }
 
-    public clearDeploymentHistory(appId: string, deployment: string): Promise<void> {
+    public clearDeploymentHistory(appName: string, deploymentName: string): Promise<void> {
         return Q(<void>null);
     }
 
@@ -103,27 +122,27 @@ export class SdkStub {
         }]);
     }
 
-    public getDeployments(appId: string): Promise<codePush.Deployment[]> {
-        return Q([<codePush.Deployment>{
-            name: "Production",
-            key: "6"
-        }, <codePush.Deployment>{
-            name: "Staging",
-            key: "6",
-            package: {
-                appVersion: "1.0.0",
-                description: "fgh",
-                label: "v2",
-                packageHash: "jkl",
-                isMandatory: true,
-                size: 10,
-                blobUrl: "http://mno.pqr",
-                uploadTime: 1000
-            }
-        }]);
+    public getDeployments(appName: string): Promise<codePush.Deployment[]> {
+        if (appName === "a") {
+            return Q([this.productionDeployment, this.stagingDeployment]);
+        }
+    
+        return Q.reject<codePush.Deployment[]>();
     }
 
-    public getDeploymentHistory(appId: string, deploymentId: string): Promise<codePush.Package[]> {
+    public getDeployment(appName: string, deploymentName: string): Promise<codePush.Deployment> {
+        if (appName === "a") {
+            if (deploymentName === "Production") {
+                return Q(this.productionDeployment);
+            } else if (deploymentName === "Staging") {
+                return Q(this.stagingDeployment);
+            }
+        }
+
+        return Q.reject<codePush.Deployment>();
+    }
+
+    public getDeploymentHistory(appName: string, deploymentName: string): Promise<codePush.Package[]> {
         return Q([
             <codePush.Package>{
                 description: null,
@@ -148,7 +167,7 @@ export class SdkStub {
         ]);
     }
 
-    public getDeploymentMetrics(appId: string, deploymentId: string): Promise<any> {
+    public getDeploymentMetrics(appName: string, deploymentName: string): Promise<any> {
         return Q({
             "1.0.0": {
                 active: 123
@@ -189,7 +208,7 @@ export class SdkStub {
         return Q(<void>null);
     }
 
-    public release(appId: string, deploymentId: string): Promise<string> {
+    public release(appName: string, deploymentName: string): Promise<string> {
         return Q("Successfully released");
     }
 
@@ -197,7 +216,7 @@ export class SdkStub {
         return Q(<void>null);
     }
 
-    public removeApp(appId: string): Promise<void> {
+    public removeApp(appName: string): Promise<void> {
         return Q(<void>null);
     }
 
@@ -205,7 +224,7 @@ export class SdkStub {
         return Q(<void>null);
     }
 
-    public removeDeployment(appId: string, deployment: string): Promise<void> {
+    public removeDeployment(appName: string, deploymentName: string): Promise<void> {
         return Q(<void>null);
     }
 
@@ -225,7 +244,7 @@ export class SdkStub {
         return Q(<void>null);
     }
 
-    public renameDeployment(appId: string, deployment: codePush.Deployment): Promise<void> {
+    public renameDeployment(appName: string, deploymentName: codePush.Deployment): Promise<void> {
         return Q(<void>null);
     }
 }
@@ -1128,7 +1147,6 @@ describe("CLI", () => {
             .catch((err) => {
                 assert.equal(err.message, `Unable to ${cordovaCommand} project. Please ensure that the CWD represents a Cordova project and that the "${command.platform}" platform was added by running "cordova platform add ${command.platform}".`);
                 sinon.assert.notCalled(release);
-                sinon.assert.threw(releaseCordova, "Error");
                 done();
             })
             .done();
@@ -1158,7 +1176,6 @@ describe("CLI", () => {
             .catch((err) => {
                 assert.equal(err.message, `Unable to find or read "config.xml" in the CWD. The "release-cordova" command must be executed in a Cordova project folder.`);
                 sinon.assert.notCalled(release);
-                sinon.assert.threw(releaseCordova, "Error");
                 sinon.assert.calledOnce(execSync);
                 done();
             })
@@ -1188,7 +1205,6 @@ describe("CLI", () => {
             .catch((err) => {
                 assert.equal(err.message, "Platform must be either \"ios\" or \"android\".");
                 sinon.assert.notCalled(release);
-                sinon.assert.threw(releaseCordova, "Error");
                 sinon.assert.notCalled(spawn);
                 done();
             })
@@ -1311,7 +1327,6 @@ describe("CLI", () => {
             .catch((err) => {
                 assert.equal(err.message, "Unable to find or read \"package.json\" in the CWD. The \"release-react\" command must be executed in a React Native project folder.");
                 sinon.assert.notCalled(release);
-                sinon.assert.threw(releaseReact, "Error");
                 sinon.assert.notCalled(spawn);
                 done();
             })
@@ -1343,7 +1358,6 @@ describe("CLI", () => {
             .catch((err) => {
                 assert.equal(err.message, "Entry file \"doesntexist.js\" does not exist.");
                 sinon.assert.notCalled(release);
-                sinon.assert.threw(releaseReact, "Error");
                 sinon.assert.notCalled(spawn);
                 done();
             })
@@ -1374,7 +1388,6 @@ describe("CLI", () => {
             .catch((err) => {
                 assert.equal(err.message, "Platform must be either \"android\", \"ios\" or \"windows\".");
                 sinon.assert.notCalled(release);
-                sinon.assert.threw(releaseReact, "Error");
                 sinon.assert.notCalled(spawn);
                 done();
             })
@@ -1408,7 +1421,6 @@ describe("CLI", () => {
             .catch((err) => {
                 assert.equal(err.message, "Please use a semver-compliant target binary version range, for example \"1.0.0\", \"*\" or \"^1.2.3\".");
                 sinon.assert.notCalled(release);
-                sinon.assert.threw(releaseReact, "Error");
                 sinon.assert.notCalled(spawn);
                 done();
             })
