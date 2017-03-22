@@ -375,6 +375,10 @@ img {
     -webkit-transform: scale(1.03);
     transform: scale(1.03); }
 
+.navbar-logo-text {
+  float: right;
+  margin-top: 4px; }
+
 .navbar-spacer {
   height: 3.6em; }
 
