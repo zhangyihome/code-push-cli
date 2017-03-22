@@ -94,8 +94,8 @@ export var confirm = (message: string = "Are you sure?"): Promise<boolean> => {
                 resolve(true);
             } else {
                 if (!rejected){
-                    console.log("Invalid response: \"" + result.response + "\"");               
-                } 
+                    console.log("Invalid response: \"" + result.response + "\"");
+                }
                 resolve(false);
             }
         });
@@ -967,7 +967,7 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
                             appVersion = parsedProperties[propertyName];
                             if (appVersion) {
                                 break;
-                            } 
+                            }
                         } catch (e) {
                             throw new Error(`Unable to parse "${propertiesFile}". Please ensure it is a well-formed properties file.`);
                         }
@@ -1078,14 +1078,14 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
         appVersion: command.appStoreVersion,
         description: command.description,
         label: command.label,
-        isDisabled: getYargsBooleanOrNull(command.disabled),
-        isMandatory: getYargsBooleanOrNull(command.mandatory),
+        isDisabled: command.disabled,
+        isMandatory: command.mandatory,
         rollout: command.rollout
     };
 
     return sdk.promote(command.appName, command.sourceDeploymentName, command.destDeploymentName, packageInfo)
         .then((): void => {
-            log("Successfully promoted " + (command.label !== null ? "\"" + command.label + "\" of " : "") + "the \"" + command.sourceDeploymentName + "\" deployment of the \"" + command.appName + "\" app to the \"" + command.destDeploymentName + "\" deployment.");
+            log("Successfully promoted " + (command.label ? "\"" + command.label + "\" of " : "") + "the \"" + command.sourceDeploymentName + "\" deployment of the \"" + command.appName + "\" app to the \"" + command.destDeploymentName + "\" deployment.");
         })
         .catch((err: CodePushError) => releaseErrorHandler(err, command));
 }
@@ -1094,8 +1094,8 @@ function patch(command: cli.IPatchCommand): Promise<void> {
     var packageInfo: PackageInfo = {
         appVersion: command.appStoreVersion,
         description: command.description,
-        isMandatory: getYargsBooleanOrNull(command.mandatory),
-        isDisabled: getYargsBooleanOrNull(command.disabled),
+        isMandatory: command.mandatory,
+        isDisabled: command.disabled,
         rollout: command.rollout
     };
 
@@ -1112,15 +1112,15 @@ function patch(command: cli.IPatchCommand): Promise<void> {
 }
 
 export var release = (command: cli.IReleaseCommand): Promise<void> => {
-    
+
     if (isBinaryOrZip(command.package)) {
         throw new Error("It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).");
     }
-    
+
     throwForInvalidSemverRange(command.appStoreVersion);
     var filePath: string = command.package;
     var isSingleFilePackage: boolean = true;
-    
+
     if (fs.lstatSync(filePath).isDirectory()) {
         isSingleFilePackage = false;
     }
@@ -1144,7 +1144,7 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
         isMandatory: command.mandatory,
         rollout: command.rollout
     };
-    
+
     return sdk.isAuthenticated(true)
         .then((isAuth: boolean): Promise<void> => {
             return sdk.release(command.appName, command.deploymentName, filePath, command.appStoreVersion, updateMetadata, uploadProgress);
@@ -1175,7 +1175,9 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
                 throw new Error("Platform must be either \"ios\" or \"android\".");
             }
 
-            var cordovaCommand: string = command.build ? "build" : "prepare";
+            var cordovaCommand: string = command.build ?
+                (command.isReleaseBuildType ? "build --release" : "build") :
+                "prepare";
             var cordovaCLI: string = "cordova";
 
             // Check whether the Cordova or PhoneGap CLIs are
@@ -1458,11 +1460,6 @@ function isBinaryOrZip(path: string): boolean {
     return path.search(/\.zip$/i) !== -1
         || path.search(/\.apk$/i) !== -1
         || path.search(/\.ipa$/i) !== -1;
-}
-
-function getYargsBooleanOrNull(value: any): boolean {
-    // Yargs treats a boolean argument as an array of size 2 for null, third is the value of boolean.
-    return value && value.length > 2 ? value[2] : null;
 }
 
 function throwForInvalidEmail(email: string): void {
