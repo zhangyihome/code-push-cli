@@ -14,8 +14,6 @@
   "license": "MIT",
   "homepage": "https://microsoft.github.io/code-push",
   "dependencies": {
-    "base-64": "^0.1.0",
-    "node-uuid": "^1.4.3",
     "q": "^1.4.1",
     "recursive-fs": "0.1.4",
     "slash": "1.0.0",
