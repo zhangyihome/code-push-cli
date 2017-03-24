@@ -1,7 +1,6 @@
 ﻿/// <reference path="../../definitions/generated/code-push.d.ts" />
 
 import AccountManager = require("code-push");
-import * as base64 from "base-64";
 import * as chalk from "chalk";
 var childProcess = require("child_process");
 import debugCommand from "./commands/debug";

@@ -28,9 +28,6 @@
     "multer/multer.d.ts": {
       "commit": "43b6bf88758852b9ab713a9b011487f047f94f4e"
     },
-    "node-uuid/node-uuid.d.ts": {
-      "commit": "84dfeeac378552c22297a5d555b1999a396d7e7c"
-    },
     "passport/passport.d.ts": {
       "commit": "3e117d8c9ddf6443d7ed71a74f6bc8b6bcd36077"
     },

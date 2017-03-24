@@ -1,5 +1,3 @@
-import * as base64 from "base-64";
-import crypto = require("crypto");
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
@@ -98,7 +96,7 @@ class AccountManager {
             });
         });
     }
-    
+
     public addAccessKey(friendlyName: string, ttl?: number): Promise<AccessKey> {
         if (!friendlyName) {
             throw new Error("A name must be specified when adding an access key.");
@@ -296,16 +294,16 @@ class AccountManager {
     }
 
     public release(appName: string, deploymentName: string, filePath: string, targetBinaryVersion: string, updateMetadata: PackageInfo, uploadProgressCallback?: (progress: number) => void): Promise<void> {
-       
+
         return Promise<void>((resolve, reject, notify) => {
-           
+
             updateMetadata.appVersion = targetBinaryVersion;
             var request: superagent.Request<any> = superagent.post(this._serverUrl + urlEncode `/apps/${appName}/deployments/${deploymentName}/release`);
             if (this._proxy) (<any>request).proxy(this._proxy);
             this.attachCredentials(request);
-            
+
             var getPackageFilePromise: Promise<PackageFile> = this.packageFileFromPath(filePath);
-            
+
             getPackageFilePromise.then((packageFile: PackageFile) => {
                 var file: any = fs.createReadStream(packageFile.path);
                 request.attach("package", file)
@@ -317,11 +315,11 @@ class AccountManager {
                         }
                     })
                     .end((err: any, res: superagent.Response) => {
-                        
+
                         if (packageFile.isTemporary) {
                             fs.unlinkSync(packageFile.path);
                         }
-                        
+
                         if (err) {
                             reject(this.getCodePushError(err, res));
                             return;
@@ -363,7 +361,7 @@ class AccountManager {
         return this.post(urlEncode `/apps/${appName}/deployments/${deploymentName}/rollback/${targetRelease || ``}`, /*requestBody=*/ null, /*expectResponseBody=*/ false)
             .then(() => null);
     }
-    
+
     private packageFileFromPath(filePath: string): Promise<PackageFile> {
         var getPackageFilePromise: Promise<PackageFile>;
         if (fs.lstatSync(filePath).isDirectory()) {
@@ -409,7 +407,7 @@ class AccountManager {
         }
         return getPackageFilePromise;
     }
-    
+
     private generateRandomFilename(length: number): string {
         var filename: string = "";
         var validChar: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
