@@ -375,10 +375,6 @@ img {
     -webkit-transform: scale(1.03);
     transform: scale(1.03); }
 
-.navbar-logo-text {
-  float: right;
-  margin-top: 4px; }
-
 .navbar-spacer {
   height: 3.6em; }
 
@@ -1169,6 +1165,19 @@ th {
   border-left: 0.5em solid rgba(76, 194, 228, 0.5); }
 
 .page-toc ul > li.toc-active {
+  font-weight: bold;
+  border-left: 0.5em solid #4CC2E4; }
+
+/* inner ToC for the page */
+.page-toc-1 ul li:first-child {
+  margin-top: 1em; }
+
+.page-toc-1 ul > li {
+  padding: 0.5em 0em 0.5em 1em;
+  font-size: 14px;
+  border-left: 0.5em solid rgba(76, 194, 228, 0.5); }
+
+.page-toc-1 ul > li.toc-active-1 {
   font-weight: bold;
   border-left: 0.5em solid #4CC2E4; }
 

@@ -380,11 +380,9 @@
           
           
           <li>
-            <a class="this-page" href="/code-push/docs/cordova.html">
+            <a class="" href="/code-push/docs/cordova.html">
                 Cordova Client SDK
             </a>
-            
-                <div id="page-toc" class="page-toc"></div>
             
           </li>
           
@@ -1013,10 +1011,25 @@
             <div class="row">  
                 <header class="doc-header">
                     <h1 class="doc-title">Cordova Client SDK</h1>
-                    <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/Cordova.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
+                    <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/cordova-code-push/Cordova.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
                 </header>  
                 <article class="doc-content">               
                     <p>This plugin provides client-side integration for the <a href="http://codepush.tools">CodePush service</a>, allowing you to easily add a dynamic update experience to your Cordova app(s).</p>
+
+<!-- Cordova Catelog -->
+
+<ul>
+<li><a href="#how-does-it-work">How does it work?</a></li>
+<li><a href="#supported-cordova-platforms">Supported Cordova Platforms</a></li>
+<li><a href="#getting-started">Getting Started</a></li>
+<li><a href="#plugin-usage">Plugin Usage</a></li>
+<li><a href="#releasing-updates">Releasing Updates</a></li>
+<li><a href="#api-reference">API Reference</a></li>
+<li><a href="#phonegap-build">PhoneGap Build</a></li>
+<li><a href="#example-apps">Example Apps</a></li>
+</ul>
+
+<!-- Cordova Catelog -->
 
 <h2>How does it work?</h2>
 
@@ -1360,7 +1373,7 @@ codePush.sync(null, { mandatoryInstallMode: InstallMode.ON_NEXT_RESUME });
 
 // Changing the title displayed in the
 // confirmation dialog of an &quot;active&quot; update
-codePush.sync(null, { updateDialog: { title: &quot;An update is available!&quot; } });
+codePush.sync(null, { updateDialog: { updateTitle: &quot;An update is available!&quot; } });
 
 // Displaying an update prompt which includes the
 // description associated with the CodePush release
@@ -1558,104 +1571,6 @@ window.codePush.checkForUpdate(onUpdateCheck, onError);
 
 <ul>
 <li><p><strong>IMMEDIATE</strong>: The update will be applied to the running application immediately. The application will be reloaded with the new content immediately.</p></li>
-<li><p><strong>ON_NEXT_RESTART</strong>: Indicates that you want to install the update, but not forcibly restart the app. When the app is &ldquo;naturally&rdquo; restarted (due the OS or end user killing it), the update will be seamlessly picked up. This value is appropriate when performing silent updates, since it would likely be disruptive to the end user if the app suddenly restarted out of nowhere, since they wouldn&rsquo;t have realized an update was even downloaded. This is the default mode used for both the <code>sync</code> and <code>LocalPackage.install</code> methods.);
-} else {
-    // The hash of each previously reverted package is stored for later use. 
-    // This way, we avoid going into an infinite bad update/revert loop.
-    if (!remotePackage.failedInstall) {
-        console.log(&ldquo;A CodePush update is available. Package hash: &rdquo; + remotePackage.packageHash);
-        remotePackage.download(onPackageDownloaded, onError);
-    } else {
-        console.log(&ldquo;The available update was attempted before and failed.&rdquo;);
-    }
-}
-};</p></li>
-</ul>
-
-<p>window.codePush.checkForUpdate(onUpdateCheck, onError);</p>
-
-<p>//&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;&mdash;</p>
-
-<p>// App version 2 (updated version)</p>
-
-<p>var app = {
-    onDeviceReady: function () {
-        // Calling this function is required during the first application run after an update.
-        // If not called, the application will be reverted to the previous version.
-        window.codePush.notifyApplicationReady();
-        // &hellip;
-    }
-}
-&ldquo;`</p>
-
-<p>For an example on how you are protected against a bad update, see the <a href="#codepushnotifyapplicationready">notifyApplicationReady() documentation</a>.</p>
-
-<h4>RemotePackage</h4>
-
-<p>Contains details about an update that is available for download from the CodePush server. You get a reference to an instance of this object by calling the <code>codePush.checkForUpdate</code> method when an update is available. If you are using the sync API, you don&rsquo;t need to worry about the <code>RemotePackage</code>, since it will handle the download and installation process automatically for you.</p>
-
-<h5>Properties</h5>
-
-<p>The <code>RemotePackage</code> inherits all of the same properties as the <code>LocalPackage</code>, but includes one additional one:</p>
-
-<ul>
-<li><strong>downloadUrl</strong>: The URL at which the package is available for download. This property is only needed for advanced usage, since the <code>download</code> method will automatically handle the acquisition of updates for you. <em>(String)</em></li>
-</ul>
-
-<h5>Methods</h5>
-
-<ul>
-<li><p><strong>abortDownload(abortSuccess, abortError)</strong>: Aborts the current download session, if any.</p></li>
-<li><p><strong>download(downloadSuccess, downloadError, downloadProgress)</strong>: Downloads the package update from the CodePush service. The <code>downloadSuccess</code> callback is invoked with a <a href="#localpackage">LocalPackage</a> argument, representing the downloaded package.
-The optional <code>downloadProgress</code> callback is invoked several times during the download progress with one <code>DownloadProgress</code> parameter.</p>
-
-<h6>DownloadProgress</h6>
-
-<p>Defines the format of the DownloadProgress object, used to send periodical update notifications on the progress of the update download.</p>
-
-<h6># Properties</h6>
-
-<ul>
-<li><strong>totalBytes</strong>: The size of the downloading update package, in bytes. (Number)</li>
-<li><strong>receivedBytes</strong>: The number of bytes already downloaded. (Number)</li>
-</ul></li>
-</ul>
-
-<p>Example Usage:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var onError = function (error) {
-    console.log(&quot;An error occurred. &quot; + error);
-};
-
-var onPackageDownloaded = function (localPackage) {
-    console.log(&quot;Package downloaded at: &quot; + localPackage.localPath);
-    // you can now update your application to the downloaded version by calling localPackage.install()
-};
-
-var onProgress = function (downloadProgress) {
-    console.log(&quot;Downloading &quot; + downloadProgress.receivedBytes + &quot; of &quot; + downloadProgress.totalBytes + &quot; bytes.&quot;);
-};
-
-var onUpdateCheck = function (remotePackage) {
-    if (!remotePackage) {
-        console.log(&quot;The application is up to date.&quot;);
-    } else {
-        console.log(&quot;A CodePush update is available. Package hash: &quot; + remotePackage.packageHash);
-        remotePackage.download(onPackageDownloaded, onError, onProgress);
-    }
-};
-
-window.codePush.checkForUpdate(onUpdateCheck, onError);
-</code></pre></div>
-<h3>Enums</h3>
-
-<p>The CodePush API includes the following &quot;enum&rdquo; objects which can be used to customize the update experience, and are available globally off of the <code>window</code> object:</p>
-
-<h4>InstallMode</h4>
-
-<p>This enum specified when you would like an installed update to actually be applied, and can be passed to either the <code>sync</code> or <code>LocalPackage.install</code> methods. It includes the following values:</p>
-
-<ul>
-<li><p><strong>IMMEDIATE</strong>: The update will be applied to the running application immediately. The application will be reloaded with the new content immediately.</p></li>
 <li><p><strong>ON_NEXT_RESTART</strong>: Indicates that you want to install the update, but not forcibly restart the app. When the app is &ldquo;naturally&rdquo; restarted (due the OS or end user killing it), the update will be seamlessly picked up. This value is appropriate when performing silent updates, since it would likely be disruptive to the end user if the app suddenly restarted out of nowhere, since they wouldn&rsquo;t have realized an update was even downloaded. This is the default mode used for both the <code>sync</code> and <code>LocalPackage.install</code> methods.</p></li>
 <li><p><strong>ON_NEXT_RESUME</strong>: Indicates that you want to install the update, but don&rsquo;t want to restart the app until the next time the end user resumes it from the background. This way, you don&rsquo;t disrupt their current session, but you can get the update in front of them sooner then having to wait for the next natural restart. This value is appropriate for silent installs that can be applied on resume in a non-invasive way.</p></li>
 </ul>
@@ -1690,6 +1605,8 @@ window.codePush.checkForUpdate(onUpdateCheck, onError);
 </ul>
 
 <p><em>Note: If you&rsquo;ve developed a Cordova app using CodePush, that is also open-source, please let us know. We would love to add it to this list!</em></p>
+
+<p>This project has adopted the <a href="https://opensource.microsoft.com/codeofconduct/">Microsoft Open Source Code of Conduct</a>. For more information see the <a href="https://opensource.microsoft.com/codeofconduct/faq/">Code of Conduct FAQ</a> or contact <a href="mailto:opencode@microsoft.com">opencode@microsoft.com</a> with any additional questions or comments.</p>
                     
                 </article>
                 <div class="feedback-container">

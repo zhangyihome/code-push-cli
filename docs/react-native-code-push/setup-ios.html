@@ -22,7 +22,7 @@
 
   <title>
     
-      Management SDK &middot; CodePush
+      React Native Set Up IOS &middot; CodePush
     
   </title>
   
@@ -341,11 +341,9 @@
           
           
           <li>
-            <a class="this-page" href="/code-push/docs/node.html">
+            <a class="" href="/code-push/docs/node.html">
                 Management SDK
             </a>
-            
-                <div id="page-toc" class="page-toc"></div>
             
           </li>
           
@@ -1012,85 +1010,111 @@
             </div>
             <div class="row">  
                 <header class="doc-header">
-                    <h1 class="doc-title">Management SDK</h1>
-                    <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/node.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
+                    <h1 class="doc-title">React Native Set Up IOS</h1>
+                    <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/react-native-code-push/setup-ios.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
                 </header>  
                 <article class="doc-content">               
-                    <p>A JavaScript library for programmatically managing your CodePush account (e.g. creating apps, promoting releases), which allows authoring Node.js-based build and/or deployment scripts, without needing to shell out to the <a href="https://github.com/Microsoft/code-push/blob/master/cli/README.md">CLI</a>.</p>
+                    <p>Once you&rsquo;ve acquired the CodePush plugin, you need to integrate it into the Xcode project of your React Native app and configure it correctly. To do this, take the following steps:</p>
 
-<h2>Getting Started</h2>
+<h3>Plugin Installation (iOS)</h3>
+
+<p>In order to accommodate as many developer preferences as possible, the CodePush plugin supports iOS installation via three mechanisms:</p>
 
 <ol>
-<li><p>Create an access key to authenticate with the CodePush server using the following CodePush CLI command:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push access-key add &quot;DESCRIPTION_OF_THE_KEY&quot;
-</code></pre></div>
-<p>If you already created a key that you want to use here, then you can retrieve it by running <code>code-push access-key ls</code> and using the value of the <code>Key</code> column for the key you wish to use.</p></li>
-<li><p>Install the management SDK by running <code>npm install code-push --save</code></p></li>
-<li><p>Import it using the following statement (using ES6 syntax as applicable):</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var CodePush = require(&quot;code-push&quot;);    
-</code></pre></div></li>
-<li><p>Create an instance of the <code>CodePush</code> class, passing it the access key you created or retrieved in step #1:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var codePush = new CodePush(&quot;YOUR_ACCESS_KEY&quot;);
-</code></pre></div></li>
-<li><p>Begin automating the management of your account! For more details on what you can do with this <code>codePush</code> object, refer to the API reference section below.</p></li>
+<li><p><a href="#plugin-installation-ios---rnpm"><strong>RNPM</strong></a> - <a href="https://github.com/rnpm/rnpm">React Native Package Manager (RNPM)</a> is an awesome tool that provides the simplest installation experience possible for React Native plugins. If you&rsquo;re already using it, or you want to use it, then we recommend this approach.</p></li>
+<li><p><a href="#plugin-installation-ios---cocoapods"><strong>CocoaPods</strong></a> - If you&rsquo;re building a native iOS app that is embedding React Native into it, or you simply prefer using <a href="https://cocoapods.org">CocoaPods</a>, then we recommend using the Podspec file that we ship as part of our plugin.</p></li>
+<li><p><a href="#plugin-installation-ios---manual"><strong>&ldquo;Manual&rdquo;</strong></a> - If you don&rsquo;t want to depend on any additional tools or are fine with a few extra installation steps (it&rsquo;s a one-time thing), then go with this approach.</p></li>
 </ol>
 
-<h2>API Reference</h2>
+<h4>Plugin Installation (iOS - RNPM)</h4>
 
-<p>The <code>code-push</code> module exports a single class (typically referred to as <code>CodePush</code>), which represents a proxy to the CodePush account management REST API. This class has a single constructor for authenticating with the CodePush service, and a collection of instance methods that correspond to the commands in the management <a href="https://github.com/Microsoft/code-push/blob/master/cli/README.md">CLI</a>, which allow you to programmatically control every aspect of your CodePush account.</p>
+<ol>
+<li><p>As of v0.27 of React Native, <code>rnpm link</code> has already been merged into the React Native CLI. Simply run:
+<code>
+react-native link react-native-code-push
+</code></p>
 
-<h3>Constructors</h3>
+<p>If your app uses a version of React Native that is lower than v0.27, run the following:
+<code>
+rnpm link react-native-code-push
+</code></p>
 
-<ul>
-<li><strong>CodePush(accessKey: string)</strong> - Creates a new instance of the CodePush management SDK, using the specified access key to authenticated with the server.</li>
-</ul>
+<p><em>Note: If you don&rsquo;t already have RNPM installed, you can do so by simply running <code>npm i -g rnpm</code> and then executing the above command. If you already have RNPM installed, make sure you have v1.9.0+ in order to benefit from this one step install.</em></p></li>
+<li><p>You will be prompted for the deployment key you&rsquo;d like to use. If you don&rsquo;t already have it, you can retrieve this value by running <code>code-push deployment ls &lt;appName&gt; -k</code>, or you can choose to ignore it (by simply hitting <code>&lt;ENTER&gt;</code>) and add it in later. To get started, we would recommend just using your <code>Staging</code> deployment key, so that you can test out the CodePush end-to-end.</p></li>
+</ol>
 
-<h3>Methods</h3>
+<p>And that&rsquo;s it! Isn&rsquo;t RNPM awesome? :)</p>
 
-<ul>
-<li><p><strong>addAccessKey(description: string): Promise&lt;AccessKey&gt;</strong> - Creates a new access key with the specified description (e.g. &ldquo;VSTS CI&rdquo;).</p></li>
-<li><p><strong>addApp(appName: string): Promise&lt;App&gt;</strong> - Creates a new CodePush app with the specified name.</p></li>
-<li><p><strong>addCollaborator(appName: string, email: string): Promise&lt;void&gt;</strong> - Adds the specified CodePush user as a collaborator to the specified CodePush app.</p></li>
-<li><p><strong>addDeployment(appName: string, deploymentName: string): Promise&lt;Deployment&gt;</strong> - Creates a new deployment with the specified name, and associated with the specified app.</p></li>
-<li><p><strong>clearDeploymentHistory(appName: string, deploymentName: string): Promise&lt;void&gt;</strong> - Clears the release history associated with the specified app deployment.</p></li>
-<li><p><strong>getAccessKey(accessKey: string): Promise&lt;AccessKey&gt;</strong> - Retrieves the metadata about the specific access key.</p></li>
-<li><p><strong>getAccessKeys(): Promise&lt;AccessKey[]&gt;</strong> - Retrieves the list of access keys associated with your CodePush account.</p></li>
-<li><p><strong>getApp(appName: string): Promise&lt;App&gt;</strong> - Retrieves the metadata about the specified app.</p></li>
-<li><p><strong>getApps(): Promise&lt;App[]&gt;</strong> - Retrieves the list of apps associated with your CodePush account.</p></li>
-<li><p><strong>getCollaborators(appName: string): Promise&lt;CollaboratorMap&gt;</strong> - Retrieves the list of collaborators associated with the specified app.</p></li>
-<li><p><strong>getDeployment(appName: string, deploymentName: string): Promise&lt;Deployment&gt;</strong> - Retrieves the metadata for the specified app deployment.</p></li>
-<li><p><strong>getDeploymentHistory(appName: string, deploymentName: string): Promise&lt;Package[]&gt;</strong> - Retrieves the list of releases that have been made to the specified app deployment.</p></li>
-<li><p><strong>getDeploymentMetrics(appName: string, deploymentName): Promise&lt;DeploymentMetrics&gt;</strong> - Retrieves the installation metrics for the specified app deployment. </p></li>
-<li><p><strong>getDeployments(appName: string): Promose&lt;Deployment[]&gt;</strong> - Retrieves the list of deployments associated with the specified app.</p></li>
-<li><p><strong>patchRelease(appName: string, deploymentName: string, label: string, updateMetadata: PackageInfo): Promise&lt;void&gt;</strong> - Updates the specified release&rsquo;s metadata with the given information.</p></li>
-<li><p><strong>promote(appName: string, sourceDeploymentName: string, destinationDeploymentName: string, updateMetadata: PackageInfo): Promise&lt;void&gt;</strong> - Promotes the latest release from one deployment to another for the specified app and updates the release with the given metadata.</p></li>
-<li><p><strong>release(appName: string, deploymentName: string, updateContentsPath: string, targetBinaryVersion: string, updateMetadata: PackageInfo): Promise&lt;void&gt;</strong> - Releases a new update to the specified deployment with the given metadata.</p></li>
-<li><p><strong>removeAccessKey(accessKey: string): Promise&lt;void&gt;</strong> - Removes the specified access key from your CodePush account.</p></li>
-<li><p><strong>removeApp(appName: string): Promise&lt;void&gt;</strong> - Deletes the specified CodePush app from your account.</p></li>
-<li><p><strong>removeCollaborator(appName: string, email: string): Promise&lt;void&gt;</strong> - Removes the specified account as a collaborator from the specified app.</p></li>
-<li><p><strong>removeDeployment(appName: string, deploymentName: string): Promise&lt;void&gt;</strong> - Removes the specified deployment from the specified app.</p></li>
-<li><p><strong>renameApp(oldAppName: string, newAppName: string): Promise&lt;void&gt;</strong> - Renames an existing app.</p></li>
-<li><p><strong>renameDeployment(appName: string, oldDeploymentName: string, newDeploymentName: string): Promise&lt;void&gt;</strong> - Renames an existing deployment within the specified app.</p></li>
-<li><p><strong>rollback(appName: string, deploymentName: string, targetRelease?: string): Promise&lt;void&gt;</strong> - Rolls back the latest release within the specified deployment. Optionally allows you to target a specific release in the deployment&rsquo;s history, as opposed to rolling to the previous release.</p></li>
-<li><p><strong>transferApp(appName: string, email: string): Promise&lt;void&gt;</strong> - Transfers the ownership of the specified app to the specified account.</p></li>
-</ul>
+<h4>Plugin Installation (iOS - CocoaPods)</h4>
 
-<h3>Error Handling</h3>
+<ol>
+<li><p>Add the CodePush plugin dependency to your <code>Podfile</code>, pointing at the path where NPM installed it</p>
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby">pod &#39;CodePush&#39;, :path =&gt; &#39;../node_modules/react-native-code-push&#39;
+</code></pre></div>
+<p>CodePush depends on an internal copy of the <code>SSZipArchive</code> library, so if your project already includes it (either directly or via a transitive dependency), then you can install a version of CodePush which excludes it by depending specifically on the <code>Core</code> subspec:</p>
+<div class="highlight"><pre><code class="language-ruby" data-lang="ruby">pod &#39;CodePush&#39;, :path =&gt; &#39;../node_modules/react-native-code-push&#39;, :subspecs =&gt; [&#39;Core&#39;]
+</code></pre></div>
+<p><em>NOTE: The above paths needs to be relative to your app&rsquo;s <code>Podfile</code>, so adjust it as nec
+cessary.</em></p></li>
+<li><p>Run <code>pod install</code></p></li>
+</ol>
 
-<p>When an error occurs in any of the methods, the promise will be rejected with a CodePushError object with the following properties:</p>
+<p><em>NOTE: The CodePush <code>.podspec</code> depends on the <code>React</code> pod, and so in order to ensure that it can correctly use the version of React Native that your app is built with, please make sure to define the <code>React</code> dependency in your app&rsquo;s <code>Podfile</code> as explained <a href="https://facebook.github.io/react-native/docs/integration-with-existing-apps.html#podfile">here</a>.</em></p>
 
-<ul>
-<li><strong>message</strong>: A user-friendly message that describes the error.</li>
-<li><strong>statusCode</strong>: An HTTP response code that identifies the category of error:
+<h4>Plugin Installation (iOS - Manual)</h4>
 
-<ul>
-<li><strong>CodePush.ERROR_GATEWAY_TIMEOUT</strong>: A network error prevented you from connecting to the CodePush server.</li>
-<li><strong>CodePush.ERROR_INTERNAL_SERVER</strong>: An error occurred internally on the CodePush server.</li>
-<li><strong>CodePush.ERROR_NOT_FOUND</strong>: The resource you are attempting to retrieve does not exist.</li>
-<li><strong>CodePush.ERROR_CONFLICT</strong>: The resource you are attempting to create already exists.</li>
-<li><strong>CodePush.ERROR_UNAUTHORIZED</strong>: The access key you configured is invalid or expired.</li>
-</ul></li>
-</ul>
+<ol>
+<li><p>Open your app&rsquo;s Xcode project</p></li>
+<li><p>Find the <code>CodePush.xcodeproj</code> file within the <code>node_modules/react-native-code-push/ios</code> directory (or <code>node_modules/react-native-code-push</code> for &lt;=<code>1.7.3-beta</code> installations) and drag it into the <code>Libraries</code> node in Xcode</p>
+
+<p><img src="https://cloud.githubusercontent.com/assets/8598682/13368613/c5c21422-dca0-11e5-8594-c0ec5bde9d81.png" alt="Add CodePush to project"></p></li>
+<li><p>Select the project node in Xcode and select the &ldquo;Build Phases&rdquo; tab of your project configuration.</p></li>
+<li><p>Drag <code>libCodePush.a</code> from <code>Libraries/CodePush.xcodeproj/Products</code> into the &ldquo;Link Binary With Libraries&rdquo; section of your project&rsquo;s &ldquo;Build Phases&rdquo; configuration.</p>
+
+<p><img src="https://cloud.githubusercontent.com/assets/516559/10322221/a75ea066-6c31-11e5-9d88-ff6f6a4d6968.png" alt="Link CodePush during build"></p></li>
+<li><p>Click the plus sign underneath the &ldquo;Link Binary With Libraries&rdquo; list and select the <code>libz.tbd</code> library underneath the <code>iOS 9.1</code> node.</p>
+
+<p><img src="https://cloud.githubusercontent.com/assets/116461/11605042/6f786e64-9aaa-11e5-8ca7-14b852f808b1.png" alt="Libz reference"></p>
+
+<p><em>Note: Alternatively, if you prefer, you can add the <code>-lz</code> flag to the <code>Other Linker Flags</code> field in the <code>Linking</code> section of the <code>Build Settings</code>.</em></p></li>
+</ol>
+
+<h3>Plugin Configuration (iOS)</h3>
+
+<p><em>NOTE: If you used RNPM or <code>react-native link</code> to automatically link the plugin, these steps have already been done for you so you may skip this section.</em></p>
+
+<p>Once your Xcode project has been setup to build/link the CodePush plugin, you need to configure your app to consult CodePush for the location of your JS bundle, since it is responsible for synchronizing it with updates that are released to the CodePush server. To do this, perform the following steps:</p>
+
+<ol>
+<li><p>Open up the <code>AppDelegate.m</code> file, and add an import statement for the CodePush headers:</p>
+<div class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">#import &lt;CodePush/CodePush.h&gt;
+</code></pre></div></li>
+<li><p>Find the following line of code, which loads your JS Bundle from the app binary for production releases:</p>
+<div class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">jsCodeLocation = [[NSBundle mainBundle] URLForResource:@&quot;main&quot; withExtension:@&quot;jsbundle&quot;];
+</code></pre></div></li>
+<li><p>Replace it with this line:</p>
+<div class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">jsCodeLocation = [CodePush bundleURL];
+</code></pre></div></li>
+</ol>
+
+<p>This change configures your app to always load the most recent version of your app&rsquo;s JS bundle. On the first launch, this will correspond to the file that was compiled with the app. However, after an update has been pushed via CodePush, this will return the location of the most recently installed update.</p>
+
+<p><em>NOTE: The <code>bundleURL</code> method assumes your app&rsquo;s JS bundle is named <code>main.jsbundle</code>. If you have configured your app to use a different file name, simply call the <code>bundleURLForResource:</code> method (which assumes you&rsquo;re using the <code>.jsbundle</code> extension) or <code>bundleURLForResource:withExtension:</code> method instead, in order to overwrite that default behavior</em></p>
+
+<p>Typically, you&rsquo;re only going to want to use CodePush to resolve your JS bundle location within release builds, and therefore, we recommend using the <code>DEBUG</code> pre-processor macro to dynamically switch between using the packager server and CodePush, depending on whether you are debugging or not. This will make it much simpler to ensure you get the right behavior you want in production, while still being able to use the Chrome Dev Tools, live reload, etc. at debug-time.</p>
+<div class="highlight"><pre><code class="language-objective-c" data-lang="objective-c">NSURL *jsCodeLocation;
+
+#ifdef DEBUG
+    jsCodeLocation = [NSURL URLWithString:@&quot;http://localhost:8081/index.ios.bundle?platform=ios&amp;dev=true&quot;];
+#else
+    jsCodeLocation = [CodePush bundleURL];
+#endif
+</code></pre></div>
+<p>To let the CodePush runtime know which deployment it should query for updates against, open your app&rsquo;s <code>Info.plist</code> file and add a new entry named <code>CodePushDeploymentKey</code>, whose value is the key of the deployment you want to configure this app against (e.g. the key for the <code>Staging</code> deployment for the <code>FooBar</code> app). You can retrieve this value by running <code>code-push deployment ls &lt;appName&gt; -k</code> in the CodePush CLI (the <code>-k</code> flag is necessary since keys aren&rsquo;t displayed by default) and copying the value of the <code>Deployment Key</code> column which corresponds to the deployment you want to use (see below). Note that using the deployment&rsquo;s name (e.g. Staging) will not work. That &ldquo;friendly name&rdquo; is intended only for authenticated management usage from the CLI, and not for public consumption within your app.</p>
+
+<p><img src="https://cloud.githubusercontent.com/assets/116461/11601733/13011d5e-9a8a-11e5-9ce2-b100498ffb34.png" alt="Deployment list"></p>
+
+<p>In order to effectively make use of the <code>Staging</code> and <code>Production</code> deployments that were created along with your CodePush app, refer to the <a href="../README.md#multi-deployment-testing">multi-deployment testing</a> docs below before actually moving your app&rsquo;s usage of CodePush into production.</p>
                     
                 </article>
                 <div class="feedback-container">

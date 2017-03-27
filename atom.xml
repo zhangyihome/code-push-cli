@@ -4,13 +4,41 @@
  <title>CodePush</title>
  <link href="http://microsoft.github.io/code-push/blog/atom.xml" rel="self"/>
  <link href="http://microsoft.github.io/code-push/blog/"/>
- <updated>2017-03-22T02:56:01-07:00</updated>
+ <updated>2017-03-27T09:45:41-07:00</updated>
  <id>http://microsoft.github.io/code-push/blog</id>
  <author>
    <name></name>
    <email></email>
  </author>
 
+ 
+ <entry>
+   <title>New updates for CodePush and React Native Module for CodePush</title>
+   <link href="http://microsoft.github.io/code-push/blog/articles/NewReleases.html"/>
+   <updated>2017-03-27T00:00:00-07:00</updated>
+   <id>http://microsoft.github.io/code-push/blog/articles/NewReleases</id>
+   <content type="html">&lt;p&gt;Over the last thirty days, we&amp;rsquo;ve released several significant updates to both CodePush and the React Native Module for CodePush that we think you&amp;rsquo;ll like. CodePush boasts several new features, including the abililty to specify Node parameters to the release-react command, the ability to specify bundle and sourcemap destination, deployment promotion based on labels, and a release build type for Apache Cordova builds. The React Native Module for CodePush now includes support for React Native Windows .NET 4.6. Both products also have seen numerous bug fixes. Check out &lt;a href=&quot;https://github.com/Microsoft/code-push/releases&quot;&gt;CodePush&lt;/a&gt; and the &lt;a href=&quot;https://github.com/Microsoft/react-native-code-push/releases&quot;&gt;Module&lt;/a&gt; release notes for details and the new and improved &lt;a href=&quot;https://github.com/Microsoft/react-native-code-push/blob/master/README.md&quot;&gt;documentation&lt;/a&gt; for the React Native Module for CodePush. &lt;/p&gt;
+
+&lt;h3&gt;Big Plans&lt;/h3&gt;
+
+&lt;p&gt;
+In addition to the features and fixes, we&amp;rsquo;re also announcing our plan to migrate CodePush to Visual Studio Mobile Center. This will let existing users continue to use the same product they know and love, while adding the tooling and services provided by Mobile Center. We could go on about the product&amp;rsquo;s Build, Test, Distribute, Crash, and Analytics services, but why bother when we made videos?
+&lt;/p&gt;
+
+&lt;p&gt;&lt;br/&gt;
+&lt;i&gt;A quick demo of building React Native app and using Mobile Center:&lt;/i&gt;
+&lt;br/&gt;&lt;br/&gt;
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/lfqZ8Uy2p3U&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt;
+&lt;br/&gt;&lt;br/&gt;
+&lt;i&gt;A an overview of CodePush and an introduction to Mobile Center:&lt;/i&gt;
+&lt;br/&gt;&lt;br/&gt;
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/SyqQkMZY8Y8&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt;
+&lt;br/&gt;&lt;br/&gt;
+Please let us know what you think of our videos and let us know what topics you&amp;rsquo;d like to see covered in the future. We want to hear from you. Sign up for a free trial of &lt;a href=&quot;https://mobile.azure.com/login&quot;&gt;Mobile Center&lt;/a&gt;, take a look around, and let us know what you &lt;a href=&quot;https://www.surveymonkey.com/r/BBVLDWW&quot; target=&quot;_new&quot;&gt;think&lt;/a&gt;. 
+&lt;br/&gt;&lt;br/&gt;
+&lt;em&gt;Also please NOTE: you can continue to use CodePush the way you do now with your React Native and Apache Cordova applications.&lt;/em&gt;&lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>React Native for Windows + CodePush</title>

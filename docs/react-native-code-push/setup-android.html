@@ -22,7 +22,7 @@
 
   <title>
     
-      Management SDK &middot; CodePush
+      React Native Set Up Android &middot; CodePush
     
   </title>
   
@@ -341,11 +341,9 @@
           
           
           <li>
-            <a class="this-page" href="/code-push/docs/node.html">
+            <a class="" href="/code-push/docs/node.html">
                 Management SDK
             </a>
-            
-                <div id="page-toc" class="page-toc"></div>
             
           </li>
           
@@ -1012,85 +1010,179 @@
             </div>
             <div class="row">  
                 <header class="doc-header">
-                    <h1 class="doc-title">Management SDK</h1>
-                    <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/node.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
+                    <h1 class="doc-title">React Native Set Up Android</h1>
+                    <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/react-native-code-push/setup-android.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
                 </header>  
                 <article class="doc-content">               
-                    <p>A JavaScript library for programmatically managing your CodePush account (e.g. creating apps, promoting releases), which allows authoring Node.js-based build and/or deployment scripts, without needing to shell out to the <a href="https://github.com/Microsoft/code-push/blob/master/cli/README.md">CLI</a>.</p>
+                    <p>In order to integrate CodePush into your Android project, perform the following steps:</p>
 
-<h2>Getting Started</h2>
+<h3>Plugin Installation (Android)</h3>
+
+<p>In order to accommodate as many developer preferences as possible, the CodePush plugin supports Android installation via two mechanisms:</p>
 
 <ol>
-<li><p>Create an access key to authenticate with the CodePush server using the following CodePush CLI command:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push access-key add &quot;DESCRIPTION_OF_THE_KEY&quot;
-</code></pre></div>
-<p>If you already created a key that you want to use here, then you can retrieve it by running <code>code-push access-key ls</code> and using the value of the <code>Key</code> column for the key you wish to use.</p></li>
-<li><p>Install the management SDK by running <code>npm install code-push --save</code></p></li>
-<li><p>Import it using the following statement (using ES6 syntax as applicable):</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var CodePush = require(&quot;code-push&quot;);    
-</code></pre></div></li>
-<li><p>Create an instance of the <code>CodePush</code> class, passing it the access key you created or retrieved in step #1:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var codePush = new CodePush(&quot;YOUR_ACCESS_KEY&quot;);
-</code></pre></div></li>
-<li><p>Begin automating the management of your account! For more details on what you can do with this <code>codePush</code> object, refer to the API reference section below.</p></li>
+<li><p><a href="#plugin-installation-android---rnpm"><strong>RNPM</strong></a> - <a href="https://github.com/rnpm/rnpm">React Native Package Manager (RNPM)</a> is an awesome tool that provides the simplest installation experience possible for React Native plugins. If you&rsquo;re already using it, or you want to use it, then we recommend this approach.</p></li>
+<li><p><a href="#plugin-installation-android---manual"><strong>&ldquo;Manual&rdquo;</strong></a> - If you don&rsquo;t want to depend on any additional tools or are fine with a few extra installation steps (it&rsquo;s a one-time thing), then go with this approach.</p></li>
 </ol>
 
-<h2>API Reference</h2>
+<p>*Note: Due to a code change from the React Native repository, if your installed React Native version ranges from 0.29 to 0.32, we recommend following the manual steps to set up correctly. *</p>
 
-<p>The <code>code-push</code> module exports a single class (typically referred to as <code>CodePush</code>), which represents a proxy to the CodePush account management REST API. This class has a single constructor for authenticating with the CodePush service, and a collection of instance methods that correspond to the commands in the management <a href="https://github.com/Microsoft/code-push/blob/master/cli/README.md">CLI</a>, which allow you to programmatically control every aspect of your CodePush account.</p>
+<h4>Plugin Installation (Android - RNPM)</h4>
 
-<h3>Constructors</h3>
+<ol>
+<li><p>As of v0.27 of React Native, <code>rnpm link</code> has already been merged into the React Native CLI. Simply run:
+<code>
+react-native link react-native-code-push
+</code></p>
 
-<ul>
-<li><strong>CodePush(accessKey: string)</strong> - Creates a new instance of the CodePush management SDK, using the specified access key to authenticated with the server.</li>
-</ul>
+<p>If your app uses a version of React Native that is lower than v0.27, run the following:
+<code>
+rnpm link react-native-code-push
+</code></p>
 
-<h3>Methods</h3>
+<p><em>Note: If you don&rsquo;t already have RNPM installed, you can do so by simply running <code>npm i -g rnpm</code> and then executing the above command.</em></p></li>
+<li><p>If you&rsquo;re using RNPM &gt;=1.6.0, you will be prompted for the deployment key you&rsquo;d like to use. If you don&rsquo;t already have it, you can retreive this value by running <code>code-push deployment ls &lt;appName&gt; -k</code>, or you can choose to ignore it (by simply hitting <code>&lt;ENTER&gt;</code>) and add it in later. To get started, we would recommend just using your <code>Staging</code> deployment key, so that you can test out the CodePush end-to-end.</p></li>
+</ol>
 
-<ul>
-<li><p><strong>addAccessKey(description: string): Promise&lt;AccessKey&gt;</strong> - Creates a new access key with the specified description (e.g. &ldquo;VSTS CI&rdquo;).</p></li>
-<li><p><strong>addApp(appName: string): Promise&lt;App&gt;</strong> - Creates a new CodePush app with the specified name.</p></li>
-<li><p><strong>addCollaborator(appName: string, email: string): Promise&lt;void&gt;</strong> - Adds the specified CodePush user as a collaborator to the specified CodePush app.</p></li>
-<li><p><strong>addDeployment(appName: string, deploymentName: string): Promise&lt;Deployment&gt;</strong> - Creates a new deployment with the specified name, and associated with the specified app.</p></li>
-<li><p><strong>clearDeploymentHistory(appName: string, deploymentName: string): Promise&lt;void&gt;</strong> - Clears the release history associated with the specified app deployment.</p></li>
-<li><p><strong>getAccessKey(accessKey: string): Promise&lt;AccessKey&gt;</strong> - Retrieves the metadata about the specific access key.</p></li>
-<li><p><strong>getAccessKeys(): Promise&lt;AccessKey[]&gt;</strong> - Retrieves the list of access keys associated with your CodePush account.</p></li>
-<li><p><strong>getApp(appName: string): Promise&lt;App&gt;</strong> - Retrieves the metadata about the specified app.</p></li>
-<li><p><strong>getApps(): Promise&lt;App[]&gt;</strong> - Retrieves the list of apps associated with your CodePush account.</p></li>
-<li><p><strong>getCollaborators(appName: string): Promise&lt;CollaboratorMap&gt;</strong> - Retrieves the list of collaborators associated with the specified app.</p></li>
-<li><p><strong>getDeployment(appName: string, deploymentName: string): Promise&lt;Deployment&gt;</strong> - Retrieves the metadata for the specified app deployment.</p></li>
-<li><p><strong>getDeploymentHistory(appName: string, deploymentName: string): Promise&lt;Package[]&gt;</strong> - Retrieves the list of releases that have been made to the specified app deployment.</p></li>
-<li><p><strong>getDeploymentMetrics(appName: string, deploymentName): Promise&lt;DeploymentMetrics&gt;</strong> - Retrieves the installation metrics for the specified app deployment. </p></li>
-<li><p><strong>getDeployments(appName: string): Promose&lt;Deployment[]&gt;</strong> - Retrieves the list of deployments associated with the specified app.</p></li>
-<li><p><strong>patchRelease(appName: string, deploymentName: string, label: string, updateMetadata: PackageInfo): Promise&lt;void&gt;</strong> - Updates the specified release&rsquo;s metadata with the given information.</p></li>
-<li><p><strong>promote(appName: string, sourceDeploymentName: string, destinationDeploymentName: string, updateMetadata: PackageInfo): Promise&lt;void&gt;</strong> - Promotes the latest release from one deployment to another for the specified app and updates the release with the given metadata.</p></li>
-<li><p><strong>release(appName: string, deploymentName: string, updateContentsPath: string, targetBinaryVersion: string, updateMetadata: PackageInfo): Promise&lt;void&gt;</strong> - Releases a new update to the specified deployment with the given metadata.</p></li>
-<li><p><strong>removeAccessKey(accessKey: string): Promise&lt;void&gt;</strong> - Removes the specified access key from your CodePush account.</p></li>
-<li><p><strong>removeApp(appName: string): Promise&lt;void&gt;</strong> - Deletes the specified CodePush app from your account.</p></li>
-<li><p><strong>removeCollaborator(appName: string, email: string): Promise&lt;void&gt;</strong> - Removes the specified account as a collaborator from the specified app.</p></li>
-<li><p><strong>removeDeployment(appName: string, deploymentName: string): Promise&lt;void&gt;</strong> - Removes the specified deployment from the specified app.</p></li>
-<li><p><strong>renameApp(oldAppName: string, newAppName: string): Promise&lt;void&gt;</strong> - Renames an existing app.</p></li>
-<li><p><strong>renameDeployment(appName: string, oldDeploymentName: string, newDeploymentName: string): Promise&lt;void&gt;</strong> - Renames an existing deployment within the specified app.</p></li>
-<li><p><strong>rollback(appName: string, deploymentName: string, targetRelease?: string): Promise&lt;void&gt;</strong> - Rolls back the latest release within the specified deployment. Optionally allows you to target a specific release in the deployment&rsquo;s history, as opposed to rolling to the previous release.</p></li>
-<li><p><strong>transferApp(appName: string, email: string): Promise&lt;void&gt;</strong> - Transfers the ownership of the specified app to the specified account.</p></li>
-</ul>
+<p>And that&rsquo;s it for installation using RNPM! Continue below to the <a href="#plugin-configuration-android">Plugin Configuration</a> section to complete the setup.</p>
 
-<h3>Error Handling</h3>
+<h4>Plugin Installation (Android - Manual)</h4>
 
-<p>When an error occurs in any of the methods, the promise will be rejected with a CodePushError object with the following properties:</p>
+<ol>
+<li><p>In your <code>android/settings.gradle</code> file, make the following additions:</p>
+<div class="highlight"><pre><code class="language-gradle" data-lang="gradle">include &#39;:app&#39;, &#39;:react-native-code-push&#39;
+project(&#39;:react-native-code-push&#39;).projectDir = new File(rootProject.projectDir, &#39;../node_modules/react-native-code-push/android/app&#39;)
+</code></pre></div></li>
+<li><p>In your <code>android/app/build.gradle</code> file, add the <code>:react-native-code-push</code> project as a compile-time dependency:</p>
+<div class="highlight"><pre><code class="language-gradle" data-lang="gradle">...
+dependencies {
+    ...
+    compile project(&#39;:react-native-code-push&#39;)
+}
+</code></pre></div></li>
+<li><p>In your <code>android/app/build.gradle</code> file, add the <code>codepush.gradle</code> file as an additional build task definition underneath <code>react.gradle</code>:</p>
+<div class="highlight"><pre><code class="language-gradle" data-lang="gradle">...
+apply from: &quot;../../node_modules/react-native/react.gradle&quot;
+apply from: &quot;../../node_modules/react-native-code-push/android/codepush.gradle&quot;
+...
+</code></pre></div></li>
+</ol>
 
-<ul>
-<li><strong>message</strong>: A user-friendly message that describes the error.</li>
-<li><strong>statusCode</strong>: An HTTP response code that identifies the category of error:
+<h3>Plugin Configuration (Android)</h3>
 
-<ul>
-<li><strong>CodePush.ERROR_GATEWAY_TIMEOUT</strong>: A network error prevented you from connecting to the CodePush server.</li>
-<li><strong>CodePush.ERROR_INTERNAL_SERVER</strong>: An error occurred internally on the CodePush server.</li>
-<li><strong>CodePush.ERROR_NOT_FOUND</strong>: The resource you are attempting to retrieve does not exist.</li>
-<li><strong>CodePush.ERROR_CONFLICT</strong>: The resource you are attempting to create already exists.</li>
-<li><strong>CodePush.ERROR_UNAUTHORIZED</strong>: The access key you configured is invalid or expired.</li>
-</ul></li>
-</ul>
+<p><em>NOTE: If you used RNPM or <code>react-native link</code> to automatically link the plugin, these steps have already been done for you so you may skip this section.</em></p>
+
+<p>After installing the plugin and syncing your Android Studio project with Gradle, you need to configure your app to consult CodePush for the location of your JS bundle, since it will &ldquo;take control&rdquo; of managing the current and all future versions. To do this:</p>
+
+<p><strong>For React Native &gt;= v0.29</strong></p>
+
+<p>Update the <code>MainApplication.java</code> file to use CodePush via the following changes:</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java">...
+// 1. Import the plugin class.
+import com.microsoft.codepush.react.CodePush;
+
+public class MainApplication extends Application implements ReactApplication {
+
+    private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+        ...
+        // 2. Override the getJSBundleFile method in order to let
+        // the CodePush runtime determine where to get the JS
+        // bundle location from on each app start
+        @Override
+        protected String getJSBundleFile() {
+            return CodePush.getJSBundleFile();
+        }
+
+        @Override
+        protected List&lt;ReactPackage&gt; getPackages() {
+            // 3. Instantiate an instance of the CodePush runtime and add it to the list of
+            // existing packages, specifying the right deployment key. If you don&#39;t already
+            // have it, you can run &quot;code-push deployment ls &lt;appName&gt; -k&quot; to retrieve your key.
+            return Arrays.&lt;ReactPackage&gt;asList(
+                new MainReactPackage(),
+                new CodePush(&quot;deployment-key-here&quot;, MainApplication.this, BuildConfig.DEBUG)
+            );
+        }
+    };
+}
+</code></pre></div>
+<p><strong>For React Native v0.19 - v0.28</strong></p>
+
+<p>Update the <code>MainActivity.java</code> file to use CodePush via the following changes:</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java">...
+// 1. Import the plugin class (if you used RNPM to install the plugin, this
+// should already be done for you automatically so you can skip this step).
+import com.microsoft.codepush.react.CodePush;
+
+public class MainActivity extends ReactActivity {
+    // 2. Override the getJSBundleFile method in order to let
+    // the CodePush runtime determine where to get the JS
+    // bundle location from on each app start
+    @Override
+    protected String getJSBundleFile() {
+        return CodePush.getJSBundleFile();
+    }
+
+    @Override
+    protected List&lt;ReactPackage&gt; getPackages() {
+        // 3. Instantiate an instance of the CodePush runtime and add it to the list of
+        // existing packages, specifying the right deployment key. If you don&#39;t already
+        // have it, you can run &quot;code-push deployment ls &lt;appName&gt; -k&quot; to retrieve your key.
+        return Arrays.&lt;ReactPackage&gt;asList(
+            new MainReactPackage(),
+            new CodePush(&quot;deployment-key-here&quot;, this, BuildConfig.DEBUG)
+        );
+    }
+
+    ...
+}
+</code></pre></div>
+<h4>Background React Instances</h4>
+
+<p><em>This section is only necessary if you&rsquo;re <b>explicitly</b> launching a React Native instance without an <code>Activity</code> (for example, from within a native push notification receiver). For these situations, CodePush must be told how to find your React Native instance.</em></p>
+
+<p>In order to update/restart your React Native instance, CodePush must be configured with a <code>ReactInstanceHolder</code> before attempting to restart an instance in the background. This is usually done in your <code>Application</code> implementation.</p>
+
+<p><strong>For React Native &gt;= v0.29</strong></p>
+
+<p>Update the <code>MainApplication.java</code> file to use CodePush via the following changes:</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java">...
+// 1. Declare your ReactNativeHost to extend ReactInstanceHolder. ReactInstanceHolder is a subset of ReactNativeHost, so no additional implementation is needed.
+import com.microsoft.codepush.react.ReactInstanceHolder;
+
+public class MyReactNativeHost extends ReactNativeHost implements ReactInstanceHolder {
+  // ... usual overrides
+}
+
+// 2. Provide your ReactNativeHost to CodePush.
+
+public class MainApplication extends Application implements ReactApplication {
+
+   private final MyReactNativeHost mReactNativeHost = new MyReactNativeHost(this);
+
+   @Override
+   public void onCreate() {
+     CodePush.setReactInstanceHolder(mReactNativeHost);
+     super.onCreate();
+  }
+}
+</code></pre></div>
+<p><strong>For React Native v0.19 - v0.28</strong></p>
+
+<p>Before v0.29, React Native did not provide a <code>ReactNativeHost</code> abstraction. If you&rsquo;re launching a background instance, you&rsquo;ll likely have built your own, which should now implement <code>ReactInstanceHolder</code>. Once that&rsquo;s done:</p>
+<div class="highlight"><pre><code class="language-java" data-lang="java">// 1. Provide your ReactInstanceHolder to CodePush.
+
+public class MainApplication extends Application {
+
+   @Override
+   public void onCreate() {
+     // ... initialize your instance holder
+     CodePush.setReactInstanceHolder(myInstanceHolder);
+     super.onCreate();
+  }
+}
+</code></pre></div>
+<p>In order to effectively make use of the <code>Staging</code> and <code>Production</code> deployments that were created along with your CodePush app, refer to the <a href="../README.md#multi-deployment-testing">multi-deployment testing</a> docs below before actually moving your app&rsquo;s usage of CodePush into production.</p>
                     
                 </article>
                 <div class="feedback-container">

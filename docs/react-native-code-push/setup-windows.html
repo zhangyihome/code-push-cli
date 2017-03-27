@@ -22,7 +22,7 @@
 
   <title>
     
-      Management SDK &middot; CodePush
+      React Native Set Up Windows &middot; CodePush
     
   </title>
   
@@ -341,11 +341,9 @@
           
           
           <li>
-            <a class="this-page" href="/code-push/docs/node.html">
+            <a class="" href="/code-push/docs/node.html">
                 Management SDK
             </a>
-            
-                <div id="page-toc" class="page-toc"></div>
             
           </li>
           
@@ -1012,86 +1010,75 @@
             </div>
             <div class="row">  
                 <header class="doc-header">
-                    <h1 class="doc-title">Management SDK</h1>
-                    <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/node.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
+                    <h1 class="doc-title">React Native Set Up Windows</h1>
+                    <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/react-native-code-push/setup-windows.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
                 </header>  
                 <article class="doc-content">               
-                    <p>A JavaScript library for programmatically managing your CodePush account (e.g. creating apps, promoting releases), which allows authoring Node.js-based build and/or deployment scripts, without needing to shell out to the <a href="https://github.com/Microsoft/code-push/blob/master/cli/README.md">CLI</a>.</p>
+                    <p>Once you&rsquo;ve acquired the CodePush plugin, you need to integrate it into the Visual Studio project of your React Native app and configure it correctly. To do this, take the following steps:</p>
 
-<h2>Getting Started</h2>
+<h3>Plugin Installation (Windows)</h3>
 
 <ol>
-<li><p>Create an access key to authenticate with the CodePush server using the following CodePush CLI command:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push access-key add &quot;DESCRIPTION_OF_THE_KEY&quot;
-</code></pre></div>
-<p>If you already created a key that you want to use here, then you can retrieve it by running <code>code-push access-key ls</code> and using the value of the <code>Key</code> column for the key you wish to use.</p></li>
-<li><p>Install the management SDK by running <code>npm install code-push --save</code></p></li>
-<li><p>Import it using the following statement (using ES6 syntax as applicable):</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var CodePush = require(&quot;code-push&quot;);    
-</code></pre></div></li>
-<li><p>Create an instance of the <code>CodePush</code> class, passing it the access key you created or retrieved in step #1:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var codePush = new CodePush(&quot;YOUR_ACCESS_KEY&quot;);
-</code></pre></div></li>
-<li><p>Begin automating the management of your account! For more details on what you can do with this <code>codePush</code> object, refer to the API reference section below.</p></li>
+<li><p>Open the Visual Studio solution located at <code>windows\&lt;AppName&gt;\&lt;AppName&gt;.sln</code> within your app</p></li>
+<li><p>Right-click the solution node in the <code>Solution Explorer</code> window and select the <code>Add -&gt; Existing Project...</code> menu item</p></li>
 </ol>
 
-<h2>API Reference</h2>
+<p><img src="https://cloud.githubusercontent.com/assets/116461/14467164/ddf6312e-008e-11e6-8a10-44a8b44b5dfc.PNG" alt="Add Project"></p>
 
-<p>The <code>code-push</code> module exports a single class (typically referred to as <code>CodePush</code>), which represents a proxy to the CodePush account management REST API. This class has a single constructor for authenticating with the CodePush service, and a collection of instance methods that correspond to the commands in the management <a href="https://github.com/Microsoft/code-push/blob/master/cli/README.md">CLI</a>, which allow you to programmatically control every aspect of your CodePush account.</p>
+<ol>
+<li><p>Browse to the <code>node_modules\react-native-code-push\windows</code> directory, select the <code>CodePush.csproj</code> file and click <code>OK</code></p></li>
+<li><p>Back in the <code>Solution Explorer</code>, right-click the project node that is named after your app, and select the <code>Add -&gt; Reference...</code> menu item</p></li>
+</ol>
 
-<h3>Constructors</h3>
+<p><img src="https://cloud.githubusercontent.com/assets/116461/14467154/d833bc98-008e-11e6-8e95-09864b1f05ef.PNG" alt="Add Reference"></p>
 
-<ul>
-<li><strong>CodePush(accessKey: string)</strong> - Creates a new instance of the CodePush management SDK, using the specified access key to authenticated with the server.</li>
-</ul>
+<ol>
+<li>Select the <code>Projects</code> tab on the left hand side, check the <code>CodePush</code> item and then click <code>OK</code></li>
+</ol>
 
-<h3>Methods</h3>
+<p><img src="https://cloud.githubusercontent.com/assets/116461/14467147/cb805b6e-008e-11e6-964f-f856c59b65af.PNG" alt="Add Reference Dialog"></p>
 
-<ul>
-<li><p><strong>addAccessKey(description: string): Promise&lt;AccessKey&gt;</strong> - Creates a new access key with the specified description (e.g. &ldquo;VSTS CI&rdquo;).</p></li>
-<li><p><strong>addApp(appName: string): Promise&lt;App&gt;</strong> - Creates a new CodePush app with the specified name.</p></li>
-<li><p><strong>addCollaborator(appName: string, email: string): Promise&lt;void&gt;</strong> - Adds the specified CodePush user as a collaborator to the specified CodePush app.</p></li>
-<li><p><strong>addDeployment(appName: string, deploymentName: string): Promise&lt;Deployment&gt;</strong> - Creates a new deployment with the specified name, and associated with the specified app.</p></li>
-<li><p><strong>clearDeploymentHistory(appName: string, deploymentName: string): Promise&lt;void&gt;</strong> - Clears the release history associated with the specified app deployment.</p></li>
-<li><p><strong>getAccessKey(accessKey: string): Promise&lt;AccessKey&gt;</strong> - Retrieves the metadata about the specific access key.</p></li>
-<li><p><strong>getAccessKeys(): Promise&lt;AccessKey[]&gt;</strong> - Retrieves the list of access keys associated with your CodePush account.</p></li>
-<li><p><strong>getApp(appName: string): Promise&lt;App&gt;</strong> - Retrieves the metadata about the specified app.</p></li>
-<li><p><strong>getApps(): Promise&lt;App[]&gt;</strong> - Retrieves the list of apps associated with your CodePush account.</p></li>
-<li><p><strong>getCollaborators(appName: string): Promise&lt;CollaboratorMap&gt;</strong> - Retrieves the list of collaborators associated with the specified app.</p></li>
-<li><p><strong>getDeployment(appName: string, deploymentName: string): Promise&lt;Deployment&gt;</strong> - Retrieves the metadata for the specified app deployment.</p></li>
-<li><p><strong>getDeploymentHistory(appName: string, deploymentName: string): Promise&lt;Package[]&gt;</strong> - Retrieves the list of releases that have been made to the specified app deployment.</p></li>
-<li><p><strong>getDeploymentMetrics(appName: string, deploymentName): Promise&lt;DeploymentMetrics&gt;</strong> - Retrieves the installation metrics for the specified app deployment. </p></li>
-<li><p><strong>getDeployments(appName: string): Promose&lt;Deployment[]&gt;</strong> - Retrieves the list of deployments associated with the specified app.</p></li>
-<li><p><strong>patchRelease(appName: string, deploymentName: string, label: string, updateMetadata: PackageInfo): Promise&lt;void&gt;</strong> - Updates the specified release&rsquo;s metadata with the given information.</p></li>
-<li><p><strong>promote(appName: string, sourceDeploymentName: string, destinationDeploymentName: string, updateMetadata: PackageInfo): Promise&lt;void&gt;</strong> - Promotes the latest release from one deployment to another for the specified app and updates the release with the given metadata.</p></li>
-<li><p><strong>release(appName: string, deploymentName: string, updateContentsPath: string, targetBinaryVersion: string, updateMetadata: PackageInfo): Promise&lt;void&gt;</strong> - Releases a new update to the specified deployment with the given metadata.</p></li>
-<li><p><strong>removeAccessKey(accessKey: string): Promise&lt;void&gt;</strong> - Removes the specified access key from your CodePush account.</p></li>
-<li><p><strong>removeApp(appName: string): Promise&lt;void&gt;</strong> - Deletes the specified CodePush app from your account.</p></li>
-<li><p><strong>removeCollaborator(appName: string, email: string): Promise&lt;void&gt;</strong> - Removes the specified account as a collaborator from the specified app.</p></li>
-<li><p><strong>removeDeployment(appName: string, deploymentName: string): Promise&lt;void&gt;</strong> - Removes the specified deployment from the specified app.</p></li>
-<li><p><strong>renameApp(oldAppName: string, newAppName: string): Promise&lt;void&gt;</strong> - Renames an existing app.</p></li>
-<li><p><strong>renameDeployment(appName: string, oldDeploymentName: string, newDeploymentName: string): Promise&lt;void&gt;</strong> - Renames an existing deployment within the specified app.</p></li>
-<li><p><strong>rollback(appName: string, deploymentName: string, targetRelease?: string): Promise&lt;void&gt;</strong> - Rolls back the latest release within the specified deployment. Optionally allows you to target a specific release in the deployment&rsquo;s history, as opposed to rolling to the previous release.</p></li>
-<li><p><strong>transferApp(appName: string, email: string): Promise&lt;void&gt;</strong> - Transfers the ownership of the specified app to the specified account.</p></li>
-</ul>
+<h3>Plugin Configuration (Windows)</h3>
 
-<h3>Error Handling</h3>
+<p>After installing the plugin, you need to configure your app to consult CodePush for the location of your JS bundle, since it will &ldquo;take control&rdquo; of managing the current and all future versions. To do this, update the <code>AppReactPage.cs</code> file to use CodePush via the following changes:</p>
+<div class="highlight"><pre><code class="language-c#" data-lang="c#">...
+// 1. Import the CodePush namespace
+using CodePush.ReactNative;
+...
+class AppReactPage : ReactPage
+{
+    // 2. Declare a private instance variable for the CodePushModule instance.
+    private CodePushReactPackage codePushReactPackage;
 
-<p>When an error occurs in any of the methods, the promise will be rejected with a CodePushError object with the following properties:</p>
+    // 3. Update the JavaScriptBundleFile property to initalize the CodePush runtime,
+    // specifying the right deployment key, then use it to return the bundle URL from
+    // CodePush instead of statically from the binary. If you don&#39;t already have your
+    // deployment key, you can run &quot;code-push deployment ls &lt;appName&gt; -k&quot; to retrieve it.
+    public override string JavaScriptBundleFile
+    {
+        get
+        {
+            codePushReactPackage = new CodePushReactPackage(&quot;deployment-key-here&quot;, this);
+            return codePushReactPackage.GetJavaScriptBundleFile();
+        }
+    }
 
-<ul>
-<li><strong>message</strong>: A user-friendly message that describes the error.</li>
-<li><strong>statusCode</strong>: An HTTP response code that identifies the category of error:
-
-<ul>
-<li><strong>CodePush.ERROR_GATEWAY_TIMEOUT</strong>: A network error prevented you from connecting to the CodePush server.</li>
-<li><strong>CodePush.ERROR_INTERNAL_SERVER</strong>: An error occurred internally on the CodePush server.</li>
-<li><strong>CodePush.ERROR_NOT_FOUND</strong>: The resource you are attempting to retrieve does not exist.</li>
-<li><strong>CodePush.ERROR_CONFLICT</strong>: The resource you are attempting to create already exists.</li>
-<li><strong>CodePush.ERROR_UNAUTHORIZED</strong>: The access key you configured is invalid or expired.</li>
-</ul></li>
-</ul>
-                    
+    // 4. Add the codePushReactPackage instance to the list of existing packages.
+    public override List&lt;IReactPackage&gt; Packages
+    {
+        get
+        {
+            return new List&lt;IReactPackage&gt;
+            {
+                new MainReactPackage(),
+                ...
+                codePushReactPackage
+            };
+        }
+    }
+    ...
+}
+</code></pre></div>                    
                 </article>
                 <div class="feedback-container">
     <div class="widget">

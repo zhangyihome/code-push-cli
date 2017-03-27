@@ -251,11 +251,9 @@
           
           
           <li>
-            <a class="this-page" href="/code-push/docs/cli.html">
+            <a class="" href="/code-push/docs/cli.html">
                 Management CLI
             </a>
-            
-                <div id="page-toc" class="page-toc"></div>
             
           </li>
           
@@ -1013,10 +1011,49 @@
             <div class="row">  
                 <header class="doc-header">
                     <h1 class="doc-title">Management CLI</h1>
-                    <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/CLI.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
+                    <!--<ul class="nav" style="display:inline-block;"><li><a class="edit-page-link" style="padding-left:0" href="https://microsoft.github.io/code-push_docs/code-push/CLI.md" target="_blank"><span class="glyphicon glyphicon-pencil"></span><i>&nbsp;</i>Edit on GitHub</a></li></ul>-->
                 </header>  
                 <article class="doc-content">               
-                    <p><img src="https://cloud.githubusercontent.com/assets/116461/16246693/2e7df77c-37bb-11e6-9456-e392af7f7b84.png" alt="CodePush CLI"></p>
+                    <p>CodePush is a cloud service that enables Cordova and React Native developers to deploy mobile app updates directly to their users&rsquo; devices. It works by acting as a central repository that developers can publish updates to (JS, HTML, CSS and images), and that apps can query for updates from (using the provided client SDKs for <a href="http://github.com/Microsoft/cordova-plugin-code-push">Cordova</a> and <a href="http://github.com/Microsoft/react-native-code-push">React Native</a>). This allows you to have a more deterministic and direct engagement model with your user base, when addressing bugs and/or adding small features that don&rsquo;t require you to re-build a binary and re-distribute it through the respective app stores.</p>
+
+<p><img src="https://cloud.githubusercontent.com/assets/116461/16246693/2e7df77c-37bb-11e6-9456-e392af7f7b84.png" alt="CodePush CLI"></p>
+
+<!-- CLI Catalog -->
+
+<ul>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#getting-started">Getting Started</a></li>
+<li><a href="#account-management">Account Management</a>
+
+<ul>
+<li><a href="#authentication">Authentication</a></li>
+<li><a href="#access-keys">Access Keys</a></li>
+<li><a href="#proxy-support">Proxy Support</a></li>
+</ul></li>
+<li><a href="#app-management">App Management</a>
+
+<ul>
+<li><a href="#app-collaboration">App Collaboration</a></li>
+<li><a href="#deployment-management">Deployment Management</a></li>
+</ul></li>
+<li><a href="#releasing-updates">Releasing Updates</a>
+
+<ul>
+<li><a href="#releasing-updates-general">Releasing Updates (General)</a></li>
+<li><a href="#releasing-updates-react-native">Releasing Updates (React Native)</a></li>
+<li><a href="#releasing-updates-cordova">Releasing Updates (Cordova)</a></li>
+</ul></li>
+<li><a href="#debugging-codepush-integration">Debugging CodePush Integration</a></li>
+<li><a href="#patching-update-metadata">Patching Update Metadata</a></li>
+<li><a href="#promoting-updates">Promoting Updates</a></li>
+<li><a href="#rolling-back-updates">Rolling Back Updates</a></li>
+<li><a href="#viewing-release-history">Viewing Release History</a></li>
+<li><a href="#clearing-release-history">Clearing Release History</a></li>
+</ul>
+
+<p><a href="./README-cn.md">[Chinese version 中文版]</a></p>
+
+<!-- CLI Catalog -->
 
 <h2>Installation</h2>
 
@@ -1103,7 +1140,7 @@ code-push session rm &lt;machineName&gt;
 <p>Before you can deploy any updates, you need to register an app with the CodePush service using the following command:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push app add &lt;appName&gt;
 </code></pre></div>
-<p>If your app targets both iOS and Android, we highly recommend creating separate apps with CodePush. One for each platform. This way, you can manage and release updates to them separately, which in the long run, tends to make things simpler. The naming convention that most folks use is to suffix the app name with <code>-iOS</code> and <code>-Android</code>. For example:</p>
+<p>If your app targets both iOS and Android, please <em>create separate apps for each platform</em> with CodePush (see the note below for details). This way, you can manage and release updates to them separately, which in the long run, also tends to make things simpler. The naming convention that most folks use is to suffix the app name with <code>-iOS</code> and <code>-Android</code>. For example:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push app add MyApp-Android
 code-push app add MyApp-iOS
 </code></pre></div>
@@ -1324,6 +1361,8 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 <p><em>NOTE: If your semver expression starts with a special shell character or operator such as <code>&gt;</code>, <code>^</code>, or *</em>
 <em>, the command may not execute correctly if you do not wrap the value in quotes as the shell will not supply the right values to our CLI process. Therefore, it is best to wrap your <code>targetBinaryVersion</code> parameter in double quotes when calling the <code>release</code> command, e.g. <code>code-push release MyApp-iOS updateContents &quot;&gt;1.2.3&quot;</code>.</em></p>
 
+<p><em>NOTE: As defined in the semver spec, ranges only work for non pre-release versions: <a href="https://github.com/npm/node-semver#prerelease-tags">https://github.com/npm/node-semver#prerelease-tags</a>. If you want to update a version with pre-release tags, then you need to write the exact version you want to update (<code>1.2.3-beta</code> for example).</em></p>
+
 <p>The following table outlines the version value that CodePush expects your update&rsquo;s semver range to satisfy for each respective app type:</p>
 
 <table><thead>
@@ -1362,7 +1401,7 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 
 <p>This provides an optional &ldquo;change log&rdquo; for the deployment. The value is simply round tripped to the client so that when the update is detected, your app can choose to display it to the end-user (e.g. via a &ldquo;What&rsquo;s new?&rdquo; dialog). This string accepts control characters such as <code>\n</code> and <code>\t</code> so that you can include whitespace formatting within your descriptions for improved readability.</p>
 
-<p><em>NOTE: This parameter can be set using either &ldquo;&ndash;description&rdquo; or &ldquo;-desc&rdquo;</em></p>
+<p><em>NOTE: This parameter can be set using either &ldquo;&ndash;description&rdquo; or &ldquo;-des&rdquo;</em></p>
 
 <h4>Disabled parameter</h4>
 
@@ -1437,6 +1476,7 @@ code-push deployment rename &lt;appName&gt; &lt;deploymentName&gt; &lt;newDeploy
 [--gradleFile &lt;gradleFile&gt;]
 [--mandatory]
 [--noDuplicateReleaseError]
+[--outputDir &lt;outputDir&gt;]
 [--plistFile &lt;plistFile&gt;]
 [--plistFilePrefix &lt;plistFilePrefix&gt;]
 [--sourcemapOutput &lt;sourcemapOutput&gt;]
@@ -1551,6 +1591,12 @@ code-push release-react MyApp-iOS ios --pre &quot;DEV-&quot;
 <p>This specifies the relative path to where the generated JS bundle&rsquo;s sourcemap file should be written. If left unspecified, sourcemaps will not be generated.</p>
 
 <p><em>NOTE: This parameter can be set using either &ndash;sourcemapOutput or -s</em></p>
+
+<h4>Output directory parameter</h4>
+
+<p>This specifies the relative path to where the assets, JS bundle and sourcemap files should be written. If left unspecified, the assets, JS bundle and sourcemap will be copied to the <code>/tmp/CodePush</code> folder.</p>
+
+<p><em>NOTE: This parameter can be set using either &ndash;outputDir or -o</em></p>
 
 <h3>Releasing Updates (Cordova)</h3>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-cordova &lt;appName&gt; &lt;platform&gt;
@@ -1695,6 +1741,7 @@ code-push patch MyApp-iOS Staging -t &quot;1.0.0 - 1.0.5&quot;
 <p>Once you&rsquo;ve tested an update against a specific deployment (e.g. <code>Staging</code>), and you want to promote it &ldquo;downstream&rdquo; (e.g. dev-&gt;staging, staging-&gt;production), you can simply use the following command to copy the release from one deployment to another:</p>
 <div class="highlight"><pre><code class="language-text" data-lang="text">code-push promote &lt;appName&gt; &lt;sourceDeploymentName&gt; &lt;destDeploymentName&gt;
 [--description &lt;description&gt;]
+[--label &lt;label&gt;]
 [--disabled &lt;disabled&gt;]
 [--mandatory]
 [--noDuplicateReleaseError]
@@ -1713,6 +1760,10 @@ code-push patch MyApp-iOS Staging -t &quot;1.0.0 - 1.0.5&quot;
 <h3>Description parameter</h3>
 
 <p>This is the same parameter as the one described in the <a href="#description-parameter">above section</a>, and simply allows you to override the description that will be used for the promoted release. If unspecified, the new release will inherit the description from the release being promoted.</p>
+
+<h3>Label parameter</h3>
+
+<p>This optional parameter allows you to pick the specified label from the source deployment and promote it to the destination deployment. If unspecified, the latest release on the source deployment will be promoted.</p>
 
 <h3>Disabled parameter</h3>
 

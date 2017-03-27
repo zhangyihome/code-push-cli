@@ -7,6 +7,20 @@
 		<atom:link href="http://microsoft.github.io/code-push/blog/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>New updates for CodePush and React Native Module for CodePush</title>
+				
+					<dc:creator>Ian Geoghegan</dc:creator>
+				        
+				
+					<description>&lt;p&gt;Over the last thirty days, we&amp;rsquo;ve released several significant updates to both CodePush and the React Native Module for CodePush that we think you&amp;rsquo;ll like. CodePush boasts several new features, including the abililty to specify Node parameters to the release-react command, the ability to specify bundle and sourcemap destination, deployment promotion based on labels, and a release build type for Apache Cordova builds. The React Native Module for CodePush now includes support for React Native Windows .NET 4.6. Both products also have seen numerous bug fixes. Check out &lt;a href=&quot;https://github.com/Microsoft/code-push/releases&quot;&gt;CodePush&lt;/a&gt; and the &lt;a href=&quot;https://github.com/Microsoft/react-native-code-push/releases&quot;&gt;Module&lt;/a&gt; release notes for details and the new and improved &lt;a href=&quot;https://github.com/Microsoft/react-native-code-push/blob/master/README.md&quot;&gt;documentation&lt;/a&gt; for the React Native Module for CodePush. &lt;/p&gt;
+</description>
+				
+				<pubDate>Mon, 27 Mar 2017 00:00:00 -0700</pubDate>
+				<link>http://microsoft.github.io/code-push/blog/articles/NewReleases.html</link>
+				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/NewReleases.html</guid>
+			</item>
+		
+			<item>
 				<title>React Native for Windows + CodePush</title>
 				
 					<dc:creator>Jonathan Carter</dc:creator>
