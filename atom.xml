@@ -4,7 +4,7 @@
  <title>CodePush</title>
  <link href="http://microsoft.github.io/code-push/blog/atom.xml" rel="self"/>
  <link href="http://microsoft.github.io/code-push/blog/"/>
- <updated>2017-03-27T09:45:41-07:00</updated>
+ <updated>2017-03-28T04:12:08-07:00</updated>
  <id>http://microsoft.github.io/code-push/blog</id>
  <author>
    <name></name>
@@ -34,7 +34,7 @@ In addition to the features and fixes, we&amp;rsquo;re also announcing our plan 
 &lt;br/&gt;&lt;br/&gt;
 &lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/SyqQkMZY8Y8&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt;
 &lt;br/&gt;&lt;br/&gt;
-Please let us know what you think of our videos and let us know what topics you&amp;rsquo;d like to see covered in the future. We want to hear from you. Sign up for a free trial of &lt;a href=&quot;https://mobile.azure.com/login&quot;&gt;Mobile Center&lt;/a&gt;, take a look around, and let us know what you &lt;a href=&quot;https://www.surveymonkey.com/r/BBVLDWW&quot; target=&quot;_new&quot;&gt;think&lt;/a&gt;. 
+Please let us know what you think of our videos and let us know what topics you&amp;rsquo;d like to see covered in the future. We want to hear from you. Sign up for a free trial of &lt;a href=&quot;https://mobile.azure.com/login&quot;&gt;Mobile Center&lt;/a&gt;, take a look around, and let us know what you think. 
 &lt;br/&gt;&lt;br/&gt;
 &lt;em&gt;Also please NOTE: you can continue to use CodePush the way you do now with your React Native and Apache Cordova applications.&lt;/em&gt;&lt;/p&gt;
 </content>
