@@ -161,16 +161,37 @@ function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
 }
 
 function appAdd(command: cli.IAppAddCommand): Promise<void> {
-    return sdk.addApp(command.appName)
-        .then((app: App): Promise<void> => {
-            log("Successfully added the \"" + command.appName + "\" app, along with the following default deployments:");
-            var deploymentListCommand: cli.IDeploymentListCommand = {
-                type: cli.CommandType.deploymentList,
-                appName: app.name,
-                format: "table",
-                displayKeys: true
-            };
-            return deploymentList(deploymentListCommand, /*showPackage=*/ false);
+    // Validate the OS and platform, doing a case insensitve comparison. Note that for CLI examples we
+    // present these values in all lower case, per CLI conventions, but when passed to the REST API the
+    // are in mixed case, per Mobile Center API naming conventions
+
+    var os: string;
+    const normalizedOs = command.os.toLowerCase();
+    if (normalizedOs === "ios") {
+        os = "iOS";
+    }
+    else if (normalizedOs === "android") {
+        os = "Android";
+    }
+    else {
+        return Q.reject<void>(new Error(`"${command.os}" is an unsupported OS. Available options are "ios" and "android".`));
+    }
+
+    var platform: string;
+    const normalizedPlatform = command.platform.toLowerCase();
+    if (normalizedPlatform === "react-native") {
+        platform = "React-Native";
+    }
+    else if (normalizedPlatform === "cordova") {
+        platform = "Cordova";
+    }
+    else {
+        return Q.reject<void>(new Error(`"${command.platform}" is an unsupported platform. Available options are "react-native" and "cordova".`));
+    }
+
+    return sdk.addApp(command.appName, os, platform, true)
+        .then((app: App): void => {
+            log("Successfully added the \"" + command.appName + "\" app.\n" + "Use \"code-push deployment add\" to add deployment(s) to the app.");
         });
 }
 
@@ -285,10 +306,28 @@ function deleteFolder(folderPath: string): Promise<void> {
 }
 
 function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
-    return sdk.addDeployment(command.appName, command.deploymentName)
-        .then((deployment: Deployment): void => {
-            log("Successfully added the \"" + command.deploymentName + "\" deployment with key \"" + deployment.key + "\" to the \"" + command.appName + "\" app.");
-        });
+    if (command.default) {
+        return sdk.addDeployment(command.appName, "Staging")
+            .then((deployment: Deployment): Promise<Deployment> => {
+                return sdk.addDeployment(command.appName, "Production");
+            })
+            .then((deployment: Deployment): Promise<void> => {
+                log("Successfully added the \"Staging\" and \"Production\" default deployments:");
+                var deploymentListCommand: cli.IDeploymentListCommand = {
+                    type: cli.CommandType.deploymentList,
+                    appName: command.appName,
+                    format: "table",
+                    displayKeys: true
+                };
+                return deploymentList(deploymentListCommand, /*showPackage=*/ false);
+            });
+    }
+    else {
+        return sdk.addDeployment(command.appName, command.deploymentName)
+            .then((deployment: Deployment): void => {
+                log("Successfully added the \"" + command.deploymentName + "\" deployment with key \"" + deployment.key + "\" to the \"" + command.appName + "\" app.");
+            });
+    }
 }
 
 function deploymentHistoryClear(command: cli.IDeploymentHistoryClearCommand): Promise<void> {
@@ -561,13 +600,25 @@ function getTotalActiveFromDeploymentMetrics(metrics: DeploymentMetrics): number
 }
 
 function initiateExternalAuthenticationAsync(action: string, serverUrl?: string): void {
-    var message: string = `A browser is being launched to authenticate your account. Follow the instructions ` +
-        `it displays to complete your ${action === "register" ? "registration" : action}.`;
+    var message: string;
 
-    log(message);
-    var hostname: string = os.hostname();
-    var url: string = `${serverUrl || AccountManager.SERVER_URL}/auth/${action}?hostname=${hostname}`;
-    opener(url);
+    if (action === "link") {
+        message = `Please login to Mobile Center in the browser window we've just opened.\nIf you login with an additional authentication provider (e.g. GitHub) that shares the same email address, it will be linked to your current Mobile Center account.`;
+
+        // For "link" there shouldn't be a token prompt, so we go straight to the Mobile Center URL to avoid that
+        log(message);
+        var url: string = serverUrl || AccountManager.MOBILE_CENTER_SERVER_URL;
+        opener(url);
+    }
+    else {
+        // We use this now for both login & register
+        message = `Please login to Mobile Center in the browser window we've just opened.`;
+
+        log(message);
+        var hostname: string = os.hostname();
+        var url: string = `${serverUrl || AccountManager.SERVER_URL}/auth/${action}?hostname=${hostname}`;
+        opener(url);
+    }
 }
 
 function link(command: cli.ILinkCommand): Promise<void> {
@@ -611,7 +662,7 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string, pro
                     if (isAuthenticated) {
                         serializeConnectionInfo(accessKey, /*preserveAccessKeyOnLogout*/ false, serverUrl, proxy, noProxy);
                     } else {
-                        throw new Error("Invalid access key.");
+                        throw new Error("Invalid token.");
                     }
                 });
         });
@@ -1158,7 +1209,7 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
     var releaseCommand: cli.IReleaseCommand = <any>command;
     // Check for app and deployment exist before releasing an update.
     // This validation helps to save about 1 minute or more in case user has typed wrong app or deployment name.
-    return sdk.getDeployment(command.appName, command.deploymentName)
+    return validateDeployment(command.appName, command.deploymentName)
         .then((): any => {
             var platform: string = command.platform.toLowerCase();
             var projectRoot: string = process.cwd();
@@ -1241,7 +1292,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
     var releaseCommand: cli.IReleaseCommand = <any>command;
     // Check for app and deployment exist before releasing an update.
     // This validation helps to save about 1 minute or more in case user has typed wrong app or deployment name.
-    return sdk.getDeployment(command.appName, command.deploymentName)
+    return validateDeployment(command.appName, command.deploymentName)
         .then((): any => {
             releaseCommand.package = outputFolder;
 
@@ -1326,6 +1377,16 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
         });
 }
 
+function validateDeployment(appName: string,  deploymentName: string): Promise<void> {
+    return sdk.getDeployment(appName, deploymentName)
+        .catch((err: any) => {
+            if (err.statusCode === AccountManager.ERROR_NOT_FOUND) {
+                err.message = err.message + "\nUse \"code-push deployment list\" to view any existing deployments and \"code-push deployment add\" to add deployment(s) to the app.";
+            }
+            throw err;
+        });
+}
+
 function rollback(command: cli.IRollbackCommand): Promise<void> {
     return confirm()
         .then((wasConfirmed: boolean) => {
@@ -1351,7 +1412,7 @@ function requestAccessKey(): Promise<string> {
         prompt.get({
             properties: {
                 response: {
-                    description: chalk.cyan("Enter your access key: ")
+                    description: chalk.cyan("Enter your token from the browser: ")
                 }
             }
         }, (err: any, result: any): void => {
@@ -1487,7 +1548,7 @@ function throwForInvalidOutputFormat(format: string): void {
 function whoami(command: cli.ICommand): Promise<void> {
     return sdk.getAccountInfo()
         .then((account): void => {
-            var accountInfo = `${account.email} (${account.linkedProviders.join(", ")})`;
+            var accountInfo = `${account.email}`;
 
             var connectionInfo = deserializeConnectionInfo();
             if (connectionInfo.noProxy || connectionInfo.proxy) {
