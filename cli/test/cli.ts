@@ -352,6 +352,7 @@ describe("CLI", () => {
     });
 
 
+    /*
     it("accessKeyPatch updates access key with new ttl", (done: MochaDone): void => {
         var ttl = 10000;
         var command: cli.IAccessKeyPatchCommand = {
@@ -394,6 +395,7 @@ describe("CLI", () => {
                 done();
             });
     });
+    */
 
     it("accessKeyList lists access key name and expires fields", (done: MochaDone): void => {
         var command: cli.IAccessKeyListCommand = {
@@ -473,9 +475,9 @@ describe("CLI", () => {
         cmdexec.execute(command)
             .done((): void => {
                 sinon.assert.calledOnce(addApp);
-                sinon.assert.calledTwice(log);
-                sinon.assert.calledWithExactly(log, "Successfully added the \"a\" app, along with the following default deployments:");
-                sinon.assert.calledOnce(deploymentList);
+                sinon.assert.calledOnce(log);
+                sinon.assert.calledWithExactly(log, "Successfully added the \"a\" app.\nUse \"code-push deployment add\" to add deployment(s) to the app.");
+                //sinon.assert.calledOnce(deploymentList);
                 done();
             });
     });
