@@ -7,6 +7,20 @@
 		<atom:link href="http://microsoft.github.io/code-push/blog/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>CodePush is moving to Mobile Center</title>
+				
+					<dc:creator>Ian Geoghegan</dc:creator>
+				        
+				
+					<description>&lt;p&gt;Your favorite rapid deployment service is moving up in the world. The move to Mobile Center will bring additional resources and focus to bear as well as an additional user interface for executing CodePush commands. The migration itself will result in a &lt;i&gt;planned service outage of about two to three hours on June 2nd, 2017 starting at approximately eight GMT.&lt;/i&gt; &lt;br/&gt;&lt;br/&gt;Once the move has completed, we encourage you to checkout &lt;a href=&quot;https://mobile.azure.com&quot;&gt;Mobile Center&lt;/a&gt; and let us know what you think of the services we offer and our CodePush MVP.&lt;/p&gt;
+</description>
+				
+				<pubDate>Thu, 01 Jun 2017 00:00:00 -0700</pubDate>
+				<link>http://microsoft.github.io/code-push/blog/articles/CodePushOnMobileCenter.html</link>
+				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/CodePushOnMobileCenter.html</guid>
+			</item>
+		
+			<item>
 				<title>New updates for CodePush and React Native Module for CodePush</title>
 				
 					<dc:creator>Ian Geoghegan</dc:creator>

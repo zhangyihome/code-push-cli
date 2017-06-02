@@ -4,13 +4,49 @@
  <title>CodePush</title>
  <link href="http://microsoft.github.io/code-push/blog/atom.xml" rel="self"/>
  <link href="http://microsoft.github.io/code-push/blog/"/>
- <updated>2017-03-28T04:12:08-07:00</updated>
+ <updated>2017-06-01T22:10:00-07:00</updated>
  <id>http://microsoft.github.io/code-push/blog</id>
  <author>
    <name></name>
    <email></email>
  </author>
 
+ 
+ <entry>
+   <title>CodePush is moving to Mobile Center</title>
+   <link href="http://microsoft.github.io/code-push/blog/articles/CodePushOnMobileCenter.html"/>
+   <updated>2017-06-01T00:00:00-07:00</updated>
+   <id>http://microsoft.github.io/code-push/blog/articles/CodePushOnMobileCenter</id>
+   <content type="html">&lt;p&gt;Your favorite rapid deployment service is moving up in the world. The move to Mobile Center will bring additional resources and focus to bear as well as an additional user interface for executing CodePush commands. The migration itself will result in a &lt;i&gt;planned service outage of about two to three hours on June 2nd, 2017 starting at approximately eight GMT.&lt;/i&gt; &lt;br/&gt;&lt;br/&gt;Once the move has completed, we encourage you to checkout &lt;a href=&quot;https://mobile.azure.com&quot;&gt;Mobile Center&lt;/a&gt; and let us know what you think of the services we offer and our CodePush MVP.&lt;/p&gt;
+
+&lt;h3&gt;FAQ&lt;/h3&gt;
+
+&lt;p&gt;&lt;b&gt;Q:&lt;/b&gt; &lt;em&gt;Will the move impact my customers?&lt;/em&gt;
+&lt;br/&gt;
+&lt;b&gt;A:&lt;/b&gt; With the exception of attempted updates that fail during the outage, your customers shouldn&amp;rsquo;t know the difference. 
+&lt;br/&gt;&lt;br/&gt;
+&lt;b&gt;Q:&lt;/b&gt; &lt;em&gt;Why the move?&lt;/em&gt;
+&lt;br/&gt;
+&lt;b&gt;A:&lt;/b&gt; Moving to Mobile Center means more support, more resources, and a home among Microsoft&amp;rsquo;s first class services for mobile development.
+&lt;br/&gt;&lt;br/&gt;
+&lt;b&gt;Q:&lt;/b&gt; &lt;em&gt;Can I continue to use the CLI?&lt;/em&gt;
+&lt;br/&gt;
+&lt;b&gt;A:&lt;/b&gt; Yes, although creating new apps will require that you specify two additional parameters: os and platform. 
+&lt;br/&gt;&lt;br/&gt;
+&lt;b&gt;Q:&lt;/b&gt; &lt;em&gt;Does this mean I have to pay some sort of subscription fee tomorrow?&lt;/em&gt;
+&lt;br/&gt;
+&lt;b&gt;A:&lt;/b&gt; No. 
+&lt;br/&gt;&lt;br/&gt;
+&lt;b&gt;Q:&lt;/b&gt; &lt;em&gt;Will I still be able to log on?&lt;/em&gt;
+&lt;br/&gt;
+&lt;b&gt;A:&lt;/b&gt; Yes. 
+&lt;br/&gt;&lt;br/&gt;
+&lt;b&gt;Q:&lt;/b&gt; &lt;em&gt;Will your pricacy policy or terms of service change with this release?&lt;/em&gt;
+&lt;br/&gt;
+&lt;b&gt;A:&lt;/b&gt; No.
+&lt;br/&gt;&lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>New updates for CodePush and React Native Module for CodePush</title>
