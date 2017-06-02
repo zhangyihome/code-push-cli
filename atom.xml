@@ -4,7 +4,7 @@
  <title>CodePush</title>
  <link href="http://microsoft.github.io/code-push/blog/atom.xml" rel="self"/>
  <link href="http://microsoft.github.io/code-push/blog/"/>
- <updated>2017-06-01T22:20:17-07:00</updated>
+ <updated>2017-06-02T10:42:49-07:00</updated>
  <id>http://microsoft.github.io/code-push/blog</id>
  <author>
    <name></name>
@@ -40,6 +40,10 @@
 &lt;b&gt;Q:&lt;/b&gt; &lt;em&gt;Will I still be able to log on?&lt;/em&gt;
 &lt;br/&gt;
 &lt;b&gt;A:&lt;/b&gt; Yes. 
+&lt;br/&gt;&lt;br/&gt;
+&lt;b&gt;Q:&lt;/b&gt; &lt;em&gt;Will I need to create a new account for Mobile Center if I already have one?&lt;/em&gt;
+&lt;br/&gt;
+&lt;b&gt;A:&lt;/b&gt; If you used the same email for both accounts, you will be able to log into Mobile Center using your original account. If not, one will be created for your CodePush app. If you would like to manage your apps from the same account you will need to create an organization in Mobile Center, add your new account to it, and transfer your application to the organization.
 &lt;br/&gt;&lt;br/&gt;
 &lt;b&gt;Q:&lt;/b&gt; &lt;em&gt;Will your privacy policy or terms of service change with this release?&lt;/em&gt;
 &lt;br/&gt;
