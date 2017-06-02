@@ -4,7 +4,7 @@
  <title>CodePush</title>
  <link href="http://microsoft.github.io/code-push/blog/atom.xml" rel="self"/>
  <link href="http://microsoft.github.io/code-push/blog/"/>
- <updated>2017-06-02T10:42:49-07:00</updated>
+ <updated>2017-06-02T13:46:16-07:00</updated>
  <id>http://microsoft.github.io/code-push/blog</id>
  <author>
    <name></name>
@@ -23,7 +23,7 @@
 
 &lt;p&gt;&lt;b&gt;Q:&lt;/b&gt; &lt;em&gt;Will the move impact my customers?&lt;/em&gt;
 &lt;br/&gt;
-&lt;b&gt;A:&lt;/b&gt; With the exception of attempted updates that fail during the outage, your customers shouldn&amp;rsquo;t know the difference. 
+&lt;b&gt;A:&lt;/b&gt; During the outage we anticipate that most your end users will still be able to download updates, however you will not be able to upload new updates to the service. 
 &lt;br/&gt;&lt;br/&gt;
 &lt;b&gt;Q:&lt;/b&gt; &lt;em&gt;Why the move?&lt;/em&gt;
 &lt;br/&gt;
