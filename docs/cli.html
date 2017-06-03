@@ -681,11 +681,11 @@ code-push session rm &lt;machineName&gt;
 <h2>App Management</h2>
 
 <p>Before you can deploy any updates, you need to register an app with the CodePush service using the following command:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push app add &lt;appName&gt;
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push app add &lt;appName&gt; &lt;os&gt; &lt;platform&gt;
 </code></pre></div>
 <p>If your app targets both iOS and Android, we highly recommend creating separate apps with CodePush. One for each platform. This way, you can manage and release updates to them separately, which in the long run, tends to make things simpler. The naming convention that most folks use is to suffix the app name with <code>-iOS</code> and <code>-Android</code>. For example:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push app add MyApp-Android
-code-push app add MyApp-iOS
+<div class="highlight"><pre><code class="language-text" data-lang="text">code-push app add MyApp-Android android react-native
+code-push app add MyApp-iOS ios cordova
 </code></pre></div>
 <p><em>NOTE: Using the same app for iOS and Android may cause installation exceptions because the CodePush update package produced for iOS will have different content from the update produced for Android.</em></p>
 
@@ -726,7 +726,6 @@ you can run the following command:</p>
 
 <ol>
 <li>Rename or delete the app</li>
-<li>Transfer ownership of the app</li>
 <li>Create, rename or delete new deployments within the app</li>
 <li>Clear a deployment&rsquo;s release history</li>
 <li>Add or remove collaborators from the app (*)</li>
@@ -740,13 +739,6 @@ you can run the following command:</p>
 <p>If at any time you want to list all collaborators that have been added to an app, you can simply run the following command:</p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push collaborator ls &lt;appName&gt;
 </code></pre></div>
-<p>Finally, if at some point, you (as the app owner) will no longer be working on the app, and you want to transfer it to another developer (or a client), you can run the following command:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push app transfer &lt;appName&gt; &lt;newOwnerEmail&gt;
-</code></pre></div>
-<p><em>NOTE: Just like with the <code>code-push collaborator add</code> command, this expects that the new owner has already registered with CodePush using the specified e-mail address.</em></p>
-
-<p>Once confirmed, the specified developer becomes the app&rsquo;s owner and immediately receives the permissions associated with that role. Besides the transfer of ownership, nothing else about the app is modified (e.g. deployments, release history, collaborators). This means that you will still be a collaborator of the app, and therefore, if you want to remove yourself, you simply need to run the <code>code-push collaborator rm</code> command after successfully transferring ownership.</p>
-
 <h3>Deployment Management</h3>
 
 <p>From the CodePush perspective, an app is simply a named grouping for one or more things called &ldquo;deployments&rdquo;. While the app represents a conceptual &ldquo;namespace&rdquo; or &ldquo;scope&rdquo; for a platform-specific version of an app (e.g. the iOS port of Foo app), its deployments represent the actual target for releasing updates (for developers) and synchronizing updates (for end-users). Deployments allow you to have multiple &ldquo;environments&rdquo; for each app in-flight at any given time, and help model the reality that apps typically move from a dev&rsquo;s personal environment to a testing/QA/staging environment, before finally making their way into production.</p>
