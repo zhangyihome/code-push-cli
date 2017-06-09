@@ -14,6 +14,7 @@ CodePush is a cloud service that enables Cordova and React Native developers to 
     * [Proxy Support](#proxy-support)
 * [App Management](#app-management)
    * [App Collaboration](#app-collaboration)
+   * [Ownership Transfer](#ownership-transfer)
    * [Deployment Management](#deployment-management)
 * [Releasing Updates](#releasing-updates)
     * [Releasing Updates (General)](#releasing-updates-general)
@@ -150,8 +151,8 @@ code-push app add <appName> <os> <platform>
 If your app targets both iOS and Android, please *create separate apps for each platform* with CodePush (see the note below for details). This way, you can manage and release updates to them separately, which in the long run, also tends to make things simpler. The naming convention that most folks use is to suffix the app name with `-iOS` and `-Android`. For example:
 
 ```
-code-push app add MyApp-Android
-code-push app add MyApp-iOS
+code-push app add MyApp-Android android cordova
+code-push app add MyApp-iOS ios react-native
 ```
 
 *NOTE: Using the same app for iOS and Android may cause installation exceptions because the CodePush update package produced for iOS will have different content from the update produced for Android.*
@@ -220,13 +221,23 @@ If at any time you want to list all collaborators that have been added to an app
 code-push collaborator ls <appName>
 ```
 
+### Ownership Transfer
+
+The update to version 2.0.0.0 saw the removal of the `app transfer` commmand. You may still transfer ownership of your applications by managing the transfer through an organization. This requires that you visit [Mobile Center](https://mobile.azure.com) and execute a few steps.
+
+1. Go to to [https://mobile.azure.com](https://mobile.azure.com) and create a new organization.
+2. Invite the person you to whom you wish to transfer the app to the organization. Once they have accepted the invitation change their access permissions to "Admin". 
+3. Navigate to your app and click on the "Manage App" button (top right when on the "Getting Started" page for the app). Hit the Transfer button there to transfer the app to the org. Note that currently this operation cannot be reversed, although this will change in the future.
+4. Once your invitee has accepted, select the organization that you created and remove yourself from it.
+
+
 ### Deployment Management
 
 From the CodePush perspective, an app is simply a named grouping for one or more things called "deployments". While the app represents a conceptual "namespace" or "scope" for a platform-specific version of an app (e.g. the iOS port of Foo app), its deployments represent the actual target for releasing updates (for developers) and synchronizing updates (for end-users). Deployments allow you to have multiple "environments" for each app in-flight at any given time, and help model the reality that apps typically move from a dev's personal environment to a testing/QA/staging environment, before finally making their way into production.
 
 *NOTE: As you'll see below, the `release`, `promote` and `rollback` commands require both an app name and a deployment name is order to work, because it is the combination of the two that uniquely identifies a point of distribution (e.g. I want to release an update of my iOS app to my beta testers).*
 
-Whenever an app is registered with the CodePush service, it includes two deployments by default: `Staging` and `Production`. This allows you to immediately begin releasing updates to an internal environment, where you can thoroughly test each update before pushing them out to your end-users. This workflow is critical for ensuring your releases are ready for mass-consumption, and is a practice that has been established in the web for a long time.
+Whenever an app is registered using the CLI, the CodePush service includes two deployments by default: `Staging` and `Production`. This allows you to immediately begin releasing updates to an internal environment (Staging), where you can thoroughly test each update before pushing them out to your end-users (Production). This workflow is critical for ensuring your releases are ready for mass-consumption, and is a practice that has been established in the web for a long time.
 
 If having a staging and production version of your app is enough to meet your needs, then you don't need to do anything else. However, if you want an alpha, dev, etc. deployment, you can easily create them using the following command:
 
