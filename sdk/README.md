@@ -41,7 +41,7 @@ The `code-push` module exports a single class (typically referred to as `CodePus
 
 - __addAccessKey(description: string): Promise&lt;AccessKey&gt;__ - Creates a new access key with the specified description (e.g. "VSTS CI").
 
-- __addApp(appName: string): Promise&lt;App&gt;__ - Creates a new CodePush app with the specified name.
+- __addApp(name: string, os: string, platform: string, manuallyProvisionDeployments: boolean = false): Promise&lt;App&gt;__ - Creates a new CodePush app with the specified name, os, and platform. If the default deployments of "Staging" and "Production" are not desired, pass a value of true for the manuallyProvisionDesployments parameter.
 
 - __addCollaborator(appName: string, email: string): Promise&lt;void&gt;__ - Adds the specified CodePush user as a collaborator to the specified CodePush app.
 
