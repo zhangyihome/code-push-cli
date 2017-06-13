@@ -102,8 +102,6 @@ If you need to be able to authenticate against the CodePush service without laun
 code-push access-key add "VSTS Integration"
 ```
 
-By default, access keys expire in 60 days. You can specify a different expiry duration by using the `--ttl` option and passing in a [human readable duration string](https://github.com/jkroso/parse-duration#parsestr) (e.g. "2d" => 2 days, "1h 15 min" => 1 hour and 15 minutes). For security, the key will only be shown once on creation, so remember to save it somewhere if needed!
-
 After creating the new key, you can specify its value using the `--accessKey` flag of the `login` command, which allows you to perform "headless" authentication, as opposed to launching a browser.
 
 ```shell
@@ -111,14 +109,6 @@ code-push login --accessKey <accessKey>
 ```
 
 When logging in via this method, the access key will not be automatically invalidated on logout, and can be used in future sessions until it is explicitly removed from the CodePush server or expires. However, it is still recommended that you log out once your session is complete, in order to remove your credentials from disk.
-
-Finally, if at any point you need to change a key's name and/or expiration date, you can use the following command:
-
-```shell
-code-push access-key patch <accessKeyName> --name "new name" --ttl 10d
-```
-
-*NOTE: When patching the TTL of an existing access key, its expiration date will be set relative to the current time, with no regard for its previous value.*
 
 ### Proxy Support
 
