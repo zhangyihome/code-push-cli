@@ -4,13 +4,82 @@
  <title>CodePush</title>
  <link href="http://microsoft.github.io/code-push/blog/atom.xml" rel="self"/>
  <link href="http://microsoft.github.io/code-push/blog/"/>
- <updated>2017-06-15T13:52:14-07:00</updated>
+ <updated>2017-06-15T13:52:51-07:00</updated>
  <id>http://microsoft.github.io/code-push/blog</id>
  <author>
    <name></name>
    <email></email>
  </author>
 
+ 
+ <entry>
+   <title>Mobile Center now supports CodePush</title>
+   <link href="http://microsoft.github.io/code-push/blog/articles/MobileCenterWalkThrough.html"/>
+   <updated>2017-06-15T00:00:00-07:00</updated>
+   <id>http://microsoft.github.io/code-push/blog/articles/MobileCenterWalkThrough</id>
+   <content type="html">&lt;h3&gt;Getting Started&lt;/h3&gt;
+
+&lt;p&gt;On June 2nd we &lt;a href=&quot;http://microsoft.github.io/code-push/articles/CodePushOnMobileCenter.html&quot;&gt;moved&lt;/a&gt; CodePush over to Mobile Center in order to provide the project with greater resources, exposure, and tooling beyond what we offer in the command line interface (CLI). We now would like to give you a brief tour of what you can expect. First, we encourage you to install the latest version of the CLI. Start by running &lt;code&gt;code-push -v&lt;/code&gt; from the command line. If your version number is less than 2, then update code-push by running &lt;code&gt;npm install -g code-push&lt;/code&gt;.
+&lt;br/&gt;&lt;br/&gt;
+Even though existing users can continue to use previous versions of the CLI with their old apps, some things have changed and will ultimately require them to upgrade - for instance, new apps can&amp;rsquo;t be added through pre-2.0 versions of the CLI as Mobile Center requires OS and platform information in order to present the best user experience. 
+&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h3&gt;Time for Mobile Center&lt;/h3&gt;
+
+&lt;p&gt;Now that you have the latest version of the CLI (and even if you don&amp;rsquo;t), visit &lt;a href=&quot;https://mobile.azure.com&quot;&gt;Mobile Center&lt;/a&gt;. If you are not logged in and/or have not created an account, you will be able to use the account and credentials that you set up with CodePush. If you had &lt;em&gt;both&lt;/em&gt; a CodePush and Mobile Center account that shared an email address, then you should find the accounts merged upon login. 
+&lt;br/&gt;&lt;br/&gt;
+Once you login, the first thing you will see is a list of all your applications. If you had a previous CodePush application, you should find it listed and annotated.
+&lt;br/&gt;&lt;br/&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/26582198/27192390-063471a0-51b0-11e7-89b0-605c0cf80c69.png&quot; alt=&quot;All Your Apps&quot;&gt;
+&lt;br/&gt;&lt;br/&gt;
+Imported CodePush apps require that you specify their OS and Platform so that Mobile Center knows how to handle them. 
+&lt;br/&gt;&lt;br/&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/26582198/27060055-34f59d34-4f8f-11e7-9e38-7c1b928a08da.png&quot; alt=&quot;Import&quot;&gt;
+&lt;br/&gt;&lt;br/&gt;
+If you specify that your app is a Cordova or Windows application, you may notice that we don&amp;rsquo;t yet support these platforms; if this is the case, please do not despair. Mobile Center&amp;rsquo;s mission is to provide quality support for as many mobile platforms as possible; we are working hard to make it so. Periodically check out our &lt;a href=&quot;https://engineering.mobile.azure.com/&quot;&gt;blog&lt;/a&gt; for news and updates and our product &lt;a href=&quot;https://docs.microsoft.com/en-us/mobile-center/general/roadmap&quot;&gt;roadmap&lt;/a&gt;.
+&lt;br/&gt;&lt;br/&gt;
+If your imported app&amp;rsquo;s platform is React Native or if you are starting a new React Native app from scratch, you should see an app overview panel that lets you manage your app and provides you with instruction on how to integrate other Mobile Center SDKs. Please note that your app secret is &lt;em&gt;not&lt;/em&gt; the same as your CodePush deployment keys; the latter can be discovered by running &lt;code&gt;code-push deployment ls &amp;lt;appName&amp;gt; -k&lt;/code&gt; from the CLI and soon will also be exposed in the Mobile Center dashboard.
+&lt;br/&gt;&lt;br/&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/26582198/27110358-9313d3c6-505d-11e7-81f7-3b87652b2edb.png&quot; alt=&quot;App Overview&quot;&gt;
+&lt;br/&gt;&lt;br/&gt;
+These SDKs allow your app to take advantage of the rich service suites that you see listed on the side nav:
+&lt;br/&gt;&lt;br/&gt;
+1. &lt;strong&gt;Cloud Build&lt;/strong&gt; services for iOS, Android, Xamarin, and React Native&lt;br/&gt;
+2. &lt;strong&gt;Automated UI Testing&lt;/strong&gt; with stack traces and screenshots of errors&lt;br/&gt;
+3. &lt;strong&gt;Distribution&lt;/strong&gt; to beta testers without submitting to the app store&lt;br/&gt;
+4. &lt;strong&gt;Analytics&lt;/strong&gt; to measure user engagement by device, geographic region, app version number, custom events, etc.&lt;br/&gt;
+5. &lt;strong&gt;Crash &amp;amp; Error&lt;/strong&gt; Reporting with full stack traces in native code and source maps for JavaScript&lt;br/&gt;
+6. &lt;strong&gt;Push Notifications&lt;/strong&gt; segmented by device characteristics and user behavior
+&lt;br/&gt;&lt;br/&gt;
+ Clicking on any one of these will display further, service-specific instruction and/or controls. If anything isn&amp;rsquo;t obvious, you can also click on your user name in the lower left-hand corner of the screen and select &lt;a href=&quot;https://docs.microsoft.com/en-us/mobile-center/&quot;&gt;Docs &amp;amp; APIs&lt;/a&gt;.
+&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h3&gt;Where&amp;rsquo;s CodePush?&lt;/h3&gt;
+
+&lt;p&gt;You will find CodePush under Distribute. If your app has a history of releases in a given deployment, you will see them there. You can switch between deployments using the dropdown at the upper right-hand corner of the screen and if you select a release you will see a pane displaying metrics and details for it. 
+&lt;br/&gt;&lt;br/&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/26582198/27064699-8db89192-4fad-11e7-9521-c28c388b7636.png&quot; alt=&quot;Release Detail&quot;&gt;
+&lt;br/&gt;&lt;br/&gt;
+Clicking the &amp;ldquo;Edit&amp;rdquo; button will provide you with a panel for patching your release.
+&lt;br/&gt;&lt;br/&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/26582198/27064765-e206f40a-4fad-11e7-8b34-5e1f0bbb161a.png&quot; alt=&quot;Release Patch&quot;&gt;
+&lt;br/&gt;&lt;br/&gt;
+Developers using CodePush must continue to distribute releases using the release commands in the CLI, but we are looking into extending this functionality to the Mobile Center dashboard. Please note that if you create your React Native app using the dashboard, you &lt;em&gt;first&lt;/em&gt; will have to create default deployments using Mobile Center.
+&lt;br/&gt;&lt;br/&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/26582198/27160991-126d84b2-512d-11e7-960a-da98d72a719b.png&quot; alt=&quot;CreateDeployments&quot;&gt;
+&lt;br/&gt;&lt;br/&gt;
+or using the CLI command &lt;code&gt;code-push deployment add &amp;lt;appName&amp;gt; --default&lt;/code&gt; prior to pushing out a release. Release commands remain unchanged; you can update your React Native app by executing &lt;code&gt;code-push release-react &amp;lt;appName&amp;gt; &amp;lt;platform&amp;gt; [options]&lt;/code&gt;. For examples of how to execute release commands and explanations of the options, run &lt;code&gt;code-push release-react&lt;/code&gt; or &lt;code&gt;code-push release&lt;/code&gt;. 
+&lt;br/&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h3&gt;What&amp;rsquo;s next?&lt;/h3&gt;
+
+&lt;p&gt;We are planning several updates to CodePush including deployment management in the dashboard, bundle signing, and other features, but we really would like your feedback about what you would like to see next. Please let us know even - especially if it is to let us know that something isn&amp;rsquo;t working for you. Email us at &lt;a href=&quot;mailto:codepush@microsoft.com?subject=CodePush%20Feature%20Suggestion&quot;&gt;&lt;a href=&quot;mailto:codepush@microsoft.com&quot;&gt;codepush@microsoft.com&lt;/a&gt;&lt;/a&gt; or use the Intercom widget at the bottom right-hand corner of the screen on Mobile Center.
+&lt;br/&gt;&lt;br/&gt;
+&lt;img src=&quot;https://user-images.githubusercontent.com/26582198/27064939-d0b2f81a-4fae-11e7-8d2d-52df1904a884.png&quot; alt=&quot;Intercom&quot;&gt;
+&lt;br/&gt;&lt;br/&gt;
+Going forward the CodePush team will continue to provide you with the &lt;em&gt;free&lt;/em&gt; standalone service that you know and love from its new home in Mobile Center.&lt;/p&gt;
+</content>
+ </entry>
  
  <entry>
    <title>CodePush is Moving to Mobile Center</title>

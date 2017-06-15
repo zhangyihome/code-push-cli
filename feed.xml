@@ -7,6 +7,20 @@
 		<atom:link href="http://microsoft.github.io/code-push/blog/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
+				<title>Mobile Center now supports CodePush</title>
+				
+					<dc:creator>Ian Geoghegan</dc:creator>
+				        
+				
+					<description>&lt;h3&gt;Getting Started&lt;/h3&gt;
+</description>
+				
+				<pubDate>Thu, 15 Jun 2017 00:00:00 -0700</pubDate>
+				<link>http://microsoft.github.io/code-push/blog/articles/MobileCenterWalkThrough.html</link>
+				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/MobileCenterWalkThrough.html</guid>
+			</item>
+		
+			<item>
 				<title>CodePush is Moving to Mobile Center</title>
 				
 					<dc:creator>Ian Geoghegan</dc:creator>

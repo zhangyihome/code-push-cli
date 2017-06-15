@@ -6,23 +6,23 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta property="og:title" content="CodePush" />
   <meta property="og:site_name" content="CodePush"/>
-  <meta property="og:description" content="CodePush Blog" />
+  <meta property="og:description" content="Getting Started" />
   <meta property="og:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG" />
   
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@Microsoft">
   <meta name="twitter:title" content="CodePush">
-  <meta name="twitter:description" content="CodePush Blog">
+  <meta name="twitter:description" content="Getting Started">
   <meta name="twitter:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG">
 
   <!-- Enable responsiveness on mobile devices-->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
   <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
-  <meta name="description" content="CodePush Blog">
+  <meta name="description" content="Getting Started">
 
   <title>
     
-      Blog &middot; CodePush
+      Mobile Center now supports CodePush &middot; CodePush
     
   </title>
   
@@ -104,7 +104,7 @@
 				<li class=""><a href="/code-push/index.html#getting_started">Getting Started</a></li>
 				<li class=""><a href="/code-push/docs/index.html">Documentation</a></li>
 		        <li class=""><a href="/code-push/faq/index.html">FAQ</a></li>
-				<li class=" active "><a href="/code-push/blog/index.html">Blog</a></li>
+				<li class=""><a href="/code-push/blog/index.html">Blog</a></li>
                 <li class=""><a href="/code-push/community/friends.html">Showcase</a></li>
 		      </ul>
 		    </div><!-- /.navbar-collapse -->
@@ -112,137 +112,79 @@
 	</nav>				   		
 </header>
 <div class="top_navbar_spacer"></div>
-	<div class="blog">
-  <div id="content" class="container main_content">
-     <div class="row">
-        <div class="col-md-10 col-md-offset-1 blog-list">  
-		      <div class="blogHeader">
-  <h1>Blog</h1>
-  
-    <div>
-      <img src="/code-push/assets/images/subscribe.png">
-      <a href="/code-push/feed.xml">Subscribe</a>
+	<div class="post">
+    <div id="content" class="container main_content">   
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1"> 
+                <div class="post-header">
+                    <h1>Mobile Center now supports CodePush</h1>
+                    <span class="date">15 Jun 2017</span><span>&nbsp;- by</span><span class="author"><a href="https://twitter.com/mscodepush">Ian Geoghegan</a></span>
+                </div>
+                <h3>Getting Started</h3>
+
+<p>On June 2nd we <a href="http://microsoft.github.io/code-push/articles/CodePushOnMobileCenter.html">moved</a> CodePush over to Mobile Center in order to provide the project with greater resources, exposure, and tooling beyond what we offer in the command line interface (CLI). We now would like to give you a brief tour of what you can expect. First, we encourage you to install the latest version of the CLI. Start by running <code>code-push -v</code> from the command line. If your version number is less than 2, then update code-push by running <code>npm install -g code-push</code>.
+<br/><br/>
+Even though existing users can continue to use previous versions of the CLI with their old apps, some things have changed and will ultimately require them to upgrade - for instance, new apps can&rsquo;t be added through pre-2.0 versions of the CLI as Mobile Center requires OS and platform information in order to present the best user experience. 
+<br/><br/></p>
+
+<h3>Time for Mobile Center</h3>
+
+<p>Now that you have the latest version of the CLI (and even if you don&rsquo;t), visit <a href="https://mobile.azure.com">Mobile Center</a>. If you are not logged in and/or have not created an account, you will be able to use the account and credentials that you set up with CodePush. If you had <em>both</em> a CodePush and Mobile Center account that shared an email address, then you should find the accounts merged upon login. 
+<br/><br/>
+Once you login, the first thing you will see is a list of all your applications. If you had a previous CodePush application, you should find it listed and annotated.
+<br/><br/>
+<img src="https://user-images.githubusercontent.com/26582198/27192390-063471a0-51b0-11e7-89b0-605c0cf80c69.png" alt="All Your Apps">
+<br/><br/>
+Imported CodePush apps require that you specify their OS and Platform so that Mobile Center knows how to handle them. 
+<br/><br/>
+<img src="https://user-images.githubusercontent.com/26582198/27060055-34f59d34-4f8f-11e7-9e38-7c1b928a08da.png" alt="Import">
+<br/><br/>
+If you specify that your app is a Cordova or Windows application, you may notice that we don&rsquo;t yet support these platforms; if this is the case, please do not despair. Mobile Center&rsquo;s mission is to provide quality support for as many mobile platforms as possible; we are working hard to make it so. Periodically check out our <a href="https://engineering.mobile.azure.com/">blog</a> for news and updates and our product <a href="https://docs.microsoft.com/en-us/mobile-center/general/roadmap">roadmap</a>.
+<br/><br/>
+If your imported app&rsquo;s platform is React Native or if you are starting a new React Native app from scratch, you should see an app overview panel that lets you manage your app and provides you with instruction on how to integrate other Mobile Center SDKs. Please note that your app secret is <em>not</em> the same as your CodePush deployment keys; the latter can be discovered by running <code>code-push deployment ls &lt;appName&gt; -k</code> from the CLI and soon will also be exposed in the Mobile Center dashboard.
+<br/><br/>
+<img src="https://user-images.githubusercontent.com/26582198/27110358-9313d3c6-505d-11e7-81f7-3b87652b2edb.png" alt="App Overview">
+<br/><br/>
+These SDKs allow your app to take advantage of the rich service suites that you see listed on the side nav:
+<br/><br/>
+1. <strong>Cloud Build</strong> services for iOS, Android, Xamarin, and React Native<br/>
+2. <strong>Automated UI Testing</strong> with stack traces and screenshots of errors<br/>
+3. <strong>Distribution</strong> to beta testers without submitting to the app store<br/>
+4. <strong>Analytics</strong> to measure user engagement by device, geographic region, app version number, custom events, etc.<br/>
+5. <strong>Crash &amp; Error</strong> Reporting with full stack traces in native code and source maps for JavaScript<br/>
+6. <strong>Push Notifications</strong> segmented by device characteristics and user behavior
+<br/><br/>
+ Clicking on any one of these will display further, service-specific instruction and/or controls. If anything isn&rsquo;t obvious, you can also click on your user name in the lower left-hand corner of the screen and select <a href="https://docs.microsoft.com/en-us/mobile-center/">Docs &amp; APIs</a>.
+<br/><br/></p>
+
+<h3>Where&rsquo;s CodePush?</h3>
+
+<p>You will find CodePush under Distribute. If your app has a history of releases in a given deployment, you will see them there. You can switch between deployments using the dropdown at the upper right-hand corner of the screen and if you select a release you will see a pane displaying metrics and details for it. 
+<br/><br/>
+<img src="https://user-images.githubusercontent.com/26582198/27064699-8db89192-4fad-11e7-9521-c28c388b7636.png" alt="Release Detail">
+<br/><br/>
+Clicking the &ldquo;Edit&rdquo; button will provide you with a panel for patching your release.
+<br/><br/>
+<img src="https://user-images.githubusercontent.com/26582198/27064765-e206f40a-4fad-11e7-8b34-5e1f0bbb161a.png" alt="Release Patch">
+<br/><br/>
+Developers using CodePush must continue to distribute releases using the release commands in the CLI, but we are looking into extending this functionality to the Mobile Center dashboard. Please note that if you create your React Native app using the dashboard, you <em>first</em> will have to create default deployments using Mobile Center.
+<br/><br/>
+<img src="https://user-images.githubusercontent.com/26582198/27160991-126d84b2-512d-11e7-960a-da98d72a719b.png" alt="CreateDeployments">
+<br/><br/>
+or using the CLI command <code>code-push deployment add &lt;appName&gt; --default</code> prior to pushing out a release. Release commands remain unchanged; you can update your React Native app by executing <code>code-push release-react &lt;appName&gt; &lt;platform&gt; [options]</code>. For examples of how to execute release commands and explanations of the options, run <code>code-push release-react</code> or <code>code-push release</code>. 
+<br/><br/></p>
+
+<h3>What&rsquo;s next?</h3>
+
+<p>We are planning several updates to CodePush including deployment management in the dashboard, bundle signing, and other features, but we really would like your feedback about what you would like to see next. Please let us know even - especially if it is to let us know that something isn&rsquo;t working for you. Email us at <a href="mailto:codepush@microsoft.com?subject=CodePush%20Feature%20Suggestion"><a href="mailto:codepush@microsoft.com">codepush@microsoft.com</a></a> or use the Intercom widget at the bottom right-hand corner of the screen on Mobile Center.
+<br/><br/>
+<img src="https://user-images.githubusercontent.com/26582198/27064939-d0b2f81a-4fae-11e7-8d2d-52df1904a884.png" alt="Intercom">
+<br/><br/>
+Going forward the CodePush team will continue to provide you with the <em>free</em> standalone service that you know and love from its new home in Mobile Center.</p>
+
+            </div>
+        </div>
     </div>
-  
-</div>
-<ul class="posts">
-  
-  <li>
-    <header>
-      <div class="adorner"></div>
-      <div>
-        <div class="title"><a href="/code-push/articles/MobileCenterWalkThrough.html">Mobile Center now supports CodePush</a></div>
-        <div><span class="date">15 Jun 2017</span><span>&nbsp;- by</span><span class="author"><a href="https://twitter.com/mscodepush">Ian Geoghegan</a></span></div>
-      </div>
-    </header>
-    <section class="post-excerpt">
-      <p>Getting Started On June 2nd we moved CodePush over to Mobile Center in order to provide the project with greater resources, exposure, and tooling beyond what we offer in the command line interface (CLI). We now would like to give you a brief tour of what you can expect. First, we encourage you to install the latest version of the CLI. Start by running code-push -v from the command line. If your version number is less than 2, then update...</p>
-      <div><a href="/code-push/articles/MobileCenterWalkThrough.html">More...</a></div>
-    </section>
-  </li>
-  
-  <li>
-    <header>
-      <div class="adorner"></div>
-      <div>
-        <div class="title"><a href="/code-push/articles/CodePushOnMobileCenter.html">CodePush is Moving to Mobile Center</a></div>
-        <div><span class="date">01 Jun 2017</span><span>&nbsp;- by</span><span class="author"><a href="https://twitter.com/mscodepush">Ian Geoghegan</a></span></div>
-      </div>
-    </header>
-    <section class="post-excerpt">
-      <p>Your favorite rapid deployment service is moving up in the world. The move to Mobile Center will bring additional resources and focus to bear as well as an additional user interface for executing CodePush commands. The migration itself will result in a planned service outage of about two to three hours on June 2nd, 2017 starting at approximately 8 PM GMT. Once the move has completed, we encourage you to check out Mobile Center and let us know what you...</p>
-      <div><a href="/code-push/articles/CodePushOnMobileCenter.html">More...</a></div>
-    </section>
-  </li>
-  
-  <li>
-    <header>
-      <div class="adorner"></div>
-      <div>
-        <div class="title"><a href="/code-push/articles/NewReleases.html">New updates for CodePush and React Native Module for CodePush</a></div>
-        <div><span class="date">27 Mar 2017</span><span>&nbsp;- by</span><span class="author"><a href="https://twitter.com/mscodepush">Ian Geoghegan</a></span></div>
-      </div>
-    </header>
-    <section class="post-excerpt">
-      <p>Over the last thirty days, we&rsquo;ve released several significant updates to both CodePush and the React Native Module for CodePush that we think you&rsquo;ll like. CodePush boasts several new features, including the abililty to specify Node parameters to the release-react command, the ability to specify bundle and sourcemap destination, deployment promotion based on labels, and a release build type for Apache Cordova builds. The React Native Module for CodePush now includes support for React Native Windows .NET 4.6. Both products...</p>
-      <div><a href="/code-push/articles/NewReleases.html">More...</a></div>
-    </section>
-  </li>
-  
-  <li>
-    <header>
-      <div class="adorner"></div>
-      <div>
-        <div class="title"><a href="/code-push/articles/ReactNativeWindows.html">React Native for Windows + CodePush</a></div>
-        <div><span class="date">13 Apr 2016</span><span>&nbsp;- by</span><span class="author"><a href="https://twitter.com/lostintangent">Jonathan Carter</a></span></div>
-      </div>
-    </header>
-    <section class="post-excerpt">
-      <p>We&rsquo;re very excited about today&rsquo;s announcement at F8 2016 that Universal Windows Platform support is coming to React Native! The CodePush team has been fortunate enough to work with thousands of developers in the React Native community, and the ability to target your app(s) at any Windows 10 device is an awesome opportunity that we look forward to seeing folks begin to take advantage of. Along with this announcement, we have also published a very early version of Windows support...</p>
-      <div><a href="/code-push/articles/ReactNativeWindows.html">More...</a></div>
-    </section>
-  </li>
-  
-  <li>
-    <header>
-      <div class="adorner"></div>
-      <div>
-        <div class="title"><a href="/code-push/articles/DevOpsExp.html">Web-like release agility for React Native Apps</a></div>
-        <div><span class="date">22 Feb 2016</span><span>&nbsp;- by</span><span class="author"><a href="https://twitter.com/rub8n">Ruben Rios</a></span></div>
-      </div>
-    </header>
-    <section class="post-excerpt">
-      <p>It’s been a few months since we opened up our beta program and we couldn’t be happier about all the support and excitement we&rsquo;ve seen from the community! Thanks to your feedback we have made tons of fixes and added features to enable new scenarios that aim to make your React Native development cycle that much better. In lieu of the ReactJS Conf 2016, we want to emphasize how much we care about this community and making your DevOps experience...</p>
-      <div><a href="/code-push/articles/DevOpsExp.html">More...</a></div>
-    </section>
-  </li>
-  
-  <li>
-    <header>
-      <div class="adorner"></div>
-      <div>
-        <div class="title"><a href="/code-push/articles/OpenBeta.html">CodePush enters "open beta"</a></div>
-        <div><span class="date">18 Nov 2015</span><span>&nbsp;- by</span><span class="author"><a href="https://twitter.com/lostintangent">Jonathan Carter</a></span></div>
-      </div>
-    </header>
-    <section class="post-excerpt">
-      <p>It&rsquo;s been roughly a month since we first released the CodePush &ldquo;closed beta&rdquo;, and we&rsquo;ve received an unbelievable amount of support from the community in evaluating the service, filing bugs, giving feedback and helping improve overall quality. However, the amount of interest in the service far outweighed our expectations, and unfortunately, our ability to keep up with approving (and reaching out to) the incoming requests quickly became slower than we would have liked. Sorry to everyone that had to wait...</p>
-      <div><a href="/code-push/articles/OpenBeta.html">More...</a></div>
-    </section>
-  </li>
-  
-  <li>
-    <header>
-      <div class="adorner"></div>
-      <div>
-        <div class="title"><a href="/code-push/articles/CDWithCodePushAndVSTS.html">Continuous Delivery with CodePush and VSTS</a></div>
-        <div><span class="date">18 Nov 2015</span><span>&nbsp;- by</span><span class="author"><a href="https://twitter.com/lostintangent">Jonathan Carter</a></span></div>
-      </div>
-    </header>
-    <section class="post-excerpt">
-      <p>While the CodePush CLI provides a simple experience for managing your account, it could become pretty tedious doing manual deployments every time you need to release an update, particularly if you want to keep your dev/staging/etc. deployments always current. To better enable scripting a custom continuous delivery solution from your CI environment (e.g. Travis), we enhanced the CLI in the 1.1 release with the ability to create access keys and authenticate with them &ldquo;headlessly&rdquo;, but we wanted to make it...</p>
-      <div><a href="/code-push/articles/CDWithCodePushAndVSTS.html">More...</a></div>
-    </section>
-  </li>
-  
-  <li>
-    <header>
-      <div class="adorner"></div>
-      <div>
-        <div class="title"><a href="/code-push/articles/CodePush1.1.html">CodePush 1.1 (beta) released</a></div>
-        <div><span class="date">04 Nov 2015</span><span>&nbsp;- by</span><span class="author"><a href="https://twitter.com/lostintangent">Jonathan Carter</a></span></div>
-      </div>
-    </header>
-    <section class="post-excerpt">
-      <p>As part of our commitment to respond quickly to all of the great developer feedback we&rsquo;ve been getting, we&rsquo;ve released an update to the CodePush service, management CLI and client SDKs for both Cordova and React Native. You can update any of these components immediately via NPM, and then refer to the docs, which have been updated to account for the changes. The 1.1 update includes a handful of bug fixes (thanks for everyone who helped report issues!) that we...</p>
-      <div><a href="/code-push/articles/CodePush1.1.html">More...</a></div>
-    </section>
-  </li>
-  
-</ul>        
-        </div>  
-     </div> 
-  </div>
 </div>
 	<footer>
     <div class="footer-container">
