@@ -15,7 +15,7 @@
 					<description>&lt;h3&gt;Getting Started&lt;/h3&gt;
 </description>
 				
-				<pubDate>Thu, 15 Jun 2017 00:00:00 -0700</pubDate>
+				<pubDate>Thu, 15 Jun 2017 00:00:00 -0400</pubDate>
 				<link>http://microsoft.github.io/code-push/blog/articles/MobileCenterWalkThrough.html</link>
 				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/MobileCenterWalkThrough.html</guid>
 			</item>
@@ -29,7 +29,7 @@
 					<description>&lt;p&gt;Your favorite rapid deployment service is moving up in the world. The move to Mobile Center will bring additional resources and focus to bear as well as an additional user interface for executing CodePush commands. The migration itself will result in a &lt;b&gt;&lt;i&gt;planned service outage of about two to three hours on June 2nd, 2017 starting at approximately 8 PM GMT.&lt;/i&gt;&lt;/b&gt; &lt;br/&gt;&lt;br/&gt;Once the move has completed, we encourage you to check out &lt;a href=&quot;https://mobile.azure.com&quot;&gt;Mobile Center&lt;/a&gt; and let us know what you think of the services we offer and our CodePush MVP.&lt;/p&gt;
 </description>
 				
-				<pubDate>Thu, 01 Jun 2017 00:00:00 -0700</pubDate>
+				<pubDate>Thu, 01 Jun 2017 00:00:00 -0400</pubDate>
 				<link>http://microsoft.github.io/code-push/blog/articles/CodePushOnMobileCenter.html</link>
 				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/CodePushOnMobileCenter.html</guid>
 			</item>
@@ -43,7 +43,7 @@
 					<description>&lt;p&gt;Over the last thirty days, we&amp;rsquo;ve released several significant updates to both CodePush and the React Native Module for CodePush that we think you&amp;rsquo;ll like. CodePush boasts several new features, including the abililty to specify Node parameters to the release-react command, the ability to specify bundle and sourcemap destination, deployment promotion based on labels, and a release build type for Apache Cordova builds. The React Native Module for CodePush now includes support for React Native Windows .NET 4.6. Both products also have seen numerous bug fixes. Check out &lt;a href=&quot;https://github.com/Microsoft/code-push/releases&quot;&gt;CodePush&lt;/a&gt; and the &lt;a href=&quot;https://github.com/Microsoft/react-native-code-push/releases&quot;&gt;Module&lt;/a&gt; release notes for details and the new and improved &lt;a href=&quot;https://github.com/Microsoft/react-native-code-push/blob/master/README.md&quot;&gt;documentation&lt;/a&gt; for the React Native Module for CodePush. &lt;/p&gt;
 </description>
 				
-				<pubDate>Mon, 27 Mar 2017 00:00:00 -0700</pubDate>
+				<pubDate>Mon, 27 Mar 2017 00:00:00 -0400</pubDate>
 				<link>http://microsoft.github.io/code-push/blog/articles/NewReleases.html</link>
 				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/NewReleases.html</guid>
 			</item>
@@ -57,7 +57,7 @@
 					<description>&lt;p&gt;We&amp;rsquo;re very excited about today&amp;rsquo;s announcement at &lt;a href=&quot;https://www.fbf8.com&quot;&gt;F8 2016&lt;/a&gt; that &lt;a href=&quot;https://blogs.windows.com/buildingapps/2016/04/13/react-native-on-the-universal-windows-platform&quot;&gt;Universal Windows Platform support is coming to React Native&lt;/a&gt;! The CodePush team has been fortunate enough to work with thousands of developers in the React Native community, and the ability to target your app(s) at any Windows 10 device is an awesome opportunity that we look forward to seeing folks begin to take advantage of.&lt;/p&gt;
 </description>
 				
-				<pubDate>Wed, 13 Apr 2016 00:00:00 -0700</pubDate>
+				<pubDate>Wed, 13 Apr 2016 00:00:00 -0400</pubDate>
 				<link>http://microsoft.github.io/code-push/blog/articles/ReactNativeWindows.html</link>
 				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/ReactNativeWindows.html</guid>
 			</item>
@@ -71,7 +71,7 @@
 					<description>&lt;p&gt;It’s been a few months since we opened up our beta program and we couldn’t be happier about all the support and excitement we&amp;rsquo;ve seen from the community! Thanks to your feedback we have made tons of fixes and added features to enable new scenarios that aim to make your React Native development cycle that much better. &lt;/p&gt;
 </description>
 				
-				<pubDate>Mon, 22 Feb 2016 00:00:00 -0800</pubDate>
+				<pubDate>Mon, 22 Feb 2016 00:00:00 -0500</pubDate>
 				<link>http://microsoft.github.io/code-push/blog/articles/DevOpsExp.html</link>
 				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/DevOpsExp.html</guid>
 			</item>
@@ -85,7 +85,7 @@
 					<description>&lt;p&gt;It&amp;rsquo;s been roughly a month since we first released the CodePush &amp;ldquo;closed beta&amp;rdquo;, and we&amp;rsquo;ve received an unbelievable amount of support from the community in evaluating the service, filing bugs, giving feedback and helping improve overall quality. However, the amount of interest in the service far outweighed our expectations, and unfortunately, our ability to keep up with approving (and reaching out to) the incoming requests quickly became slower than we would have liked. Sorry to everyone that had to wait a while to get access!&lt;/p&gt;
 </description>
 				
-				<pubDate>Wed, 18 Nov 2015 00:00:00 -0800</pubDate>
+				<pubDate>Wed, 18 Nov 2015 00:00:00 -0500</pubDate>
 				<link>http://microsoft.github.io/code-push/blog/articles/OpenBeta.html</link>
 				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/OpenBeta.html</guid>
 			</item>
@@ -99,7 +99,7 @@
 					<description>&lt;p&gt;While the &lt;a href=&quot;http://microsoft.github.io/code-push/docs/cli.html&quot;&gt;CodePush CLI&lt;/a&gt; provides a simple experience for managing your account, it could become pretty tedious doing manual deployments every time you need to release an update, particularly if you want to keep your dev/staging/etc. deployments always current. To better enable scripting a custom continuous delivery solution from your CI environment (e.g. Travis), we enhanced the CLI in the &lt;a href=&quot;http://microsoft.github.io/code-push/articles/CodePush1.1.html&quot;&gt;1.1 release&lt;/a&gt; with the ability to create access keys and authenticate with them &amp;ldquo;headlessly&amp;rdquo;, but we wanted to make it even simpler to automated this process E2E.&lt;/p&gt;
 </description>
 				
-				<pubDate>Wed, 18 Nov 2015 00:00:00 -0800</pubDate>
+				<pubDate>Wed, 18 Nov 2015 00:00:00 -0500</pubDate>
 				<link>http://microsoft.github.io/code-push/blog/articles/CDWithCodePushAndVSTS.html</link>
 				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/CDWithCodePushAndVSTS.html</guid>
 			</item>
@@ -113,7 +113,7 @@
 					<description>&lt;p&gt;As part of our commitment to respond quickly to all of the great developer feedback we&amp;rsquo;ve been getting, we&amp;rsquo;ve released an update to the CodePush service, management CLI and client SDKs for both Cordova and React Native. You can update any of these components immediately via NPM, and then refer to the docs, which have been updated to account for the changes.&lt;/p&gt;
 </description>
 				
-				<pubDate>Wed, 04 Nov 2015 00:00:00 -0800</pubDate>
+				<pubDate>Wed, 04 Nov 2015 00:00:00 -0500</pubDate>
 				<link>http://microsoft.github.io/code-push/blog/articles/CodePush1.1.html</link>
 				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/CodePush1.1.html</guid>
 			</item>
