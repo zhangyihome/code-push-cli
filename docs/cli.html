@@ -652,17 +652,11 @@ code-push session rm &lt;machineName&gt;
 <p>If you need to be able to authenticate against the CodePush service without launching a browser and/or without needing to use your GitHub and/or Microsoft credentials (e.g. in a CI environment), you can run the following command to create an &ldquo;access key&rdquo; (along with a name describing what it is for):</p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push access-key add &quot;VSTS Integration&quot;
 </code></pre></div>
-<p>By default, access keys expire in 60 days. You can specify a different expiry duration by using the <code>--ttl</code> option and passing in a <a href="https://github.com/jkroso/parse-duration#parsestr">human readable duration string</a> (e.g. &ldquo;2d&rdquo; =&gt; 2 days, &ldquo;1h 15 min&rdquo; =&gt; 1 hour and 15 minutes). For security, the key will only be shown once on creation, so remember to save it somewhere if needed!</p>
-
-<p>After creating the new key, you can specify its value using the <code>--accessKey</code> flag of the <code>login</code> command, which allows you to perform &ldquo;headless&rdquo; authentication, as opposed to launching a browser.</p>
+<p>For security, the key will only be shown once on creation, so remember to save it somewhere if needed!
+After creating the new key, you can specify its value using the <code>--accessKey</code> flag of the <code>login</code> command, which allows you to perform &ldquo;headless&rdquo; authentication, as opposed to launching a browser. </p>
 <div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push login --accessKey &lt;accessKey&gt;
 </code></pre></div>
-<p>When logging in via this method, the access key will not be automatically invalidated on logout, and can be used in future sessions until it is explicitly removed from the CodePush server or expires. However, it is still recommended that you log out once your session is complete, in order to remove your credentials from disk.</p>
-
-<p>Finally, if at any point you need to change a key&rsquo;s name and/or expiration date, you can use the following command:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push access-key patch &lt;accessKeyName&gt; --name &quot;new name&quot; --ttl 10d
-</code></pre></div>
-<p><em>NOTE: When patching the TTL of an existing access key, its expiration date will be set relative to the current time, with no regard for its previous value.</em></p>
+<p>When logging in via this method, the access key will not be automatically invalidated on logout, and can be used in future sessions until it is explicitly removed from the CodePush server. However, it is still recommended that you log out once your session is complete, in order to remove your credentials from disk.</p>
 
 <h3>Proxy Support</h3>
 
