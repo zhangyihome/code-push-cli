@@ -213,7 +213,7 @@ code-push collaborator ls <appName>
 
 ### Ownership Transfer
 
-The update to version 2.0.0.0 saw the removal of the `app transfer` commmand. You may still transfer ownership of your applications by managing the transfer through an organization. This requires that you visit [Mobile Center](https://mobile.azure.com) and execute a few steps.
+The update to version 2.0.0.0 saw the removal of the `app transfer` command. You may still transfer ownership of your applications by managing the transfer through an organization. This requires that you visit [Mobile Center](https://mobile.azure.com) and execute a few steps.
 
 1. Go to to [https://mobile.azure.com](https://mobile.azure.com) and create a new organization.
 2. Invite the person you to whom you wish to transfer the app to the organization. Once they have accepted the invitation change their access permissions to "Admin". 
