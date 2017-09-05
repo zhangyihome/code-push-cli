@@ -3,8 +3,8 @@
 	<channel>
 		<title>CodePush</title>
 		<description>CodePush Blog</description>		
-		<link>http://microsoft.github.io/code-push/blog</link>
-		<atom:link href="http://microsoft.github.io/code-push/blog/feed.xml" rel="self" type="application/rss+xml" />
+		<link></link>
+		<atom:link href="/feed.xml" rel="self" type="application/rss+xml" />
 		
 			<item>
 				<title>Mobile Center now supports CodePush</title>
@@ -16,8 +16,8 @@
 </description>
 				
 				<pubDate>Thu, 15 Jun 2017 00:00:00 +0300</pubDate>
-				<link>http://microsoft.github.io/code-push/blog/articles/MobileCenterWalkThrough.html</link>
-				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/MobileCenterWalkThrough.html</guid>
+				<link>/articles/MobileCenterWalkThrough.html</link>
+				<guid isPermaLink="true">/articles/MobileCenterWalkThrough.html</guid>
 			</item>
 		
 			<item>
@@ -30,8 +30,8 @@
 </description>
 				
 				<pubDate>Thu, 01 Jun 2017 00:00:00 +0300</pubDate>
-				<link>http://microsoft.github.io/code-push/blog/articles/CodePushOnMobileCenter.html</link>
-				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/CodePushOnMobileCenter.html</guid>
+				<link>/articles/CodePushOnMobileCenter.html</link>
+				<guid isPermaLink="true">/articles/CodePushOnMobileCenter.html</guid>
 			</item>
 		
 			<item>
@@ -44,8 +44,8 @@
 </description>
 				
 				<pubDate>Mon, 27 Mar 2017 00:00:00 +0300</pubDate>
-				<link>http://microsoft.github.io/code-push/blog/articles/NewReleases.html</link>
-				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/NewReleases.html</guid>
+				<link>/articles/NewReleases.html</link>
+				<guid isPermaLink="true">/articles/NewReleases.html</guid>
 			</item>
 		
 			<item>
@@ -58,8 +58,8 @@
 </description>
 				
 				<pubDate>Wed, 13 Apr 2016 00:00:00 +0300</pubDate>
-				<link>http://microsoft.github.io/code-push/blog/articles/ReactNativeWindows.html</link>
-				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/ReactNativeWindows.html</guid>
+				<link>/articles/ReactNativeWindows.html</link>
+				<guid isPermaLink="true">/articles/ReactNativeWindows.html</guid>
 			</item>
 		
 			<item>
@@ -72,8 +72,8 @@
 </description>
 				
 				<pubDate>Mon, 22 Feb 2016 00:00:00 +0300</pubDate>
-				<link>http://microsoft.github.io/code-push/blog/articles/DevOpsExp.html</link>
-				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/DevOpsExp.html</guid>
+				<link>/articles/DevOpsExp.html</link>
+				<guid isPermaLink="true">/articles/DevOpsExp.html</guid>
 			</item>
 		
 			<item>
@@ -86,8 +86,8 @@
 </description>
 				
 				<pubDate>Wed, 18 Nov 2015 00:00:00 +0300</pubDate>
-				<link>http://microsoft.github.io/code-push/blog/articles/OpenBeta.html</link>
-				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/OpenBeta.html</guid>
+				<link>/articles/OpenBeta.html</link>
+				<guid isPermaLink="true">/articles/OpenBeta.html</guid>
 			</item>
 		
 			<item>
@@ -100,8 +100,8 @@
 </description>
 				
 				<pubDate>Wed, 18 Nov 2015 00:00:00 +0300</pubDate>
-				<link>http://microsoft.github.io/code-push/blog/articles/CDWithCodePushAndVSTS.html</link>
-				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/CDWithCodePushAndVSTS.html</guid>
+				<link>/articles/CDWithCodePushAndVSTS.html</link>
+				<guid isPermaLink="true">/articles/CDWithCodePushAndVSTS.html</guid>
 			</item>
 		
 			<item>
@@ -114,8 +114,8 @@
 </description>
 				
 				<pubDate>Wed, 04 Nov 2015 00:00:00 +0300</pubDate>
-				<link>http://microsoft.github.io/code-push/blog/articles/CodePush1.1.html</link>
-				<guid isPermaLink="true">http://microsoft.github.io/code-push/blog/articles/CodePush1.1.html</guid>
+				<link>/articles/CodePush1.1.html</link>
+				<guid isPermaLink="true">/articles/CodePush1.1.html</guid>
 			</item>
 		
 	</channel>
