@@ -25,11 +25,13 @@
   "license": "MIT",
   "dependencies": {
     "backslash": "^0.1.7",
+    "base-64": "^0.1.0",
     "chalk": "^1.1.0",
     "cli-table": "^0.3.1",
     "code-push": "2.0.2-beta",
     "email-validator": "^1.0.3",
     "gradle-to-js": "0.2.5",
+    "jsonwebtoken": "^7.4.1",
     "moment": "^2.10.6",
     "opener": "^1.4.1",
     "parse-duration": "0.1.1",
@@ -42,10 +44,12 @@
     "rimraf": "^2.5.1",
     "semver": "4.3.6",
     "simctl": "0.0.9",
+    "slash": "1.0.0",
     "update-notifier": "^0.5.0",
     "which": "^1.2.7",
     "wordwrap": "1.0.0",
     "xml2js": "^0.4.16",
-    "yargs": "^6.5.0"
+    "yargs": "^6.5.0",
+    "yazl": "^2.4.1"
   }
 }

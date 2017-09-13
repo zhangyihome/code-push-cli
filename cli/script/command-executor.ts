@@ -14,13 +14,18 @@ var plist = require("plist");
 var progress = require("progress");
 var prompt = require("prompt");
 import * as Q from "q";
+import * as recursiveFs from "recursive-fs";
 var rimraf = require("rimraf");
 import * as semver from "semver";
 var simctl = require("simctl");
+import slash = require("slash");
 var Table = require("cli-table");
+import * as yazl from "yazl";
 var which = require("which");
 import wordwrap = require("wordwrap");
+import { CommonUtils } from "./common-utils";
 import * as cli from "../definitions/cli";
+import hooks from "./release-hooks/index";
 import { AccessKey, Account, App, CodePushError, CollaboratorMap, CollaboratorProperties, Deployment, DeploymentMetrics, Headers, Package, PackageInfo, Session, UpdateMetrics } from "code-push/script/types";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
@@ -53,8 +58,6 @@ interface ILoginConnectionInfo {
     proxy?: string; // To specify the proxy url explicitly, other than the environment var (HTTP_PROXY)
     noProxy?: boolean; // To suppress the environment proxy setting, like HTTP_PROXY
 }
-
-
 
 export interface UpdateMetricsWithTotalActive extends UpdateMetrics {
     totalActive: number;
@@ -89,10 +92,10 @@ export var confirm = (message: string = "Are you sure?"): Promise<boolean> => {
             var accepted = result.response && result.response.toLowerCase() === "y";
             var rejected = !result.response || result.response.toLowerCase() === "n";
 
-            if (accepted){
+            if (accepted) {
                 resolve(true);
             } else {
-                if (!rejected){
+                if (!rejected) {
                     console.log("Invalid response: \"" + result.response + "\"");
                 }
                 resolve(false);
@@ -1181,41 +1184,44 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
     }
 
     throwForInvalidSemverRange(command.appStoreVersion);
-    var filePath: string = command.package;
-    var isSingleFilePackage: boolean = true;
 
-    if (fs.lstatSync(filePath).isDirectory()) {
-        isSingleFilePackage = false;
+    let confirmContinue: Q.Promise<boolean>;
+    if (command.privateKeyPath) {
+        confirmContinue = confirm("You are going to use code signing which is experimental feature. If it is the first time you sign bundle please make sure that you have configured a public key for your client SDK and released new binary version of your app. Also, be sure that this release is targeting to new binary version. You can find more information about code signing feature here: https://github.com/Microsoft/code-push/blob/master/cli/README.md#code-signing  Do you want to continue?");
+    } else {
+        confirmContinue = Q.resolve(true);
     }
 
-    var lastTotalProgress = 0;
-    var progressBar = new progress("Upload progress:[:bar] :percent :etas", {
-        complete: "=",
-        incomplete: " ",
-        width: 50,
-        total: 100
+    return confirmContinue.then((result: boolean) => {
+        if (!result) {
+            process.exit();
+        }
+        // Copy the command so that the original is not modified
+        var currentCommand: cli.IReleaseCommand = {
+            appName: command.appName,
+            appStoreVersion: command.appStoreVersion,
+            deploymentName: command.deploymentName,
+            description: command.description,
+            disabled: command.disabled,
+            mandatory: command.mandatory,
+            package: command.package,
+            rollout: command.rollout,
+            privateKeyPath: command.privateKeyPath,
+            type: command.type
+        };
+
+        var releaseHooksPromise = hooks.reduce((accumulatedPromise: Q.Promise<cli.IReleaseCommand>, hook: cli.ReleaseHook) => {
+            return accumulatedPromise
+                .then((modifiedCommand: cli.IReleaseCommand) => {
+                    currentCommand = modifiedCommand || currentCommand;
+                    return hook(currentCommand, command, sdk);
+                });
+        }, Q(currentCommand));
+
+        return releaseHooksPromise
+            .then(() => { })
+            .catch((err: CodePushError) => releaseErrorHandler(err, command));
     });
-
-    var uploadProgress = (currentProgress: number): void => {
-        progressBar.tick(currentProgress - lastTotalProgress);
-        lastTotalProgress = currentProgress;
-    };
-
-    var updateMetadata: PackageInfo = {
-        description: command.description,
-        isDisabled: command.disabled,
-        isMandatory: command.mandatory,
-        rollout: command.rollout
-    };
-
-    return sdk.isAuthenticated(true)
-        .then((isAuth: boolean): Promise<void> => {
-            return sdk.release(command.appName, command.deploymentName, filePath, command.appStoreVersion, updateMetadata, uploadProgress);
-        })
-        .then((): void => {
-            log("Successfully released an update containing the \"" + command.package + "\" " + (isSingleFilePackage ? "file" : "directory") + " to the \"" + command.deploymentName + "\" deployment of the \"" + command.appName + "\" app.");
-        })
-        .catch((err: CodePushError) => releaseErrorHandler(err, command));
 }
 
 export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void> => {
@@ -1392,7 +1398,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
         });
 }
 
-function validateDeployment(appName: string,  deploymentName: string): Promise<void> {
+function validateDeployment(appName: string, deploymentName: string): Promise<void> {
     return sdk.getDeployment(appName, deploymentName)
         .catch((err: any) => {
             // If we get an error that the deployment doesn't exist (but not the app doesn't exist), then tack on a more descriptive error message telling the user what to do
@@ -1446,16 +1452,16 @@ export var runReactNativeBundleCommand = (bundleName: string, development: boole
     let envNodeArgs: string = process.env.CODE_PUSH_NODE_ARGS;
 
     if (typeof envNodeArgs !== "undefined") {
-      Array.prototype.push.apply(reactNativeBundleArgs, envNodeArgs.trim().split(/\s+/));
+        Array.prototype.push.apply(reactNativeBundleArgs, envNodeArgs.trim().split(/\s+/));
     }
 
     Array.prototype.push.apply(reactNativeBundleArgs, [
-      path.join("node_modules", "react-native", "local-cli", "cli.js"), "bundle",
-      "--assets-dest", outputFolder,
-      "--bundle-output", path.join(outputFolder, bundleName),
-      "--dev", development,
-      "--entry-file", entryFile,
-      "--platform", platform,
+        path.join("node_modules", "react-native", "local-cli", "cli.js"), "bundle",
+        "--assets-dest", outputFolder,
+        "--bundle-output", path.join(outputFolder, bundleName),
+        "--dev", development,
+        "--entry-file", entryFile,
+        "--platform", platform,
     ]);
 
     if (sourcemapOutput) {
@@ -1599,7 +1605,7 @@ function getSdk(accessKey: string, headers: Headers, customServerUrl: string, pr
     Object.getOwnPropertyNames(AccountManager.prototype).forEach((functionName: any) => {
         if (typeof sdk[functionName] === "function") {
             var originalFunction = sdk[functionName];
-            sdk[functionName] = function() {
+            sdk[functionName] = function () {
                 var maybePromise: Promise<any> = originalFunction.apply(sdk, arguments);
                 if (maybePromise && maybePromise.then !== undefined) {
                     maybePromise = maybePromise

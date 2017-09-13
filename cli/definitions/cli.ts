@@ -1,4 +1,7 @@
-﻿export enum CommandType {
+﻿/// <reference path="../../definitions/generated/code-push.d.ts" />
+import AccountManager = require("code-push");
+
+export enum CommandType {
     accessKeyAdd,
     accessKeyPatch,
     accessKeyList,
@@ -181,6 +184,7 @@ export interface IReleaseBaseCommand extends ICommand, IPackageInfo {
     appStoreVersion: string;
     deploymentName: string;
     noDuplicateReleaseError?: boolean;
+    privateKeyPath?: string;
 }
 
 export interface IReleaseCommand extends IReleaseBaseCommand {
@@ -217,4 +221,11 @@ export interface ISessionListCommand extends ICommand {
 
 export interface ISessionRemoveCommand extends ICommand {
     machineName: string;
+}
+
+export type ReleaseHook = (currentCommand: IReleaseCommand, originalCommand: IReleaseCommand, sdk: AccountManager) => Q.Promise<IReleaseCommand|void>;
+
+export interface ReleaseFile {
+    sourceLocation: string;     // The current location of the file on disk
+    targetLocation: string;     // The desired location of the file within the zip
 }

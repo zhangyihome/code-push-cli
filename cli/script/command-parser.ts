@@ -392,12 +392,13 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " release <appName> <updateContentsPath> <targetBinaryVersion> [options]")
             .demand(/*count*/ 3, /*max*/ 3)  // Require exactly three non-option arguments.
             .example("release MyApp app.js \"*\"", "Releases the \"app.js\" file to the \"MyApp\" app's \"Staging\" deployment, targeting any binary version using the \"*\" wildcard range syntax.")
-            .example("release MyApp ./platforms/ios/www 1.0.3 -d Production", "Releases the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting only the 1.0.3 binary version")
+            .example("release MyApp ./platforms/ios/www 1.0.3 -d Production -k ~/.ssh/codepush_rsa", "Releases the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting only the 1.0.3 binary version and signed with the \"codepush_rsa\" private key")
             .example("release MyApp ./platforms/ios/www 1.0.3 -d Production -r 20", "Releases the \"./platforms/ios/www\" folder and all its contents to the \"MyApp\" app's \"Production\" deployment, targeting the 1.0.3 binary version and rolling out to about 20% of the users")
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "Deployment to release the update to", type: "string" })
             .option("description", { alias: "des", default: null, demand: false, description: "Description of the changes made to the app in this release", type: "string" })
             .option("disabled", { alias: "x", default: false, demand: false, description: "Specifies whether this release should be immediately downloadable", type: "boolean" })
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Specifies whether this release should be considered mandatory", type: "boolean" })
+            .option("privateKeyPath", { alias: "k", default: false, demand: false, description: "Specifies the location of a RSA private key to sign the release with. " + chalk.yellow("NOTICE:") + " use it for react native applications only, client SDK on other platforms will be ignoring signature verification for now!", type: "string" })
             .option("noDuplicateReleaseError", { default: false, demand: false, description: "When this flag is set, releasing a package that is identical to the latest release will produce a warning instead of an error", type: "boolean" })
             .option("rollout", { alias: "r", default: "100%", demand: false, description: "Percentage of users this release should be available to", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return checkValidReleaseOptions(argv); });
@@ -417,7 +418,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("mandatory", { alias: "m", default: false, demand: false, description: "Specifies whether this release should be considered mandatory", type: "boolean" })
             .option("noDuplicateReleaseError", { default: false, demand: false, description: "When this flag is set, releasing a package that is identical to the latest release will produce a warning instead of an error", type: "boolean" })
             .option("rollout", { alias: "r", default: "100%", demand: false, description: "Percentage of users this release should be immediately available to", type: "string" })
-            .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "Semver expression that specifies the binary app version(s) this release is targeting (e.g. 1.1.0, ~1.2.3). If omitted, the release will target the exact version specified in the config.xml file.", type: "string" })           
+            .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "Semver expression that specifies the binary app version(s) this release is targeting (e.g. 1.1.0, ~1.2.3). If omitted, the release will target the exact version specified in the config.xml file.", type: "string" })
             .check((argv: any, aliases: { [aliases: string]: string }): any => { return checkValidReleaseOptions(argv); });
 
         addCommonConfiguration(yargs);
@@ -426,7 +427,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
         yargs.usage(USAGE_PREFIX + " release-react <appName> <platform> [options]")
             .demand(/*count*/ 2, /*max*/ 2)  // Require exactly two non-option arguments
             .example("release-react MyApp ios", "Releases the React Native iOS project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
-            .example("release-react MyApp android -d Production", "Releases the React Native Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment")
+            .example("release-react MyApp android -d Production -k ~/.ssh/codepush_rsa", "Releases the React Native Android project in the current working directory to the \"MyApp\" app's \"Production\" deployment, signed with the \"codepush_rsa\" private key")
             .example("release-react MyApp windows --dev", "Releases the development bundle of the React Native Windows project in the current working directory to the \"MyApp\" app's \"Staging\" deployment")
             .option("bundleName", { alias: "b", default: null, demand: false, description: "Name of the generated JS bundle file. If unspecified, the standard bundle name will be used, depending on the specified platform: \"main.jsbundle\" (iOS), \"index.android.bundle\" (Android) or \"index.windows.bundle\" (Windows)", type: "string" })
             .option("deploymentName", { alias: "d", default: "Staging", demand: false, description: "Deployment to release the update to", type: "string" })
@@ -440,6 +441,7 @@ var argv = yargs.usage(USAGE_PREFIX + " <command>")
             .option("plistFile", { alias: "p", default: null, demand: false, description: "Path to the plist file which specifies the binary version you want to target this release at (iOS only)." })
             .option("plistFilePrefix", { alias: "pre", default: null, demand: false, description: "Prefix to append to the file name when attempting to find your app's Info.plist file (iOS only)." })
             .option("rollout", { alias: "r", default: "100%", demand: false, description: "Percentage of users this release should be immediately available to", type: "string" })
+            .option("privateKeyPath", { alias: "k", default: false, demand: false, description: "Specifies the location of a RSA private key to sign the release with", type: "string" })
             .option("sourcemapOutput", { alias: "s", default: null, demand: false, description: "Path to where the sourcemap for the resulting bundle should be written. If omitted, a sourcemap will not be generated.", type: "string" })
             .option("targetBinaryVersion", { alias: "t", default: null, demand: false, description: "Semver expression that specifies the binary app version(s) this release is targeting (e.g. 1.1.0, ~1.2.3). If omitted, the release will target the exact version specified in the \"Info.plist\" (iOS), \"build.gradle\" (Android) or \"Package.appxmanifest\" (Windows) files.", type: "string" })
             .option("outputDir", { alias: "o", default: null, demand: false, description: "Path to where the bundle and sourcemap should be written. If omitted, a bundle and sourcemap will not be written.", type: "string" })
@@ -807,6 +809,7 @@ function createCommand(): cli.ICommand {
                     releaseCommand.mandatory = argv["mandatory"];
                     releaseCommand.noDuplicateReleaseError = argv["noDuplicateReleaseError"];
                     releaseCommand.rollout = getRolloutValue(argv["rollout"]);
+                    releaseCommand.privateKeyPath = argv["privateKeyPath"];
                 }
                 break;
 
@@ -853,6 +856,7 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.plistFile = argv["plistFile"];
                     releaseReactCommand.plistFilePrefix = argv["plistFilePrefix"];
                     releaseReactCommand.rollout = getRolloutValue(argv["rollout"]);
+                    releaseReactCommand.privateKeyPath = argv["privateKeyPath"];
                     releaseReactCommand.sourcemapOutput = argv["sourcemapOutput"];
                     releaseReactCommand.outputDir = argv["outputDir"];
                 }
