@@ -6,23 +6,23 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta property="og:title" content="CodePush" />
   <meta property="og:site_name" content="CodePush"/>
-  <meta property="og:description" content="We&rsquo;re very excited about today&rsquo;s announcement at F8 2016 that Universal Windows Platform support is coming to React Native! The CodePush team has..." />
+  <meta property="og:description" content="You asked for it and now you&rsquo;ve got it: it’s our pleasure to announce the release of the code signing feature today! Code signing lets developers sign ..." />
   <meta property="og:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG" />
   
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@Microsoft">
   <meta name="twitter:title" content="CodePush">
-  <meta name="twitter:description" content="We&rsquo;re very excited about today&rsquo;s announcement at F8 2016 that Universal Windows Platform support is coming to React Native! The CodePush team has...">
+  <meta name="twitter:description" content="You asked for it and now you&rsquo;ve got it: it’s our pleasure to announce the release of the code signing feature today! Code signing lets developers sign ...">
   <meta name="twitter:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG">
 
   <!-- Enable responsiveness on mobile devices-->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
   <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
-  <meta name="description" content="We&rsquo;re very excited about today&rsquo;s announcement at F8 2016 that Universal Windows Platform support is coming to React Native! The CodePush team has...">
+  <meta name="description" content="You asked for it and now you&rsquo;ve got it: it’s our pleasure to announce the release of the code signing feature today! Code signing lets developers sign ...">
 
   <title>
     
-      React Native for Windows + CodePush &middot; CodePush
+      New CodePush Feature - Code Signing &middot; CodePush
     
   </title>
   
@@ -117,26 +117,22 @@
         <div class="row">
             <div class="col-md-10 col-md-offset-1"> 
                 <div class="post-header">
-                    <h1>React Native for Windows + CodePush</h1>
-                    <span class="date">13 Apr 2016</span><span>&nbsp;- by</span><span class="author"><a href="https://twitter.com/lostintangent">Jonathan Carter</a></span>
+                    <h1>New CodePush Feature - Code Signing</h1>
+                    <span class="date">14 Sep 2017</span><span>&nbsp;- by</span><span class="author"><a href="https://twitter.com/mscodepush">Zakeel Muhammad</a></span>
                 </div>
-                <p>We&rsquo;re very excited about today&rsquo;s announcement at <a href="https://www.fbf8.com">F8 2016</a> that <a href="https://blogs.windows.com/buildingapps/2016/04/13/react-native-on-the-universal-windows-platform">Universal Windows Platform support is coming to React Native</a>! The CodePush team has been fortunate enough to work with thousands of developers in the React Native community, and the ability to target your app(s) at any Windows 10 device is an awesome opportunity that we look forward to seeing folks begin to take advantage of.</p>
+                <p>You asked for it and now you&rsquo;ve got it: it’s our pleasure to announce the release of the code signing feature today! Code signing lets developers sign application bundles and on download verify that these bundles haven&rsquo;t been tampered with. Code signing can also be used to validate your identity. We take security seriously and we know that you do too.</p>
 
-<p>Along with this announcement, we have also published a <strong>very early</strong> version of Windows support for the React Native CodePush module, which will allow releasing updates to your React Native apps running on a Windows 10 PC, phone, Xbox One and even HoloLens (!), using the same developement workflow as iOS and Android: <code>code-push release-react MyApp windows</code>. We want to make it as simple as possible to practice continuous delivery with React Native, and this support will extend that capability to millions of new devices.</p>
+<h3>How it works</h3>
 
-<p><img src="https://cloud.githubusercontent.com/assets/116461/14446152/b1e1b766-0007-11e6-96a0-fa5d6beb37a7.PNG" width="220"  />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://cloud.githubusercontent.com/assets/116461/14477041/49cd7b60-00c0-11e6-8b12-d3825339d6ba.PNG" width="630"  /></p>
+<p>First, you&rsquo;ll generates an asymmetric key pair: the private key will be used for signing bundles; the public key for bundle signature verification. The CodePush cli then uses the private key to sign bundles during <code>release</code> and <code>release-react</code> commands. The public key is shipped with the mobile application. Control over the generation and management of keys is in the hands of the developer.</p>
 
-<p><em>NOTE: While the production F8 app uses CodePush, it doesn&rsquo;t display an update prompt. We just added that for the sake of illustrating the concept more easily.</em></p>
-
-<h3>Current Support</h3>
-
-<p>The Windows implementation of CodePush currently has ~80% parity with the existing iOS and Android platforms, including all of the most commonly used features (e.g. updating assets, pivoting the install mode based on whether an update is mandatory or not). We were able to re-use 100% of our existing JavaScript code, and because React Native for Windows was architected to be conceptually similar to React Native for Android, it was a pretty straight forward port for our native code. We expect to implement the few remaining features in the next couple weeks, and will then maintain 100% parity across all three platforms moving forward.</p>
-
-<p>We haven&rsquo;t published the Windows support to NPM yet, but if you want to check it out, you can view the source and/or install the bits from our <a href="https://github.com/Microsoft/react-native-code-push/tree/windows-support">Windows branch</a>, which includes an updated readme with setup instructions. Additionally, if you want to check out a sample app that uses React Native for Windows and CodePush, the beautiful and open-sourced <a href="https://github.com/fbsamples/f8app">F8 App</a> is a great example to play around with. The production version of the app already uses CodePush for iOS and Android, and we implemented a <a href="https://github.com/CatalystCode/f8app/tree/CodePushWindows/windows">fork of it</a> which includes CodePush support on Windows. Clone the fork, run the setup instructions, and try it out! The above screenshots were taken using it, so feel free to have fun with running the app on the various device emulators.</p>
+<p>At the end of release command, the cli computes the bundle&rsquo;s content hash and places this value into a JWT signed with the private key. When the codepush plugin downloads a bundle to a device, it checks the <code>.codepushrelease</code> file containing the JWT and validates the JWT signature using the public key. If validation fails, the update is not installed.</p>
 
 <h3>Moving Forward</h3>
 
-<p>As the Windows support for React Native continues to evolve and mature, we&rsquo;ll be improving the CodePush support as well, and will look forward to seeing the community response and contributions. In the meantime, please continue to <a href="mailto:codepushfeed@microsoft.com">send us feedback</a>, ping us in the <a href="https://discord.gg/0ZcbPKXt5bWxFdFu">#code-push</a> chanel on Reactiflux, and stay tuned for future feature investments!</p>
+<p>Being a part of the open source community means that the CodePush team thrives on collaboration with our end users. This feature is a very important addition to CodePush and we would like your help to perfect it. Feel free to send suggestions to our <a href="mailto:codepushfeed@microsoft.com">email</a>, ping us in the <a href="https://discord.gg/0ZcbPKXt5bWxFdFu">#code-push</a> channel on Reactiflux (or React Native), or reach out via <a href="https://twitter.com/mscodepush">twitter</a>. We look forward to you testing out this new feature and we welcome any feedback!
+ <br/><br/>
+More information regarding Code Signing can be found <a href="https://github.com/Microsoft/code-push/blob/master/cli/README.md#code-signing">here</a>.</p>
 
             </div>
         </div>
