@@ -282,7 +282,7 @@ Once your app has been configured to query for updates against the CodePush serv
 
 Which of these commands you should use is mostly a matter of requirements and/or preference. However, we generally recommend using the relevant platform-specific command to start (since it greatly simplifies the experience), and then leverage the general-purpose `release` command if/when greater control is needed.
 
-*NOTE: Only 50 most recent releases in a deployment can be discovered and downloaded by the clients.*
+*NOTE: Only the 50 most recent releases in a deployment can be discovered and downloaded by the clients.*
 
 ### Releasing Updates (General)
 
