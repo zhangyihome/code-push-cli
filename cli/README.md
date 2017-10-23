@@ -87,11 +87,14 @@ When you login from the CLI, your access key is persisted to disk for the durati
 code-push logout
 ```
 
-If you forget to logout from a machine you'd prefer not to leave a running session on (e.g. your friend's laptop), you can use the following commands to list and remove any current login sessions.
+If you forget to logout from a machine you'd prefer not to leave a running session on (e.g. your friend's laptop), so you can invalidate it by using one of two choices:
+
+1. via [Mobile Center site](https://mobile.azure.com/settings/apitokens)
+2. via [Mobile Center CLI](https://github.com/Microsoft/mobile-center-cli) commands:
 
 ```shell
-code-push session ls
-code-push session rm <machineName>
+mobile-center tokens list
+mobile-center tokens delete <machineName>
 ```
 
 ### Access Keys
