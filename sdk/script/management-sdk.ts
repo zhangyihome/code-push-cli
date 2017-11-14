@@ -299,9 +299,9 @@ class AccountManager {
             .then((res: JsonResponse) => res.body.history);
     }
 
-    public release(appName: string, deploymentName: string, filePath: string, targetBinaryVersion: string, updateMetadata: PackageInfo, uploadProgressCallback?: (progress: number) => void): Promise<void> {
+    public release(appName: string, deploymentName: string, filePath: string, targetBinaryVersion: string, updateMetadata: PackageInfo, uploadProgressCallback?: (progress: number) => void): Promise<Package> {
 
-        return Promise<void>((resolve, reject, notify) => {
+        return Promise<Package>((resolve, reject, notify) => {
 
             updateMetadata.appVersion = targetBinaryVersion;
             var request: superagent.Request<any> = superagent.post(this._serverUrl + urlEncode `/apps/${this.appNameParam(appName)}/deployments/${deploymentName}/release`);
@@ -331,19 +331,17 @@ class AccountManager {
                             return;
                         }
 
-                        if (res.ok) {
-                            resolve(<void>null);
-                        } else {
-                            try {
-                                var body = JSON.parse(res.text);
-                            } catch (err) {
-                            }
+                        try {
+                            var body = JSON.parse(res.text);
+                        } catch (err) {
+                            reject(<CodePushError>{ message: `Could not parse response: ${res.text}`, statusCode: AccountManager.ERROR_INTERNAL_SERVER });
+                            return;
+                        }
 
-                            if (body) {
-                                reject(<CodePushError>{ message: body.message, statusCode: res && res.status });
-                            } else {
-                                reject(<CodePushError>{ message: res.text, statusCode: res && res.status });
-                            }
+                        if (res.ok) {
+                            resolve(<Package>body.package);
+                        } else {
+                            reject(<CodePushError>{ message: body.message, statusCode: res && res.status });
                         }
                     });
             });
