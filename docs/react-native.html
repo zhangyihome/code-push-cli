@@ -852,7 +852,7 @@ cessary.</em></p></li>
 
 <p><img src="https://cloud.githubusercontent.com/assets/116461/11601733/13011d5e-9a8a-11e5-9ce2-b100498ffb34.png" alt="Deployment list"></p>
 
-<p>In order to effectively make use of the <code>Staging</code> and <code>Production</code> deployments that were created along with your CodePush app, refer to the <a href="../README.md#multi-deployment-testing">multi-deployment testing</a> docs below before actually moving your app&rsquo;s usage of CodePush into production.</p>
+<p>In order to effectively make use of the <code>Staging</code> and <code>Production</code> deployments that were created along with your CodePush app, refer to the <a href="#multi-deployment-testing">multi-deployment testing</a> docs below before actually moving your app&rsquo;s usage of CodePush into production.</p>
 
 <h3>HTTP exception domains configuration (iOS)</h3>
 
@@ -1164,7 +1164,7 @@ class MyApp extends Component {
 
 MyApp = codePush(codePushOptions)(MyApp);
 </code></pre></div>
-<p>Alternatively, if you want fine-grained control over when the check happens (e.g. a button press or timer interval), you can call <a href="docs/api-js.md#codepushsync"><code>CodePush.sync()</code></a> at any time with your desired <code>SyncOptions</code>, and optionally turn off CodePush&rsquo;s automatic checking by specifying a manual <code>checkFrequency</code>:</p>
+<p>Alternatively, if you want fine-grained control over when the check happens (e.g. a button press or timer interval), you can call <a href="#api-reference"><code>CodePush.sync()</code></a> at any time with your desired <code>SyncOptions</code>, and optionally turn off CodePush&rsquo;s automatic checking by specifying a manual <code>checkFrequency</code>:</p>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript">let codePushOptions = { checkFrequency: codePush.CheckFrequency.MANUAL };
 
 class MyApp extends Component {
@@ -1186,7 +1186,7 @@ class MyApp extends Component {
 
 MyApp = codePush(codePushOptions)(MyApp);
 </code></pre></div>
-<p>If you would like to display an update confirmation dialog (an &ldquo;active install&rdquo;), configure when an available update is installed (e.g. force an immediate restart) or customize the update experience in any other way, refer to the <a href="docs/api-js.md#codepush"><code>codePush()</code></a> API reference for information on how to tweak this default behavior.</p>
+<p>If you would like to display an update confirmation dialog (an &ldquo;active install&rdquo;), configure when an available update is installed (e.g. force an immediate restart) or customize the update experience in any other way, refer to the <a href="#api-reference"><code>codePush()</code></a> API reference for information on how to tweak this default behavior.</p>
 
 <p><em>NOTE: If you are using <a href="http://redux.js.org">Redux</a> and <a href="http://yelouafi.github.io/redux-saga/">Redux Saga</a>, you can alternatively use the <a href="http://github.com/lostintangent/react-native-code-push-saga">react-native-code-push-saga</a> module, which allows you to customize when <code>sync</code> is called in a perhaps simpler/more idiomatic way.</em></p>
 
@@ -2068,7 +2068,7 @@ codePush.sync({ updateDialog: true },
 </tr>
 <tr>
 <td>Images dissappear after installing CodePush update</td>
-<td>If your app is using the React Native assets system to load images (i.e. the <code>require(./foo.png)</code> syntax), then you <strong>MUST</strong> release your assets along with your JS bundle to CodePush. Follow <a href="#releasing-updates-javascript--images">these instructions</a> to see how to do this.</td>
+<td>If your app is using the React Native assets system to load images (i.e. the <code>require(./foo.png)</code> syntax), then you <strong>MUST</strong> release your assets along with your JS bundle to CodePush.</td>
 </tr>
 <tr>
 <td>No JS bundle is being found when running your app against the iOS simulator</td>

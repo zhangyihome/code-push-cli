@@ -14,7 +14,7 @@ h2 {
   line-height: 28px; }
 
 p, span {
-    font-size: 1.7em; }
+    font-size: 1.5em; }
 
 
 @media (min-width: 1200px) {
@@ -34,7 +34,7 @@ p, span {
 .bannerText {
   font-family: wf_segoe-ui_light;
   font-size: 1.3em;
-  margin: 18em auto 0 auto;
+  margin: 17em auto 0 auto;
   max-width: 900px;
   min-width: 200px;
   text-align: left;
@@ -99,14 +99,7 @@ p, span {
     transform: translateX(-50%);
     position: relative; }
 
-@media (max-width: 500px) {
-  .ga-hero-image-foreground {
-    margin-top: 15em;
-    max-width: initial;
-    width: 100%;
-    height: 150; }
-  .bannerLogo {
-    display: none; } }
+
 
 
 .timeline-container {
@@ -141,12 +134,30 @@ p, span {
 .timeline-header p {
   font-size: 1em;
   text-align: left;
+  padding-left: 1em;
   margin: .7em;
 }
 
-.timeline-img {
-  margin: 3em 0 3em 0;
+.timeline-min-img {
+  display: none;
 }
+
+@media (max-width: 500px) {
+  .ga-hero-image-foreground {
+    margin-top: 15em;
+    max-width: initial;
+    width: 100%;
+    height: 150; }
+  .bannerLogo {
+    display: none; } 
+  .timeline-min-img {
+    display: inline;
+    padding: 1em;
+  }
+  .timeline-img {
+    display: none;
+  }
+  }
 
 .ga-tab {
   height: 175px;
@@ -180,6 +191,6 @@ p, span {
   line-height: 40px;
 }
 .feature-tab {
-  margin-top: 6em;
-  margin-bottom: 6em;
+  margin-top: 2em;
+  margin-bottom: 2em;
 }
