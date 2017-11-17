@@ -1,5 +1,5 @@
 body {
-  font-family: wf_segoe-ui_light;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
   font-size: 1.3em;
   font-weight: 100;
   background-color: white;
@@ -8,7 +8,7 @@ body {
 
 h2 {
   color: rgba(0,0,0,0.90);
-  font-family: wf_segoe-ui_light;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
   font-weight: 1000;
   font-size: 1.8em; 
   line-height: 28px; }
@@ -32,7 +32,7 @@ p, span {
   margin-top: -7em;}
 
 .bannerText {
-  font-family: wf_segoe-ui_light;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
   font-size: 1.3em;
   margin: 17em auto 0 auto;
   max-width: 900px;
@@ -67,11 +67,15 @@ p, span {
   font-size: 1.6em; }
 
 .visit-ac {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   margin-top: 2em;
   background: #FFFFFF;
+  border: 1px solid #BBB;
   border-radius: 5px;
-  font-weight: bold;
-  font-family: wf_segoe-ui_light;
+  font-weight: 500;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
   font-size: 15px;
   color: #0078D7;
   width:135px;
@@ -126,13 +130,13 @@ p, span {
     font-size: 1.6em; }
 
 .timeline-header  {
-  font-family: wf_segoe-ui_light;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
   font-size: 1.3em;
   color: #000;
   text-align: center;
 }
 .timeline-header p {
-  font-size: 1em;
+  font-size: 0.9em;
   text-align: left;
   padding-left: 1em;
   margin: .7em;
@@ -185,7 +189,7 @@ p, span {
   margin-top:50px;
 }
 .ga-be-excited {
-  font-family: wf_segoe-ui_light;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
   font-size: 34px;
   color: #0078D7;
   line-height: 40px;
