@@ -900,7 +900,7 @@ function getReactNativeProjectAppVersion(command: cli.IReleaseReactCommand, proj
         catch (e) { return false }
     };
 
-    // Allow plain integer versions (as well as '1.0' values) for now, e.g. '1' is valid here and we assume that it is equal to '1.0.0'. 
+    // Allow plain integer versions (as well as '1.0' values) for now, e.g. '1' is valid here and we assume that it is equal to '1.0.0'.
     // (missing minor/patch values will be added on server side to pass semver.satisfies check)
     const isValidVersion = (version: string): boolean => !!semver.valid(version) || /^\d+\.\d+$/.test(version) || /^\d+$/.test(version);
 
@@ -1173,17 +1173,7 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
 
     throwForInvalidSemverRange(command.appStoreVersion);
 
-    let confirmContinue: Q.Promise<boolean>;
-    if (command.privateKeyPath) {
-        confirmContinue = confirm("You are going to use code signing which is experimental feature. If it is the first time you sign bundle please make sure that you have configured a public key for your client SDK and released new binary version of your app. Also, be sure that this release is targeting to new binary version. You can find more information about code signing feature here: https://github.com/Microsoft/code-push/blob/master/cli/README.md#code-signing  Do you want to continue?");
-    } else {
-        confirmContinue = Q.resolve(true);
-    }
-
-    return confirmContinue.then((result: boolean) => {
-        if (!result) {
-            process.exit();
-        }
+    return Q(<void>null).then(() => {
         // Copy the command so that the original is not modified
         var currentCommand: cli.IReleaseCommand = {
             appName: command.appName,
