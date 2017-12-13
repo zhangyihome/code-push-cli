@@ -5,6 +5,7 @@ import * as chalk from "chalk";
 var childProcess = require("child_process");
 import debugCommand from "./commands/debug";
 import * as fs from "fs";
+var mkdirp = require("mkdirp");
 var g2js = require("gradle-to-js/lib/parser");
 import * as moment from "moment";
 var opener = require("opener");
@@ -1287,6 +1288,12 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
     var outputFolder: string = command.outputDir || path.join(os.tmpdir(), "CodePush");
     var platform: string = command.platform = command.platform.toLowerCase();
     var releaseCommand: cli.IReleaseCommand = <any>command;
+
+    // we have to add "CodePush" root forlder to make update contents file structure 
+    // to be compatible with React Native client SDK
+    outputFolder = path.join(outputFolder, "CodePush");
+    mkdirp.sync(outputFolder);
+
     // Check for app and deployment exist before releasing an update.
     // This validation helps to save about 1 minute or more in case user has typed wrong app or deployment name.
     return validateDeployment(command.appName, command.deploymentName)
@@ -1348,7 +1355,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
                 : getReactNativeProjectAppVersion(command, projectName);
 
             if (command.outputDir) {
-                command.sourcemapOutput = path.join(command.outputDir, bundleName + ".map");
+                command.sourcemapOutput = path.join(releaseCommand.package, bundleName + ".map");
             }
 
             return appVersionPromise;
