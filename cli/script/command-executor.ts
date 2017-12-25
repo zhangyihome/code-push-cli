@@ -1218,7 +1218,14 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
             if (platform === "ios") {
                 outputFolder = path.join(platformFolder, "www");
             } else if (platform === "android") {
-                outputFolder = path.join(platformFolder, "assets", "www");
+                
+                // Since cordova-android 7 assets directory moved to android/app/src/main/assets instead of android/assets                
+                const outputFolderVer7 = path.join(platformFolder, "app", "src", "main", "assets", "www");
+                if (fs.existsSync(outputFolderVer7)) {
+                    outputFolder = outputFolderVer7;
+                } else {
+                    outputFolder = path.join(platformFolder, "assets", "www");
+                }
             } else {
                 throw new Error("Platform must be either \"ios\" or \"android\".");
             }
