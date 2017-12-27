@@ -103,10 +103,15 @@ export class AcquisitionManager {
             }
 
             if (response.statusCode !== 200) {
-                callback(new Error(response.statusCode + ": " + response.body), /*remotePackage=*/ null);
+                let errorMessage;
+                if (response.statusCode === 0) {
+                    errorMessage = `Couldn't send request to ${requestUrl}, xhr.statusCode = 0 was returned. One of the possible reasons for that might be connection problems. Please, check your internet connection.`;
+                } else {
+                    errorMessage = `${response.statusCode}: ${response.body}`;
+                }
+                callback(new Error(errorMessage), /*remotePackage=*/ null);
                 return;
             }
-
             try {
                 var responseObject = JSON.parse(response.body);
                 var updateInfo: UpdateCheckResponse = responseObject.updateInfo;
