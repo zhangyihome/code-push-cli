@@ -367,7 +367,7 @@ This specifies which deployment you want to release the update to. This defaults
 
 This provides an optional "change log" for the deployment. The value is simply round tripped to the client so that when the update is detected, your app can choose to display it to the end-user (e.g. via a "What's new?" dialog). This string accepts control characters such as `\n` and `\t` so that you can include whitespace formatting within your descriptions for improved readability.
 
-*NOTE: This parameter can be set using either "--description" or "-des"*
+*NOTE: This parameter can be set using either "--description" or "--des"*
 
 #### Disabled parameter
 
@@ -445,6 +445,7 @@ code-push release-react <appName> <platform>
 [--targetBinaryVersion <targetBinaryVersion>]
 [--rollout <rolloutPercentage>]
 [--privateKeyPath <pathToPrivateKey>]
+[--config <config>]
 ```
 
 The `release-react` command is a React Native-specific version of the "vanilla" [`release`](#releasing-app-updates) command, which supports all of the same parameters (e.g. `--mandatory`, `--description`), yet simplifies the process of releasing updates by performing the following additional behavior:
