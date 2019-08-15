@@ -32,19 +32,19 @@ declare module "rest-definitions" {
 
     /*in*/
     export interface DeploymentStatusReport {
-        appVersion: string;
-        clientUniqueId?: string;
-        deploymentKey: string;
-        previousDeploymentKey?: string;
-        previousLabelOrAppVersion?: string;
+        app_version: string;
+        client_unique_id?: string;
+        deployment_key: string;
+        previous_deployment_key?: string;
+        previous_label_or_app_version?: string;
         label?: string;
         status?: string;
     }
 
     /*in*/
     export interface DownloadReport {
-        clientUniqueId: string;
-        deploymentKey: string;
+        client_unique_id: string;
+        deployment_key: string;
         label: string;
     }
 
@@ -60,29 +60,28 @@ declare module "rest-definitions" {
     }
 
     /*out*/
-    export interface UpdateCheckResponse extends PackageInfo {
-        downloadURL?: string;
-        isAvailable: boolean;
-        packageSize?: number;
-        shouldRunBinaryVersion?: boolean;
-        updateAppVersion?: boolean;
-    }
-
-    /*out*/
-    export interface UpdateCheckCacheResponse {
-        originalPackage: UpdateCheckResponse;
-        rollout?: number;
-        rolloutPackage?: UpdateCheckResponse;
+    export interface UpdateCheckResponse {
+        download_url?: string;
+        description?: string;
+        is_available: boolean;
+        is_disabled?: boolean;
+        target_binary_range: string;
+        /*generated*/ label?: string;
+        /*generated*/ package_hash?: string;
+        package_size?: number;
+        should_run_binary_version?: boolean;
+        update_app_version?: boolean;
+        is_mandatory?: boolean;
     }
 
     /*in*/
     export interface UpdateCheckRequest {
-        appVersion: string;
-        clientUniqueId?: string;
-        deploymentKey: string;
-        isCompanion?: boolean;
+        app_version: string;
+        client_unique_id?: string;
+        deployment_key: string;
+        is_companion?: boolean;
         label?: string;
-        packageHash?: string;
+        package_hash?: string;
     }
 
     /*out*/
