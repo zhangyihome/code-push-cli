@@ -115,6 +115,34 @@
             ]
         },
         {
+            "name": "CLI Deployment Clear",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "cwd": "C://Proj/test12",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "deployment", "clear", "test12", "StagingRename"
+            ]
+        },
+        {
+            "name": "CLI Deployment Remove",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "cwd": "C://Proj/test12",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "deployment", "remove", "test12", "StagingRename"
+            ]
+        },
+        {
             "name": "Unit Test",
             "type": "node",
             "request": "launch",
