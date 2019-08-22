@@ -31,6 +31,34 @@
             ]
         },
         {
+            "name": "CLI Release-cordova",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "cwd": "C://Proj/test12",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "release-cordova", "test12", "android", "-d", "Staging"
+            ]
+        },
+        {
+            "name": "CLI Rollback",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "cwd": "C://Proj/test12",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "rollback", "test12", "Staging"
+            ]
+        },
+        {
             "name": "Unit Test",
             "type": "node",
             "request": "launch",
