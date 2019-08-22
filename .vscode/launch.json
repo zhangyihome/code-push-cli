@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run CLI",
+            "name": "CLI Patch",
             "type": "node",
             "request": "launch",
             "protocol": "inspector",
@@ -14,7 +14,20 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "--info"
+                "patch", "test11-android", "Staging", "-t", "1.13"
+            ]
+        },
+        {
+            "name": "CLI Promote",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "promote", "test11-android", "Staging", "Production"
             ]
         },
         {
