@@ -73,6 +73,20 @@
             ]
         },
         {
+            "name": "CLI Deployment History",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "cwd": "C://Proj/test12",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "deployment", "history", "test12", "Staging"
+            ]
+        },
+        {
             "name": "Unit Test",
             "type": "node",
             "request": "launch",
