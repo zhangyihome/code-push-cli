@@ -97,7 +97,7 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "deployment", "List", "test12"
+                "deployment", "list", "test12"
             ]
         },
         {
