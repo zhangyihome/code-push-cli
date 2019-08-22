@@ -101,6 +101,20 @@
             ]
         },
         {
+            "name": "CLI Deployment Rename",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "cwd": "C://Proj/test12",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "deployment", "rename", "test12", "StagingRename", "Staging"
+            ]
+        },
+        {
             "name": "Unit Test",
             "type": "node",
             "request": "launch",
