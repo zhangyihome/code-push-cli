@@ -55,7 +55,21 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "rollback", "test12", "Staging"
+                "rollback", "test12", "Staging", "-r", "v3"
+            ]
+        },
+        {
+            "name": "CLI Deployment Add",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "cwd": "C://Proj/test12",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "deployment", "add", "test12", "Staging4"
             ]
         },
         {
