@@ -14,7 +14,11 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "patch", "test11-android", "Staging", "-t", "1.13"
+                "patch",
+                "test11-android",
+                "Staging",
+                "-t",
+                "1.13"
             ]
         },
         {
@@ -27,7 +31,10 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "promote", "test11-android", "Staging", "Production"
+                "promote",
+                "test11-android",
+                "Staging",
+                "Production"
             ]
         },
         {
@@ -41,7 +48,11 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "release-cordova", "test12", "android", "-d", "Staging"
+                "release-cordova",
+                "test12",
+                "android",
+                "-d",
+                "Staging"
             ]
         },
         {
@@ -55,7 +66,11 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "rollback", "test12", "Staging", "-r", "v3"
+                "rollback",
+                "test12",
+                "Staging",
+                "-r",
+                "v3"
             ]
         },
         {
@@ -69,7 +84,10 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "deployment", "add", "test12", "Staging4"
+                "deployment",
+                "add",
+                "test12",
+                "Staging4"
             ]
         },
         {
@@ -83,7 +101,10 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "deployment", "history", "test12", "Staging"
+                "deployment",
+                "history",
+                "test12",
+                "Staging"
             ]
         },
         {
@@ -97,7 +118,9 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "deployment", "list", "test12"
+                "deployment",
+                "list",
+                "test12"
             ]
         },
         {
@@ -111,7 +134,11 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "deployment", "rename", "test12", "StagingRename", "Staging"
+                "deployment",
+                "rename",
+                "test12",
+                "StagingRename",
+                "Staging"
             ]
         },
         {
@@ -125,7 +152,10 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "deployment", "clear", "test12", "StagingRename"
+                "deployment",
+                "clear",
+                "test12",
+                "StagingRename"
             ]
         },
         {
@@ -139,7 +169,10 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "deployment", "remove", "test12", "StagingRename"
+                "deployment",
+                "remove",
+                "test12",
+                "StagingRename"
             ]
         },
         {
@@ -153,7 +186,9 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "access-key", "add", "testNamelalalal"
+                "access-key",
+                "add",
+                "testNamelalalal"
             ]
         },
         {
@@ -167,7 +202,9 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "access-key", "remove", "testNamelalalal"
+                "access-key",
+                "remove",
+                "testNamelalalal"
             ]
         },
         {
@@ -181,7 +218,8 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "access-key", "list"
+                "access-key",
+                "list"
             ]
         },
         {
@@ -195,7 +233,11 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "app", "add", "testRemove2", "android", "cordova"
+                "app",
+                "add",
+                "testRemove2",
+                "android",
+                "cordova"
             ]
         },
         {
@@ -209,7 +251,9 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "app", "remove", "testRemove2"
+                "app",
+                "remove",
+                "testRemove2"
             ]
         },
         {
@@ -223,7 +267,8 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "app", "list"
+                "app",
+                "list"
             ]
         },
         {
@@ -237,7 +282,10 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "app", "rename", "test", "test2"
+                "app",
+                "rename",
+                "test",
+                "test2"
             ]
         },
         {
@@ -251,7 +299,10 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "collaborator", "add", "test12", "lala@lala.com"
+                "collaborator",
+                "add",
+                "test12",
+                "lala@lala.com"
             ]
         },
         {
@@ -265,7 +316,10 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "collaborator", "remove", "test12", "lala@lala.com"
+                "collaborator",
+                "remove",
+                "test12",
+                "lala@lala.com"
             ]
         },
         {
@@ -279,7 +333,23 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "collaborator", "list", "test12"
+                "collaborator",
+                "list",
+                "test12"
+            ]
+        },
+        {
+            "name": "CLI Link",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "cwd": "C://Proj/test12",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "link"
             ]
         },
         {
