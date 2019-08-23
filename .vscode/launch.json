@@ -157,7 +157,7 @@
             ]
         },
         {
-            "name": "CLI Access-key remove",
+            "name": "CLI Access-key Remove",
             "type": "node",
             "request": "launch",
             "protocol": "inspector",
@@ -168,6 +168,20 @@
             "preLaunchTask": "gulp: build",
             "args": [
                 "access-key", "remove", "testNamelalalal"
+            ]
+        },
+        {
+            "name": "CLI Access-key list",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "cwd": "C://Proj/test12",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "access-key", "list"
             ]
         },
         {
