@@ -171,7 +171,7 @@
             ]
         },
         {
-            "name": "CLI Access-key list",
+            "name": "CLI Access-key List",
             "type": "node",
             "request": "launch",
             "protocol": "inspector",
@@ -182,6 +182,62 @@
             "preLaunchTask": "gulp: build",
             "args": [
                 "access-key", "list"
+            ]
+        },
+        {
+            "name": "CLI App Add",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "cwd": "C://Proj/test12",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "app", "add", "testRemove2", "android", "cordova"
+            ]
+        },
+        {
+            "name": "CLI App Remove",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "cwd": "C://Proj/test12",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "app", "remove", "testRemove2"
+            ]
+        },
+        {
+            "name": "CLI App List",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "cwd": "C://Proj/test12",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "app", "list"
+            ]
+        },
+        {
+            "name": "CLI App Rename",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "cwd": "C://Proj/test12",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "app", "rename", "test", "test2"
             ]
         },
         {
