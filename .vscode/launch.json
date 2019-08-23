@@ -143,6 +143,34 @@
             ]
         },
         {
+            "name": "CLI Access-key Add",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "cwd": "C://Proj/test12",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "access-key", "add", "testNamelalalal"
+            ]
+        },
+        {
+            "name": "CLI Access-key remove",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "cwd": "C://Proj/test12",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "access-key", "remove", "testNamelalalal"
+            ]
+        },
+        {
             "name": "Unit Test",
             "type": "node",
             "request": "launch",
