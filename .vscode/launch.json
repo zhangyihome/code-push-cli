@@ -339,6 +339,20 @@
             ]
         },
         {
+            "name": "CLI Whoami",
+            "type": "node",
+            "request": "launch",
+            "protocol": "inspector",
+            "program": "${workspaceRoot}/cli/bin/script/cli.js",
+            "cwd": "C://Proj/test12",
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "preLaunchTask": "gulp: build",
+            "args": [
+                "whoami"
+            ]
+        },
+        {
             "name": "Unit Test",
             "type": "node",
             "request": "launch",
