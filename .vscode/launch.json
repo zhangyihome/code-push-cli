@@ -14,7 +14,7 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "patch", "test11-android", "Staging", "-t", "1.13"
+                "patch", "appName", "deploymentName", "-t", "1.0.0"
             ]
         },
         {
@@ -27,7 +27,7 @@
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "promote", "test11-android", "Staging", "Production"
+                "promote", "appName", "deploymentName", "deploymentNameDestination"
             ]
         },
         {
@@ -36,12 +36,12 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
+            "cwd": "${workspaceRoot}",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "release-cordova", "test12", "android", "-d", "Staging"
+                "release-cordova", "appName", "android", "-d", "deploymentName"
             ]
         },
         {
@@ -50,12 +50,11 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "rollback", "test12", "Staging", "-r", "v3"
+                "rollback", "appName", "deploymentName", "-r", "v1"
             ]
         },
         {
@@ -64,12 +63,11 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "deployment", "add", "test12", "Staging4"
+                "deployment", "add", "appName", "deploymentName"
             ]
         },
         {
@@ -78,12 +76,11 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "deployment", "history", "test12", "Staging"
+                "deployment", "history", "appName", "deploymentName"
             ]
         },
         {
@@ -92,12 +89,11 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "deployment", "list", "test12"
+                "deployment", "list", "appName"
             ]
         },
         {
@@ -106,12 +102,11 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "deployment", "rename", "test12", "StagingRename", "Staging"
+                "deployment", "rename", "appName", "deploymentName", "deploymentNameRename"
             ]
         },
         {
@@ -120,12 +115,11 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "deployment", "clear", "test12", "StagingRename"
+                "deployment", "clear", "appName", "deploymentName"
             ]
         },
         {
@@ -134,12 +128,11 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "deployment", "remove", "test12", "StagingRename"
+                "deployment", "remove", "appName", "deploymentName"
             ]
         },
         {
@@ -148,12 +141,11 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "access-key", "add", "testNamelalalal"
+                "access-key", "add", "testName"
             ]
         },
         {
@@ -162,12 +154,11 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "access-key", "remove", "testNamelalalal"
+                "access-key", "remove", "testName"
             ]
         },
         {
@@ -176,7 +167,6 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
@@ -190,12 +180,11 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "app", "add", "testRemove2", "android", "cordova"
+                "app", "add", "appName", "android", "cordova"
             ]
         },
         {
@@ -204,12 +193,11 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "app", "remove", "testRemove2"
+                "app", "remove", "appName"
             ]
         },
         {
@@ -218,7 +206,6 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
@@ -232,12 +219,11 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "app", "rename", "test", "test2"
+                "app", "rename", "appName", "appNameRename"
             ]
         },
         {
@@ -246,12 +232,11 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "collaborator", "add", "test12", "lala@lala.com"
+                "collaborator", "add", "appName", "collaboratorEmail"
             ]
         },
         {
@@ -260,12 +245,11 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "collaborator", "remove", "test12", "lala@lala.com"
+                "collaborator", "remove", "appName", "collaboratorEmail"
             ]
         },
         {
@@ -274,12 +258,11 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "collaborator", "list", "test12"
+                "collaborator", "list", "appName"
             ]
         },
         {
@@ -288,7 +271,6 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
@@ -302,12 +284,11 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
             "args": [
-                "login", "--key", "b768f9d85f60a6736d3aca1c068acd16fa10e571"
+                "login", "--key", "<token>"
             ]
         },
         {
@@ -316,7 +297,6 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
@@ -330,7 +310,6 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
@@ -344,7 +323,6 @@
             "request": "launch",
             "protocol": "inspector",
             "program": "${workspaceRoot}/cli/bin/script/cli.js",
-            "cwd": "C://Proj/test12",
             "stopOnEntry": false,
             "sourceMaps": true,
             "preLaunchTask": "gulp: build",
