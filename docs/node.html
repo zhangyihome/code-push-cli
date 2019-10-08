@@ -6,19 +6,19 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta property="og:title" content="CodePush" />
   <meta property="og:site_name" content="CodePush"/>
-  <meta property="og:description" content="CodePush Blog" />
+  <meta property="og:description" content="A JavaScript library for programmatically managing your CodePush account (e.g. creating apps, promoting releases), which allows authoring Node.js-based build..." />
   <meta property="og:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG" />
   
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@Microsoft">
   <meta name="twitter:title" content="CodePush">
-  <meta name="twitter:description" content="CodePush Blog">
+  <meta name="twitter:description" content="A JavaScript library for programmatically managing your CodePush account (e.g. creating apps, promoting releases), which allows authoring Node.js-based build...">
   <meta name="twitter:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG">
 
   <!-- Enable responsiveness on mobile devices-->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
   <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
-  <meta name="description" content="CodePush Blog">
+  <meta name="description" content="A JavaScript library for programmatically managing your CodePush account (e.g. creating apps, promoting releases), which allows authoring Node.js-based build...">
 
   <title>
     
@@ -606,16 +606,16 @@
 
 <ol>
 <li><p>Create an access key to authenticate with the CodePush server using the following CodePush CLI command:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push access-key add &quot;DESCRIPTION_OF_THE_KEY&quot;
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell">code-push access-key add &quot;DESCRIPTION_OF_THE_KEY&quot;
+</code></pre></figure>
 <p>If you already created a key that you want to use here, then you can retrieve it by running <code>code-push access-key ls</code> and using the value of the <code>Key</code> column for the key you wish to use.</p></li>
 <li><p>Install the management SDK by running <code>npm install code-push --save</code></p></li>
 <li><p>Import it using the following statement (using ES6 syntax as applicable):</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var CodePush = require(&quot;code-push&quot;);    
-</code></pre></div></li>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">var CodePush = require(&quot;code-push&quot;);    
+</code></pre></figure></li>
 <li><p>Create an instance of the <code>CodePush</code> class, passing it the access key you created or retrieved in step #1:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var codePush = new CodePush(&quot;YOUR_ACCESS_KEY&quot;);
-</code></pre></div></li>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">var codePush = new CodePush(&quot;YOUR_ACCESS_KEY&quot;);
+</code></pre></figure></li>
 <li><p>Begin automating the management of your account! For more details on what you can do with this <code>codePush</code> object, refer to the API reference section below.</p></li>
 </ol>
 

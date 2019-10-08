@@ -4,7 +4,7 @@
  <title>CodePush</title>
  <link href="http://microsoft.github.io/code-push/blog/atom.xml" rel="self"/>
  <link href="http://microsoft.github.io/code-push/blog/"/>
- <updated>2019-10-08T18:31:48+03:00</updated>
+ <updated>2019-10-08T18:40:27+03:00</updated>
  <id>http://microsoft.github.io/code-push/blog</id>
  <author>
    <name></name>
@@ -307,13 +307,13 @@ Please let us know what you think of our videos and let us know what topics you&
 &lt;h2&gt;CodePush.sync()&lt;/h2&gt;
 
 &lt;p&gt;Our client SDKs already included APIs which allowed your apps to check for the presence of an update and then subsequently download and apply it, customizing the user experience however you wished. While we think this &amp;ldquo;advanced API&amp;rdquo; is critical in allowing unexpected and custom scenarios to be more easily achievable, we also wanted to provide an API that allowed some common experiences to be possible with very little code. After talking to many users, we were able to infer a common user experience that we encapsulated in a new API method called &lt;code&gt;codePush.sync&lt;/code&gt;.&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;CodePush.sync().then((status) =&amp;gt; {
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-javascript&quot; data-lang=&quot;javascript&quot;&gt;CodePush.sync().then((status) =&amp;gt; {
     if (status == codePush.SyncStatus.UPDATE_APPLIED) {
         // Do any neccessary work here before the app
         // is restarted in order to apply the update
     }
 });
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 &lt;p&gt;The &lt;code&gt;sync&lt;/code&gt; method performs the update check, and handles displaying a notification to end-users when available. If a release is optional, the displayed dialog will allow ignoring it; otherwise, if the release is marked as mandatory, the end-user is required to install it before moving forward (this is useful for internal and testing scenarios). Additionally, you can choose to display your release description in the update notification and customize any string used in the dialog (e.g. buttons, header text).&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/116461/10925666/fca687b8-8244-11e5-919a-80e17a7d3156.png&quot; alt=&quot;CodePush update notification&quot;&gt;&lt;/p&gt;
@@ -325,8 +325,8 @@ Please let us know what you think of our videos and let us know what topics you&
 &lt;p&gt;A very common release practice is to submit an update to a dev or staging environment, test it, and then &amp;ldquo;promote&amp;rdquo; that update to your production environment. While this was possible previously by using the &lt;code&gt;code-push release&lt;/code&gt; command in our CLI, it wasn&amp;rsquo;t optimized for making this experience as simple as possible.&lt;/p&gt;
 
 &lt;p&gt;To better accomodate this common scenario, we introduced a new command to the management CLI called &lt;code&gt;promote&lt;/code&gt; that simply allows you to copy the contents and metadata (e.g. description, app store version, mandatory) from one deployment to another.&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;code-push promote &amp;lt;appName&amp;gt; &amp;lt;sourceDeploymentName&amp;gt; &amp;lt;targetDeploymentName&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;code-push promote &amp;lt;appName&amp;gt; &amp;lt;sourceDeploymentName&amp;gt; &amp;lt;targetDeploymentName&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 &lt;p&gt;With this addition, you can now easily do migrations between deployments (dev-&amp;gt;staging, staging-&amp;gt;production, etc.), which we hope should make your development process even smoother when using CodePush. Refer to the management CLI&amp;rsquo;s &lt;a href=&quot;http://localhost:3000/code-push/docs/cli.html&quot;&gt;documentation&lt;/a&gt; for more information.&lt;/p&gt;
 
 &lt;h2&gt;CI integration/&amp;ldquo;headless releases&amp;rdquo;&lt;/h2&gt;

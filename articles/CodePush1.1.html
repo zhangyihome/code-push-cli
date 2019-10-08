@@ -131,13 +131,13 @@
 <h2>CodePush.sync()</h2>
 
 <p>Our client SDKs already included APIs which allowed your apps to check for the presence of an update and then subsequently download and apply it, customizing the user experience however you wished. While we think this &ldquo;advanced API&rdquo; is critical in allowing unexpected and custom scenarios to be more easily achievable, we also wanted to provide an API that allowed some common experiences to be possible with very little code. After talking to many users, we were able to infer a common user experience that we encapsulated in a new API method called <code>codePush.sync</code>.</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">CodePush.sync().then((status) =&gt; {
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">CodePush.sync().then((status) =&gt; {
     if (status == codePush.SyncStatus.UPDATE_APPLIED) {
         // Do any neccessary work here before the app
         // is restarted in order to apply the update
     }
 });
-</code></pre></div>
+</code></pre></figure>
 <p>The <code>sync</code> method performs the update check, and handles displaying a notification to end-users when available. If a release is optional, the displayed dialog will allow ignoring it; otherwise, if the release is marked as mandatory, the end-user is required to install it before moving forward (this is useful for internal and testing scenarios). Additionally, you can choose to display your release description in the update notification and customize any string used in the dialog (e.g. buttons, header text).</p>
 
 <p><img src="https://cloud.githubusercontent.com/assets/116461/10925666/fca687b8-8244-11e5-919a-80e17a7d3156.png" alt="CodePush update notification"></p>
@@ -149,8 +149,8 @@
 <p>A very common release practice is to submit an update to a dev or staging environment, test it, and then &ldquo;promote&rdquo; that update to your production environment. While this was possible previously by using the <code>code-push release</code> command in our CLI, it wasn&rsquo;t optimized for making this experience as simple as possible.</p>
 
 <p>To better accomodate this common scenario, we introduced a new command to the management CLI called <code>promote</code> that simply allows you to copy the contents and metadata (e.g. description, app store version, mandatory) from one deployment to another.</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text">code-push promote &lt;appName&gt; &lt;sourceDeploymentName&gt; &lt;targetDeploymentName&gt;
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-text" data-lang="text">code-push promote &lt;appName&gt; &lt;sourceDeploymentName&gt; &lt;targetDeploymentName&gt;
+</code></pre></figure>
 <p>With this addition, you can now easily do migrations between deployments (dev-&gt;staging, staging-&gt;production, etc.), which we hope should make your development process even smoother when using CodePush. Refer to the management CLI&rsquo;s <a href="http://localhost:3000/code-push/docs/cli.html">documentation</a> for more information.</p>
 
 <h2>CI integration/&ldquo;headless releases&rdquo;</h2>

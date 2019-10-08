@@ -6,19 +6,19 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta property="og:title" content="CodePush" />
   <meta property="og:site_name" content="CodePush"/>
-  <meta property="og:description" content="CodePush Blog" />
+  <meta property="og:description" content="This plugin provides client-side integration for the CodePush service, allowing you to easily add a dynamic update experience to your Cordova app(s)." />
   <meta property="og:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG" />
   
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@Microsoft">
   <meta name="twitter:title" content="CodePush">
-  <meta name="twitter:description" content="CodePush Blog">
+  <meta name="twitter:description" content="This plugin provides client-side integration for the CodePush service, allowing you to easily add a dynamic update experience to your Cordova app(s).">
   <meta name="twitter:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG">
 
   <!-- Enable responsiveness on mobile devices-->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
   <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
-  <meta name="description" content="CodePush Blog">
+  <meta name="description" content="This plugin provides client-side integration for the CodePush service, allowing you to easily add a dynamic update experience to your Cordova app(s).">
 
   <title>
     
@@ -622,45 +622,45 @@
 </ul>
 
 <p>To check which versions of each Cordova platform you are currently using, you can run the following command and inspect the <code>Installed platforms</code> list:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">cordova platform ls
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell">cordova platform ls
+</code></pre></figure>
 <p>If you&rsquo;re running an older Android and/or iOS platform than is mentioned above, and would be open to upgrading, you can easily do so by running the following commands (omitting a platform if it isn&rsquo;t neccessary):</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">cordova platform update android
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell">cordova platform update android
 cordova platform update ios
-</code></pre></div>
+</code></pre></figure>
 <h2>Getting Started</h2>
 
 <p>Once you&rsquo;ve followed the general-purpose <a href="http://microsoft.github.io/code-push//docs/getting-started.html">&ldquo;getting started&rdquo;</a> instructions for setting up your CodePush account, you can start CodePush-ifying your Cordova app by running the following command from within your app&rsquo;s root directory:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">cordova plugin add cordova-plugin-code-push@latest
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell">cordova plugin add cordova-plugin-code-push@latest
+</code></pre></figure>
 <p>With the CodePush plugin installed, configure your app to use it via the following steps:</p>
 
 <ol>
 <li><p>Add your deployment keys to the <code>config.xml</code> file, making sure to include the right key for each Cordova platform:</p>
-<div class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;platform name=&quot;android&quot;&gt;
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;platform name=&quot;android&quot;&gt;
     &lt;preference name=&quot;CodePushDeploymentKey&quot; value=&quot;YOUR-ANDROID-DEPLOYMENT-KEY&quot; /&gt;
 &lt;/platform&gt;
 &lt;platform name=&quot;ios&quot;&gt;
     &lt;preference name=&quot;CodePushDeploymentKey&quot; value=&quot;YOUR-IOS-DEPLOYMENT-KEY&quot; /&gt;
 &lt;/platform&gt;
-</code></pre></div>
+</code></pre></figure>
 <p>As a reminder, these keys are generated for you when you created your CodePush app via the CLI. If you need to retrieve them, you can simply run <code>code-push deployment ls APP_NAME -k</code>, and grab the key for the specific deployment you want to use (e.g. <code>Staging</code>, <code>Production</code>).</p>
 
 <p><em>NOTE: We <a href="http://microsoft.github.io/code-push/docs/cli.html#link-4">recommend</a> creating a separate CodePush app for iOS and Android, which is why the above sample illustrates declaring seperate keys for Android and iOS. If you&rsquo;re only developing for a single platform, then you only need to specify the deployment key for either Android or iOS, so you don&rsquo;t need to add the additional <code>&lt;platform&gt;</code> element as illustrated above.</em></p></li>
 <li><p>If you&rsquo;re using an <code>&lt;access origin=&quot;*&quot; /&gt;</code> element in your <code>config.xml</code> file, then your app is already allowed to communicate with the CodePush servers and you can safely skip this step. Otherwise, add the following additional <code>&lt;access /&gt;</code> elements:</p>
-<div class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;access origin=&quot;https://codepush.azurewebsites.net&quot; /&gt;
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;access origin=&quot;https://codepush.azurewebsites.net&quot; /&gt;
 &lt;access origin=&quot;https://codepush.blob.core.windows.net&quot; /&gt;
 &lt;access origin=&quot;https://codepushupdates.azureedge.net&quot; /&gt;
-</code></pre></div></li>
+</code></pre></figure></li>
 <li><p>To ensure that your app can access the CodePush server on <a href="https://developer.mozilla.org/en-US/docs/Web/Security/CSP/Introducing_Content_Security_Policy">CSP</a>-compliant platforms, add <code>https://codepush.azurewebsites.net</code> to the <code>Content-Security-Policy</code> <code>meta</code> tag in your <code>index.html</code> file:</p>
-<div class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src https://codepush.azurewebsites.net &#39;self&#39; data: gap: https://ssl.gstatic.com &#39;unsafe-eval&#39;; style-src &#39;self&#39; &#39;unsafe-inline&#39;; media-src *&quot; /&gt;
-</code></pre></div></li>
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src https://codepush.azurewebsites.net &#39;self&#39; data: gap: https://ssl.gstatic.com &#39;unsafe-eval&#39;; style-src &#39;self&#39; &#39;unsafe-inline&#39;; media-src *&quot; /&gt;
+</code></pre></figure></li>
 <li><p>Finally, double-check that you already have the <a href="https://github.com/apache/cordova-plugin-whitelist"><code>cordova-plugin-whitelist</code></a> plugin installed (most apps will). To check this, simply run the following command:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">cordova plugin ls
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell">cordova plugin ls
+</code></pre></figure>
 <p>If <code>cordova-plugin-whitelist</code> is in the list, then you are good to go. Otherwise, simply run the following command to add it:</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">cordova plugin add cordova-plugin-whitelist
-</code></pre></div></li>
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell">cordova plugin add cordova-plugin-whitelist
+</code></pre></figure></li>
 </ol>
 
 <p>You are now ready to use the plugin in the application code. See the <a href="/samples">sample applications</a> for examples and the API documentation for more details.</p>
@@ -675,15 +675,15 @@ cordova platform update ios
 </ol>
 
 <p>The simplest way to do this is to perform the following in your app&rsquo;s <code>deviceready</code> event handler:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.sync();
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.sync();
+</code></pre></figure>
 <p>If an update is available, it will be silently downloaded, and installed the next time the app is restarted (either explicitly by the end user or by the OS), which ensures the least invasive experience for your end users. If an available update is mandatory, then it will be installed immediately, ensuring that the end user gets it as soon as possible.</p>
 
 <p>If you would like your app to discover updates more quickly, you can also choose to call <code>sync</code> every time the app resumes from the background, by adding the following code (or something equivalent) as part of your app&rsquo;s startup behavior. You can call <code>sync</code> as frequently as you would like, so when and where you call it just depends on your personal preference.</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">document.addEventListener(&quot;resume&quot;, function () {
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">document.addEventListener(&quot;resume&quot;, function () {
     codePush.sync();
 });
-</code></pre></div>
+</code></pre></figure>
 <p>Additionally, if you would like to display an update confirmation dialog (an &ldquo;active install&rdquo;), configure when an available update is installed (e.g. force an immediate restart) or customize the update experience in any way, refer to the <code>sync</code> method&rsquo;s API reference for information on how to tweak this default behavior.</p>
 
 <p><em>NOTE: While <a href="https://developer.apple.com/programs/ios/information/iOS_Program_Information_4_3_15.pdf">Apple&rsquo;s developer agreement</a> fully allows performing over-the-air updates of JavaScript and assets (which is what enables CodePush!), it is against their policy for an app to display an update prompt. Because of this, we recommend that App Store-distributed apps don&rsquo;t enable the <code>updateDialog</code> option when calling <code>sync</code>, whereas Google Play and internally distributed apps (e.g. Enterprise, Fabric, HockeyApp) can choose to enable/customize it.</em></p>
@@ -693,15 +693,15 @@ cordova platform update ios
 <p>Once your app has been configured and distributed to your users, and you&rsquo;ve made some code and/or asset changes, it&rsquo;s time to instantly release them! The simplest (and recommended) way to do this is to use the <code>release-cordova</code> comand in the CodePush CLI, which will handle preparing and releasing your update to the CodePush server. </p>
 
 <p>In it&rsquo;s most basic form, this command only requires two parameters: your app name and the platform you are creating the update for (either <code>ios</code> or <code>android</code>).</p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-cordova &lt;appName&gt; &lt;platform&gt;
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell">code-push release-cordova &lt;appName&gt; &lt;platform&gt;
 
 code-push release-cordova MyApp-ios ios
 code-push release-cordova MyApp-Android android
-</code></pre></div>
+</code></pre></figure>
 <p><em>NOTE: When releasing updates to CodePush, you do not need to bump your app&rsquo;s version in the <code>config.xml</code> file, since you aren&rsquo;t modifying the app store version at all. You only need to bump this version when you upgrade Cordova and/or one of your plugins, at which point, you need to release an update to the native store(s). CodePush will automatically generate a &ldquo;label&rdquo; for each release you make (e.g. <code>v3</code>) in order to help identify it within your release history.</em></p>
 
 <p>The <code>release-cordova</code> command enables such a simple workflow because it understands the standard layout of a Cordova app, and therefore, can generate your update and know exactly which files to upload. Additionally, in order to support flexible release strategies, the <code>release-cordova</code> command exposes numerous optional parameters that let you customize how the update should be distributed to your end users (e.g. Which binary versions are compatible with it? Should the release be viewed as mandatory?).  </p>
-<div class="highlight"><pre><code class="language-shell" data-lang="shell"># Release a mandatory update with a changelog
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell"># Release a mandatory update with a changelog
 code-push release-cordova MyApp-ios ios -m --description &quot;Modified the header color&quot;
 
 # Release a dev Android build to just 1/4 of your end users
@@ -714,7 +714,7 @@ code-push release-cordova MyApp-Android android --targetBinaryVersion &quot;~1.1
 # Release the update now but mark it as disabled
 # so that no users can download it yet
 code-push release-cordova MyApp-ios ios -x
-</code></pre></div>
+</code></pre></figure>
 <p>The CodePush client supports differential updates, so even though you are releasing your app code on every update, your end users will only actually download the files they need. The service handles this automatically so that you can focus on creating awesome apps and we can worry about optimizing end user downloads.</p>
 
 <p>For more details about how the <code>release-cordova</code> command works, as well as the various parameters it exposes, refer to the <a href="https://github.com/Microsoft/code-push/tree/master/cli#releasing-updates-cordova">CLI docs</a>. Additionally, if you would prefer to handle running the <code>cordova prepare</code> command yourself, and therefore, want an even more flexible solution than <code>release-cordova</code>, refer to the <a href="https://github.com/Microsoft/code-push/tree/master/cli#releasing-updates-general"><code>release</code> command</a> for more details.</p>
@@ -744,8 +744,8 @@ code-push release-cordova MyApp-ios ios -x
 </ul>
 
 <h3>codePush.checkForUpdate</h3>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.checkForUpdate(onSuccess, onError?, deploymentKey?: String);
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.checkForUpdate(onSuccess, onError?, deploymentKey?: String);
+</code></pre></figure>
 <p>Queries the CodePush service to see whether the configured app deployment has an update available. By default, it will use the deployment key that is configured in your <code>config.xml</code> file, but you can override that by specifying a value via the optional <code>deploymentKey</code> parameter. This can be useful when you want to dynamically &ldquo;redirect&rdquo; a user to a specific deployment, such as allowing &ldquo;Early access&rdquo; via an easter egg or a user setting switch.</p>
 
 <p>When the update check completes, it will trigger the <code>onUpdateCheck</code> callback with one of two possible values:</p>
@@ -770,17 +770,17 @@ code-push release-cordova MyApp-ios ios -x
 </ul>
 
 <p>Example usage:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.checkForUpdate(function (update) {
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.checkForUpdate(function (update) {
     if (!update) {
         console.log(&quot;The app is up to date.&quot;);
     } else {
         console.log(&quot;An update is available! Should we download it?&quot;);
     }
 });
-</code></pre></div>
+</code></pre></figure>
 <h3>codePush.getCurrentPackage</h3>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.getCurrentPackage(onSuccess, onError?);
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.getCurrentPackage(onSuccess, onError?);
+</code></pre></figure>
 <p>Retrieves the metadata about the currently installed &ldquo;package&rdquo; (e.g. description, installation time). This can be useful for scenarios such as displaying a &ldquo;what&rsquo;s new?&rdquo; dialog after an update has been applied or checking whether there is a pending update that is waiting to be applied via a resume or restart.</p>
 
 <p>When the update retrieval completes, it will trigger the <code>onSuccess</code> callback with one of two possible values:</p>
@@ -803,7 +803,7 @@ code-push release-cordova MyApp-ios ios -x
 </ul>
 
 <p>Example Usage:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.getCurrentPackage(function (update) {
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.getCurrentPackage(function (update) {
     if (!update) {
         console.log(&quot;No updates have been installed&quot;);
         return;
@@ -816,10 +816,10 @@ code-push release-cordova MyApp-ios ios -x
         // Display a &quot;what&#39;s new?&quot; modal
     }
 });
-</code></pre></div>
+</code></pre></figure>
 <h3>codePush.getPendingPackage</h3>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.getPendingPackage(onSuccess, onError?);
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.getPendingPackage(onSuccess, onError?);
+</code></pre></figure>
 <p>Gets the metadata for the currently pending update (if one exists). An update is considered &ldquo;pending&rdquo; if it has been downloaded and installed, but hasn&rsquo;t been applied yet via an app restart. An update could only ever be in this state if   <code>InstallMode.ON_NEXT_RESTART</code> or <code>InstallMode.ON_NEXT_RESUME</code> were specified upon calling <code>sync</code> or <code>LocalPackage.install</code>, and the app hasn&rsquo;t yet been restarted or resumed (respectively). This method can be useful if you&rsquo;d like to determine whether there is a pending update and then prompt the user if they would like to restart now (via <code>codePush.restartApplication</code>) in order to apply it.</p>
 
 <p>When the update retrieval completes, it will trigger the <code>onSuccess</code> callback with one of two possible values:</p>
@@ -837,16 +837,16 @@ code-push release-cordova MyApp-ios ios -x
 </ul>
 
 <p>Example Usage:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.getPendingPackage(function (update) {
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.getPendingPackage(function (update) {
     if (update) {
         // An update is currently pending, ask the
         // user if they would like to restart
     }
 });
-</code></pre></div>
+</code></pre></figure>
 <h3>codePush.notifyApplicationReady</h3>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.notifyApplicationReady(notifySucceeded?, notifyFailed?);
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.notifyApplicationReady(notifySucceeded?, notifyFailed?);
+</code></pre></figure>
 <p>Notifies the CodePush runtime that a freshly installed update should be considered successful, and therefore, an automatic client-side rollback isn&rsquo;t necessary. It is mandatory to call this function somewhere in the code of the updated bundle. Otherwise, when the app next restarts, the CodePush runtime will assume that the installed update has failed and roll back to the previous version. This behavior exists to help ensure that your end users aren&rsquo;t blocked by a broken update.</p>
 
 <p>If you are using the <code>sync</code> function, and doing your update check on app start, then you don&rsquo;t need to manually call <code>notifyApplicationReady</code> since <code>sync</code> will call it for you. This behavior exists due to the assumption that the point at which <code>sync</code> is called in your app represents a good approximation of a successful startup.</p>
@@ -859,8 +859,8 @@ code-push release-cordova MyApp-ios ios -x
 </ul>
 
 <h3>codePush.restartApplication</h3>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.restartApplication();
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.restartApplication();
+</code></pre></figure>
 <p>Immediately restarts the app. This method is for advanced scenarios, and is primarily useful when the following conditions are true:</p>
 
 <ol>
@@ -869,8 +869,8 @@ code-push release-cordova MyApp-ios ios -x
 </ol>
 
 <h3>codePush.sync</h3>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.sync(syncCallback?, syncOptions?, downloadProgress?);
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.sync(syncCallback?, syncOptions?, downloadProgress?);
+</code></pre></figure>
 <p>Synchronizes your app&rsquo;s code and images with the latest release to the configured deployment. Unlike the <code>checkForUpdate</code> method, which simply checks for the presence of an update, and let&rsquo;s you control what to do next, <code>sync</code> handles the update check, download and installation experience for you.</p>
 
 <p>This method provides support for two different (but customizable) &ldquo;modes&rdquo; to easily enable apps with different requirements:</p>
@@ -881,7 +881,7 @@ code-push release-cordova MyApp-ios ios -x
 </ol>
 
 <p>Example Usage:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">// Fully silent update which keeps the app in
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">// Fully silent update which keeps the app in
 // sync with the server, without ever 
 // interrupting the end user
 codePush.sync();
@@ -890,7 +890,7 @@ codePush.sync();
 // about each update, and displays it to them
 // immediately after downloading it
 codePush.sync(null, { updateDialog: true, installMode: InstallMode.IMMEDIATE });
-</code></pre></div>
+</code></pre></figure>
 <p><em>Note: If you want to decide whether you check and/or download an available update based on the end user&rsquo;s device battery level, network conditions, etc. then simply wrap the call to sync in a condition that ensures you only call it when desired.</em></p>
 
 <p>While the sync method tries to make it easy to perform silent and active updates with little configuration, it accepts the following optional parameters which allow you to customize numerous aspects of the default behavior mentioned above:</p>
@@ -933,7 +933,7 @@ codePush.sync(null, { updateDialog: true, installMode: InstallMode.IMMEDIATE });
 </ul>
 
 <p>Example Usage:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">// Download the update silently, but install it on
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">// Download the update silently, but install it on
 // the next resume, as long as at least 5 minutes
 // has passed since the app was put into the background.
 codePush.sync(null, { installMode: InstallMode.ON_NEXT_RESUME, minimumBackgroundDuration: 60 * 5 });
@@ -978,7 +978,7 @@ function downloadProgress(downloadProgress) {
         //console.log(&quot;Downloading &quot; + downloadProgress.receivedBytes + &quot; of &quot; + downloadProgress.totalBytes);
     }
 }
-</code></pre></div>
+</code></pre></figure>
 <p>The <code>sync</code> method can be called anywhere you&rsquo;d like to check for an update. That could be in the <code>deviceready</code> event handler, the <code>click</code> event of a button, in the callback of a periodic timer, or whatever else makes sense for your needs. Just like the <code>checkForUpdate</code> method, it will perform the network request to check for an update in the background, so it won&rsquo;t impact your UI thread and/or JavaScript thread&rsquo;s responsiveness.</p>
 
 <h3>Package objects</h3>
@@ -1028,7 +1028,7 @@ Otherwise, the install operation will be marked as failed, and the application i
 </ul>
 
 <p>Example Usage:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">// App version 1 (current version)
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">// App version 1 (current version)
 
 var onError = function (error) {
     console.log(&quot;An error occurred. &quot; + error);
@@ -1073,7 +1073,7 @@ var app = {
         // ...
     }
 }
-</code></pre></div>
+</code></pre></figure>
 <p>For an example on how you are protected against a bad update, see the <a href="#codepushnotifyapplicationready">notifyApplicationReady() documentation</a>.</p>
 
 <h4>RemotePackage</h4>
@@ -1108,7 +1108,7 @@ The optional <code>downloadProgress</code> callback is invoked several times dur
 </ul>
 
 <p>Example Usage:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var onError = function (error) {
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">var onError = function (error) {
     console.log(&quot;An error occurred. &quot; + error);
 };
 
@@ -1131,7 +1131,7 @@ var onUpdateCheck = function (remotePackage) {
 };
 
 window.codePush.checkForUpdate(onUpdateCheck, onError);
-</code></pre></div>
+</code></pre></figure>
 <h3>Enums</h3>
 
 <p>The CodePush API includes the following &ldquo;enum&rdquo; objects which can be used to customize the update experience, and are available globally off of the <code>window</code> object:</p>
@@ -1206,7 +1206,7 @@ The optional <code>downloadProgress</code> callback is invoked several times dur
 </ul>
 
 <p>Example Usage:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var onError = function (error) {
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">var onError = function (error) {
     console.log(&quot;An error occurred. &quot; + error);
 };
 
@@ -1229,7 +1229,7 @@ var onUpdateCheck = function (remotePackage) {
 };
 
 window.codePush.checkForUpdate(onUpdateCheck, onError);
-</code></pre></div>
+</code></pre></figure>
 <h3>Enums</h3>
 
 <p>The CodePush API includes the following &quot;enum&rdquo; objects which can be used to customize the update experience, and are available globally off of the <code>window</code> object:</p>
@@ -1263,8 +1263,8 @@ window.codePush.checkForUpdate(onUpdateCheck, onError);
 <h2>PhoneGap Build</h2>
 
 <p>This plugin is compatible with <a href="https://build.phonegap.com">PhoneGap Build</a>, and supports creating Android and iOS builds out-of-the-box. However, in order for CodePush to calculate the hash of your binary contents on Android, PhoneGap Build needs to use Gradle to build your app, which isn&rsquo;t its default behavior (it uses Ant). To resolve this, simply add the following element to your app&rsquo;s <code>config.xml</code> file, as a child of the <code>&lt;platform name=&quot;android&quot;&gt;</code> element:</p>
-<div class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;preference name=&quot;android-build-tool&quot; value=&quot;gradle&quot; /&gt;
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml">&lt;preference name=&quot;android-build-tool&quot; value=&quot;gradle&quot; /&gt;
+</code></pre></figure>
 <h2>Example Apps</h2>
 
 <p>The Cordova community has graciously created some awesome open source apps that can serve as examples for developers that are getting started. The following is a list of OSS Cordova apps that are also using CodePush, and can therefore be used to see how others are using the service:</p>

@@ -6,19 +6,19 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <meta property="og:title" content="CodePush" />
   <meta property="og:site_name" content="CodePush"/>
-  <meta property="og:description" content="CodePush Blog" />
+  <meta property="og:description" content="Update experience configuration" />
   <meta property="og:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG" />
   
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@Microsoft">
   <meta name="twitter:title" content="CodePush">
-  <meta name="twitter:description" content="CodePush Blog">
+  <meta name="twitter:description" content="Update experience configuration">
   <meta name="twitter:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG">
 
   <!-- Enable responsiveness on mobile devices-->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
   <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
-  <meta name="description" content="CodePush Blog">
+  <meta name="description" content="Update experience configuration">
 
   <title>
     
@@ -613,8 +613,8 @@
 <h3>1.   Silent mode</h3>
 
 <p>Silent mode updates are the simplest way to update an app and the least invasive experience for the end users.</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.sync();
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.sync();
+</code></pre></figure>
 <p>If an update is available, it will be silently downloaded, and installed the next time the app is restarted (either explicitly by the end user or by the OS). However, developers can modify the install behavior if they so choose, by leveraging the <code>installMode</code> parameter:</p>
 
 <ul>
@@ -624,36 +624,36 @@
 </ul>
 
 <p>For example, to download and install an update immediately, developers can use the <code>installMode</code> parameter as follows:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.sync({installMode: InstallMode.IMMEDIATE});
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.sync({installMode: InstallMode.IMMEDIATE});
+</code></pre></figure>
 <h4>Recommendation</h4>
 
 <p>Depending on the complexity of the app, pushing an update immediately might be a jarring experience for end users (e.g. changing the UI or losing the current state can be frustrating and confusing).  Because of this, we recommend updates are installed only after a certain period of app inactivity has been reached. To achieve this experience, developers can use the InstallMode.ON_NEXT_RESUME and minimumBackgroundDuration parameters as follows:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">// Download the update silently, but install on next
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">// Download the update silently, but install on next
 // app resume and after 10 minutes of app inactivity
 // We recommend doing this call on app start (e.g. `componentDidMount` event on React Native or `deviceready` on Cordova)
 codePush.sync({ installMode: InstallMode.ON_NEXT_RESUME, minimumBackgroundDuration: 60 * 10 });
-</code></pre></div>
+</code></pre></figure>
 <blockquote>
 <p><strong>Note:</strong> If <code>codePush.sync()</code> is not called on app start (e.g. <code>componentDidMount</code> event on React Native or <code>deviceready</code> on Cordova), developers will need to notify the update was successfully installed by calling the <code>codePush.notifyApplicationReady()</code> method. Otherwise the CodePush runtime will assume the installed update has failed and roll back to the previous version.</p>
 
 <p><strong>Note:</strong> For Cordova, the first parameter that <code>codePush.sync()</code> expects is a <code>syncStatusCallback</code>, so to do the same thing, you should insert <code>null</code> as the first parameter to the call, i.e:</p>
 </blockquote>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.sync(null, { installMode: InstallMode.ON_NEXT_RESUME, minimumBackgroundDuration: 60 * 10 });
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">codePush.sync(null, { installMode: InstallMode.ON_NEXT_RESUME, minimumBackgroundDuration: 60 * 10 });
+</code></pre></figure>
 <h3>2.   Active mode</h3>
 
 <p>In contrast to the silent mode updates, active mode updates prompt end users about available updates and thus require user interaction.</p>
 
 <p>The difference is introduced by the usage of the <code>updateDialog</code> parameter.</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">    codePush.sync({ updateDialog: true });
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">    codePush.sync({ updateDialog: true });
+</code></pre></figure>
 <p>If an update is available, the app automatically launches a native prompt asking end users for permission to download and install the update. Once the user accepts, the update is silently downloaded and inmmediatly applied., and installed the next time the app is restarted (either explicitly by the end user or by the OS).</p>
 
 <h4>Update dialog customization</h4>
 
 <p>To customize the update dialog, developers can create an updateDialogOption object and pass it to the <code>codePush.sync()</code> call as follows:</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">
     var updateDialogOptions = {
         updateTitle: &quot;You have an update&quot;,
         optionalUpdateMessage: &quot;Update available. Install?&quot;,
@@ -663,7 +663,7 @@ codePush.sync({ installMode: InstallMode.ON_NEXT_RESUME, minimumBackgroundDurati
 
     codePush.sync({ updateDialog: updateDialogOptions});
 
-</code></pre></div>
+</code></pre></figure>
 <p>Visit the  <a href="http://microsoft.github.io/code-push/docs/cordova.html#link-5">Cordova</a> or <a href="http://microsoft.github.io/code-push/docs/react-native.html#link-8">React Native</a> API Reference pages for a full description of all the avaiable UpdateDialogOptions options.</p>
 
 <blockquote>
@@ -677,7 +677,7 @@ codePush.sync({ installMode: InstallMode.ON_NEXT_RESUME, minimumBackgroundDurati
 <h4>Update cycle notifications</h4>
 
 <p>The <code>codePush.sync()</code> method allows the use of a call back to hook into the overall update process and thus provide a custom experience on each stage of the update process as follows.</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">var onSyncStatusChange = function(SyncStatus) {
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">var onSyncStatusChange = function(SyncStatus) {
     switch (SyncStatus) {
         case SyncStatus.CHECKING_FOR_UPDATE:
             // Show &quot;Checking for update&quot; notification
@@ -697,13 +697,13 @@ codePush.sync({ installMode: InstallMode.ON_NEXT_RESUME, minimumBackgroundDurati
 // Prompt the user when an update is available and display a &quot;downloading&quot; modal
 codePush.sync({ updateDialog: true }, onSyncStatusChange);
 
-</code></pre></div>
+</code></pre></figure>
 <p>Visit the  <a href="http://microsoft.github.io/code-push/docs/cordova.html#syncstatus">Cordova</a> or <a href="http://microsoft.github.io/code-push/docs/react-native.html#syncstatus">React Native</a> SyncStatus enum for a full description of all the available enum values.</p>
 
 <h4>Adding a &ldquo;downloading&rdquo; progress indicator</h4>
 
 <p>To provide an enhanced experience, developers can choose to provide a download progress indicator. The <code>codePush.sync()</code> method provides a different call back to make this possible.</p>
-<div class="highlight"><pre><code class="language-javascript" data-lang="javascript">
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">
 var onError = function (error) {
     console.log(&quot;An error occurred. &quot; + error);
 };
@@ -716,7 +716,7 @@ var onDownloadProgress = function (downloadProgress) {
 
 codePush.sync({ updateDialog: true }, onSyncStatusChange, onDownloadProgress, onError);
 
-</code></pre></div>
+</code></pre></figure>
 <h2>Automate your deployments with VSTS</h2>
 
 <p>Continuous Integration (CI) and Continuous Deployment (CD) are key practices of DevOps. It requires the team to have a mindset to merge all working copies of developers’ code with a shared repository, producing a new build upon code commit. In turn this provides them with the opportunity to leverage the CI output, deploy it to one or more environments, and ultimately serve the end users via app updates.</p>
@@ -793,11 +793,11 @@ code-push app add VSTSCDSample-Android android react-native
 <p><img src="/code-push/assets/images/docs/tutorials/vsts/vsts-remote.png" alt="Getting VSTS remote"></p>
 
 <p>Update the repository&rsquo;s remote URL using the following <a href="https://help.github.com/articles/changing-a-remote-s-url">command</a>:</p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"> git remote set-url origin replaceWithVSTSRepositoryURL
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-text" data-lang="text"> git remote set-url origin replaceWithVSTSRepositoryURL
+</code></pre></figure>
 <p>Once the new remote URL is set, push the repository to VSTS via <a href="https://help.github.com/articles/pushing-to-a-remote/">Git push</a></p>
-<div class="highlight"><pre><code class="language-text" data-lang="text"> git push -u origin --all
-</code></pre></div>
+<figure class="highlight"><pre><code class="language-text" data-lang="text"> git push -u origin --all
+</code></pre></figure>
 <p>A few seconds later, the source will be added to your VSTS repository:</p>
 
 <p><img src="/code-push/assets/images/docs/tutorials/vsts/vsts-code.png" alt="New project dialog"></p>
