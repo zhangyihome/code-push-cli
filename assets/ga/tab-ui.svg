@@ -1,0 +1,41 @@
+
+<svg width="92px" height="92px" viewBox="0 0 92 92" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="0 0 1.24519942 11.7730596 3.78586449 9.42010179 6.85308931 14.3346179 9.19203085 13.0237055 6.12480603 8.10918945 9.57318217 6.9649424"></polygon>
+    </defs>
+    <g id="Mobile-Center" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="CodePush---Migration" transform="translate(-161.000000, -1095.000000)">
+            <g id="Group-13" transform="translate(162.000000, 803.000000)">
+                <g id="box" transform="translate(0.000000, 293.000000)">
+                    <g id="Group-28">
+                        <circle id="Oval" stroke="#E5E6E9" fill="#FFFFFF" cx="45" cy="45" r="45"></circle>
+                        <g id="Group-27" transform="translate(19.000000, 25.000000)">
+                            <g id="Group-14">
+                                <rect id="Rectangle-8" stroke="#27333F" stroke-width="2" x="1" y="1" width="50" height="38" rx="3"></rect>
+                                <rect id="Rectangle-10" fill="#27333F" x="0" y="9" width="52" height="2"></rect>
+                                <circle id="Oval-7" fill="#27333F" cx="8" cy="6" r="1"></circle>
+                                <rect id="Rectangle-12" fill="#27333F" x="10" y="11" width="2" height="27"></rect>
+                                <rect id="Rectangle-12" fill="#27333F" x="20" y="11" width="2" height="27"></rect>
+                                <circle id="Oval-7" fill="#27333F" cx="12" cy="6" r="1"></circle>
+                            </g>
+                            <g id="Group-25" transform="translate(41.000000, 30.000000)" fill-rule="nonzero">
+                                <g id="Group-22" stroke-width="8" stroke="#FFFFFF" fill="#FFFFFF">
+                                    <polygon id="Shape" points="0 0 1.24519942 11.7730596 3.78586449 9.42010179 6.85308931 14.3346179 9.19203085 13.0237055 6.12480603 8.10918945 9.57318217 6.9649424"></polygon>
+                                </g>
+                                <g id="Shape">
+                                    <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                                    <path stroke="#009EE1" stroke-width="2" d="M7.6461083,8.6580035 L10.5953776,13.3835232 L6.5098373,15.673356 L3.57792694,10.97565 L0.460629752,13.8626377 L-1.23110962,-2.13234923 L11.7351049,7.30118451 L7.6461083,8.6580035 Z"></path>
+                                </g>
+                            </g>
+                            <rect id="Rectangle-21" fill="#27333F" x="26" y="15" width="19" height="2" rx="1"></rect>
+                            <rect id="Rectangle-21" fill="#27333F" x="26" y="20" width="16" height="2" rx="1"></rect>
+                            <rect id="Rectangle-21" fill="#27333F" x="26" y="25" width="10" height="2" rx="1"></rect>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

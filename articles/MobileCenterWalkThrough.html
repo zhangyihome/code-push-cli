@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta property="og:title" content="CodePush" />
+  <meta property="og:site_name" content="CodePush"/>
+  <meta property="og:description" content="Getting Started" />
+  <meta property="og:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG" />
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@Microsoft">
+  <meta name="twitter:title" content="CodePush">
+  <meta name="twitter:description" content="Getting Started">
+  <meta name="twitter:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+  <meta name="description" content="Getting Started">
+
+  <title>
+    
+      Mobile Center now supports CodePush &middot; CodePush
+    
+  </title>
+  
+  <!-- build:css  /assets/css/vendor.css -->
+  <link rel="stylesheet" href="/code-push/libraries/bootstrap/dist/css/bootstrap.css" />
+  <link rel="stylesheet" href="/code-push/libraries/highlightjs/styles/solarized_light.css">
+  <link rel="stylesheet" href="/code-push/libraries/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/code-push/libraries/github-fork-ribbon-css/gh-fork-ribbon.css">
+  <!-- endbuild -->
+  
+  <!-- CSS -->
+  <!-- build:css /assets/css/style.min.css -->
+  <link rel="stylesheet" href="/code-push/assets/stylesheets/style.css">
+  <link rel="stylesheet" href="/code-push/assets/stylesheets/ga.style.css">
+  <!-- endbuild -->             
+
+  <!-- Icons --> <!-- TODO: Check that these all wok -->
+  <link rel="apple-touch-icon" sizes="57x57" href="/code-push/assets/images/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/code-push/assets/images/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/code-push/assets/images/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/code-push/assets/images/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/code-push/assets/images/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/code-push/assets/images/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/code-push/assets/images/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/code-push/assets/images/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/code-push/assets/images/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/code-push/assets/images/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/code-push/assets/images/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/code-push/assets/images/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/code-push/assets/images/icons/favicon-16x16.png">
+  <link rel="manifest" href="/code-push/assets/images/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#294E80">
+  <meta name="msapplication-TileImage" content="/code-push/assets/images/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- JS -->    
+  <!-- Redirect logic from this docs(as it was depricated) to new docs https://docs.microsoft.com/en-us/appcenter/distribution/codepush/   -->    
+  <script src="/code-push/assets/javascript/redirect.js"></script>
+
+	<!-- build:js  /assets/js/vendors.js  -->	
+	<script src="/code-push/libraries/jquery/dist/jquery.min.js"></script>
+	<script src="/code-push/libraries/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="/code-push/libraries/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+  <script src="/code-push/libraries/anchorific.js/min/anchorific.min.js"></script>
+  <script src="/code-push/libraries/toc/dist/toc.min.js"></script>
+  <script src="/code-push/libraries/highlightjs/highlight.pack.min.js"></script>
+  <!-- endbuild -->   
+  
+  <!-- build:js /assets/js/all.min.js -->
+  <script src="/code-push/assets/javascript/global.js"></script>
+  <script src="/code-push/assets/javascript/home.js"></script>  
+  <script src="/code-push/assets/javascript/docs.js"></script>
+  <script src="/code-push/assets/javascript/faq.js"></script>
+  <!-- endbuild -->
+ 
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/code-push/atom.xml">
+
+    
+</head>
+<body>
+    <header role="banner">
+	<nav class="navbar navbar-default navbar-fixed-top">
+		 <div class="container-fluid">
+        	<!--<img class="fork-me-ribbon pull-right" src="../assets/images/fork_me_ribbon.svg" />-->
+		    <!-- Brand and toggle get grouped for better mobile display -->
+		    <div class="navbar-header">
+		      <button type="button" class="navbar-toggle pull-left collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+		        <span class="sr-only">Toggle navigation</span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		      </button>
+		      <a class="navbar-brand" href="/code-push/index.html">
+						<img class="navbar-logo" src="/code-push/assets/images/codepush_navbar_logo.svg">
+							<sup class="navbar-logo-text">PREVIEW</sup>
+						</image>
+					</a>
+		    </div>
+		    <!-- Collect the nav links, forms, and other content for toggling -->
+		    <div class="collapse navbar-collapse navbar_center" id="bs-example-navbar-collapse-1">
+		      <ul class="nav navbar-nav">
+				<li class=""><a href="/code-push/index.html#getting_started">Getting Started</a></li>
+				<li class=""><a href="/code-push/docs/index.html">Documentation</a></li>
+		        <li class=""><a href="/code-push/faq/index.html">FAQ</a></li>
+				<li class=""><a href="/code-push/blog/index.html">Blog</a></li>
+                <li class=""><a href="/code-push/community/friends.html">Showcase</a></li>
+		      </ul>
+		    </div><!-- /.navbar-collapse -->
+		</div><!-- /.container-fluid -->
+	</nav>				   		
+</header>
+<div class="top_navbar_spacer"></div>
+	<div class="post">
+    <div id="content" class="container main_content">   
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1"> 
+                <div class="post-header">
+                    <h1>Mobile Center now supports CodePush</h1>
+                    <span class="date">15 Jun 2017</span><span>&nbsp;- by</span><span class="author"><a href="https://twitter.com/mscodepush">Ian Geoghegan</a></span>
+                </div>
+                <h3>Getting Started</h3>
+
+<p>On June 2nd we <a href="http://microsoft.github.io/code-push/articles/CodePushOnMobileCenter.html">moved</a> CodePush over to Mobile Center in order to provide the project with greater resources, exposure, and tooling beyond what we offer in the command line interface (CLI). We now would like to give you a brief tour of what you can expect. First, we encourage you to install the latest version of the CLI. Start by running <code>code-push -v</code> from the command line. If your version number is less than 2, then update code-push by running <code>npm install -g code-push</code>.
+<br/><br/>
+Even though existing users can continue to use previous versions of the CLI with their old apps, some things have changed and will ultimately require them to upgrade - for instance, new apps can&rsquo;t be added through pre-2.0 versions of the CLI as Mobile Center requires OS and platform information in order to present the best user experience. 
+<br/><br/></p>
+
+<h3>Time for Mobile Center</h3>
+
+<p>Now that you have the latest version of the CLI (and even if you don&rsquo;t), visit <a href="https://mobile.azure.com">Mobile Center</a>. If you are not logged in and/or have not created an account, you will be able to use the account and credentials that you set up with CodePush. If you had <em>both</em> a CodePush and Mobile Center account that shared an email address, then you should find the accounts merged upon login. 
+<br/><br/>
+Once you login, the first thing you will see is a list of all your applications. If you had a previous CodePush application, you should find it listed and annotated.
+<br/><br/>
+<img src="https://user-images.githubusercontent.com/26582198/27192390-063471a0-51b0-11e7-89b0-605c0cf80c69.png" alt="All Your Apps">
+<br/><br/>
+Imported CodePush apps require that you specify their OS and Platform so that Mobile Center knows how to handle them. 
+<br/><br/>
+<img src="https://user-images.githubusercontent.com/26582198/27060055-34f59d34-4f8f-11e7-9e38-7c1b928a08da.png" alt="Import">
+<br/><br/>
+If you specify that your app is a Cordova or Windows application, you may notice that we don&rsquo;t yet support these platforms; if this is the case, please do not despair. Mobile Center&rsquo;s mission is to provide quality support for as many mobile platforms as possible; we are working hard to make it so. Periodically check out our <a href="https://engineering.mobile.azure.com/">blog</a> for news and updates and our product <a href="https://docs.microsoft.com/en-us/mobile-center/general/roadmap">roadmap</a>.
+<br/><br/>
+If your imported app&rsquo;s platform is React Native or if you are starting a new React Native app from scratch, you should see an app overview panel that lets you manage your app and provides you with instruction on how to integrate other Mobile Center SDKs. Please note that your app secret is <em>not</em> the same as your CodePush deployment keys; the latter can be discovered by running <code>code-push deployment ls &lt;appName&gt; -k</code> from the CLI and soon will also be exposed in the Mobile Center dashboard.
+<br/><br/>
+<img src="https://user-images.githubusercontent.com/26582198/27110358-9313d3c6-505d-11e7-81f7-3b87652b2edb.png" alt="App Overview">
+<br/><br/>
+These SDKs allow your app to take advantage of the rich service suites that you see listed on the side nav:
+<br/><br/>
+1. <strong>Cloud Build</strong> services for iOS, Android, Xamarin, and React Native<br/>
+2. <strong>Automated UI Testing</strong> with stack traces and screenshots of errors<br/>
+3. <strong>Distribution</strong> to beta testers without submitting to the app store<br/>
+4. <strong>Analytics</strong> to measure user engagement by device, geographic region, app version number, custom events, etc.<br/>
+5. <strong>Crash &amp; Error</strong> Reporting with full stack traces in native code and source maps for JavaScript<br/>
+6. <strong>Push Notifications</strong> segmented by device characteristics and user behavior
+<br/><br/>
+ Clicking on any one of these will display further, service-specific instruction and/or controls. If anything isn&rsquo;t obvious, you can also click on your user name in the lower left-hand corner of the screen and select <a href="https://docs.microsoft.com/en-us/mobile-center/">Docs &amp; APIs</a>.
+<br/><br/></p>
+
+<h3>Where&rsquo;s CodePush?</h3>
+
+<p>You will find CodePush under Distribute. If your app has a history of releases in a given deployment, you will see them there. You can switch between deployments using the dropdown at the upper right-hand corner of the screen and if you select a release you will see a pane displaying metrics and details for it. 
+<br/><br/>
+<img src="https://user-images.githubusercontent.com/26582198/27064699-8db89192-4fad-11e7-9521-c28c388b7636.png" alt="Release Detail">
+<br/><br/>
+Clicking the &ldquo;Edit&rdquo; button will provide you with a panel for patching your release.
+<br/><br/>
+<img src="https://user-images.githubusercontent.com/26582198/27064765-e206f40a-4fad-11e7-8b34-5e1f0bbb161a.png" alt="Release Patch">
+<br/><br/>
+Developers using CodePush must continue to distribute releases using the release commands in the CLI, but we are looking into extending this functionality to the Mobile Center dashboard. Please note that if you create your React Native app using the dashboard, you <em>first</em> will have to create default deployments using Mobile Center.
+<br/><br/>
+<img src="https://user-images.githubusercontent.com/26582198/27160991-126d84b2-512d-11e7-960a-da98d72a719b.png" alt="CreateDeployments">
+<br/><br/>
+or using the CLI command <code>code-push deployment add &lt;appName&gt; --default</code> prior to pushing out a release. Release commands remain unchanged; you can update your React Native app by executing <code>code-push release-react &lt;appName&gt; &lt;platform&gt; [options]</code>. For examples of how to execute release commands and explanations of the options, run <code>code-push release-react</code> or <code>code-push release</code>. 
+<br/><br/></p>
+
+<h3>What&rsquo;s next?</h3>
+
+<p>We are planning several updates to CodePush including deployment management in the dashboard, bundle signing, and other features, but we really would like your feedback about what you would like to see next. Please let us know even - especially if it is to let us know that something isn&rsquo;t working for you. Email us at <a href="mailto:codepush@microsoft.com?subject=CodePush%20Feature%20Suggestion"><a href="mailto:codepush@microsoft.com">codepush@microsoft.com</a></a> or use the Intercom widget at the bottom right-hand corner of the screen on Mobile Center.
+<br/><br/>
+<img src="https://user-images.githubusercontent.com/26582198/27064939-d0b2f81a-4fae-11e7-8d2d-52df1904a884.png" alt="Intercom">
+<br/><br/>
+Going forward the CodePush team will continue to provide you with the <em>free</em> standalone service that you know and love from its new home in Mobile Center.</p>
+
+            </div>
+        </div>
+    </div>
+</div>
+	<footer>
+    <div class="footer-container">
+        <div class="container" id="footer">
+            <div class="row">
+                <div class="col-sm-9">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <h4>General</h4>
+                            <ul class="nav">
+                                <!--TODO: CHECK LINKS-->
+                                <li><a href="https://github.com/Microsoft/code-push/blob/master/LICENSE.md" target="_blank">License</a></li>
+                                <li><a href="https://www.visualstudio.com/en-us/privacy-policy-vs" target="_blank">Privacy</a></li>
+                                <li><a href="https://msdn.microsoft.com/en-us/cc300389" target="_blank">Terms of Service</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-4">
+                            <h4>Community</h4>
+                            <ul class="nav">
+                                <li><a href="https://github.com/Microsoft/code-push/" target="_blank">GitHub Project</a></li>
+                                <li><a href="https://stackoverflow.com/questions/tagged/codepush" target="_blank">Stack Overflow</a></li>
+                                <li><a href="https://twitter.com/hashtag/codepush" target="_blank">#CodePush</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-4">
+                            <h4>Documentation</h4>
+                            <ul class="nav">
+                                <li><a href="https://github.com/Microsoft/code-push/blob/master/cli/README.md" target="_blank">CLI Docs</a></li>
+                                <li><a href="https://github.com/Microsoft/cordova-plugin-code-push/blob/master/README.md" target="_blank">Cordova Plugin Docs</a></li>
+                                <li><a href="https://github.com/Microsoft/react-native-code-push/blob/master/README.md" target="_blank">React Native Plugin Docs</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <h3><i class="fa fa-comment"></i> Talk to us!</h3>
+                    <p>If you have any feedback or suggestions on how we can make CodePush more awesome, please contact via Twitter <a href="https://twitter.com/mscodepush">@mscodepush, <a href=mailto:codepush@microsoft.com>email us</a> or ping us in the <a href="https://discord.gg/0ZcbPKXt5bWxFdFu">#code-push</a> channel on Reactiflux (for React Native).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid signature-container">
+        <div class="container">
+            <div class="row signature">          
+                <p class="pull-left hidden-xs">Made with <span class="glyphicon glyphicon-heart"></span> in Redmond</p> 
+                <div class="pull-right">
+                    <p class="copyright pull-left">&copy;2012-2017 Microsoft
+                    <img class="ms-logo-footer" src="/code-push/assets/images/Microsoft_logo.svg"/></p>
+                </div>              
+            </div>
+        </div>        
+    </div>
+</footer>
+</body>	
+</html>

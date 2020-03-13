@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta property="og:title" content="CodePush" />
+  <meta property="og:site_name" content="CodePush"/>
+  <meta property="og:description" content="CodePush Blog" />
+  <meta property="og:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG" />
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@Microsoft">
+  <meta name="twitter:title" content="CodePush">
+  <meta name="twitter:description" content="CodePush Blog">
+  <meta name="twitter:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+  <meta name="description" content="CodePush Blog">
+
+  <title>
+    
+      Friends of CodePush &middot; CodePush
+    
+  </title>
+  
+  <!-- build:css  /assets/css/vendor.css -->
+  <link rel="stylesheet" href="/code-push/libraries/bootstrap/dist/css/bootstrap.css" />
+  <link rel="stylesheet" href="/code-push/libraries/highlightjs/styles/solarized_light.css">
+  <link rel="stylesheet" href="/code-push/libraries/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/code-push/libraries/github-fork-ribbon-css/gh-fork-ribbon.css">
+  <!-- endbuild -->
+  
+  <!-- CSS -->
+  <!-- build:css /assets/css/style.min.css -->
+  <link rel="stylesheet" href="/code-push/assets/stylesheets/style.css">
+  <link rel="stylesheet" href="/code-push/assets/stylesheets/ga.style.css">
+  <!-- endbuild -->             
+
+  <!-- Icons --> <!-- TODO: Check that these all wok -->
+  <link rel="apple-touch-icon" sizes="57x57" href="/code-push/assets/images/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/code-push/assets/images/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/code-push/assets/images/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/code-push/assets/images/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/code-push/assets/images/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/code-push/assets/images/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/code-push/assets/images/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/code-push/assets/images/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/code-push/assets/images/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/code-push/assets/images/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/code-push/assets/images/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/code-push/assets/images/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/code-push/assets/images/icons/favicon-16x16.png">
+  <link rel="manifest" href="/code-push/assets/images/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#294E80">
+  <meta name="msapplication-TileImage" content="/code-push/assets/images/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- JS -->    
+  <!-- Redirect logic from this docs(as it was depricated) to new docs https://docs.microsoft.com/en-us/appcenter/distribution/codepush/   -->    
+  <script src="/code-push/assets/javascript/redirect.js"></script>
+
+	<!-- build:js  /assets/js/vendors.js  -->	
+	<script src="/code-push/libraries/jquery/dist/jquery.min.js"></script>
+	<script src="/code-push/libraries/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="/code-push/libraries/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+  <script src="/code-push/libraries/anchorific.js/min/anchorific.min.js"></script>
+  <script src="/code-push/libraries/toc/dist/toc.min.js"></script>
+  <script src="/code-push/libraries/highlightjs/highlight.pack.min.js"></script>
+  <!-- endbuild -->   
+  
+  <!-- build:js /assets/js/all.min.js -->
+  <script src="/code-push/assets/javascript/global.js"></script>
+  <script src="/code-push/assets/javascript/home.js"></script>  
+  <script src="/code-push/assets/javascript/docs.js"></script>
+  <script src="/code-push/assets/javascript/faq.js"></script>
+  <!-- endbuild -->
+ 
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/code-push/atom.xml">
+
+    
+</head>
+<body>
+    <header role="banner">
+	<nav class="navbar navbar-default navbar-fixed-top">
+		 <div class="container-fluid">
+        	<!--<img class="fork-me-ribbon pull-right" src="../assets/images/fork_me_ribbon.svg" />-->
+		    <!-- Brand and toggle get grouped for better mobile display -->
+		    <div class="navbar-header">
+		      <button type="button" class="navbar-toggle pull-left collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+		        <span class="sr-only">Toggle navigation</span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		      </button>
+		      <a class="navbar-brand" href="/code-push/index.html">
+						<img class="navbar-logo" src="/code-push/assets/images/codepush_navbar_logo.svg">
+							<sup class="navbar-logo-text">PREVIEW</sup>
+						</image>
+					</a>
+		    </div>
+		    <!-- Collect the nav links, forms, and other content for toggling -->
+		    <div class="collapse navbar-collapse navbar_center" id="bs-example-navbar-collapse-1">
+		      <ul class="nav navbar-nav">
+				<li class=""><a href="/code-push/index.html#getting_started">Getting Started</a></li>
+				<li class=""><a href="/code-push/docs/index.html">Documentation</a></li>
+		        <li class=""><a href="/code-push/faq/index.html">FAQ</a></li>
+				<li class=""><a href="/code-push/blog/index.html">Blog</a></li>
+                <li class=" active "><a href="/code-push/community/friends.html">Showcase</a></li>
+		      </ul>
+		    </div><!-- /.navbar-collapse -->
+		</div><!-- /.container-fluid -->
+	</nav>				   		
+</header>
+<div class="top_navbar_spacer"></div>
+	<div class="friends">
+    <div class="friendbar-content friend-info">
+        <div data-hash-nav="friends" class="has-hash-nav clearfix friend-contentcontainer">
+            <center>
+                <h1>Who's using CodePush?</h1>
+                <p class="introduction">The following list represents some of the great examples of Cordova and React Native apps using CodePush to perform over-the-air updates. If you are currently using CodePush and would like to have your app added, please <a href="https://github.com/microsoft/code-push/issues/new?title=New+Website+Logo%3A+%5Binsert+name%5D%0A&body=Please+fill+the+following+out%3A%0A%0A-+Name%3A+%28correctly+formatted%29%0A-+Homepage+(or+app+store)+url%3A+%28homepage%2Fapp+store%2Fprimary+entry+point+for+users%29%0A-+Brand+Guidelines%2FLicensing%3A+%28or+anything+we+need+to+know+before+using+your+logo%29%0A-+Logo%3A+%28svg+if+possible%2C+pngs+over+300x300px+with+transparent+backgrounds+are+also+acceptable%29%0A%0A%3E+Example%3A%0A%3E%0A%3E+Name%3A+Microsoft%0A%3E+Homepage+url%3A+https%3A%2F%2Fmicrosoft.com%0A%3E+Brand+Guidelines%2FLicensing%3A+https%3A%2F%2Fwww.microsoft.com%2Fen-us%2Flegal%2Fintellectualproperty%2Ftrademarks%2Fusage%2Flogo.aspx%0A%3E+Logo%3A+https%3A%2F%2Fnews.microsoft.com%2Fmicrosoft-news-center-photos%2Fmsft_logo_rgb_c-gray%2F%0A">fill out this short form</a>, and we would be happy to spread the love!</p>
+            </center>
+            <div class="friend-container">
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/bhagavad-gita-lite/id1071711190" target="_blank"><img src="/code-push/assets/images/friends/bhagavadgita.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/canvasser-pro/id1065066757" target="_blank"><img src="/code-push/assets/images/friends/canvasserpro.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://play.google.com/store/apps/details?id=cdiscount.mobile" target="_blank"><img src="/code-push/assets/images/friends/cdiscount.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/convoy-driver/id1045368390" target="_blank"><img src="/code-push/assets/images/friends/convoy.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/curbit-find-treasures-nearby/id1090705910" target="_blank"><img src="/code-push/assets/images/friends/curbit.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://www.dashdoc.eu/fr/" target="_blank"><img src="/code-push/assets/images/friends/dashdoc.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/delivery.com-food-alcohol/id435168129" target="_blank"><img src="/code-push/assets/images/friends/deliverycom.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/dutch-home-rentals/id540376128" target="_blank"><img src="/code-push/assets/images/friends/dutchhomerentals.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/evocq-live-events-your-way/id1050974001" target="_blank"><img src="/code-push/assets/images/friends/evocq.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/fanvision-golf/id1081891275" target="_blank"><img src="/code-push/assets/images/friends/fanvisiongolf.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/fashwell/id977668416" target="_blank"><img src="/code-push/assets/images/friends/fashwell.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://play.google.com/store/apps/details?id=com.arjunkomath.product_hunt&hl=en" target="_blank"><img src="/code-push/assets/images/friends/felineforproducthunt.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://www.fixt.co/" target="_blank"><img src="/code-push/assets/images/friends/fixt.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://flipagram.com/" target="_blank"><img src="/code-push/assets/images/friends/flipagram.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/f8/id853467066" target="_blank"><img src="/code-push/assets/images/friends/f8.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://www.gasolinamovil.com" target="_blank"><img src="/code-push/assets/images/friends/gasolinamovil.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/giddyup/id1078624702" target="_blank"><img src="/code-push/assets/images/friends/giddyup.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/gou-huo/id1001476888" target="_blank"><img src="/code-push/assets/images/friends/gofire.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/goodnight-never-alone-at-night/id962923207"  target="_blank"><img src="/code-push/assets/images/friends/goodnight.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/hirebotics/id1076996139" target="_blank"><img src="/code-push/assets/images/friends/hirebotics.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/hitch-crowdsourced-delivery/id932675959" target="_blank"><img src="/code-push/assets/images/friends/hitch.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://play.google.com/store/apps/details?id=com.herepin.mercury" target="_blank"><img src="/code-push/assets/images/friends/herepin.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="http://www.hoverapp.io" target="_blank"><img src="/code-push/assets/images/friends/hover.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/ca/app/hypebae-x-fitboi-streetwear/id989735184" target="_blank"><img src="/code-push/assets/images/friends/hypebaexfitboi.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/fuji-rock-festival-16-app/id1112045623" target="_blank"><img src="/code-push/assets/images/friends/fujirock.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/higher-things/id1108566149?mt=8" target="_blank"><img src="/code-push/assets/images/friends/higherthings.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://play.google.com/store/apps/details?id=com.ionicframework.iogrow124767" target="_blank"><img src="/code-push/assets/images/friends/iogrow.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/intersect-real-life.-real/id1019474872" target="_blank"><img src="/code-push/assets/images/friends/intersect.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/jobletics-app/id1068697872" target="_blank"><img src="/code-push/assets/images/friends/jobletics.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/justwatch-streaming-search/id979227482" target="_blank"><img src="/code-push/assets/images/friends/justwatch.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://www.kiwiship.com/" target="_blank"><img src="/code-push/assets/images/friends/kiwiship.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/liao-yuan/id1074472777" target="_blank"><img src="/code-push/assets/images/friends/liaoyuan.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/live-uptop/id1130520036" target="_blank"><img src="/code-push/assets/images/friends/liveuptop.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/sg/app/luxglove/id1031016059" target="_blank"><img src="/code-push/assets/images/friends/luxglove.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://github.com/Khan/math-facts" target="_blank"><img src="/code-push/assets/images/friends/mathfacts.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/mobabuild-builds-for-league/id1059193502" target="_blank"><img src="/code-push/assets/images/friends/mobabuild.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/app/moneylion/id1064677082" target="_blank"><img src="/code-push/assets/images/friends/moneylion.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://github.com/multunus/moveit-react-native" target="_blank"><img src="/code-push/assets/images/friends/moveit.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://movielala.com/" target="_blank"><img src="/code-push/assets/images/friends/movielalatrailers.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/myappointment/id1055361158" target="_blank"><img src="/code-push/assets/images/friends/myappointment.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/myror/id1101364693" target="_blank"><img src="/code-push/assets/images/friends/myror.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/nudgit-for-merchants/id711750999" target="_blank"><img src="/code-push/assets/images/friends/nudgitformerchants.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/lc/app/onsendb/id1071001956" target="_blank"><img src="/code-push/assets/images/friends/onsendb.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/pokewhere-real-time-radar/id1136259229" target="_blank"><img src="/code-push/assets/images/friends/pokewhere.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://polle.com/" target="_blank"><img src="/code-push/assets/images/friends/polle.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/nl/app/pimmr/id1023343303" target="_blank"><img src="/code-push/assets/images/friends/pimmr.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/pixitrip/id1049124738" target="_blank"><img src="/code-push/assets/images/friends/pixitrip.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/robin-rooms-meeting-room-schedule/id947566115"  target="_blank"><img src="/code-push/assets/images/friends/robinrooms.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://play.google.com/store/apps/details?id=jobs.savvy.mobile&hl=en" target="_blank"><img src="/code-push/assets/images/friends/savvy.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/cg/app/stridekick/id933359805" target="_blank"><img src="/code-push/assets/images/friends/stridekick.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/simple-contacts-contact-refills/id1069573128" target="_blank"><img src="/code-push/assets/images/friends/simplecontacts.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/smooth.../id1046192115" target="_blank"><img src="/code-push/assets/images/friends/smooth.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/fr/app/sneat-reservez-les-meilleurs/id1062510079" target="_blank"><img src="/code-push/assets/images/friends/sneat.jpg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/stylisted-hair-makeup-on-location/id887419793" target="_blank"><img src="/code-push/assets/images/friends/stylisted.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/sudoblock/id1207401341" target="_blank"><img src="/code-push/assets/images/friends/sudoblock.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/swipes-meal-sharing-made-easy/id1037536474" target="_blank"><img src="/code-push/assets/images/friends/swipes.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/tracksat/id1000281269"  target="_blank"><img src="/code-push/assets/images/friends/tracksats.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://ticketea.com"  target="_blank"><img src="/code-push/assets/images/friends/ticketea.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/taxfyle/id1058033104"  target="_blank"><img src="/code-push/assets/images/friends/taxfyle.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/townske-stunning-city-guides/id1018136179"  target="_blank"><img src="/code-push/assets/images/friends/townske.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/tucci-reservations-at-elusive/id1039661754" target="_blank"><img src="/code-push/assets/images/friends/tucci.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/winkat/id1001974618" target="_blank"><img src="/code-push/assets/images/friends/winkat.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/app/id1071060001" target="_blank"><img src="/code-push/assets/images/friends/yesno.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/zeemee/id1044878258" target="_blank"><img src="/code-push/assets/images/friends/zeemee.jpeg" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/zerocar-syeeolinghamyeon-jeloga/id1128309540?mt=8" target="_blank"><img src="/code-push/assets/images/friends/zerocar.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="http://frangout.com" target="_blank"><img src="/code-push/assets/images/friends/frangout.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://play.google.com/store/apps/details?id=com.readjournal.hurriyetegazete" target="_blank"><img src="/code-push/assets/images/friends/hurriyetegazete.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://www.axsy.com/" target="_blank"><img src="/code-push/assets/images/friends/axsy.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="http://cafebazaar.ir/app/com.sportnews/" target="_blank"><img src="/code-push/assets/images/friends/sportnews.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://play.google.com/store/apps/details?id=com.lusus" target="_blank"><img src="/code-push/assets/images/friends/lusus.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/mercuryone/id1015811834?mt=8" target="_blank"><img src="/code-push/assets/images/friends/mercuryone.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://toganews.com/" target="_blank"><img src="/code-push/assets/images/friends/toga.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/tw/app/partido-wan-you-xi-jiao-peng/id1153371765?l=zh&mt=8" target="_blank"><img src="/code-push/assets/images/friends/partido.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://flatironapp.com/" target="_blank"><img src="/code-push/assets/images/friends/flatiron.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="http://scanned-app.com/" target="_blank"><img src="/code-push/assets/images/friends/scannedapp.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/nl/app/people-of-the-park/id1276036755" target="_blank"><img src="/code-push/assets/images/friends/peopleofthepark.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://itunes.apple.com/us/app/arrow-card/id1228440036" target="_blank"><img src="/code-push/assets/images/friends/arrowcardmobile.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://business.sudzy.co" target="_blank"><img src="/code-push/assets/images/friends/sudzy.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://www.heloprotocol.in//" target="_blank"><img src="/code-push/assets/images/friends/helo.png" class="friend-logo"></a>
+                    </div>
+                </div>
+                <div class="friend-item  ">
+                    <div class="friend-itemcontainer">
+                        <a href="https://apps.apple.com/us/app/sonar-tim/id1465699298" target="_blank"><img src="/code-push/assets/images/friends/sonar.png" class="friend-logo"></a>
+                    </div>
+                </div>
+            </div>
+            <p class="disclaimer">All logos used by permission of the respective owners.  If you'd like to add your logo, please <a href="https://github.com/microsoft/code-push/issues/new?title=New+Website+Logo%3A+%5Binsert+name%5D%0A&amp;body=Please+fill+the+following+out%3A%0A%0A-+Name%3A+%28correctly+formatted%29%0A-+Homepage+(or+app+store)+url%3A+%28homepage%2Fapp+store%2Fprimary+entry+point+for+users%29%0A-+Brand+Guidelines%2FLicensing%3A+%28or+anything+we+need+to+know+before+using+your+logo%29%0A-+Logo%3A+%28svg+if+possible%2C+pngs+over+300x300px+with+transparent+backgrounds+are+also+acceptable%29%0A%0A%3E+Example%3A%0A%3E%0A%3E+Name%3A+Microsoft%0A%3E+Homepage+url%3A+https%3A%2F%2Fmicrosoft.com%0A%3E+Brand+Guidelines%2FLicensing%3A+https%3A%2F%2Fwww.microsoft.com%2Fen-us%2Flegal%2Fintellectualproperty%2Ftrademarks%2Fusage%2Flogo.aspx%0A%3E+Logo%3A+https%3A%2F%2Fnews.microsoft.com%2Fmicrosoft-news-center-photos%2Fmsft_logo_rgb_c-gray%2F%0A">fill out this short form</a>.</p>
+        </div>
+    </div>
+</div>
+
+	<footer>
+    <div class="footer-container">
+        <div class="container" id="footer">
+            <div class="row">
+                <div class="col-sm-9">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <h4>General</h4>
+                            <ul class="nav">
+                                <!--TODO: CHECK LINKS-->
+                                <li><a href="https://github.com/Microsoft/code-push/blob/master/LICENSE.md" target="_blank">License</a></li>
+                                <li><a href="https://www.visualstudio.com/en-us/privacy-policy-vs" target="_blank">Privacy</a></li>
+                                <li><a href="https://msdn.microsoft.com/en-us/cc300389" target="_blank">Terms of Service</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-4">
+                            <h4>Community</h4>
+                            <ul class="nav">
+                                <li><a href="https://github.com/Microsoft/code-push/" target="_blank">GitHub Project</a></li>
+                                <li><a href="https://stackoverflow.com/questions/tagged/codepush" target="_blank">Stack Overflow</a></li>
+                                <li><a href="https://twitter.com/hashtag/codepush" target="_blank">#CodePush</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-4">
+                            <h4>Documentation</h4>
+                            <ul class="nav">
+                                <li><a href="https://github.com/Microsoft/code-push/blob/master/cli/README.md" target="_blank">CLI Docs</a></li>
+                                <li><a href="https://github.com/Microsoft/cordova-plugin-code-push/blob/master/README.md" target="_blank">Cordova Plugin Docs</a></li>
+                                <li><a href="https://github.com/Microsoft/react-native-code-push/blob/master/README.md" target="_blank">React Native Plugin Docs</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <h3><i class="fa fa-comment"></i> Talk to us!</h3>
+                    <p>If you have any feedback or suggestions on how we can make CodePush more awesome, please contact via Twitter <a href="https://twitter.com/mscodepush">@mscodepush, <a href=mailto:codepush@microsoft.com>email us</a> or ping us in the <a href="https://discord.gg/0ZcbPKXt5bWxFdFu">#code-push</a> channel on Reactiflux (for React Native).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid signature-container">
+        <div class="container">
+            <div class="row signature">          
+                <p class="pull-left hidden-xs">Made with <span class="glyphicon glyphicon-heart"></span> in Redmond</p> 
+                <div class="pull-right">
+                    <p class="copyright pull-left">&copy;2012-2017 Microsoft
+                    <img class="ms-logo-footer" src="/code-push/assets/images/Microsoft_logo.svg"/></p>
+                </div>              
+            </div>
+        </div>        
+    </div>
+</footer>
+</body>	
+</html>

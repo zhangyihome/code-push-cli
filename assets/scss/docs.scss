@@ -1,0 +1,268 @@
+/*
+********* Docs ***********
+*/
+
+html, body{
+    height: 100%;
+}
+
+.docs {
+    .col-sm-3 {
+        width: 22%;
+    }
+}
+
+h3, h4, h5{
+    padding: 4px 0;
+}
+
+blockquote {
+    font-size: 10px;
+    margin: 2em 0;
+    padding: .4em 2em;  
+}
+
+nav.xs-toc {
+    padding-top: 3em;
+    margin-bottom: -3em;
+}
+
+.toc-container {
+    overflow: hidden;
+    margin-left: 24px;
+    margin-top: 12px;
+}
+
+.doc-fragment-anchor {
+    display: block;
+    position: relative;
+    bottom: 50px;
+}
+
+.toc-icon {
+    width: 25px;
+    height: 25px;
+    background-image: url("../images/tocIcons.png");
+    background-position: 75px 0;
+    float: right;
+    margin-right: 15px;
+}
+
+.xs-toc {
+    h2 {
+        padding-left: 10px;
+    }
+
+    a:hover {
+        background-color: #eee;
+    }
+}
+
+.toc-icon-active {
+    width: 25px;
+    height: 25px;
+    background-image: url("../images/tocIcons.png");
+    background-position: 50px 0;
+    float: right;
+    margin-right: 15px;
+}
+
+.doc-header {
+    padding-left: 10px;
+
+    .doc-title {
+        font-size: 4em;
+    }
+
+    .edit-page-link {
+        font-size: 12px;
+    }
+}
+
+.doc-content {
+    padding-left: 10px;
+    padding-bottom: 20px;
+
+    p, span, code {
+        font-size: 1.6em;
+    }
+    
+    ul, ol {
+        li {
+            font-size: 1.6em;
+            li {
+                font-size: 1.0em;
+            }
+            p {
+                font-size: 1.0em;
+            }
+        }
+    }
+    
+    h1 {
+        color: $docs-accent-textcolor;
+        margin-bottom: 2em;
+    }
+
+    h2, p, li {
+        line-height: 1.8em;
+    }
+
+    img {
+        height: auto;
+        max-width: 100%;
+        padding-bottom: 1.2em;
+    }
+}
+
+p, li, td {
+    code {
+        background-color: transparent;
+        color: #657b83;
+        font-size: 1em !important;
+    }
+}
+
+pre {
+    margin-top: 0;
+    margin-bottom: 1em;
+    display: block;
+    padding: 0px;
+    font-size: 1em;
+    line-height: 1.4285;
+    color: #333;
+    white-space: pre !important;
+    word-wrap: normal !important;
+    background-color: $docs-code-box-background-color;
+    border: 2px solid $docs-code-box-background-color;
+    border-radius: 0px;
+
+    code {
+        white-space: pre !important;
+        word-wrap: normal !important;
+        font-size: 100%;
+        font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+        background-color: transparent;
+        color: #657b83;
+        font-size: 1em;
+    }
+
+    p:first-child, span:first-child {
+        font-size: 14px;
+    }
+}
+
+table {
+    margin-bottom: 1em;
+    width: 100%;
+}
+
+td, th {
+    padding: .25em .5em;
+    border: 2px solid #000;
+    font-size: 1.3em;
+}
+
+th {
+    text-align: left;
+    background-color: rgba(30, 30, 30, 1);
+    color: #fff;
+}
+
+.site-toc-title {
+    font-weight: 300;
+    font-size: 2.2em;
+    text-transform: uppercase;
+}
+
+/* outer ToC for the site */
+.site-toc {
+    padding: 0px;
+}
+
+.site-toc li {
+    list-style: none;
+}
+
+.site-toc > li {
+    list-style: none;
+    font-size: 1.8em;
+    font-weight: 300;
+    padding: 0.5em 0em;
+}
+
+.site-toc > li .this-page {
+    font-weight: bold;
+}
+
+/* inner ToC for the page */
+.page-toc ul li:first-child {
+    margin-top: 1em;
+}
+
+.page-toc ul > li {
+    padding: 0.5em 0em 0.5em 1em;
+    font-size: 14px;
+    border-left: 0.5em solid rgba(76, 194, 228, 0.5);
+}
+
+.page-toc ul > li.toc-active {
+    font-weight: bold;
+    border-left: 0.5em solid #4CC2E4;
+}
+
+.hljs {
+    background: lighten($brand-light-blue, 36.5%);
+    span {
+        font-size: 1.0em !important;
+    }
+}
+
+.hljs-keyword {
+    color: darken($brand-accent-color,5%);
+}
+
+.toc-container { 
+    height:100%; overflow:hidden;
+    .row {
+        position: fixed;
+    }
+}
+
+.feedback-container{
+    width: 80%;
+    .widget{
+        background-color: #a6e1f2;
+        padding: 6px 20px 20px 20px;
+        font-size: 1.3rem;
+        margin-top: 10px;
+        margin-bottom: 40px;
+        
+        h3{
+            color:white;
+            font-size: 1.6em;
+        }
+        
+        .widget-thankyou{
+            h3{
+                font-size: 2.2em;
+            }
+            .message{
+                p{
+                    color: #666;  
+                    font-size: 1.2em;
+                }
+            }                      
+        }
+
+        .buttons button {
+            background-color: #21bbed;
+            color: #fff;
+            font-size: 1.4rem;
+            padding: 5px 20px;
+            margin-right: 5px;
+            margin-top: 10px;
+            border: 0px transparent;
+        }                     
+    }    
+}

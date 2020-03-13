@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta property="og:title" content="CodePush" />
+  <meta property="og:site_name" content="CodePush"/>
+  <meta property="og:description" content="Over the last thirty days, we&rsquo;ve released several significant updates to both CodePush and the React Native Module for CodePush that we think you&rsquo..." />
+  <meta property="og:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG" />
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@Microsoft">
+  <meta name="twitter:title" content="CodePush">
+  <meta name="twitter:description" content="Over the last thirty days, we&rsquo;ve released several significant updates to both CodePush and the React Native Module for CodePush that we think you&rsquo...">
+  <meta name="twitter:image" content="https://microsoft.github.io/code-push/assets/images/fbshare.PNG">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+  <meta name="description" content="Over the last thirty days, we&rsquo;ve released several significant updates to both CodePush and the React Native Module for CodePush that we think you&rsquo...">
+
+  <title>
+    
+      New updates for CodePush and React Native Module for CodePush &middot; CodePush
+    
+  </title>
+  
+  <!-- build:css  /assets/css/vendor.css -->
+  <link rel="stylesheet" href="/code-push/libraries/bootstrap/dist/css/bootstrap.css" />
+  <link rel="stylesheet" href="/code-push/libraries/highlightjs/styles/solarized_light.css">
+  <link rel="stylesheet" href="/code-push/libraries/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/code-push/libraries/github-fork-ribbon-css/gh-fork-ribbon.css">
+  <!-- endbuild -->
+  
+  <!-- CSS -->
+  <!-- build:css /assets/css/style.min.css -->
+  <link rel="stylesheet" href="/code-push/assets/stylesheets/style.css">
+  <link rel="stylesheet" href="/code-push/assets/stylesheets/ga.style.css">
+  <!-- endbuild -->             
+
+  <!-- Icons --> <!-- TODO: Check that these all wok -->
+  <link rel="apple-touch-icon" sizes="57x57" href="/code-push/assets/images/icons/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/code-push/assets/images/icons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/code-push/assets/images/icons/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/code-push/assets/images/icons/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/code-push/assets/images/icons/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/code-push/assets/images/icons/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/code-push/assets/images/icons/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/code-push/assets/images/icons/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/code-push/assets/images/icons/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/code-push/assets/images/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/code-push/assets/images/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/code-push/assets/images/icons/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/code-push/assets/images/icons/favicon-16x16.png">
+  <link rel="manifest" href="/code-push/assets/images/icons/manifest.json">
+  <meta name="msapplication-TileColor" content="#294E80">
+  <meta name="msapplication-TileImage" content="/code-push/assets/images/icons/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- JS -->    
+  <!-- Redirect logic from this docs(as it was depricated) to new docs https://docs.microsoft.com/en-us/appcenter/distribution/codepush/   -->    
+  <script src="/code-push/assets/javascript/redirect.js"></script>
+
+	<!-- build:js  /assets/js/vendors.js  -->	
+	<script src="/code-push/libraries/jquery/dist/jquery.min.js"></script>
+	<script src="/code-push/libraries/bootstrap/dist/js/bootstrap.js"></script>
+  <script src="/code-push/libraries/zeroclipboard/dist/ZeroClipboard.min.js"></script>
+  <script src="/code-push/libraries/anchorific.js/min/anchorific.min.js"></script>
+  <script src="/code-push/libraries/toc/dist/toc.min.js"></script>
+  <script src="/code-push/libraries/highlightjs/highlight.pack.min.js"></script>
+  <!-- endbuild -->   
+  
+  <!-- build:js /assets/js/all.min.js -->
+  <script src="/code-push/assets/javascript/global.js"></script>
+  <script src="/code-push/assets/javascript/home.js"></script>  
+  <script src="/code-push/assets/javascript/docs.js"></script>
+  <script src="/code-push/assets/javascript/faq.js"></script>
+  <!-- endbuild -->
+ 
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/code-push/atom.xml">
+
+    
+</head>
+<body>
+    <header role="banner">
+	<nav class="navbar navbar-default navbar-fixed-top">
+		 <div class="container-fluid">
+        	<!--<img class="fork-me-ribbon pull-right" src="../assets/images/fork_me_ribbon.svg" />-->
+		    <!-- Brand and toggle get grouped for better mobile display -->
+		    <div class="navbar-header">
+		      <button type="button" class="navbar-toggle pull-left collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+		        <span class="sr-only">Toggle navigation</span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		      </button>
+		      <a class="navbar-brand" href="/code-push/index.html">
+						<img class="navbar-logo" src="/code-push/assets/images/codepush_navbar_logo.svg">
+							<sup class="navbar-logo-text">PREVIEW</sup>
+						</image>
+					</a>
+		    </div>
+		    <!-- Collect the nav links, forms, and other content for toggling -->
+		    <div class="collapse navbar-collapse navbar_center" id="bs-example-navbar-collapse-1">
+		      <ul class="nav navbar-nav">
+				<li class=""><a href="/code-push/index.html#getting_started">Getting Started</a></li>
+				<li class=""><a href="/code-push/docs/index.html">Documentation</a></li>
+		        <li class=""><a href="/code-push/faq/index.html">FAQ</a></li>
+				<li class=""><a href="/code-push/blog/index.html">Blog</a></li>
+                <li class=""><a href="/code-push/community/friends.html">Showcase</a></li>
+		      </ul>
+		    </div><!-- /.navbar-collapse -->
+		</div><!-- /.container-fluid -->
+	</nav>				   		
+</header>
+<div class="top_navbar_spacer"></div>
+	<div class="post">
+    <div id="content" class="container main_content">   
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1"> 
+                <div class="post-header">
+                    <h1>New updates for CodePush and React Native Module for CodePush</h1>
+                    <span class="date">27 Mar 2017</span><span>&nbsp;- by</span><span class="author"><a href="https://twitter.com/mscodepush">Ian Geoghegan</a></span>
+                </div>
+                <p>Over the last thirty days, we&rsquo;ve released several significant updates to both CodePush and the React Native Module for CodePush that we think you&rsquo;ll like. CodePush boasts several new features, including the abililty to specify Node parameters to the release-react command, the ability to specify bundle and sourcemap destination, deployment promotion based on labels, and a release build type for Apache Cordova builds. The React Native Module for CodePush now includes support for React Native Windows .NET 4.6. Both products also have seen numerous bug fixes. Check out <a href="https://github.com/Microsoft/code-push/releases">CodePush</a> and the <a href="https://github.com/Microsoft/react-native-code-push/releases">Module</a> release notes for details and the new and improved <a href="https://github.com/Microsoft/react-native-code-push/blob/master/README.md">documentation</a> for the React Native Module for CodePush. </p>
+
+<h3>Big Plans</h3>
+
+<p>
+In addition to the features and fixes, we&rsquo;re also announcing our plan to migrate CodePush to Visual Studio Mobile Center. This will let existing users continue to use the same product they know and love, while adding the tooling and services provided by Mobile Center. We could go on about the product&rsquo;s Build, Test, Distribute, Crash, and Analytics services, but why bother when we made videos?
+</p>
+
+<p><br/>
+<i>A quick demo of building React Native app and using Mobile Center:</i>
+<br/><br/>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/lfqZ8Uy2p3U" frameborder="0" allowfullscreen></iframe>
+<br/><br/>
+<i>A an overview of CodePush and an introduction to Mobile Center:</i>
+<br/><br/>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/SyqQkMZY8Y8" frameborder="0" allowfullscreen></iframe>
+<br/><br/>
+Please let us know what you think of our videos and let us know what topics you&rsquo;d like to see covered in the future. We want to hear from you. Sign up for a free trial of <a href="https://mobile.azure.com/login">Mobile Center</a>, take a look around, and let us know what you think. 
+<br/><br/>
+<em>Also please NOTE: you can continue to use CodePush the way you do now with your React Native and Apache Cordova applications.</em></p>
+
+            </div>
+        </div>
+    </div>
+</div>
+	<footer>
+    <div class="footer-container">
+        <div class="container" id="footer">
+            <div class="row">
+                <div class="col-sm-9">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <h4>General</h4>
+                            <ul class="nav">
+                                <!--TODO: CHECK LINKS-->
+                                <li><a href="https://github.com/Microsoft/code-push/blob/master/LICENSE.md" target="_blank">License</a></li>
+                                <li><a href="https://www.visualstudio.com/en-us/privacy-policy-vs" target="_blank">Privacy</a></li>
+                                <li><a href="https://msdn.microsoft.com/en-us/cc300389" target="_blank">Terms of Service</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-4">
+                            <h4>Community</h4>
+                            <ul class="nav">
+                                <li><a href="https://github.com/Microsoft/code-push/" target="_blank">GitHub Project</a></li>
+                                <li><a href="https://stackoverflow.com/questions/tagged/codepush" target="_blank">Stack Overflow</a></li>
+                                <li><a href="https://twitter.com/hashtag/codepush" target="_blank">#CodePush</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-4">
+                            <h4>Documentation</h4>
+                            <ul class="nav">
+                                <li><a href="https://github.com/Microsoft/code-push/blob/master/cli/README.md" target="_blank">CLI Docs</a></li>
+                                <li><a href="https://github.com/Microsoft/cordova-plugin-code-push/blob/master/README.md" target="_blank">Cordova Plugin Docs</a></li>
+                                <li><a href="https://github.com/Microsoft/react-native-code-push/blob/master/README.md" target="_blank">React Native Plugin Docs</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <h3><i class="fa fa-comment"></i> Talk to us!</h3>
+                    <p>If you have any feedback or suggestions on how we can make CodePush more awesome, please contact via Twitter <a href="https://twitter.com/mscodepush">@mscodepush, <a href=mailto:codepush@microsoft.com>email us</a> or ping us in the <a href="https://discord.gg/0ZcbPKXt5bWxFdFu">#code-push</a> channel on Reactiflux (for React Native).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid signature-container">
+        <div class="container">
+            <div class="row signature">          
+                <p class="pull-left hidden-xs">Made with <span class="glyphicon glyphicon-heart"></span> in Redmond</p> 
+                <div class="pull-right">
+                    <p class="copyright pull-left">&copy;2012-2017 Microsoft
+                    <img class="ms-logo-footer" src="/code-push/assets/images/Microsoft_logo.svg"/></p>
+                </div>              
+            </div>
+        </div>        
+    </div>
+</footer>
+</body>	
+</html>
