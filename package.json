@@ -1,18 +1,23 @@
 {
-  "name": "code-push-cli",
+  "name": "code-push-cli-r",
   "version": "2.1.9",
   "description": "Management CLI for the CodePush service",
   "main": "bin/script/cli.js",
   "scripts": {
     "start": "tsc --watch",
-    "test": "gulp test"
+    "build": "tsc",
+    "preversion": "npm run build",
+    "test": "echo 'no tests'"
   },
   "bin": {
     "code-push": "bin/script/cli.js"
   },
+  "files": [
+    "bin/"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Microsoft/code-push/"
+    "url": "https://github.com/rocwind/code-push-cli"
   },
   "keywords": [
     "code",
@@ -21,7 +26,7 @@
     "react-native",
     "react"
   ],
-  "homepage": "https://microsoft.github.io/code-push",
+  "homepage": "https://github.com/rocwind/code-push-cli",
   "author": "Microsoft Corporation",
   "license": "MIT",
   "dependencies": {

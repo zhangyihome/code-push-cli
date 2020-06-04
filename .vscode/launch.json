@@ -13,16 +13,6 @@
       "stopOnEntry": false,
       "sourceMaps": true,
       "args": ["--info"]
-    },
-    {
-      "name": "Unit Test",
-      "type": "node",
-      "request": "launch",
-      "protocol": "inspector",
-      "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
-      "stopOnEntry": false,
-      "sourceMaps": true,
-      "args": ["test"]
     }
   ]
 }
