@@ -42,7 +42,6 @@ var configFilePath: string = path.join(
 var emailValidator = require("email-validator");
 var packageJson = require("../../package.json");
 var parseXml = Q.denodeify(require("xml2js").parseString);
-import Promise = Q.Promise;
 var properties = require("properties");
 
 const CLI_HEADERS: Headers = {
@@ -80,7 +79,7 @@ var connectionInfo: ILoginConnectionInfo;
 
 export var confirm = (message: string = "Are you sure?"): Promise<boolean> => {
     message += " (y/N):";
-    return Promise<boolean>((resolve, reject, notify): void => {
+    return new Promise<boolean>((resolve): void => {
         prompt.message = "";
         prompt.delimiter = "";
 
@@ -197,7 +196,7 @@ function appAdd(command: cli.IAppAddCommand): Promise<void> {
     } else if (normalizedOs === "windows") {
         os = "Windows";
     } else {
-        return Q.reject<void>(
+        return Promise.reject<void>(
             new Error(
                 `"${command.os}" is an unsupported OS. Available options are "ios", "android", and "windows".`
             )
@@ -211,7 +210,7 @@ function appAdd(command: cli.IAppAddCommand): Promise<void> {
     } else if (normalizedPlatform === "cordova") {
         platform = "Cordova";
     } else {
-        return Q.reject<void>(
+        return Promise.reject<void>(
             new Error(
                 `"${command.platform}" is an unsupported platform. Available options are "react-native" and "cordova".`
             )
@@ -380,7 +379,7 @@ function deleteConnectionInfoCache(printMessage: boolean = true): void {
 }
 
 function deleteFolder(folderPath: string): Promise<void> {
-    return Promise<void>((resolve, reject, notify) => {
+    return new Promise<void>((resolve, reject) => {
         rimraf(folderPath, (err: any) => {
             if (err) {
                 reject(err);
@@ -576,16 +575,16 @@ function deploymentHistory(
 ): Promise<void> {
     throwForInvalidOutputFormat(command.format);
 
-    return Q.all<any>([
+    return Promise.all<any>([
         sdk.getAccountInfo(),
         sdk.getDeploymentHistory(command.appName, command.deploymentName),
         sdk.getDeploymentMetrics(command.appName, command.deploymentName),
-    ]).spread<void>(
-        (
-            account: Account,
-            deploymentHistory: Package[],
-            metrics: DeploymentMetrics
-        ): void => {
+    ]).then(
+        ([account, deploymentHistory, metrics]: [
+            Account,
+            Package[],
+            DeploymentMetrics
+        ]): void => {
             var totalActive: number = getTotalActiveFromDeploymentMetrics(
                 metrics
             );
@@ -639,7 +638,7 @@ function deserializeConnectionInfo(): ILoginConnectionInfo {
 export function execute(command: cli.ICommand): Promise<void> {
     connectionInfo = deserializeConnectionInfo();
 
-    return Q(<void>null).then(() => {
+    return Promise.resolve().then(() => {
         switch (command.type) {
             // Must not be logged in
             case cli.CommandType.login:
@@ -831,7 +830,7 @@ function initiateExternalAuthenticationAsync(
 
 function link(command: cli.ILinkCommand): Promise<void> {
     initiateExternalAuthenticationAsync("link", command.serverUrl);
-    return Q(<void>null);
+    return Promise.resolve();
 }
 
 function login(command: cli.ILoginCommand): Promise<void> {
@@ -905,7 +904,7 @@ function loginWithExternalAuthentication(
 }
 
 function logout(command: cli.ICommand): Promise<void> {
-    return Q(<void>null)
+    return Promise.resolve()
         .then(
             (): Promise<void> => {
                 if (!connectionInfo.preserveAccessKeyOnLogout) {
@@ -1284,7 +1283,7 @@ function getReactNativeProjectAppVersion(
                 log(
                     `Using the target binary version value "${parsedPlist.CFBundleShortVersionString}" from "${resolvedPlistFile}".\n`
                 );
-                return Q(parsedPlist.CFBundleShortVersionString);
+                return Promise.resolve(parsedPlist.CFBundleShortVersionString);
             } else {
                 throw new Error(
                     `The "CFBundleShortVersionString" key in the "${resolvedPlistFile}" file needs to specify a valid semver string, containing both a major and minor version (e.g. 1.3.2, 1.1).`
@@ -1451,7 +1450,7 @@ function getReactNativeProjectAppVersion(
                         )}" file.`
                     );
                 }
-            });
+            }) as any;
     }
 }
 
@@ -1619,7 +1618,7 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
 
     throwForInvalidSemverRange(command.appStoreVersion);
 
-    return Q(<void>null).then(() => {
+    return Promise.resolve().then(() => {
         // Copy the command so that the original is not modified
         var currentCommand: cli.IReleaseCommand = {
             appName: command.appName,
@@ -1745,7 +1744,7 @@ export var releaseCordova = (
                 );
             }
 
-            var configPromise: Promise<any> = parseXml(configString);
+            var configPromise: Promise<any> = parseXml(configString) as any;
 
             releaseCommand.package = outputFolder;
             releaseCommand.type = cli.CommandType.release;
@@ -1865,7 +1864,7 @@ export var releaseReact = (
                 }
 
                 var appVersionPromise: Promise<string> = command.appStoreVersion
-                    ? Q(command.appStoreVersion)
+                    ? (Q(command.appStoreVersion) as any)
                     : getReactNativeProjectAppVersion(command, projectName);
 
                 if (command.outputDir) {
@@ -1895,6 +1894,22 @@ export var releaseReact = (
                     command.config
                 )
             )
+            .then(() => {
+                if (platform === "android") {
+                    return getHermesEnabled(command.gradleFile).then(
+                        (isHermesEnabled) => {
+                            if (isHermesEnabled) {
+                                return runHermesEmitBinaryCommand(
+                                    bundleName,
+                                    outputFolder,
+                                    command.sourcemapOutput,
+                                    [] // TODO: extra flags
+                                );
+                            }
+                        }
+                    );
+                }
+            })
             .then(() => {
                 log(chalk.cyan("\nReleasing update contents to CodePush:\n"));
                 return release(releaseCommand);
@@ -1955,7 +1970,7 @@ function rollback(command: cli.IRollbackCommand): Promise<void> {
 }
 
 function requestAccessKey(): Promise<string> {
-    return Promise<string>((resolve, reject, notify): void => {
+    return new Promise<string>((resolve): void => {
         prompt.message = "";
         prompt.delimiter = "";
 
@@ -2028,7 +2043,7 @@ export var runReactNativeBundleCommand = (
     var reactNativeBundleProcess = spawn("node", reactNativeBundleArgs);
     log(`node ${reactNativeBundleArgs.join(" ")}`);
 
-    return Promise<void>((resolve, reject, notify) => {
+    return new Promise<void>((resolve, reject) => {
         reactNativeBundleProcess.stdout.on("data", (data: Buffer) => {
             log(data.toString().trim());
         });
@@ -2050,6 +2065,157 @@ export var runReactNativeBundleCommand = (
         });
     });
 };
+
+export function runHermesEmitBinaryCommand(
+    bundleName: string,
+    outputFolder: string,
+    sourcemapOutput: string,
+    extraHermesFlags: string[]
+): Promise<void> {
+    const hermesArgs: string[] = [];
+    const envNodeArgs: string = process.env.CODE_PUSH_NODE_ARGS;
+
+    if (typeof envNodeArgs !== "undefined") {
+        Array.prototype.push.apply(hermesArgs, envNodeArgs.trim().split(/\s+/));
+    }
+
+    Array.prototype.push.apply(hermesArgs, [
+        "-emit-binary",
+        "-out",
+        path.join(outputFolder, bundleName + ".hbc"),
+        path.join(outputFolder, bundleName),
+        ...extraHermesFlags,
+    ]);
+
+    if (sourcemapOutput) {
+        hermesArgs.push("-output-source-map");
+    }
+
+    /*
+    if (!isDebug()) {
+      hermesArgs.push("-w");
+    }
+    */
+
+    log(
+        chalk.cyan(
+            "Converting JS bundle to byte code via Hermes, running command:\n"
+        )
+    );
+
+    const hermesCommand = getHermesCommand();
+    const hermesProcess = spawn(hermesCommand, hermesArgs);
+    log(`${hermesCommand} ${hermesArgs.join(" ")}`);
+
+    return new Promise<void>((resolve, reject) => {
+        hermesProcess.stdout.on("data", (data: Buffer) => {
+            log(data.toString().trim());
+        });
+
+        hermesProcess.stderr.on("data", (data: Buffer) => {
+            console.error(data.toString().trim());
+        });
+
+        hermesProcess.on("close", (exitCode: number) => {
+            if (exitCode) {
+                reject(
+                    new Error(`"hermes" command exited with code ${exitCode}.`)
+                );
+            }
+            // Copy HBC bundle to overwrite JS bundle
+            const source = path.join(outputFolder, bundleName + ".hbc");
+            const destination = path.join(outputFolder, bundleName);
+            fs.copyFile(source, destination, (err) => {
+                if (err) {
+                    console.error(err);
+                    reject(
+                        new Error(
+                            `Copying file ${source} to ${destination} failed. "hermes" previously exited with code ${exitCode}.`
+                        )
+                    );
+                }
+                fs.unlink(source, (err) => {
+                    if (err) {
+                        console.error(err);
+                        reject(err);
+                    }
+                    resolve(null as void);
+                });
+            });
+        });
+    });
+}
+
+export function getHermesEnabled(gradleFile: string): Promise<boolean> {
+    let buildGradlePath: string = path.join("android", "app");
+    if (gradleFile) {
+        buildGradlePath = gradleFile;
+    }
+    if (fs.lstatSync(buildGradlePath).isDirectory()) {
+        buildGradlePath = path.join(buildGradlePath, "build.gradle");
+    }
+
+    if (fileDoesNotExistOrIsDirectory(buildGradlePath)) {
+        throw new Error(`Unable to find gradle file "${buildGradlePath}".`);
+    }
+
+    return g2js
+        .parseFile(buildGradlePath)
+        .catch(() => {
+            throw new Error(
+                `Unable to parse the "${buildGradlePath}" file. Please ensure it is a well-formed Gradle file.`
+            );
+        })
+        .then((buildGradle: any) => {
+            return Array.from(buildGradle["project.ext.react"]).includes(
+                "enableHermes: true"
+            );
+        });
+}
+
+function getHermesOSBin(): string {
+    switch (process.platform) {
+        case "win32":
+            return "win64-bin";
+        case "darwin":
+            return "osx-bin";
+        case "freebsd":
+        case "linux":
+        case "sunos":
+        default:
+            return "linux64-bin";
+    }
+}
+
+function getHermesOSExe(): string {
+    switch (process.platform) {
+        case "win32":
+            return "hermes.exe";
+        default:
+            return "hermes";
+    }
+}
+
+function getHermesCommand(): string {
+    const fileExists = (file: string): boolean => {
+        try {
+            return fs.statSync(file).isFile();
+        } catch (e) {
+            return false;
+        }
+    };
+    // assume if hermes-engine exists it should be used instead of hermesvm
+    const hermesEngine = path.join(
+        "node_modules",
+        "hermes-engine",
+        getHermesOSBin(),
+        getHermesOSExe()
+    );
+    if (fileExists(hermesEngine)) {
+        return hermesEngine;
+    }
+    return path.join("node_modules", "hermesvm", getHermesOSBin(), "hermes");
+}
 
 function serializeConnectionInfo(
     accessKey: string,
