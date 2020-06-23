@@ -2124,26 +2124,49 @@ export function runHermesEmitBinaryCommand(
                     new Error(`"hermes" command exited with code ${exitCode}.`)
                 );
             }
+
+            const copyFiles = [];
             // Copy HBC bundle to overwrite JS bundle
             const source = path.join(outputFolder, bundleName + ".hbc");
             const destination = path.join(outputFolder, bundleName);
-            fs.copyFile(source, destination, (err) => {
-                if (err) {
-                    console.error(err);
-                    reject(
-                        new Error(
-                            `Copying file ${source} to ${destination} failed. "hermes" previously exited with code ${exitCode}.`
-                        )
-                    );
+            
+            copyFiles.push([source, destination]);
+            if (sourcemapOutput) {
+                const sourceMap = path.join(outputFolder, bundleName + ".hbc" + ".map");
+                if (fs.existsSync(sourceMap)) {
+                    copyFiles.push([sourceMap, sourcemapOutput]);
                 }
-                fs.unlink(source, (err) => {
+            }
+
+            const recursiveCopyFile = (files) => {
+                const [file, target] = files.shift();
+                log(`cp ${file} to ${target}`);
+                fs.copyFile(file, target, (err) => {
                     if (err) {
                         console.error(err);
-                        reject(err);
+                        reject(
+                            new Error(
+                                `Copying file ${file} to ${target} failed. "hermes" previously exited with code ${exitCode}.`
+                            )
+                        );
+                        return;
                     }
-                    resolve(null as void);
+                    fs.unlink(file, (err) => {
+                        if (err) {
+                            console.error(err);
+                            reject(err);
+                            return;
+                        }
+
+                        if (files.length === 0) {
+                            resolve(null as void);
+                        } else {
+                            recursiveCopyFile(files);
+                        }
+                    });
                 });
-            });
+            }
+            recursiveCopyFile(copyFiles);
         });
     });
 }
