@@ -1867,11 +1867,13 @@ export var releaseReact = (
                     ? (Q(command.appStoreVersion) as any)
                     : getReactNativeProjectAppVersion(command, projectName);
 
-                if (command.outputDir) {
-                    command.sourcemapOutput = path.join(
-                        releaseCommand.package,
-                        bundleName + ".map"
-                    );
+                if (command.sourcemapOutputDir && command.sourcemapOutput) {
+                    log('\n"sourcemap-output-dir" argument will be ignored as "sourcemap-output" argument is provided.\n');
+                }
+
+                if ((command.outputDir || command.sourcemapOutputDir) && !command.sourcemapOutput) {
+                    const sourcemapDir = command.sourcemapOutputDir || releaseCommand.package;
+                    command.sourcemapOutput = path.join(sourcemapDir, bundleName + ".map");
                 }
 
                 return appVersionPromise;

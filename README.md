@@ -442,6 +442,7 @@ code-push release-react <appName> <platform>
 [--plistFile <plistFile>]
 [--plistFilePrefix <plistFilePrefix>]
 [--sourcemapOutput <sourcemapOutput>]
+[--sourcemapOutputDir <sourcemapOutputDir>]
 [--targetBinaryVersion <targetBinaryVersion>]
 [--rollout <rolloutPercentage>]
 [--privateKeyPath <pathToPrivateKey>]
@@ -574,6 +575,12 @@ code-push release-react MyApp-iOS ios --pre "DEV-"
 This specifies the relative path to where the generated JS bundle's sourcemap file should be written. If left unspecified, sourcemaps will not be generated.
 
 *NOTE: This parameter can be set using either --sourcemapOutput or -s*
+
+#### Sourcemap output dir parameter
+
+Specify the folder path where the sourcemap of the generated JS bundle is written. If `--sourcemapOutput` is specified, the `sourcemap-output-dir` parameter will be ignored.
+
+*NOTE: This parameter can be set using either --sourcemapOutputDir
 
 #### Output directory parameter
 

@@ -1282,6 +1282,13 @@ var argv = yargs
                         "Path to where the sourcemap for the resulting bundle should be written. If omitted, a sourcemap will not be generated.",
                     type: "string",
                 })
+                .option("sourcemapOutputDir", {
+                    default: null,
+                    demand: false,
+                    description:
+                        'Path to folder where the sourcemap for the resulting bundle should be written. Name of sourcemap file will be generated automatically. This argument will be ignored if "sourcemap-output" argument is provided. If omitted, a sourcemap will not be generated.',
+                    type: "string",
+                })
                 .option("targetBinaryVersion", {
                     alias: "t",
                     default: null,
@@ -1817,6 +1824,8 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.privateKeyPath = argv["privateKeyPath"];
                     releaseReactCommand.sourcemapOutput =
                         argv["sourcemapOutput"];
+                    releaseReactCommand.sourcemapOutputDir =
+                            argv["sourcemapOutputDir"];
                     releaseReactCommand.outputDir = argv["outputDir"];
                     releaseReactCommand.config = argv["config"];
                 }
