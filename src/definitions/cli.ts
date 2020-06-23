@@ -204,6 +204,7 @@ export interface IReleaseReactCommand extends IReleaseBaseCommand {
     plistFile?: string;
     plistFilePrefix?: string;
     sourcemapOutput?: string;
+    sourcemapOutputDir?: string;
     outputDir?: string;
     config?: string;
 }

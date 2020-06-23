@@ -400,6 +400,7 @@ code-push release-react <appName> <platform>
 [--plistFile <plistFile>]
 [--plistFilePrefix <plistFilePrefix>]
 [--sourcemapOutput <sourcemapOutput>]
+[--sourcemapOutputDir <sourcemapOutputDir>]
 [--targetBinaryVersion <targetBinaryVersion>]
 [--rollout <rolloutPercentage>]
 [--privateKeyPath <pathToPrivateKey>]
@@ -488,6 +489,12 @@ code-push release-react MyApp ios
 指明生成的JS bundle 的sourcemap写入的相对路径。如果没有指定，sourcemaps文件不会生成。
 
 *注意：参数可以配置成`--sourcemapOutput`或`-s`*
+
+#### Sourcemap output dir 参数
+
+指明生成的JS bundle 的sourcemap写入的文件夹路径。如果指定了`--sourcemapOutput`，`sourcemap-output-dir`参数将被忽略。
+
+*注意：参数可以配置成`--sourcemapOutputDir`
 
 ### 发布更新 (Cordova)
 
