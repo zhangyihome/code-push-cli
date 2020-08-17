@@ -11,7 +11,7 @@ import AccountManager = require("code-push");
 import { Package, PackageInfo } from "code-push/script/types";
 import { CommonUtils } from "../common-utils";
 var log = CommonUtils.log;
-import * as cli from "../../definitions/cli";
+import * as cli from "../definitions/cli";
 import ReleaseFile = cli.ReleaseFile;
 
 var coreReleaseHook: cli.ReleaseHook = (

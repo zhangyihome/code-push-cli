@@ -2,7 +2,7 @@
   "name": "code-push-cli-r",
   "version": "2.2.1",
   "description": "Management CLI for the CodePush service",
-  "main": "bin/script/cli.js",
+  "main": "bin/cli.js",
   "scripts": {
     "start": "tsc --watch",
     "build": "tsc",
@@ -10,7 +10,7 @@
     "test": "echo 'no tests'"
   },
   "bin": {
-    "code-push": "bin/script/cli.js"
+    "code-push": "bin/cli.js"
   },
   "files": [
     "bin/"

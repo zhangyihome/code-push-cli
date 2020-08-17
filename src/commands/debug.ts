@@ -1,5 +1,5 @@
 import childProcess from "child_process";
-import * as cli from "../../definitions/cli";
+import * as cli from "../definitions/cli";
 import moment from "moment";
 import path from "path";
 import Q from "q";

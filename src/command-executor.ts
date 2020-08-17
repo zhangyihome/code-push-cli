@@ -17,7 +17,7 @@ import semver from "semver";
 var Table = require("cli-table");
 var which = require("which");
 import wordwrap = require("wordwrap");
-import * as cli from "../definitions/cli";
+import * as cli from "./definitions/cli";
 import hooks from "./release-hooks/index";
 import {
     AccessKey,
@@ -2160,12 +2160,17 @@ export function runHermesEmitBinaryCommand(
     }).then(() => {
         const composeSourceMapsPath = getComposeSourceMapsPath();
         if (sourcemapOutput && !composeSourceMapsPath) {
-            throw new Error('react-native compose-source-maps.js scripts is not found');
+            throw new Error(
+                "react-native compose-source-maps.js scripts is not found"
+            );
         }
 
-        const jsCompilerSourceMapFile = path.join(outputFolder, bundleName + ".hbc" + ".map");
+        const jsCompilerSourceMapFile = path.join(
+            outputFolder,
+            bundleName + ".hbc" + ".map"
+        );
         if (!fs.existsSync(jsCompilerSourceMapFile)) {
-            throw new Error('sourcemap file is not found');
+            throw new Error("sourcemap file is not found");
         }
 
         return new Promise((resolve, reject) => {
@@ -2178,21 +2183,26 @@ export function runHermesEmitBinaryCommand(
 
             // https://github.com/facebook/react-native/blob/master/react.gradle#L211
             // index.android.bundle.packager.map + index.android.bundle.compiler.map = index.android.bundle.map
-            const composeSourceMapsProcess = spawn(composeSourceMapsPath, composeSourceMapsArgs);
+            const composeSourceMapsProcess = spawn(
+                composeSourceMapsPath,
+                composeSourceMapsArgs
+            );
             log(`${composeSourceMapsPath} ${composeSourceMapsArgs.join(" ")}`);
 
             composeSourceMapsProcess.stdout.on("data", (data: Buffer) => {
                 log(data.toString().trim());
             });
-    
+
             composeSourceMapsProcess.stderr.on("data", (data: Buffer) => {
                 console.error(data.toString().trim());
             });
-    
+
             composeSourceMapsProcess.on("close", (exitCode: number) => {
                 if (exitCode) {
                     reject(
-                        new Error(`"compose-source-maps" command exited with code ${exitCode}.`)
+                        new Error(
+                            `"compose-source-maps" command exited with code ${exitCode}.`
+                        )
                     );
                 }
 
@@ -2309,7 +2319,7 @@ function getComposeSourceMapsPath(): string {
         "node_modules",
         "react-native",
         "scripts",
-        "compose-source-maps.js",
+        "compose-source-maps.js"
     );
     if (fs.existsSync(composeSourceMaps)) {
         return composeSourceMaps;

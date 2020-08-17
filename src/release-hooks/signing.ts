@@ -1,4 +1,4 @@
-import * as cli from "../../definitions/cli";
+import * as cli from "../definitions/cli";
 import fs from "fs";
 import * as hashUtils from "../hash-utils";
 import jwt from "jsonwebtoken";

@@ -1,5 +1,5 @@
 ﻿import yargs from "yargs";
-import * as cli from "../definitions/cli";
+import * as cli from "./definitions/cli";
 import chalk from "chalk";
 import updateNotifier from "update-notifier";
 import backslash = require("backslash");
@@ -1825,7 +1825,7 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.sourcemapOutput =
                         argv["sourcemapOutput"];
                     releaseReactCommand.sourcemapOutputDir =
-                            argv["sourcemapOutputDir"];
+                        argv["sourcemapOutputDir"];
                     releaseReactCommand.outputDir = argv["outputDir"];
                     releaseReactCommand.config = argv["config"];
                 }
