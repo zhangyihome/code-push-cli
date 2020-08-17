@@ -1868,12 +1868,21 @@ export var releaseReact = (
                     : getReactNativeProjectAppVersion(command, projectName);
 
                 if (command.sourcemapOutputDir && command.sourcemapOutput) {
-                    log('\n"sourcemap-output-dir" argument will be ignored as "sourcemap-output" argument is provided.\n');
+                    log(
+                        '\n"sourcemap-output-dir" argument will be ignored as "sourcemap-output" argument is provided.\n'
+                    );
                 }
 
-                if ((command.outputDir || command.sourcemapOutputDir) && !command.sourcemapOutput) {
-                    const sourcemapDir = command.sourcemapOutputDir || releaseCommand.package;
-                    command.sourcemapOutput = path.join(sourcemapDir, bundleName + ".map");
+                if (
+                    (command.outputDir || command.sourcemapOutputDir) &&
+                    !command.sourcemapOutput
+                ) {
+                    const sourcemapDir =
+                        command.sourcemapOutputDir || releaseCommand.package;
+                    command.sourcemapOutput = path.join(
+                        sourcemapDir,
+                        bundleName + ".map"
+                    );
                 }
 
                 return appVersionPromise;
@@ -2198,6 +2207,15 @@ function getHermesOSExe(): string {
     }
 }
 
+function getHermescOSExe(): string {
+    switch (process.platform) {
+        case "win32":
+            return "hermesc.exe";
+        default:
+            return "hermesc";
+    }
+}
+
 function getHermesCommand(): string {
     const fileExists = (file: string): boolean => {
         try {
@@ -2207,15 +2225,28 @@ function getHermesCommand(): string {
         }
     };
     // assume if hermes-engine exists it should be used instead of hermesvm
-    const hermesEngine = path.join(
+    // check hermes-engine/hermesc hermes-engine@0.5.0+
+    const hermesEngineHermesc = path.join(
+        "node_modules",
+        "hermes-engine",
+        getHermesOSBin(),
+        getHermescOSExe()
+    );
+    if (fileExists(hermesEngineHermesc)) {
+        return hermesEngineHermesc;
+    }
+    // checke hermes-engine/hermes
+    const hermesEngineHermes = path.join(
         "node_modules",
         "hermes-engine",
         getHermesOSBin(),
         getHermesOSExe()
     );
-    if (fileExists(hermesEngine)) {
-        return hermesEngine;
+    if (fileExists(hermesEngineHermes)) {
+        return hermesEngineHermes;
     }
+
+    // fallback to hermesvm
     return path.join("node_modules", "hermesvm", getHermesOSBin(), "hermes");
 }
 
