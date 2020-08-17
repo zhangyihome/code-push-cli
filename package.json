@@ -33,7 +33,7 @@
     "@types/yazl": "^2.4.2",
     "backslash": "^0.1.7",
     "base-64": "^0.1.0",
-    "chalk": "^1.1.0",
+    "chalk": "^4.1.0",
     "cli-table3": "^0.6.0",
     "code-push": "2.0.6",
     "email-validator": "^1.0.3",
@@ -61,7 +61,6 @@
     "yazl": "^2.4.1"
   },
   "devDependencies": {
-    "@types/chalk": "^0.4.31",
     "@types/node": "^14.0.10",
     "@types/q": "^1.5.4",
     "@types/semver": "^7.2.0",

@@ -28,7 +28,6 @@ import {
   Headers,
   Package,
   PackageInfo,
-  Session,
   UpdateMetrics,
 } from "code-push/script/types";
 import {
@@ -852,7 +851,7 @@ function printDeploymentHistory(
   }
 }
 
-function applyChalkSkippingLineBreaks(applyString: string, chalkMethod: (string: string) => chalk.ChalkChain): string {
+function applyChalkSkippingLineBreaks(applyString: string, chalkMethod: (string: string) => any): string {
   // Used to prevent "chalk" from applying styles to linebreaks which
   // causes table border chars to have the style applied as well.
   return applyString
