@@ -6,7 +6,7 @@
   "scripts": {
     "start": "tsc --watch",
     "build": "tsc",
-    "preversion": "npm run build",
+    "release": "npm test && npm run build && standard-version && git push --follow-tags origin master && npm publish",
     "test": "echo 'no tests'"
   },
   "bin": {
@@ -65,6 +65,7 @@
     "@types/node": "^14.0.10",
     "@types/q": "^1.5.4",
     "@types/semver": "^7.2.0",
+    "standard-version": "^9.0.0",
     "typescript": "^3.9.3"
   }
 }
