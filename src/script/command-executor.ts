@@ -2133,9 +2133,11 @@ export function runHermesEmitBinaryCommand(
                     new Error(`"hermes" command exited with code ${exitCode}.`)
                 );
             }
+
             // Copy HBC bundle to overwrite JS bundle
             const source = path.join(outputFolder, bundleName + ".hbc");
             const destination = path.join(outputFolder, bundleName);
+
             fs.copyFile(source, destination, (err) => {
                 if (err) {
                     console.error(err);
@@ -2150,7 +2152,58 @@ export function runHermesEmitBinaryCommand(
                         console.error(err);
                         reject(err);
                     }
+
                     resolve(null as void);
+                });
+            });
+        });
+    }).then(() => {
+        const composeSourceMapsPath = getComposeSourceMapsPath();
+        if (sourcemapOutput && !composeSourceMapsPath) {
+            throw new Error('react-native compose-source-maps.js scripts is not found');
+        }
+
+        const jsCompilerSourceMapFile = path.join(outputFolder, bundleName + ".hbc" + ".map");
+        if (!fs.existsSync(jsCompilerSourceMapFile)) {
+            throw new Error('sourcemap file is not found');
+        }
+
+        return new Promise((resolve, reject) => {
+            const composeSourceMapsArgs = [
+                sourcemapOutput,
+                jsCompilerSourceMapFile,
+                "-o",
+                sourcemapOutput,
+            ];
+
+            // https://github.com/facebook/react-native/blob/master/react.gradle#L211
+            // index.android.bundle.packager.map + index.android.bundle.compiler.map = index.android.bundle.map
+            const composeSourceMapsProcess = spawn(composeSourceMapsPath, composeSourceMapsArgs);
+            log(`${composeSourceMapsPath} ${composeSourceMapsArgs.join(" ")}`);
+
+            composeSourceMapsProcess.stdout.on("data", (data: Buffer) => {
+                log(data.toString().trim());
+            });
+    
+            composeSourceMapsProcess.stderr.on("data", (data: Buffer) => {
+                console.error(data.toString().trim());
+            });
+    
+            composeSourceMapsProcess.on("close", (exitCode: number) => {
+                if (exitCode) {
+                    reject(
+                        new Error(`"compose-source-maps" command exited with code ${exitCode}.`)
+                    );
+                }
+
+                // Delete the HBC sourceMap, otherwise it will be included in 'code-push' bundle as well
+                fs.unlink(jsCompilerSourceMapFile, (err) => {
+                    if (err) {
+                        console.error(err);
+                        reject(err);
+                    }
+
+                    resolve(null);
                 });
             });
         });
@@ -2248,6 +2301,20 @@ function getHermesCommand(): string {
 
     // fallback to hermesvm
     return path.join("node_modules", "hermesvm", getHermesOSBin(), "hermes");
+}
+
+function getComposeSourceMapsPath(): string {
+    // detect if compose-source-maps.js script exists
+    const composeSourceMaps = path.join(
+        "node_modules",
+        "react-native",
+        "scripts",
+        "compose-source-maps.js",
+    );
+    if (fs.existsSync(composeSourceMaps)) {
+        return composeSourceMaps;
+    }
+    return null;
 }
 
 function serializeConnectionInfo(
