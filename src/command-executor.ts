@@ -40,7 +40,7 @@ var configFilePath: string = path.join(
     ".code-push.config"
 );
 var emailValidator = require("email-validator");
-var packageJson = require("../../package.json");
+var packageJson = require("../package.json");
 var parseXml = Q.denodeify(require("xml2js").parseString);
 var properties = require("properties");
 

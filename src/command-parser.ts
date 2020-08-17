@@ -5,7 +5,7 @@ import updateNotifier from "update-notifier";
 import backslash = require("backslash");
 import parseDuration = require("parse-duration");
 
-var packageJson = require("../../package.json");
+var packageJson = require("../package.json");
 const ROLLOUT_PERCENTAGE_REGEX: RegExp = /^(100|[1-9][0-9]|[1-9])%?$/;
 const USAGE_PREFIX = "Usage: code-push";
 
