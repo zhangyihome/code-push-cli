@@ -1,5 +1,9 @@
 import * as fs from "fs";
 
+export function isBinaryOrZip(path: string): boolean {
+  return path.search(/\.zip$/i) !== -1 || path.search(/\.apk$/i) !== -1 || path.search(/\.ipa$/i) !== -1;
+}
+
 export function isDirectory(path: string): boolean {
   return fs.statSync(path).isDirectory();
 }

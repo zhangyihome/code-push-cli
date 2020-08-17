@@ -36,6 +36,7 @@ import {
   runHermesEmitBinaryCommand,
   getReactNativeProjectAppVersion,
 } from "./lib/react-native-utils";
+import { isBinaryOrZip } from "./lib/file-utils";
 import { out } from "./util/interaction";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
@@ -1378,10 +1379,6 @@ function releaseErrorHandler(error: CodePushError, command: cli.ICommand): void 
   } else {
     throw error;
   }
-}
-
-function isBinaryOrZip(path: string): boolean {
-  return path.search(/\.zip$/i) !== -1 || path.search(/\.apk$/i) !== -1 || path.search(/\.ipa$/i) !== -1;
 }
 
 function throwForInvalidEmail(email: string): void {
