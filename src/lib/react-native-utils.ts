@@ -1,10 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as xml2js from "xml2js";
-import { out, isDebug } from "../util/interaction";
+import { out } from "../util/interaction";
 import { isValidVersion, isLowVersion } from "./validation-utils";
 import { fileDoesNotExistOrIsDirectory } from "./file-utils";
-import * as chalk from "chalk";
+import chalk from "chalk";
 import * as cli from "../definitions/cli";
 
 const plist = require("plist");
