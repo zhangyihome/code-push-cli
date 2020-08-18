@@ -2,8 +2,6 @@ import fs from "fs";
 import path from "path";
 import recursiveFs from "recursive-fs";
 import slash = require("slash");
-import Q from "q";
-import Promise = Q.Promise;
 import yazl from "yazl";
 var progress = require("progress");
 
@@ -19,7 +17,7 @@ var coreReleaseHook: cli.ReleaseHook = (
   originalCommand: cli.IReleaseCommand,
   sdk: AccountManager
 ): Promise<cli.IReleaseCommand> => {
-  return Q(<void>null)
+  return Promise.resolve(<void>null)
     .then(() => {
       var releaseFiles: ReleaseFile[] = [];
 
@@ -28,36 +26,35 @@ var coreReleaseHook: cli.ReleaseHook = (
           sourceLocation: currentCommand.package,
           targetLocation: path.basename(currentCommand.package), // Put the file in the root
         });
-        return Q(releaseFiles);
+        return Promise.resolve(releaseFiles);
       }
 
-      var deferred = Q.defer<ReleaseFile[]>();
-      var directoryPath: string = currentCommand.package;
-      var baseDirectoryPath = path.join(directoryPath, ".."); // For legacy reasons, put the root directory in the zip
+      return new Promise<ReleaseFile[]>((resolve, reject) => {
+        var directoryPath: string = currentCommand.package;
+        var baseDirectoryPath = path.join(directoryPath, ".."); // For legacy reasons, put the root directory in the zip
 
-      recursiveFs.readdirr(currentCommand.package, (error?: any, directories?: string[], files?: string[]): void => {
-        if (error) {
-          deferred.reject(error);
-          return;
-        }
+        recursiveFs.readdirr(currentCommand.package, (error?: any, directories?: string[], files?: string[]): void => {
+          if (error) {
+            reject(error);
+            return;
+          }
 
-        files.forEach((filePath: string) => {
-          var relativePath: string = path.relative(baseDirectoryPath, filePath);
-          // yazl does not like backslash (\) in the metadata path.
-          relativePath = slash(relativePath);
-          releaseFiles.push({
-            sourceLocation: filePath,
-            targetLocation: relativePath,
+          files.forEach((filePath: string) => {
+            var relativePath: string = path.relative(baseDirectoryPath, filePath);
+            // yazl does not like backslash (\) in the metadata path.
+            relativePath = slash(relativePath);
+            releaseFiles.push({
+              sourceLocation: filePath,
+              targetLocation: relativePath,
+            });
           });
+
+          resolve(releaseFiles);
         });
-
-        deferred.resolve(releaseFiles);
       });
-
-      return deferred.promise;
     })
     .then((releaseFiles: ReleaseFile[]) => {
-      return Promise<string>((resolve: (file: string) => void, reject: (reason: Error) => void): void => {
+      return new Promise<string>((resolve, reject): void => {
         var packagePath: string = path.join(process.cwd(), generateRandomFilename(15) + ".zip");
         var zipFile = new yazl.ZipFile();
         var writeStream: fs.WriteStream = fs.createWriteStream(packagePath);

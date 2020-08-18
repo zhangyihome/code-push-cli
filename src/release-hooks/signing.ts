@@ -3,7 +3,6 @@ import fs from "fs";
 import jwt from "jsonwebtoken";
 import os from "os";
 import path from "path";
-import q from "q";
 import * as rimraf from "rimraf";
 import { generatePackageHashFromDirectory } from "../lib/hash-utils";
 
@@ -17,7 +16,7 @@ interface CodeSigningClaims {
   contentHash: string;
 }
 
-const deletePreviousSignatureIfExists = (targetPackage: string): q.Promise<any> => {
+const deletePreviousSignatureIfExists = (targetPackage: string): Promise<any> => {
   let signatureFilePath: string = path.join(targetPackage, METADATA_FILE_NAME);
   let prevSignatureExists: boolean = true;
   try {
@@ -26,7 +25,7 @@ const deletePreviousSignatureIfExists = (targetPackage: string): q.Promise<any> 
     if (err.code === "ENOENT") {
       prevSignatureExists = false;
     } else {
-      return q.reject(
+      return Promise.reject(
         new Error(
           `Could not delete previous release signature at ${signatureFilePath}.
                 Please, check your access rights.`
@@ -40,35 +39,35 @@ const deletePreviousSignatureIfExists = (targetPackage: string): q.Promise<any> 
     rimraf.sync(signatureFilePath);
   }
 
-  return q.resolve(<void>null);
+  return Promise.resolve(<void>null);
 };
 
 var sign: cli.ReleaseHook = (
   currentCommand: cli.IReleaseCommand,
   originalCommand: cli.IReleaseCommand,
   sdk: AccountManager
-): q.Promise<cli.IReleaseCommand> => {
+): Promise<cli.IReleaseCommand> => {
   if (!currentCommand.privateKeyPath) {
     if (fs.lstatSync(currentCommand.package).isDirectory()) {
       // If new update wasn't signed, but signature file for some reason still appears in the package directory - delete it
       return deletePreviousSignatureIfExists(currentCommand.package).then(() => {
-        return q.resolve<cli.IReleaseCommand>(currentCommand);
+        return Promise.resolve<cli.IReleaseCommand>(currentCommand);
       });
     } else {
-      return q.resolve<cli.IReleaseCommand>(currentCommand);
+      return Promise.resolve<cli.IReleaseCommand>(currentCommand);
     }
   }
 
   let privateKey: Buffer;
   let signatureFilePath: string;
 
-  return q(<void>null)
+  return Promise.resolve(<void>null)
     .then(() => {
       signatureFilePath = path.join(currentCommand.package, METADATA_FILE_NAME);
       try {
         privateKey = fs.readFileSync(currentCommand.privateKeyPath);
       } catch (err) {
-        return q.reject(new Error(`The path specified for the signing key ("${currentCommand.privateKeyPath}") was not valid`));
+        return Promise.reject(new Error(`The path specified for the signing key ("${currentCommand.privateKeyPath}") was not valid`));
       }
 
       if (!fs.lstatSync(currentCommand.package).isDirectory()) {
@@ -89,39 +88,45 @@ var sign: cli.ReleaseHook = (
       return generatePackageHashFromDirectory(currentCommand.package, path.join(currentCommand.package, ".."));
     })
     .then((hash: string) => {
-      var claims: CodeSigningClaims = {
-        claimVersion: CURRENT_CLAIM_VERSION,
-        contentHash: hash,
-      };
+      return new Promise<string>((resolve, reject) => {
+        const claims: CodeSigningClaims = {
+          claimVersion: CURRENT_CLAIM_VERSION,
+          contentHash: hash,
+        };
 
-      return q
-        .nfcall<string>(jwt.sign, claims, privateKey, {
-          algorithm: "RS256",
-        })
-        .catch((err: Error) => {
-          return q.reject<string>(new Error("The specified signing key file was not valid"));
-        });
+        jwt.sign(
+          claims,
+          privateKey,
+          {
+            algorithm: "RS256",
+          },
+          (err, token) => {
+            if (err) {
+              return reject(new Error("The specified signing key file was not valid"));
+            }
+            resolve(token);
+          }
+        );
+      });
     })
     .then((signedJwt: string) => {
-      var deferred = q.defer<void>();
-
-      fs.writeFile(signatureFilePath, signedJwt, (err: Error) => {
-        if (err) {
-          deferred.reject(err);
-        } else {
-          console.log(`Generated a release signature and wrote it to ${signatureFilePath}`);
-          deferred.resolve(<void>null);
-        }
+      return new Promise<void>((resolve, reject) => {
+        fs.writeFile(signatureFilePath, signedJwt, (err: Error) => {
+          if (err) {
+            reject(err);
+          } else {
+            console.log(`Generated a release signature and wrote it to ${signatureFilePath}`);
+            resolve(<void>null);
+          }
+        });
       });
-
-      return deferred.promise;
     })
     .then(() => {
       return currentCommand;
     })
     .catch((err: Error) => {
       err.message = `Could not sign package: ${err.message}`;
-      return q.reject<cli.IReleaseCommand>(err);
+      return Promise.reject<cli.IReleaseCommand>(err);
     });
 };
 
