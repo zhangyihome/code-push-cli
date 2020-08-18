@@ -9,7 +9,6 @@ var opener = require("opener");
 import os from "os";
 import path from "path";
 var prompt = require("prompt");
-import Q from "q";
 import * as rimraf from "rimraf";
 var which = require("which");
 import wordwrap = require("wordwrap");
@@ -38,11 +37,11 @@ import {
 import { isBinaryOrZip } from "./lib/file-utils";
 import { out } from "./util/interaction";
 import { isValidRange } from "./lib/validation-utils";
+import { getCordovaProjectAppVersion } from "./lib/cordova-utils";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var emailValidator = require("email-validator");
 var packageJson = require("../package.json");
-var parseXml = Q.denodeify(require("xml2js").parseString);
 
 const CLI_HEADERS: Headers = {
   "X-CodePush-CLI-Version": packageJson.version,
@@ -1063,12 +1062,12 @@ export var release = (command: cli.IReleaseCommand): Promise<void> => {
       type: command.type,
     };
 
-    var releaseHooksPromise = hooks.reduce((accumulatedPromise: Q.Promise<cli.IReleaseCommand>, hook: cli.ReleaseHook) => {
+    var releaseHooksPromise = hooks.reduce((accumulatedPromise: Promise<cli.IReleaseCommand>, hook: cli.ReleaseHook) => {
       return accumulatedPromise.then((modifiedCommand: cli.IReleaseCommand) => {
         currentCommand = modifiedCommand || currentCommand;
         return hook(currentCommand, command, sdk);
       });
-    }, Q(currentCommand));
+    }, Promise.resolve(currentCommand));
 
     return releaseHooksPromise.then(() => {}).catch((err: CodePushError) => releaseErrorHandler(err, command));
   });
@@ -1083,7 +1082,6 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
       var platform: string = command.platform.toLowerCase();
       var projectRoot: string = process.cwd();
       var platformFolder: string = path.join(projectRoot, "platforms", platform);
-      var platformCordova: string = path.join(platformFolder, "cordova");
       var outputFolder: string;
 
       if (platform === "ios") {
@@ -1125,31 +1123,17 @@ export var releaseCordova = (command: cli.IReleaseCordovaCommand): Promise<void>
         );
       }
 
-      try {
-        var configString: string = fs.readFileSync(path.join(projectRoot, "config.xml"), { encoding: "utf8" });
-      } catch (error) {
-        throw new Error(
-          `Unable to find or read "config.xml" in the CWD. The "release-cordova" command must be executed in a Cordova project folder.`
-        );
-      }
-
-      var configPromise: Promise<any> = parseXml(configString) as any;
-
       releaseCommand.package = outputFolder;
       releaseCommand.type = cli.CommandType.release;
 
-      return configPromise.catch((err: any) => {
-        throw new Error(`Unable to parse "config.xml" in the CWD. Ensure that the contents of "config.xml" is valid XML.`);
-      });
+      return getCordovaProjectAppVersion(projectRoot);
     })
-    .then((parsedConfig: any) => {
-      var config: any = parsedConfig.widget;
-
+    .then((appVersion: string) => {
       var releaseTargetVersion: string;
       if (command.appStoreVersion) {
         releaseTargetVersion = command.appStoreVersion;
       } else {
-        releaseTargetVersion = config["$"].version;
+        releaseTargetVersion = appVersion;
       }
 
       throwForInvalidSemverRange(releaseTargetVersion);
@@ -1231,7 +1215,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
         }
 
         var appVersionPromise: Promise<string> = command.appStoreVersion
-          ? (Q(command.appStoreVersion) as any)
+          ? Promise.resolve(command.appStoreVersion)
           : getReactNativeProjectAppVersion(command, projectName);
 
         if (command.sourcemapOutputDir && command.sourcemapOutput) {
