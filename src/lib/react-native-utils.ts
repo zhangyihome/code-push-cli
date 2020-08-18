@@ -338,8 +338,13 @@ export function runHermesEmitBinaryCommand(
       });
     });
   }).then(() => {
+    if (!sourcemapOutput) {
+      // skip source map compose if source map is not enabled
+      return;
+    }
+
     const composeSourceMapsPath = getComposeSourceMapsPath();
-    if (sourcemapOutput && !composeSourceMapsPath) {
+    if (!composeSourceMapsPath) {
       throw new Error("react-native compose-source-maps.js scripts is not found");
     }
 

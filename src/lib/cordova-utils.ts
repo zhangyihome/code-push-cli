@@ -1,6 +1,6 @@
-import * as xml2js from "xml2js";
-import * as fs from "fs";
-import * as path from "path";
+import xml2js from "xml2js";
+import fs from "fs";
+import path from "path";
 
 export function getCordovaProjectAppVersion(projectRoot?: string): Promise<string> {
   return new Promise<string>((resolve, reject) => {
