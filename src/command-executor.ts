@@ -399,11 +399,11 @@ export var deploymentList = (command: cli.IDeploymentListCommand, showPackage: b
               }
             });
           } else {
-            return Q(<void>null);
+            return Promise.resolve(<void>null);
           }
         });
 
-        return Q.all(metricsPromises);
+        return Promise.all(metricsPromises);
       }
     })
     .then(() => {
