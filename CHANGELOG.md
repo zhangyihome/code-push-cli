@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.4](https://github.com/rocwind/code-push-cli/compare/v2.3.3...v2.3.4) (2020-08-18)
+
+
+### Bug Fixes
+
+* skip compose sourcemap for hermes if the sourcemap option is not enabled ([0555005](https://github.com/rocwind/code-push-cli/commit/0555005074e3e709863e5482713de02eceab2ffe))
+
 ### [2.3.3](https://github.com/rocwind/code-push-cli/compare/v2.3.2...v2.3.3) (2020-08-18)
 
 
