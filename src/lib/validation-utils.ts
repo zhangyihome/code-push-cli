@@ -9,6 +9,11 @@ export function isValidVersion(version: string): boolean {
   return !!semver.valid(version) || regexpForMajorMinor.test(version) || regexpForMajor.test(version);
 }
 
+// Allow plain integer versions (as well as '1.0' values) for now, e.g. '1' is valid here and we assume that it is equal to '1.0.0'.
+export function isValidRange(semverRange: string): boolean {
+  return !!semver.validRange(semverRange);
+}
+
 export function isLowVersion(v1: string, v2: string): boolean {
   return semver.compare(v1, v2) === -1 ? true : false;
 }

@@ -10,8 +10,7 @@ import os from "os";
 import path from "path";
 var prompt = require("prompt");
 import Q from "q";
-var rimraf = require("rimraf");
-import semver from "semver";
+import * as rimraf from "rimraf";
 var which = require("which");
 import wordwrap = require("wordwrap");
 import * as cli from "./definitions/cli";
@@ -38,6 +37,7 @@ import {
 } from "./lib/react-native-utils";
 import { isBinaryOrZip } from "./lib/file-utils";
 import { out } from "./util/interaction";
+import { isValidRange } from "./lib/validation-utils";
 
 var configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 var emailValidator = require("email-validator");
@@ -1388,7 +1388,7 @@ function throwForInvalidEmail(email: string): void {
 }
 
 function throwForInvalidSemverRange(semverRange: string): void {
-  if (semver.validRange(semverRange) === null) {
+  if (!isValidRange(semverRange)) {
     throw new Error('Please use a semver-compliant target binary version range, for example "1.0.0", "*" or "^1.2.3".');
   }
 }
