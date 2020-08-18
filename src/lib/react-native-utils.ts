@@ -1,6 +1,6 @@
-import * as fs from "fs";
-import * as path from "path";
-import * as xml2js from "xml2js";
+import fs from "fs";
+import path from "path";
+import xml2js from "xml2js";
 import { out } from "../util/interaction";
 import { isValidVersion, isLowVersion } from "./validation-utils";
 import { fileDoesNotExistOrIsDirectory } from "./file-utils";

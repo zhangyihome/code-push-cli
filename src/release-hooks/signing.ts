@@ -3,7 +3,7 @@ import fs from "fs";
 import jwt from "jsonwebtoken";
 import os from "os";
 import path from "path";
-import * as rimraf from "rimraf";
+import rimraf from "rimraf";
 import { generatePackageHashFromDirectory } from "../lib/hash-utils";
 
 import AccountManager = require("code-push");

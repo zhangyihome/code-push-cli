@@ -9,7 +9,7 @@ var opener = require("opener");
 import os from "os";
 import path from "path";
 var prompt = require("prompt");
-import * as rimraf from "rimraf";
+import rimraf from "rimraf";
 var which = require("which");
 import wordwrap = require("wordwrap");
 import * as cli from "./definitions/cli";
