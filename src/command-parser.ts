@@ -171,33 +171,6 @@ function removeCollaborator(commandName: string, yargs: yargs.Argv): void {
   addCommonConfiguration(yargs);
 }
 
-function sessionList(commandName: string, yargs: yargs.Argv): void {
-  isValidCommand = true;
-  yargs
-    .usage(USAGE_PREFIX + " session " + commandName + " [options]")
-    .demand(/*count*/ 0, /*max*/ 0)
-    .example("session " + commandName, "Lists your sessions in tabular format")
-    .example("session " + commandName + " --format json", "Lists your login sessions in JSON format")
-    .option("format", {
-      default: "table",
-      demand: false,
-      description: 'Output format to display your login sessions with ("json" or "table")',
-      type: "string",
-    });
-
-  addCommonConfiguration(yargs);
-}
-
-function sessionRemove(commandName: string, yargs: yargs.Argv): void {
-  isValidCommand = true;
-  yargs
-    .usage(USAGE_PREFIX + " session " + commandName + " <machineName>")
-    .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option arguments
-    .example("session " + commandName + ' "John\'s PC"', 'Removes the existing login session from "John\'s PC"');
-
-  addCommonConfiguration(yargs);
-}
-
 function deploymentHistoryClear(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs

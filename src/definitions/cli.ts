@@ -31,8 +31,6 @@ export enum CommandType {
   releaseCordova,
   releaseReact,
   rollback,
-  sessionList,
-  sessionRemove,
   whoami,
 }
 

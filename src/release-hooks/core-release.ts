@@ -1,16 +1,17 @@
 import fs from "fs";
 import path from "path";
 import recursiveFs from "recursive-fs";
-import slash = require("slash");
 import yazl from "yazl";
-var progress = require("progress");
 
-import AccountManager = require("code-push");
 import { Package, PackageInfo } from "code-push/script/types";
 import { out } from "../util/interaction";
 import { generateRandomFilename } from "../lib/file-utils";
 import * as cli from "../definitions/cli";
-import ReleaseFile = cli.ReleaseFile;
+
+import slash = require("slash");
+const progress = require("progress");
+
+import AccountManager = require("code-push");
 
 var coreReleaseHook: cli.ReleaseHook = (
   currentCommand: cli.IReleaseCommand,
@@ -19,7 +20,7 @@ var coreReleaseHook: cli.ReleaseHook = (
 ): Promise<cli.IReleaseCommand> => {
   return Promise.resolve(<void>null)
     .then(() => {
-      var releaseFiles: ReleaseFile[] = [];
+      var releaseFiles: cli.ReleaseFile[] = [];
 
       if (!fs.lstatSync(currentCommand.package).isDirectory()) {
         releaseFiles.push({
@@ -29,7 +30,7 @@ var coreReleaseHook: cli.ReleaseHook = (
         return Promise.resolve(releaseFiles);
       }
 
-      return new Promise<ReleaseFile[]>((resolve, reject) => {
+      return new Promise<cli.ReleaseFile[]>((resolve, reject) => {
         var directoryPath: string = currentCommand.package;
         var baseDirectoryPath = path.join(directoryPath, ".."); // For legacy reasons, put the root directory in the zip
 
@@ -53,7 +54,7 @@ var coreReleaseHook: cli.ReleaseHook = (
         });
       });
     })
-    .then((releaseFiles: ReleaseFile[]) => {
+    .then((releaseFiles: cli.ReleaseFile[]) => {
       return new Promise<string>((resolve, reject): void => {
         var packagePath: string = path.join(process.cwd(), generateRandomFilename(15) + ".zip");
         var zipFile = new yazl.ZipFile();
@@ -68,7 +69,7 @@ var coreReleaseHook: cli.ReleaseHook = (
             resolve(packagePath);
           });
 
-        releaseFiles.forEach((releaseFile: ReleaseFile) => {
+        releaseFiles.forEach((releaseFile: cli.ReleaseFile) => {
           zipFile.addFile(releaseFile.sourceLocation, releaseFile.targetLocation);
         });
 
