@@ -205,6 +205,16 @@ export function getReactNativeProjectAppVersion(command: cli.IReleaseReactComman
   }
 }
 
+// https://github.com/microsoft/appcenter-cli/blob/master/src/commands/codepush/release-react.ts#L201
+// https://github.com/microsoft/appcenter-cli/blob/13495af812558bd952d8aeb9dc01b5be089cd1fc/src/commands/codepush/lib/react-native-utils.ts#L277
+function getCliPath(): string {
+  if (process.platform === "win32") {
+    return path.join("node_modules", "react-native", "local-cli", "cli.js");
+  }
+
+  return path.join("node_modules", ".bin", "react-native");
+}
+
 export function runReactNativeBundleCommand(
   bundleName: string,
   development: boolean,
@@ -222,7 +232,7 @@ export function runReactNativeBundleCommand(
   }
 
   Array.prototype.push.apply(reactNativeBundleArgs, [
-    path.join("node_modules", "react-native", "local-cli", "cli.js"),
+    getCliPath(),
     "bundle",
     "--assets-dest",
     outputFolder,
