@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.0](https://github.com/rocwind/code-push-cli/compare/v2.3.4...v2.4.0) (2021-04-02)
+
+
+### Features
+
+* 添加getCliPath()判断platform使用不同的cli ([e7a3de9](https://github.com/rocwind/code-push-cli/commit/e7a3de992b52f7e5576db15568b928ff7d89f787))
+
 ### [2.3.4](https://github.com/rocwind/code-push-cli/compare/v2.3.3...v2.3.4) (2020-08-18)
 
 
