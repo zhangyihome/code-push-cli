@@ -828,6 +828,12 @@ var argv = yargs
         demand: false,
         description: "Path to the gradle file which specifies the binary version you want to target this release at (android only).",
       })
+      .option("podFile", {
+        alias: "pf",
+        default: null,
+        demand: false,
+        description: "Path to the cocopods config file (iOS only).",
+      })
       .option("mandatory", {
         alias: "m",
         default: false,
@@ -1316,6 +1322,7 @@ function createCommand(): cli.ICommand {
           releaseReactCommand.development = argv["development"];
           releaseReactCommand.entryFile = argv["entryFile"];
           releaseReactCommand.gradleFile = argv["gradleFile"];
+          releaseReactCommand.podFile = argv["podFile"];
           releaseReactCommand.mandatory = argv["mandatory"];
           releaseReactCommand.noDuplicateReleaseError = argv["noDuplicateReleaseError"];
           releaseReactCommand.plistFile = argv["plistFile"];
