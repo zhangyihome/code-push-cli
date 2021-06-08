@@ -30,6 +30,7 @@ import {
 } from "code-push/script/types";
 import {
   getHermesEnabled,
+  getiOSHermesEnabled,
   runReactNativeBundleCommand,
   runHermesEmitBinaryCommand,
   getReactNativeProjectAppVersion,
@@ -1248,16 +1249,29 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
         )
       )
       .then(() => {
-        return getHermesEnabled(command.platform, command.gradleFile, command.podFile).then((isHermesEnabled) => {
-          if (isHermesEnabled) {
-            return runHermesEmitBinaryCommand(
-              bundleName,
-              outputFolder,
-              command.sourcemapOutput,
-              [] // TODO: extra flags
-            );
-          }
-        });
+        if (platform === "android") {
+          return getHermesEnabled(command.gradleFile).then((isHermesEnabled) => {
+            if (isHermesEnabled) {
+              return runHermesEmitBinaryCommand(
+                bundleName,
+                outputFolder,
+                command.sourcemapOutput,
+                [] // TODO: extra flags
+              );
+            }
+          });
+        } else if (platform === "ios") {
+          return getiOSHermesEnabled(command.podFile).then((isHermesEnabled) => {
+            if (isHermesEnabled) {
+              return runHermesEmitBinaryCommand(
+                bundleName,
+                outputFolder,
+                command.sourcemapOutput,
+                [] // TODO: extra flags
+              );
+            }
+          });
+        }
       })
       .then(() => {
         out.text(chalk.cyan("\nReleasing update contents to CodePush:\n"));
