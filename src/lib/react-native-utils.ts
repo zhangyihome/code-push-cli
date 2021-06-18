@@ -398,7 +398,7 @@ export function runHermesEmitBinaryCommand(
   });
 }
 
-export function getHermesEnabled(gradleFile: string): Promise<boolean> {
+export function getHermesEnabled(gradleFile?: string): Promise<boolean> {
   let buildGradlePath: string = path.join("android", "app");
   if (gradleFile) {
     buildGradlePath = gradleFile;
@@ -419,6 +419,26 @@ export function getHermesEnabled(gradleFile: string): Promise<boolean> {
     .then((buildGradle: any) => {
       return Array.from(buildGradle["project.ext.react"]).includes("enableHermes: true");
     });
+}
+
+export function getiOSHermesEnabled(podFile: string): Promise<boolean> {
+  let podPath = path.join("ios", "Podfile");
+  if (podFile) {
+    podPath = podFile;
+  }
+  if (fileDoesNotExistOrIsDirectory(podPath)) {
+    throw new Error(`Unable to find Podfile file "${podPath}".`);
+  }
+
+  return new Promise((resolve, reject) => {
+    fs.readFile(podPath, { encoding: "utf8" }, (error, res) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(/:hermes_enabled(\s+|\n+)?=>(\s+|\n+)?true/.test(res));
+    });
+  });
 }
 
 function getHermesOSBin(): string {
