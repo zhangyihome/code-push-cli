@@ -12,6 +12,7 @@ var prompt = require('prompt');
 import rimraf from 'rimraf';
 import which from 'which';
 import wordwrap = require('wordwrap');
+import emailValidator from 'email-validator';
 import * as cli from './definitions/cli';
 import hooks from './release-hooks/index';
 import {
@@ -44,7 +45,6 @@ var configFilePath: string = path.join(
     process.env.LOCALAPPDATA || process.env.HOME,
     '.code-push.config',
 );
-var emailValidator = require('email-validator');
 var packageJson = require('../package.json');
 
 const CLI_HEADERS: Headers = {
