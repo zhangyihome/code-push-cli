@@ -2,9 +2,9 @@ import childProcess from 'child_process';
 import * as cli from '../definitions/cli';
 import moment from 'moment';
 import path from 'path';
+import which from 'which';
 
 const simctl = require('simctl');
-const which = require('which');
 
 interface IDebugPlatform {
     getLogProcess(): any;
