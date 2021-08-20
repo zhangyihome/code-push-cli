@@ -1117,7 +1117,8 @@ var argv = yargs
     .wrap(/*columnLimit*/ null)
     .strict() // Validate hyphenated (named) arguments.
     .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommandCategory) // Report unrecognized, non-hyphenated command category.
-    .fail((msg: string) => showHelp(/*showRootDescription*/ true)).argv; // Suppress the default error message.
+    .fail((msg: string) => showHelp(/*showRootDescription*/ true))
+    .parseSync(); // Suppress the default error message.
 
 function createCommand(): cli.ICommand {
     var cmd: cli.ICommand;
@@ -1155,8 +1156,8 @@ function createCommand(): cli.ICommand {
                             var accessKeyPatchCmd = <cli.IAccessKeyPatchCommand>cmd;
                             accessKeyPatchCmd.oldName = arg2;
 
-                            var newNameOption: string = argv['name'];
-                            var ttlOption: string = argv['ttl'];
+                            var newNameOption = argv['name'] as string;
+                            var ttlOption = argv['ttl'] as string;
                             if (isDefined(newNameOption)) {
                                 accessKeyPatchCmd.newName = newNameOption;
                             }
@@ -1171,7 +1172,7 @@ function createCommand(): cli.ICommand {
                     case 'ls':
                         cmd = { type: cli.CommandType.accessKeyList };
 
-                        (<cli.IAccessKeyListCommand>cmd).format = argv['format'];
+                        (<cli.IAccessKeyListCommand>cmd).format = argv['format'] as string;
                         break;
 
                     case 'remove':
@@ -1203,7 +1204,7 @@ function createCommand(): cli.ICommand {
                     case 'ls':
                         cmd = { type: cli.CommandType.appList };
 
-                        (<cli.IAppListCommand>cmd).format = argv['format'];
+                        (<cli.IAppListCommand>cmd).format = argv['format'] as string;
                         break;
 
                     case 'remove':
@@ -1256,7 +1257,7 @@ function createCommand(): cli.ICommand {
                             cmd = { type: cli.CommandType.collaboratorList };
 
                             (<cli.ICollaboratorListCommand>cmd).appName = arg2;
-                            (<cli.ICollaboratorListCommand>cmd).format = argv['format'];
+                            (<cli.ICollaboratorListCommand>cmd).format = argv['format'] as string;
                         }
                         break;
 
@@ -1290,7 +1291,7 @@ function createCommand(): cli.ICommand {
 
                             deploymentAddCommand.appName = arg2;
                             deploymentAddCommand.deploymentName = arg3;
-                            deploymentAddCommand.default = argv['default'];
+                            deploymentAddCommand.default = argv['default'] as boolean;
                         }
                         break;
 
@@ -1317,8 +1318,8 @@ function createCommand(): cli.ICommand {
                             var deploymentListCommand = <cli.IDeploymentListCommand>cmd;
 
                             deploymentListCommand.appName = arg2;
-                            deploymentListCommand.format = argv['format'];
-                            deploymentListCommand.displayKeys = argv['displayKeys'];
+                            deploymentListCommand.format = argv['format'] as string;
+                            deploymentListCommand.displayKeys = argv['displayKeys'] as boolean;
                         }
                         break;
 
@@ -1355,8 +1356,10 @@ function createCommand(): cli.ICommand {
 
                             deploymentHistoryCommand.appName = arg2;
                             deploymentHistoryCommand.deploymentName = arg3;
-                            deploymentHistoryCommand.format = argv['format'];
-                            deploymentHistoryCommand.displayAuthor = argv['displayAuthor'];
+                            deploymentHistoryCommand.format = argv['format'] as string;
+                            deploymentHistoryCommand.displayAuthor = argv[
+                                'displayAuthor'
+                            ] as boolean;
                         }
                         break;
                 }
@@ -1375,9 +1378,9 @@ function createCommand(): cli.ICommand {
                 var loginCommand = <cli.ILoginCommand>cmd;
 
                 loginCommand.serverUrl = getServerUrl(arg1);
-                loginCommand.accessKey = argv['accessKey'];
-                loginCommand.proxy = argv['proxy'];
-                loginCommand.noProxy = argv['noProxy'];
+                loginCommand.accessKey = argv['accessKey'] as string;
+                loginCommand.proxy = argv['proxy'] as string;
+                loginCommand.noProxy = argv['noProxy'] as boolean;
                 break;
 
             case 'logout':
@@ -1392,15 +1395,15 @@ function createCommand(): cli.ICommand {
 
                     patchCommand.appName = arg1;
                     patchCommand.deploymentName = arg2;
-                    patchCommand.label = argv['label'];
+                    patchCommand.label = argv['label'] as string;
                     // Description must be set to null to indicate that it is not being patched.
                     patchCommand.description = argv['description']
-                        ? backslash(argv['description'])
+                        ? backslash(argv['description'] as string)
                         : null;
-                    patchCommand.disabled = argv['disabled'];
-                    patchCommand.mandatory = argv['mandatory'];
-                    patchCommand.rollout = getRolloutValue(argv['rollout']);
-                    patchCommand.appStoreVersion = argv['targetBinaryVersion'];
+                    patchCommand.disabled = argv['disabled'] as boolean;
+                    patchCommand.mandatory = argv['mandatory'] as boolean;
+                    patchCommand.rollout = getRolloutValue(argv['rollout'] as string);
+                    patchCommand.appStoreVersion = argv['targetBinaryVersion'] as string;
                 }
                 break;
 
@@ -1414,15 +1417,18 @@ function createCommand(): cli.ICommand {
                     deploymentPromoteCommand.sourceDeploymentName = arg2;
                     deploymentPromoteCommand.destDeploymentName = arg3;
                     deploymentPromoteCommand.description = argv['description']
-                        ? backslash(argv['description'])
+                        ? backslash(argv['description'] as string)
                         : '';
-                    deploymentPromoteCommand.label = argv['label'];
-                    deploymentPromoteCommand.disabled = argv['disabled'];
-                    deploymentPromoteCommand.mandatory = argv['mandatory'];
-                    deploymentPromoteCommand.noDuplicateReleaseError =
-                        argv['noDuplicateReleaseError'];
-                    deploymentPromoteCommand.rollout = getRolloutValue(argv['rollout']);
-                    deploymentPromoteCommand.appStoreVersion = argv['targetBinaryVersion'];
+                    deploymentPromoteCommand.label = argv['label'] as string;
+                    deploymentPromoteCommand.disabled = argv['disabled'] as boolean;
+                    deploymentPromoteCommand.mandatory = argv['mandatory'] as boolean;
+                    deploymentPromoteCommand.noDuplicateReleaseError = argv[
+                        'noDuplicateReleaseError'
+                    ] as boolean;
+                    deploymentPromoteCommand.rollout = getRolloutValue(argv['rollout'] as string);
+                    deploymentPromoteCommand.appStoreVersion = argv[
+                        'targetBinaryVersion'
+                    ] as string;
                 }
                 break;
 
@@ -1432,8 +1438,8 @@ function createCommand(): cli.ICommand {
                 var registerCommand = <cli.IRegisterCommand>cmd;
 
                 registerCommand.serverUrl = getServerUrl(arg1);
-                registerCommand.proxy = argv['proxy'];
-                registerCommand.noProxy = argv['noProxy'];
+                registerCommand.proxy = argv['proxy'] as string;
+                registerCommand.noProxy = argv['noProxy'] as boolean;
                 break;
 
             case 'release':
@@ -1445,15 +1451,17 @@ function createCommand(): cli.ICommand {
                     releaseCommand.appName = arg1;
                     releaseCommand.package = arg2;
                     releaseCommand.appStoreVersion = arg3;
-                    releaseCommand.deploymentName = argv['deploymentName'];
+                    releaseCommand.deploymentName = argv['deploymentName'] as string;
                     releaseCommand.description = argv['description']
-                        ? backslash(argv['description'])
+                        ? backslash(argv['description'] as string)
                         : '';
-                    releaseCommand.disabled = argv['disabled'];
-                    releaseCommand.mandatory = argv['mandatory'];
-                    releaseCommand.noDuplicateReleaseError = argv['noDuplicateReleaseError'];
-                    releaseCommand.rollout = getRolloutValue(argv['rollout']);
-                    releaseCommand.privateKeyPath = argv['privateKeyPath'];
+                    releaseCommand.disabled = argv['disabled'] as boolean;
+                    releaseCommand.mandatory = argv['mandatory'] as boolean;
+                    releaseCommand.noDuplicateReleaseError = argv[
+                        'noDuplicateReleaseError'
+                    ] as boolean;
+                    releaseCommand.rollout = getRolloutValue(argv['rollout'] as string);
+                    releaseCommand.privateKeyPath = argv['privateKeyPath'] as string;
                 }
                 break;
 
@@ -1466,18 +1474,22 @@ function createCommand(): cli.ICommand {
                     releaseCordovaCommand.appName = arg1;
                     releaseCordovaCommand.platform = arg2;
 
-                    releaseCordovaCommand.build = argv['build'];
-                    releaseCordovaCommand.deploymentName = argv['deploymentName'];
+                    releaseCordovaCommand.build = argv['build'] as boolean;
+                    releaseCordovaCommand.deploymentName = argv['deploymentName'] as string;
                     releaseCordovaCommand.description = argv['description']
-                        ? backslash(argv['description'])
+                        ? backslash(argv['description'] as string)
                         : '';
-                    releaseCordovaCommand.disabled = argv['disabled'];
-                    releaseCordovaCommand.mandatory = argv['mandatory'];
-                    releaseCordovaCommand.noDuplicateReleaseError = argv['noDuplicateReleaseError'];
-                    releaseCordovaCommand.rollout = getRolloutValue(argv['rollout']);
-                    releaseCordovaCommand.appStoreVersion = argv['targetBinaryVersion'];
-                    releaseCordovaCommand.isReleaseBuildType = argv['isReleaseBuildType'];
-                    releaseCordovaCommand.privateKeyPath = argv['privateKeyPath'];
+                    releaseCordovaCommand.disabled = argv['disabled'] as boolean;
+                    releaseCordovaCommand.mandatory = argv['mandatory'] as boolean;
+                    releaseCordovaCommand.noDuplicateReleaseError = argv[
+                        'noDuplicateReleaseError'
+                    ] as boolean;
+                    releaseCordovaCommand.rollout = getRolloutValue(argv['rollout'] as string);
+                    releaseCordovaCommand.appStoreVersion = argv['targetBinaryVersion'] as string;
+                    releaseCordovaCommand.isReleaseBuildType = argv[
+                        'isReleaseBuildType'
+                    ] as boolean;
+                    releaseCordovaCommand.privateKeyPath = argv['privateKeyPath'] as string;
                 }
                 break;
 
@@ -1490,27 +1502,29 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.appName = arg1;
                     releaseReactCommand.platform = arg2;
 
-                    releaseReactCommand.appStoreVersion = argv['targetBinaryVersion'];
-                    releaseReactCommand.bundleName = argv['bundleName'];
-                    releaseReactCommand.deploymentName = argv['deploymentName'];
-                    releaseReactCommand.disabled = argv['disabled'];
+                    releaseReactCommand.appStoreVersion = argv['targetBinaryVersion'] as string;
+                    releaseReactCommand.bundleName = argv['bundleName'] as string;
+                    releaseReactCommand.deploymentName = argv['deploymentName'] as string;
+                    releaseReactCommand.disabled = argv['disabled'] as boolean;
                     releaseReactCommand.description = argv['description']
-                        ? backslash(argv['description'])
+                        ? backslash(argv['description'] as string)
                         : '';
-                    releaseReactCommand.development = argv['development'];
-                    releaseReactCommand.entryFile = argv['entryFile'];
-                    releaseReactCommand.gradleFile = argv['gradleFile'];
-                    releaseReactCommand.podFile = argv['podFile'];
-                    releaseReactCommand.mandatory = argv['mandatory'];
-                    releaseReactCommand.noDuplicateReleaseError = argv['noDuplicateReleaseError'];
-                    releaseReactCommand.plistFile = argv['plistFile'];
-                    releaseReactCommand.plistFilePrefix = argv['plistFilePrefix'];
-                    releaseReactCommand.rollout = getRolloutValue(argv['rollout']);
-                    releaseReactCommand.privateKeyPath = argv['privateKeyPath'];
-                    releaseReactCommand.sourcemapOutput = argv['sourcemapOutput'];
-                    releaseReactCommand.sourcemapOutputDir = argv['sourcemapOutputDir'];
-                    releaseReactCommand.outputDir = argv['outputDir'];
-                    releaseReactCommand.config = argv['config'];
+                    releaseReactCommand.development = argv['development'] as boolean;
+                    releaseReactCommand.entryFile = argv['entryFile'] as string;
+                    releaseReactCommand.gradleFile = argv['gradleFile'] as string;
+                    releaseReactCommand.podFile = argv['podFile'] as string;
+                    releaseReactCommand.mandatory = argv['mandatory'] as boolean;
+                    releaseReactCommand.noDuplicateReleaseError = argv[
+                        'noDuplicateReleaseError'
+                    ] as boolean;
+                    releaseReactCommand.plistFile = argv['plistFile'] as string;
+                    releaseReactCommand.plistFilePrefix = argv['plistFilePrefix'] as string;
+                    releaseReactCommand.rollout = getRolloutValue(argv['rollout'] as string);
+                    releaseReactCommand.privateKeyPath = argv['privateKeyPath'] as string;
+                    releaseReactCommand.sourcemapOutput = argv['sourcemapOutput'] as string;
+                    releaseReactCommand.sourcemapOutputDir = argv['sourcemapOutputDir'] as string;
+                    releaseReactCommand.outputDir = argv['outputDir'] as string;
+                    releaseReactCommand.config = argv['config'] as string;
                 }
                 break;
 
@@ -1522,7 +1536,7 @@ function createCommand(): cli.ICommand {
 
                     rollbackCommand.appName = arg1;
                     rollbackCommand.deploymentName = arg2;
-                    rollbackCommand.targetRelease = argv['targetRelease'];
+                    rollbackCommand.targetRelease = argv['targetRelease'] as string;
                 }
                 break;
 
