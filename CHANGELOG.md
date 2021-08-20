@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.5.1](https://github.com/shm-open/code-push-cli/compare/v2.5.0...v2.5.1) (2021-08-20)
+
+
+### Bug Fixes
+
+* turn off yargs strict check for compatible(as a quick workaround) ([38827d4](https://github.com/shm-open/code-push-cli/commit/38827d42ad59554773952f0cc9fac7c09591d1e0))
+
 ## [2.5.0](https://github.com/shm-open/code-push-cli/compare/v2.4.0...v2.5.0) (2021-08-20)
 
 
