@@ -523,15 +523,15 @@ var argv = yargs
         isValidCommandCategory = true;
         isValidCommand = true;
         yargs
-            .usage(USAGE_PREFIX + ' login [options]')
-            .demand(/*count*/ 0, /*max*/ 1) //set 'max' to one to allow usage of serverUrl undocument parameter for testing
+            .usage(USAGE_PREFIX + ' login <serverUrl> [options]')
+            .demand(/*count*/ 1, /*max*/ 1)
             .example('login', 'Logs in to the Mobile Center server')
             .example(
-                'login --accessKey mykey',
+                'login https://codepushserver --accessKey mykey',
                 'Logs in on behalf of the user who owns and created the access key "mykey"',
             )
             .example(
-                'login --proxy http://someproxy.com:455',
+                'login https://codepushserver --proxy http://someproxy.com:455',
                 'Logs in with the specified proxy url',
             )
             .option('accessKey', {
@@ -568,6 +568,8 @@ var argv = yargs
         addCommonConfiguration(yargs);
     })
     .command('patch', 'Update the metadata for an existing release', (yargs: yargs.Argv) => {
+        isValidCommandCategory = true;
+        isValidCommand = true;
         yargs
             .usage(USAGE_PREFIX + ' patch <appName> <deploymentName> [options]')
             .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
@@ -634,6 +636,8 @@ var argv = yargs
         'promote',
         'Promote the latest release from one app deployment to another',
         (yargs: yargs.Argv) => {
+            isValidCommandCategory = true;
+            isValidCommand = true;
             yargs
                 .usage(
                     USAGE_PREFIX +
@@ -714,11 +718,11 @@ var argv = yargs
         isValidCommandCategory = true;
         isValidCommand = true;
         yargs
-            .usage(USAGE_PREFIX + ' register')
-            .demand(/*count*/ 0, /*max*/ 1) //set 'max' to one to allow usage of serverUrl undocument parameter for testing
+            .usage(USAGE_PREFIX + ' register <serverUrl>')
+            .demand(/*count*/ 1, /*max*/ 1)
             .example('register', 'Registers a new Mobile Center account')
             .example(
-                'register --proxy http://someproxy.com:455',
+                'register https://codepushserver --proxy http://someproxy.com:455',
                 'Registers with the specified proxy url',
             )
             .option('proxy', {
@@ -738,6 +742,8 @@ var argv = yargs
         addCommonConfiguration(yargs);
     })
     .command('release', 'Release an update to an app deployment', (yargs: yargs.Argv) => {
+        isValidCommandCategory = true;
+        isValidCommand = true;
         yargs
             .usage(
                 USAGE_PREFIX +
@@ -815,6 +821,8 @@ var argv = yargs
         'release-cordova',
         'Release a Cordova update to an app deployment',
         (yargs: yargs.Argv) => {
+            isValidCommandCategory = true;
+            isValidCommand = true;
             yargs
                 .usage(USAGE_PREFIX + ' release-cordova <appName> <platform> [options]')
                 .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
@@ -912,6 +920,8 @@ var argv = yargs
         'release-react',
         'Release a React Native update to an app deployment',
         (yargs: yargs.Argv) => {
+            isValidCommandCategory = true;
+            isValidCommand = true;
             yargs
                 .usage(USAGE_PREFIX + ' release-react <appName> <platform> [options]')
                 .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
@@ -1078,6 +1088,8 @@ var argv = yargs
         'rollback',
         'Rollback the latest release for an app deployment',
         (yargs: yargs.Argv) => {
+            isValidCommandCategory = true;
+            isValidCommand = true;
             yargs
                 .usage(USAGE_PREFIX + ' rollback <appName> <deploymentName> [options]')
                 .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
