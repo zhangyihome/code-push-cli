@@ -128,7 +128,8 @@ function addCommonConfiguration(yargs: yargs.Argv): void {
     yargs
         .wrap(/*columnLimit*/ null)
         .string('_') // Interpret non-hyphenated arguments as strings (e.g. an app version of '1.10').
-        .strict() // Validate hyphenated (named) arguments.
+        // TODO: fix this
+        // .strict() // Validate hyphenated (named) arguments.
         .fail((msg: string) => showHelp()); // Suppress the default error message.
 }
 
@@ -1116,7 +1117,8 @@ var argv = yargs
     .alias('v', 'version')
     .version(packageJson.version)
     .wrap(/*columnLimit*/ null)
-    .strict() // Validate hyphenated (named) arguments.
+    // TODO: fix this
+    // .strict() // Validate hyphenated (named) arguments.
     .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommandCategory) // Report unrecognized, non-hyphenated command category.
     .fail((msg: string) => showHelp(/*showRootDescription*/ true))
     .parseSync(); // Suppress the default error message.
