@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.5.0](https://github.com/shm-open/code-push-cli/compare/v2.4.0...v2.5.0) (2021-08-20)
+
+
+### Features
+
+* add getiOSHermesEnabled function ([7075ff7](https://github.com/shm-open/code-push-cli/commit/7075ff735c41feec20c1ebf4b4b86df97d665749))
+* ios hermes sourcemap ([3c092c6](https://github.com/shm-open/code-push-cli/commit/3c092c617ab48e938ac3acf818e7549600c71d58))
+
+
+### Bug Fixes
+
+* **deps:** update backslash to v0.2.0 ([b80f00f](https://github.com/shm-open/code-push-cli/commit/b80f00f49aded6f0a16e384c669259c79ffcff7f))
+* **deps:** update dependency code-push to v2.0.7 ([05cae4f](https://github.com/shm-open/code-push-cli/commit/05cae4f4505277a06a79576a4a17dda90be453d0))
+* **deps:** update email-validator to v2.0.4 ([e670a13](https://github.com/shm-open/code-push-cli/commit/e670a136dc0f6dffe2efe43944437ac0098916c1))
+* **deps:** update parse-duration to v1 ([47a5a31](https://github.com/shm-open/code-push-cli/commit/47a5a318457e3b9faa19b4aca6911dc8961e9df2))
+* **deps:** update simctl to v2.0.0 ([a1cca6a](https://github.com/shm-open/code-push-cli/commit/a1cca6a18fba568e6b502f42b64d103dbc2a22c4))
+* **deps:** update slash to 3.0.0 and use package types for slash, yargs ([b563337](https://github.com/shm-open/code-push-cli/commit/b563337e232d7d1b82d663c4c32eac78c6bd5436))
+* **deps:** update update-notifier to v5 ([6bb35bf](https://github.com/shm-open/code-push-cli/commit/6bb35bf1e5567b950eb2fc298e134db14b611042))
+* **deps:** update which to v2.0.2 ([835ada9](https://github.com/shm-open/code-push-cli/commit/835ada97ca9707f33831ab2d36c41d0c3f1382c0))
+* **deps:** update yargs to v17 ([e17779d](https://github.com/shm-open/code-push-cli/commit/e17779d75fcc3869e3ac7459e362ca19378850b7))
+
 ## [2.4.0](https://github.com/shm-open/code-push-cli/compare/v2.3.4...v2.4.0) (2021-04-02)
 
 
