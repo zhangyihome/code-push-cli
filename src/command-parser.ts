@@ -2,8 +2,9 @@
 import * as cli from './definitions/cli';
 import chalk from 'chalk';
 import updateNotifier from 'update-notifier';
+import parseDuration from 'parse-duration';
+
 import backslash = require('backslash');
-import parseDuration = require('parse-duration');
 
 var packageJson = require('../package.json');
 const ROLLOUT_PERCENTAGE_REGEX: RegExp = /^(100|[1-9][0-9]|[1-9])%?$/;
