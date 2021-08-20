@@ -6,26 +6,26 @@
 let debug: boolean = false;
 
 export function isDebug(): boolean {
-  return debug;
+    return debug;
 }
 export function setDebug(): void {
-  debug = true;
+    debug = true;
 }
 
 let quiet: boolean = false;
 
 export function isQuiet() {
-  return quiet;
+    return quiet;
 }
 export function setQuiet(): void {
-  quiet = true;
+    quiet = true;
 }
 
-let format: "list" | "json" | "csv" = "list";
+let format: 'list' | 'json' | 'csv' = 'list';
 
 // Can be used to prevent output which will make output un-parsable
 export function formatIsParsingCompatible(): boolean {
-  return format === "json" || format === "csv";
+    return format === 'json' || format === 'csv';
 }
 
 // Key is a string to be passed to "--output" parameter, e.g. "json"
@@ -33,19 +33,19 @@ export function formatIsParsingCompatible(): boolean {
 export type OutputFormatSupport = { [formatKey: string]: () => void };
 
 export function formatIsJson(): boolean {
-  return format === "json";
+    return format === 'json';
 }
 export function setFormatJson(): void {
-  format = "json";
+    format = 'json';
 }
 
 export function supportsCsv(supportedFormats: OutputFormatSupport): void {
-  supportedFormats["csv"] = setFormatCsv;
+    supportedFormats['csv'] = setFormatCsv;
 }
 
 export function formatIsCsv(): boolean {
-  return format === "csv";
+    return format === 'csv';
 }
 export function setFormatCsv(): void {
-  format = "csv";
+    format = 'csv';
 }

@@ -16,8 +16,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 // This file has been changed from the original.
 
-declare module "yargs" {
-
+declare module 'yargs' {
     module yargs {
         interface Argv {
             argv: any;
@@ -37,7 +36,7 @@ declare module "yargs" {
             demand(keys: string[], required?: boolean): Argv;
             demand(positionals: number, required?: boolean): Argv;
             demand(positionals: number, msg: string): Argv;
-            demand(count: number, max?: number, msg?: string): Argv;  // new from original
+            demand(count: number, max?: number, msg?: string): Argv; // new from original
 
             require(key: string, msg: string): Argv;
             require(key: string, required: boolean): Argv;
@@ -67,7 +66,7 @@ declare module "yargs" {
             usage(message: string, options?: { [key: string]: Options }): Argv;
             usage(options?: { [key: string]: Options }): Argv;
 
-            command(command: string, description: string, func?: (yargs: Argv) => any): Argv;  // changed from original
+            command(command: string, description: string, func?: (yargs: Argv) => any): Argv; // changed from original
 
             example(command: string, description: string): Argv;
 
@@ -95,7 +94,7 @@ declare module "yargs" {
 
             showHelp(func?: (message: string) => any): Argv;
 
-            terminalWidth(): number;  // new from original
+            terminalWidth(): number; // new from original
 
             /* Undocumented */
 
@@ -108,7 +107,7 @@ declare module "yargs" {
             count(key: string): Argv;
             count(keys: string[]): Argv;
 
-            fail(func: (msg: string) => any): Argv;  // changed from original
+            fail(func: (msg: string) => any): Argv; // changed from original
         }
 
         interface Options {

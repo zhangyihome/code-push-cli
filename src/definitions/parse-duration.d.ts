@@ -1,4 +1,4 @@
-declare module "parse-duration" {
+declare module 'parse-duration' {
     function parseDuration(duration: string): number;
 
     export = parseDuration;

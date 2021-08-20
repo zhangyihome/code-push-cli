@@ -1,226 +1,226 @@
-﻿import AccountManager = require("code-push");
+﻿import AccountManager = require('code-push');
 
 export enum CommandType {
-  accessKeyAdd,
-  accessKeyPatch,
-  accessKeyList,
-  accessKeyRemove,
-  appAdd,
-  appList,
-  appRemove,
-  appRename,
-  appTransfer,
-  collaboratorAdd,
-  collaboratorList,
-  collaboratorRemove,
-  debug,
-  deploymentAdd,
-  deploymentHistory,
-  deploymentHistoryClear,
-  deploymentList,
-  deploymentMetrics,
-  deploymentRemove,
-  deploymentRename,
-  link,
-  login,
-  logout,
-  patch,
-  promote,
-  register,
-  release,
-  releaseCordova,
-  releaseReact,
-  rollback,
-  whoami,
+    accessKeyAdd,
+    accessKeyPatch,
+    accessKeyList,
+    accessKeyRemove,
+    appAdd,
+    appList,
+    appRemove,
+    appRename,
+    appTransfer,
+    collaboratorAdd,
+    collaboratorList,
+    collaboratorRemove,
+    debug,
+    deploymentAdd,
+    deploymentHistory,
+    deploymentHistoryClear,
+    deploymentList,
+    deploymentMetrics,
+    deploymentRemove,
+    deploymentRename,
+    link,
+    login,
+    logout,
+    patch,
+    promote,
+    register,
+    release,
+    releaseCordova,
+    releaseReact,
+    rollback,
+    whoami,
 }
 
 export interface ICommand {
-  type: CommandType;
+    type: CommandType;
 }
 
 export interface IAccessKeyAddCommand extends ICommand {
-  name: string;
-  ttl?: number;
+    name: string;
+    ttl?: number;
 }
 
 export interface IAccessKeyPatchCommand extends ICommand {
-  newName?: string;
-  oldName: string;
-  ttl?: number;
+    newName?: string;
+    oldName: string;
+    ttl?: number;
 }
 
 export interface IAccessKeyListCommand extends ICommand {
-  format: string;
+    format: string;
 }
 
 export interface IAccessKeyRemoveCommand extends ICommand {
-  accessKey: string;
+    accessKey: string;
 }
 
 export interface IAppAddCommand extends ICommand {
-  appName: string;
-  os: string;
-  platform: string;
+    appName: string;
+    os: string;
+    platform: string;
 }
 
 export interface IAppListCommand extends ICommand {
-  format: string;
+    format: string;
 }
 
 export interface IAppRemoveCommand extends ICommand {
-  appName: string;
+    appName: string;
 }
 
 export interface IAppRenameCommand extends ICommand {
-  currentAppName: string;
-  newAppName: string;
+    currentAppName: string;
+    newAppName: string;
 }
 
 export interface IAppTransferCommand extends ICommand {
-  appName: string;
-  email: string;
+    appName: string;
+    email: string;
 }
 
 export interface ICollaboratorAddCommand extends ICommand {
-  appName: string;
-  email: string;
+    appName: string;
+    email: string;
 }
 
 export interface ICollaboratorListCommand extends ICommand {
-  appName: string;
-  format: string;
+    appName: string;
+    format: string;
 }
 
 export interface ICollaboratorRemoveCommand extends ICommand {
-  appName: string;
-  email: string;
+    appName: string;
+    email: string;
 }
 
 export interface IDebugCommand extends ICommand {
-  platform: string;
+    platform: string;
 }
 
 export interface IDeploymentAddCommand extends ICommand {
-  appName: string;
-  deploymentName: string;
-  default: boolean;
+    appName: string;
+    deploymentName: string;
+    default: boolean;
 }
 
 export interface IDeploymentHistoryClearCommand extends ICommand {
-  appName: string;
-  deploymentName: string;
+    appName: string;
+    deploymentName: string;
 }
 
 export interface IDeploymentHistoryCommand extends ICommand {
-  appName: string;
-  deploymentName: string;
-  format: string;
-  displayAuthor: boolean;
+    appName: string;
+    deploymentName: string;
+    format: string;
+    displayAuthor: boolean;
 }
 
 export interface IDeploymentListCommand extends ICommand {
-  appName: string;
-  format: string;
-  displayKeys: boolean;
+    appName: string;
+    format: string;
+    displayKeys: boolean;
 }
 
 export interface IDeploymentRemoveCommand extends ICommand {
-  appName: string;
-  deploymentName: string;
+    appName: string;
+    deploymentName: string;
 }
 
 export interface IDeploymentRenameCommand extends ICommand {
-  appName: string;
-  currentDeploymentName: string;
-  newDeploymentName: string;
+    appName: string;
+    currentDeploymentName: string;
+    newDeploymentName: string;
 }
 
 export interface ILinkCommand extends ICommand {
-  serverUrl?: string;
+    serverUrl?: string;
 }
 
 export interface ILoginCommand extends ICommand {
-  serverUrl?: string;
-  accessKey: string;
-  proxy?: string;
-  noProxy?: boolean;
+    serverUrl?: string;
+    accessKey: string;
+    proxy?: string;
+    noProxy?: boolean;
 }
 
 export interface IPackageInfo {
-  description?: string;
-  label?: string;
-  disabled?: boolean;
-  mandatory?: boolean;
-  rollout?: number;
+    description?: string;
+    label?: string;
+    disabled?: boolean;
+    mandatory?: boolean;
+    rollout?: number;
 }
 
 export interface IPatchCommand extends ICommand, IPackageInfo {
-  appName: string;
-  appStoreVersion?: string;
-  deploymentName: string;
-  label: string;
+    appName: string;
+    appStoreVersion?: string;
+    deploymentName: string;
+    label: string;
 }
 
 export interface IPromoteCommand extends ICommand, IPackageInfo {
-  appName: string;
-  appStoreVersion?: string;
-  sourceDeploymentName: string;
-  destDeploymentName: string;
-  noDuplicateReleaseError?: boolean;
+    appName: string;
+    appStoreVersion?: string;
+    sourceDeploymentName: string;
+    destDeploymentName: string;
+    noDuplicateReleaseError?: boolean;
 }
 
 export interface IRegisterCommand extends ICommand {
-  serverUrl?: string;
-  proxy?: string;
-  noProxy?: boolean;
+    serverUrl?: string;
+    proxy?: string;
+    noProxy?: boolean;
 }
 
 export interface IReleaseBaseCommand extends ICommand, IPackageInfo {
-  appName: string;
-  appStoreVersion: string;
-  deploymentName: string;
-  noDuplicateReleaseError?: boolean;
-  privateKeyPath?: string;
+    appName: string;
+    appStoreVersion: string;
+    deploymentName: string;
+    noDuplicateReleaseError?: boolean;
+    privateKeyPath?: string;
 }
 
 export interface IReleaseCommand extends IReleaseBaseCommand {
-  package: string;
+    package: string;
 }
 
 export interface IReleaseCordovaCommand extends IReleaseBaseCommand {
-  build: boolean;
-  platform: string;
-  isReleaseBuildType?: boolean;
+    build: boolean;
+    platform: string;
+    isReleaseBuildType?: boolean;
 }
 
 export interface IReleaseReactCommand extends IReleaseBaseCommand {
-  bundleName?: string;
-  development?: boolean;
-  entryFile?: string;
-  gradleFile?: string;
-  podFile?: string;
-  platform: string;
-  plistFile?: string;
-  plistFilePrefix?: string;
-  sourcemapOutput?: string;
-  sourcemapOutputDir?: string;
-  outputDir?: string;
-  config?: string;
+    bundleName?: string;
+    development?: boolean;
+    entryFile?: string;
+    gradleFile?: string;
+    podFile?: string;
+    platform: string;
+    plistFile?: string;
+    plistFilePrefix?: string;
+    sourcemapOutput?: string;
+    sourcemapOutputDir?: string;
+    outputDir?: string;
+    config?: string;
 }
 
 export interface IRollbackCommand extends ICommand {
-  appName: string;
-  deploymentName: string;
-  targetRelease: string;
+    appName: string;
+    deploymentName: string;
+    targetRelease: string;
 }
 
 export type ReleaseHook = (
-  currentCommand: IReleaseCommand,
-  originalCommand: IReleaseCommand,
-  sdk: AccountManager
+    currentCommand: IReleaseCommand,
+    originalCommand: IReleaseCommand,
+    sdk: AccountManager,
 ) => Promise<IReleaseCommand | void>;
 
 export interface ReleaseFile {
-  sourceLocation: string; // The current location of the file on disk
-  targetLocation: string; // The desired location of the file within the zip
+    sourceLocation: string; // The current location of the file on disk
+    targetLocation: string; // The desired location of the file within the zip
 }

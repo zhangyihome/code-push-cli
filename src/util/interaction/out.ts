@@ -1,7 +1,7 @@
 // Functions to support outputting stuff to the user
-import { formatIsJson, formatIsCsv } from "./io-options";
+import { formatIsJson, formatIsCsv } from './io-options';
 
-const Table = require("cli-table3");
+const Table = require('cli-table3');
 
 //
 // Output a line of plain text. Only outputs if the format is regular text.
@@ -10,24 +10,24 @@ const Table = require("cli-table3");
 export function text<T>(converter: { (data: T): string }, data: T): void;
 export function text(t: string): void;
 export function text(...args: any[]): void {
-  console.assert(!formatIsCsv(), "this function doesn't support CSV mode");
-  let converter: { (data: any): string };
-  let data: any;
-  if (args.length === 1) {
-    converter = null;
-    data = args[0];
-  } else {
-    [converter, data] = args;
-  }
-
-  if (formatIsJson()) {
-    if (converter) {
-      console.log(JSON.stringify(data));
+    console.assert(!formatIsCsv(), "this function doesn't support CSV mode");
+    let converter: { (data: any): string };
+    let data: any;
+    if (args.length === 1) {
+        converter = null;
+        data = args[0];
+    } else {
+        [converter, data] = args;
     }
-  } else {
-    converter = converter || ((s) => s);
-    console.log(converter(data));
-  }
+
+    if (formatIsJson()) {
+        if (converter) {
+            console.log(JSON.stringify(data));
+        }
+    } else {
+        converter = converter || ((s) => s);
+        console.log(converter(data));
+    }
 }
 
 //
@@ -38,28 +38,28 @@ export function text(...args: any[]): void {
 // on the module.
 //
 export function table(options: any, data: any[]): void {
-  console.assert(!formatIsCsv(), "this function doesn't support CSV mode");
+    console.assert(!formatIsCsv(), "this function doesn't support CSV mode");
 
-  if (!data) {
-    data = options;
-    options = undefined;
-  }
+    if (!data) {
+        data = options;
+        options = undefined;
+    }
 
-  if (!formatIsJson()) {
-    const cliTable = new Table(options);
-    data.forEach((item) => cliTable.push(item));
-    console.log(cliTable.toString());
-  } else {
-    console.log(JSON.stringify(data));
-  }
+    if (!formatIsJson()) {
+        const cliTable = new Table(options);
+        data.forEach((item) => cliTable.push(item));
+        console.log(cliTable.toString());
+    } else {
+        console.log(JSON.stringify(data));
+    }
 }
 
 // Formatting helper for cli-table3 - default command output table style
 export function getCommandOutputTableOptions(header: string[]): object {
-  return {
-    head: header,
-    style: {
-      head: [],
-    },
-  };
+    return {
+        head: header,
+        style: {
+            head: [],
+        },
+    };
 }

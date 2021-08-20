@@ -1,5 +1,5 @@
-import { ReleaseHook } from "../definitions/cli";
+import { ReleaseHook } from '../definitions/cli';
 
-var hooks: ReleaseHook[] = [require("./signing"), require("./core-release")];
+var hooks: ReleaseHook[] = [require('./signing'), require('./core-release')];
 
 export default hooks;

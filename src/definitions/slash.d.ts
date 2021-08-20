@@ -1,4 +1,4 @@
-declare module "slash" {
+declare module 'slash' {
     function slash(str: string): string;
     export = slash;
 }

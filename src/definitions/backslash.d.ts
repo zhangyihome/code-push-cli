@@ -1,4 +1,4 @@
-declare module "backslash" {
+declare module 'backslash' {
     function backslash(str: string): string;
 
     export = backslash;
