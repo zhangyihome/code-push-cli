@@ -5,7 +5,7 @@
   "main": "bin/cli.js",
   "scripts": {
     "start": "tsc --watch",
-    "build": "tsc",
+    "build": "rm -rf bin && tsc",
     "release": "npm test && npm run build && standard-version && git push --follow-tags origin master && npm publish",
     "test": "echo 'no tests'"
   },
