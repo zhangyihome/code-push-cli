@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.5.4](https://github.com/shm-open/code-push-cli/compare/v2.5.3...v2.5.4) (2022-01-28)
+
+
+### Bug Fixes
+
+* **deps:** update dependency cli-table3 to v0.6.1 ([f03fd02](https://github.com/shm-open/code-push-cli/commit/f03fd025738a1adb76365daa2c5bddbcbbd111ec))
+* **deps:** update dependency prompt to v1.2.1 ([da7fc80](https://github.com/shm-open/code-push-cli/commit/da7fc8069e545f9c89855d5497f80b1421de655c))
+* **deps:** update dependency yargs to v17.3.1 ([678b6ef](https://github.com/shm-open/code-push-cli/commit/678b6effafb240d884feec8eb0321cea8733747e))
+* **deps:** update recursive-fs to v2 ([fd58c58](https://github.com/shm-open/code-push-cli/commit/fd58c5881dbda43210987bfe0228139ac2afa372))
+
 ### [2.5.3](https://github.com/shm-open/code-push-cli/compare/v2.5.2...v2.5.3) (2021-11-23)
 
 
