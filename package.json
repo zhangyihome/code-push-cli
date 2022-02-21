@@ -58,7 +58,7 @@
     "yazl": "2.5.1"
   },
   "devDependencies": {
-    "@shm-open/eslint-config-bundle": "1.8.1",
+    "@shm-open/eslint-config-bundle": "1.8.3",
     "@types/node": "16.11.9",
     "@types/semver": "7.3.9",
     "@types/which": "2.0.1",
