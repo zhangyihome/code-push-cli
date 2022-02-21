@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.5.5](https://github.com/shm-open/code-push-cli/compare/v2.5.4...v2.5.5) (2022-02-21)
+
+
+### Bug Fixes
+
+* **deps:** update dependency prompt to v1.2.2 ([8fa5562](https://github.com/shm-open/code-push-cli/commit/8fa5562fba0a4b9c08bfdfb083c5afba985b7faf))
+* **deps:** update dependency simctl to v2.0.3 ([e70b5e1](https://github.com/shm-open/code-push-cli/commit/e70b5e170b3c0040c41fda32a8db22d81bcb32b4))
+
 ### [2.5.4](https://github.com/shm-open/code-push-cli/compare/v2.5.3...v2.5.4) (2022-01-28)
 
 
