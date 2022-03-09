@@ -1,4 +1,5 @@
-# CodePush Management CLI
+# CodePush Management CLI ![Node.js CI](https://github.com/shm-open/code-push-cli/workflows/Node.js%20CI/badge.svg)
+
 
 [[Chinese version 中文版]](./README.cn.md)
 
