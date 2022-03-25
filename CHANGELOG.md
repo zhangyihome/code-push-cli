@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.5.6](https://github.com/shm-open/code-push-cli/compare/v2.5.5...v2.5.6) (2022-03-25)
+
+
+### Bug Fixes
+
+* **deps:** update dependency plist to v3.0.5 ([b5f56ce](https://github.com/shm-open/code-push-cli/commit/b5f56ce7ef48ecdd3ece1c9cb38fb912da6d0c56))
+* **deps:** update dependency yargs to v17.4.0 ([2bd8615](https://github.com/shm-open/code-push-cli/commit/2bd861545f2f3f100af663f5eceee1f4be959bf9))
+
 ### [2.5.5](https://github.com/shm-open/code-push-cli/compare/v2.5.4...v2.5.5) (2022-02-21)
 
 
