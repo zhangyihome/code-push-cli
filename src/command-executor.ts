@@ -1395,6 +1395,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
                     platform,
                     command.sourcemapOutput,
                     command.config,
+                    command.extraBundlerOptions,
                 ),
             )
             .then(() => {
@@ -1405,7 +1406,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
                                 bundleName,
                                 outputFolder,
                                 command.sourcemapOutput,
-                                [], // TODO: extra flags
+                                command.extraHermesFlags,
                             );
                         }
                     });
@@ -1416,7 +1417,7 @@ export var releaseReact = (command: cli.IReleaseReactCommand): Promise<void> => 
                                 bundleName,
                                 outputFolder,
                                 command.sourcemapOutput,
-                                [], // TODO: extra flags
+                                command.extraHermesFlags,
                             );
                         }
                     });
