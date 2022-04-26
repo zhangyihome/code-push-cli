@@ -1077,6 +1077,20 @@ var argv = yargs
                     description: 'Path to the React Native CLI configuration file',
                     type: 'string',
                 })
+                .option('extraBundlerOptions', {
+                    default: [],
+                    demand: false,
+                    description:
+                        'Option that gets passed to react-native bundler. Can be specified multiple times',
+                    type: 'array',
+                })
+                .option('extraHermesFlags', {
+                    default: [],
+                    demand: false,
+                    description:
+                        'Flag that gets passed to Hermes, JavaScript to bytecode compiler. Can be specified multiple times',
+                    type: 'array',
+                })
                 .check((argv: any, aliases: { [aliases: string]: string }): any => {
                     return checkValidReleaseOptions(argv);
                 });
@@ -1540,6 +1554,10 @@ function createCommand(): cli.ICommand {
                     releaseReactCommand.sourcemapOutputDir = argv['sourcemapOutputDir'] as string;
                     releaseReactCommand.outputDir = argv['outputDir'] as string;
                     releaseReactCommand.config = argv['config'] as string;
+                    releaseReactCommand.extraBundlerOptions = argv[
+                        'extraBundlerOptions'
+                    ] as string[];
+                    releaseReactCommand.extraHermesFlags = argv['extraHermesFlags'] as string[];
                 }
                 break;
 
