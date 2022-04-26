@@ -35,7 +35,7 @@
     "cli-table3": "0.6.2",
     "code-push": "2.0.7",
     "email-validator": "2.0.4",
-    "gradle-to-js": "2.0.0",
+    "gradle-to-js": "2.0.1",
     "jsonwebtoken": "8.5.1",
     "mkdirp": "1.0.4",
     "moment": "2.29.1",
