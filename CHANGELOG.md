@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.6.0](https://github.com/shm-open/code-push-cli/compare/v2.5.6...v2.6.0) (2022-04-26)
+
+
+### Features
+
+* add extraBundlerOptions and extraHermesFlags params ([6fda542](https://github.com/shm-open/code-push-cli/commit/6fda542eb604b1d32b7eb2b98a47d01ccf5bc86d))
+
+
+### Bug Fixes
+
+* **deps:** update dependency cli-table3 to v0.6.2 ([ef9212a](https://github.com/shm-open/code-push-cli/commit/ef9212aef5f1ab640353d03654d58eb882614f55))
+* **deps:** update dependency gradle-to-js to v2.0.1 ([f95df91](https://github.com/shm-open/code-push-cli/commit/f95df915fea1acb6bb0b1c9408df2099fb2045d7))
+* **deps:** update dependency moment to v2.29.3 ([9edf90f](https://github.com/shm-open/code-push-cli/commit/9edf90f0ebdb6b875ac13ad9593306882dc7c9a5))
+* **deps:** update dependency prompt to v1.3.0 ([2ad5642](https://github.com/shm-open/code-push-cli/commit/2ad56422eeabc71f0ceeae2f2ca99906c45e4485))
+* **deps:** update dependency semver to v7.3.7 ([eda9149](https://github.com/shm-open/code-push-cli/commit/eda91495e2e2d50870427c8a700af4b9e52ee84e))
+* **deps:** update dependency yargs to v17.4.1 ([451138b](https://github.com/shm-open/code-push-cli/commit/451138ba0c75de3f83e27382cf12ecf7752deb5e))
+
 ### [2.5.6](https://github.com/shm-open/code-push-cli/compare/v2.5.5...v2.5.6) (2022-03-25)
 
 
